@@ -27,10 +27,25 @@ import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
 import { Button } from "./ui/button";
 
-const menuItems = [
-  { icon: LayoutDashboard, label: "Page 1", path: "/" },
-  { icon: Users, label: "Page 2", path: "/some-path" },
-];
+const getMenuItems = (role: string) => {
+  const adminItems = [
+    { icon: LayoutDashboard, label: "Tableau de bord", path: "/dashboard/admin" },
+    { icon: Users, label: "Utilisateurs", path: "/dashboard/admin/users" },
+  ];
+  
+  const mentorItems = [
+    { icon: LayoutDashboard, label: "Tableau de bord", path: "/dashboard/mentor" },
+    { icon: Users, label: "Étudiants en attente", path: "/dashboard/mentor/pending" },
+  ];
+  
+  const studentItems = [
+    { icon: LayoutDashboard, label: "Tableau de bord", path: "/dashboard/student" },
+  ];
+  
+  if (role === 'admin') return adminItems;
+  if (role === 'mentor') return mentorItems;
+  return studentItems;
+};
 
 const SIDEBAR_WIDTH_KEY = "sidebar-width";
 const DEFAULT_WIDTH = 280;
@@ -112,6 +127,7 @@ function DashboardLayoutContent({
   const isCollapsed = state === "collapsed";
   const [isResizing, setIsResizing] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
+  const menuItems = getMenuItems(user?.role || 'student');
   const activeMenuItem = menuItems.find(item => item.path === location);
   const isMobile = useIsMobile();
 

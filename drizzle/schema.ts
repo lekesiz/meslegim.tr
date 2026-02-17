@@ -1,22 +1,23 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
+import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, json, boolean } from "drizzle-orm/mysql-core";
 
 /**
  * Core user table backing auth flow.
- * Extend this file with additional tables as your product grows.
- * Columns use camelCase to match both database fields and generated types.
+ * Extended with role-based fields for the Meslegim.tr platform.
  */
 export const users = mysqlTable("users", {
-  /**
-   * Surrogate primary key. Auto-incremented numeric value managed by the database.
-   * Use this for relations between tables.
-   */
   id: int("id").autoincrement().primaryKey(),
-  /** Manus OAuth identifier (openId) returned from the OAuth callback. Unique per user. */
   openId: varchar("openId", { length: 64 }).notNull().unique(),
   name: text("name"),
   email: varchar("email", { length: 320 }),
+  phone: varchar("phone", { length: 20 }),
+  tcKimlik: varchar("tcKimlik", { length: 11 }),
   loginMethod: varchar("loginMethod", { length: 64 }),
-  role: mysqlEnum("role", ["user", "admin"]).default("user").notNull(),
+  role: mysqlEnum("role", ["student", "mentor", "admin"]).default("student").notNull(),
+  status: mysqlEnum("status", ["pending", "active", "inactive"]).default("pending").notNull(),
+  ageGroup: mysqlEnum("ageGroup", ["14-17", "18-21", "22-24"]),
+  mentorId: int("mentorId"),
+  kvkkConsent: boolean("kvkkConsent").default(false).notNull(),
+  kvkkConsentDate: timestamp("kvkkConsentDate"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
@@ -25,4 +26,88 @@ export const users = mysqlTable("users", {
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 
-// TODO: Add your tables here
+/**
+ * Stages (étapes) table - defines evaluation stages for each age group
+ */
+export const stages = mysqlTable("stages", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description"),
+  ageGroup: mysqlEnum("ageGroup", ["14-17", "18-21", "22-24"]).notNull(),
+  order: int("order").notNull(), // 1, 2, 3, etc.
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Stage = typeof stages.$inferSelect;
+export type InsertStage = typeof stages.$inferInsert;
+
+/**
+ * Questions table - stores questions for each stage
+ */
+export const questions = mysqlTable("questions", {
+  id: int("id").autoincrement().primaryKey(),
+  stageId: int("stageId").notNull(),
+  text: text("text").notNull(),
+  type: mysqlEnum("type", ["multiple_choice", "likert", "ranking", "text"]).notNull(),
+  options: json("options"), // JSON array of options for multiple_choice, likert, ranking
+  required: boolean("required").default(true).notNull(),
+  order: int("order").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Question = typeof questions.$inferSelect;
+export type InsertQuestion = typeof questions.$inferInsert;
+
+/**
+ * Answers table - stores student answers to questions
+ */
+export const answers = mysqlTable("answers", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  questionId: int("questionId").notNull(),
+  answer: text("answer").notNull(), // JSON string or plain text depending on question type
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Answer = typeof answers.$inferSelect;
+export type InsertAnswer = typeof answers.$inferInsert;
+
+/**
+ * User stages table - tracks student progress through stages
+ */
+export const userStages = mysqlTable("user_stages", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  stageId: int("stageId").notNull(),
+  status: mysqlEnum("status", ["locked", "active", "completed"]).default("locked").notNull(),
+  unlockedAt: timestamp("unlockedAt"),
+  completedAt: timestamp("completedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type UserStage = typeof userStages.$inferSelect;
+export type InsertUserStage = typeof userStages.$inferInsert;
+
+/**
+ * Reports table - stores generated PDF reports
+ */
+export const reports = mysqlTable("reports", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  stageId: int("stageId"), // NULL for final report
+  type: mysqlEnum("type", ["stage", "final"]).notNull(),
+  fileUrl: varchar("fileUrl", { length: 500 }),
+  fileKey: varchar("fileKey", { length: 500 }),
+  status: mysqlEnum("status", ["pending_approval", "approved"]).default("pending_approval").notNull(),
+  approvedBy: int("approvedBy"), // mentor ID who approved
+  approvedAt: timestamp("approvedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Report = typeof reports.$inferSelect;
+export type InsertReport = typeof reports.$inferInsert;

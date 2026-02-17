@@ -1,6 +1,6 @@
-import { eq } from "drizzle-orm";
+import { eq, and, or } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users } from "../drizzle/schema";
+import { InsertUser, users, stages, questions, answers, userStages, reports } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -35,7 +35,7 @@ export async function upsertUser(user: InsertUser): Promise<void> {
     };
     const updateSet: Record<string, unknown> = {};
 
-    const textFields = ["name", "email", "loginMethod"] as const;
+    const textFields = ["name", "email", "loginMethod", "phone", "tcKimlik"] as const;
     type TextField = (typeof textFields)[number];
 
     const assignNullable = (field: TextField) => {
@@ -52,12 +52,38 @@ export async function upsertUser(user: InsertUser): Promise<void> {
       values.lastSignedIn = user.lastSignedIn;
       updateSet.lastSignedIn = user.lastSignedIn;
     }
-    if (user.role !== undefined) {
-      values.role = user.role;
-      updateSet.role = user.role;
-    } else if (user.openId === ENV.ownerOpenId) {
+    
+    // Set role - admin if owner, otherwise use provided role or default to student
+    if (user.openId === ENV.ownerOpenId) {
       values.role = 'admin';
       updateSet.role = 'admin';
+      values.status = 'active'; // Admin is always active
+      updateSet.status = 'active';
+    } else if (user.role !== undefined) {
+      values.role = user.role;
+      updateSet.role = user.role;
+    }
+
+    // Handle other fields
+    if (user.status !== undefined) {
+      values.status = user.status;
+      updateSet.status = user.status;
+    }
+    if (user.ageGroup !== undefined) {
+      values.ageGroup = user.ageGroup;
+      updateSet.ageGroup = user.ageGroup;
+    }
+    if (user.mentorId !== undefined) {
+      values.mentorId = user.mentorId;
+      updateSet.mentorId = user.mentorId;
+    }
+    if (user.kvkkConsent !== undefined) {
+      values.kvkkConsent = user.kvkkConsent;
+      updateSet.kvkkConsent = user.kvkkConsent;
+    }
+    if (user.kvkkConsentDate !== undefined) {
+      values.kvkkConsentDate = user.kvkkConsentDate;
+      updateSet.kvkkConsentDate = user.kvkkConsentDate;
     }
 
     if (!values.lastSignedIn) {
@@ -89,4 +115,163 @@ export async function getUserByOpenId(openId: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
-// TODO: add feature queries here as your schema grows.
+export async function getUserById(id: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db.select().from(users).where(eq(users.id, id)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+// Admin functions
+export async function getAllUsers() {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(users);
+}
+
+export async function updateUser(id: number, data: Partial<InsertUser>) {
+  const db = await getDb();
+  if (!db) return;
+  await db.update(users).set(data).where(eq(users.id, id));
+}
+
+// Mentor functions
+export async function getPendingStudents(mentorId?: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const conditions = [eq(users.status, 'pending'), eq(users.role, 'student')];
+  if (mentorId) {
+    conditions.push(eq(users.mentorId, mentorId));
+  }
+  
+  return await db.select().from(users).where(and(...conditions));
+}
+
+export async function getStudentsByMentor(mentorId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(users).where(
+    and(eq(users.mentorId, mentorId), eq(users.role, 'student'))
+  );
+}
+
+// Stage functions
+export async function getStagesByAgeGroup(ageGroup: string) {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(stages).where(eq(stages.ageGroup, ageGroup as any));
+}
+
+export async function getAllStages() {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(stages);
+}
+
+// Question functions
+export async function getQuestionsByStage(stageId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(questions).where(eq(questions.stageId, stageId));
+}
+
+// User stage functions
+export async function getUserStages(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(userStages).where(eq(userStages.userId, userId));
+}
+
+export async function getActiveStage(userId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  
+  const result = await db.select().from(userStages).where(
+    and(eq(userStages.userId, userId), eq(userStages.status, 'active'))
+  ).limit(1);
+  
+  return result.length > 0 ? result[0] : undefined;
+}
+
+// Answer functions
+export async function saveAnswer(userId: number, questionId: number, answer: string) {
+  const db = await getDb();
+  if (!db) return;
+  
+  // Check if answer exists
+  const existing = await db.select().from(answers).where(
+    and(eq(answers.userId, userId), eq(answers.questionId, questionId))
+  ).limit(1);
+  
+  if (existing.length > 0) {
+    // Update existing answer
+    await db.update(answers).set({ answer }).where(
+      and(eq(answers.userId, userId), eq(answers.questionId, questionId))
+    );
+  } else {
+    // Insert new answer
+    await db.insert(answers).values({ userId, questionId, answer });
+  }
+}
+
+export async function getAnswersByUserAndStage(userId: number, stageId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  // Get all questions for this stage
+  const stageQuestions = await getQuestionsByStage(stageId);
+  const questionIds = stageQuestions.map(q => q.id);
+  
+  if (questionIds.length === 0) return [];
+  
+  return await db.select().from(answers).where(
+    and(
+      eq(answers.userId, userId),
+      or(...questionIds.map(id => eq(answers.questionId, id)))
+    )
+  );
+}
+
+// Report functions
+export async function createReport(data: typeof reports.$inferInsert) {
+  const db = await getDb();
+  if (!db) return;
+  await db.insert(reports).values(data);
+}
+
+export async function getReportsByUser(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(reports).where(eq(reports.userId, userId));
+}
+
+export async function getPendingReports(mentorId?: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  // Get reports that are pending approval
+  const pendingReports = await db.select().from(reports).where(
+    eq(reports.status, 'pending_approval')
+  );
+  
+  // If mentorId is provided, filter by students assigned to this mentor
+  if (mentorId) {
+    const mentorStudents = await getStudentsByMentor(mentorId);
+    const studentIds = mentorStudents.map(s => s.id);
+    return pendingReports.filter(r => studentIds.includes(r.userId));
+  }
+  
+  return pendingReports;
+}
+
+export async function approveReport(reportId: number, mentorId: number) {
+  const db = await getDb();
+  if (!db) return;
+  await db.update(reports).set({
+    status: 'approved',
+    approvedBy: mentorId,
+    approvedAt: new Date()
+  }).where(eq(reports.id, reportId));
+}
