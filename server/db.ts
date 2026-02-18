@@ -123,6 +123,36 @@ export async function getUserById(id: number) {
   return result.length > 0 ? result[0] : undefined;
 }
 
+export async function getUserByEmail(email: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db.select().from(users).where(eq(users.email, email)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function createUser(data: Omit<InsertUser, 'openId'> & { openId?: string }) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  // Generate a temporary openId if not provided (for registration without OAuth)
+  const openId = data.openId || `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+  const result = await db.insert(users).values({
+    ...data,
+    openId,
+    kvkkConsent: true,
+    kvkkConsentDate: new Date(),
+    lastSignedIn: new Date(),
+  });
+  
+  // Return the created user
+  const userId = result[0].insertId;
+  const user = await getUserById(userId);
+  if (!user) throw new Error("Failed to create user");
+  return user;
+}
+
 // Admin functions
 export async function getAllUsers() {
   const db = await getDb();

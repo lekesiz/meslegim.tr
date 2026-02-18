@@ -41,6 +41,34 @@ export const appRouter = router({
       ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
       return { success: true } as const;
     }),
+    register: publicProcedure
+      .input(z.object({
+        name: z.string().min(1),
+        email: z.string().email(),
+        phone: z.string().min(10),
+        tcKimlik: z.string().length(11),
+        ageGroup: z.enum(['14-17', '18-21', '22-24']),
+      }))
+      .mutation(async ({ input }) => {
+        // Check if user already exists
+        const existingUser = await db.getUserByEmail(input.email);
+        if (existingUser) {
+          throw new TRPCError({ code: 'CONFLICT', message: 'Bu e-posta adresi zaten kayıtlı' });
+        }
+        
+        // Create new student with pending status
+        const newUser = await db.createUser({
+          name: input.name,
+          email: input.email,
+          phone: input.phone,
+          tcKimlik: input.tcKimlik,
+          ageGroup: input.ageGroup,
+          role: 'student',
+          status: 'pending',
+        });
+        
+        return { success: true, userId: newUser.id };
+      }),
   }),
 
   // Admin procedures

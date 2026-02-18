@@ -18,7 +18,7 @@
 - [ ] Ajouter champs TC Kimlik, téléphone
 - [x] Créer middleware d'autorisation par rôle dans `server/routers.ts`
 - [ ] Créer `protectedProcedure` pour chaque rôle (studentProcedure, mentorProcedure, adminProcedure)
-- [ ] Implémenter le formulaire d'inscription avec consentement KVKK
+- [x] Implémenter le formulaire d'inscription avec consentement KVKK
 
 ## Phase 3: Panneau Super Admin
 - [x] Créer page `/dashboard/admin` avec DashboardLayout
@@ -121,3 +121,34 @@
 - **Statuts rapports:** `pending_approval` (en attente d'approbation mentor), `approved` (approuvé)
 - **Délai activation:** Exactement 7 jours (604800000 ms) après complétion de l'étape précédente
 - **Groupes d'âge:** `14-17`, `18-21`, `22-24` (enum strict)
+
+
+## 🔴 Test Raporundan Gelen Kritik Görevler (17 Şubat 2026)
+
+### P0 - Blocker (Hemen)
+- [x] Ana sayfa render sorununu çöz (CSS/React hydration)
+- [x] Ana sayfa test et ve doğrula
+
+### P1 - High Priority (1-2 Gün)
+- [ ] E-posta bildirim sistemi kur (Nodemailer)
+- [ ] E-posta şablonları oluştur (Welcome, Stage Complete, Report Ready)
+- [ ] SMTP konfigürasyonu yap
+- [ ] Otomatik etap aktivasyonu sistemi kur (Cron job)
+- [ ] 7 gün kontrolü implement et
+- [ ] Manuel unlock API endpoint ekle (admin için)
+
+### P2 - Medium Priority (1 Hafta)
+- [ ] Bundle size optimizasyonu (869 kB → 400 kB)
+- [ ] Code-splitting ile lazy loading ekle
+- [ ] Tree-shaking optimizasyonu
+- [ ] Unit test coverage artır (%2 → %80)
+- [ ] Admin procedures testleri yaz
+- [ ] Student procedures testleri yaz
+- [ ] Report generator testleri yaz
+- [ ] Manus AI entegrasyonunu gerçek API ile test et
+
+### P3 - Low Priority (1 Ay)
+- [ ] Responsive design test (mobil/tablet)
+- [ ] Cross-browser test (Chrome, Firefox, Safari)
+- [ ] Accessibility audit (WCAG 2.1 AA)
+- [ ] Performance optimization (Lighthouse 90+)
