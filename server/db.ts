@@ -425,3 +425,12 @@ export async function getAllQuestions() {
   if (!db) return [];
   return await db.select().from(questions);
 }
+
+export async function updateReport(reportId: number, data: Partial<{ fileUrl: string; status: 'pending' | 'approved' | 'rejected'; content: string; mentorFeedback: string }>) {
+  const dbInstance = await getDb();
+  if (!dbInstance) throw new Error('Database not initialized');
+  await dbInstance
+    .update(reports)
+    .set(data)
+    .where(eq(reports.id, reportId));
+}

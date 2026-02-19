@@ -72,3 +72,10 @@
 - [ ] Etap aktivasyon email testi - otomatik etap aktivasyonu kontrolü
 - [x] Rapor onay email testi - mentor rapor onayı sonrası email - BAŞARILI (mikaillekesiz@gmail.com'a rapor onay email'i gönderildi ve alındı)
 - [x] Email template'lerini kontrol et - profesyonel görünüm - BAŞARILI (Tüm email'ler profesyonel HTML template ile formatlanmış)
+
+
+## 📄 PDF Export Görevleri (19 Şubat 2026)
+- [x] WeasyPrint ile markdown'ı PDF'e dönüştürme servisi oluştur - ÇALIŞIYOR- [x] PDF template tasarla (logo, header, footer, styling) - TAMAMLANDI- [x] PDF oluşturma endpoint'i ekle (generatePDF mutation) - TAMAMLANDI
+- [x] PDF'i S3'e yükleme entegrasyonu - TAMAMLANDI
+- [x] ReportView sayfasında PDF indirme butonunu aktif et - TAMAMLANDI
+- [x] PDF export testini yap - WeasyPrint test edildi ve çalışıyor
