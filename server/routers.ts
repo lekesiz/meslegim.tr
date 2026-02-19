@@ -332,6 +332,16 @@ export const appRouter = router({
     getMyReports: studentProcedure.query(async ({ ctx }) => {
       return await db.getReportsByUser(ctx.user.id);
     }),
+    
+    getReport: studentProcedure
+      .input(z.object({ reportId: z.number() }))
+      .query(async ({ input, ctx }) => {
+        const report = await db.getReportById(input.reportId);
+        if (!report || report.userId !== ctx.user.id) {
+          throw new TRPCError({ code: 'NOT_FOUND', message: 'Rapor bulunamadı' });
+        }
+        return report;
+      }),
   }),
 });
 

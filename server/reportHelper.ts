@@ -43,7 +43,8 @@ export async function generateStageReportAsync(userId: number, stageId: number) 
       userId,
       stageId,
       type: 'stage',
-      status: 'pending_approval',
+      content: reportContent,
+      status: 'pending',
       fileUrl,
       fileKey,
     });

@@ -179,10 +179,10 @@ export default function StudentDashboard() {
                       >
                         {report.status === 'approved' ? 'Onaylandı' : 'Beklemede'}
                       </Badge>
-                      {report.status === 'approved' && report.fileUrl && (
+                      {report.status === 'approved' && (
                         <Button
                           size="sm"
-                          onClick={() => window.open(report.fileUrl!, '_blank')}
+                          onClick={() => setLocation(`/reports/${report.id}`)}
                         >
                           Görüntüle
                         </Button>

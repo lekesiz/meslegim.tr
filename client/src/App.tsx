@@ -13,6 +13,7 @@ import MentorDashboard from "./pages/dashboard/MentorDashboard";
 import StudentDashboard from "./pages/dashboard/StudentDashboard";
 import StudentStageForm from "./pages/student/StageForm";
 import Login from "./pages/Login";
+import ReportView from "./pages/ReportView";
 
 function Router() {
   return (
@@ -29,6 +30,7 @@ function Router() {
       {/* Student routes */}
       <Route path="/dashboard/student" component={StudentDashboard} />
       <Route path="/dashboard/student/stage/:stageId" component={StudentStageForm} />
+      <Route path="/reports/:id" component={ReportView} />
       
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />

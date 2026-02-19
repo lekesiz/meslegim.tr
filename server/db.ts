@@ -277,13 +277,20 @@ export async function getReportsByUser(userId: number) {
   return await db.select().from(reports).where(eq(reports.userId, userId));
 }
 
+export async function getReportById(reportId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  const result = await db.select().from(reports).where(eq(reports.id, reportId)).limit(1);
+  return result[0] || null;
+}
+
 export async function getPendingReports(mentorId?: number) {
   const db = await getDb();
   if (!db) return [];
   
   // Get reports that are pending approval
   const pendingReports = await db.select().from(reports).where(
-    eq(reports.status, 'pending_approval')
+    eq(reports.status, 'pending')
   );
   
   // If mentorId is provided, filter by students assigned to this mentor

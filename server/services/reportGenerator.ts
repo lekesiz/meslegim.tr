@@ -44,8 +44,9 @@ export async function generateReport({ userId, stageId, type }: GenerateReportPa
     userId,
     stageId,
     type,
+    content: reportContent,
     fileUrl: pdfUrl,
-    status: "pending_approval",
+    status: "pending",
   });
 
   return {

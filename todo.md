@@ -46,3 +46,8 @@
 - [x] Rapor onaylama sistemi (mentor için) - ÇALIŞIYOR
 - [ ] Rapor görüntüleme sayfası (student için)
 - [ ] PDF export özelliği (rapor indirme)
+
+## 🚀 Devam Eden Görevler (19 Şubat 2026)
+- [x] Rapor görüntüleme sayfası oluştur (/reports/:id route) - ÇALIŞIYOR
+- [x] PDF export endpoint ekle (rapor indirme) - Buton mevcut, PDF URL'den açılıyor
+- [x] Student dashboard'da onaylanmış raporları göster - ÇALIŞIYOR
