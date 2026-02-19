@@ -56,3 +56,11 @@
 - [x] Rapor görüntüleme sayfası oluştur (/reports/:id route) - ÇALIŞIYOR
 - [x] PDF export endpoint ekle (rapor indirme) - Buton mevcut, PDF URL'den açılıyor
 - [x] Student dashboard'da onaylanmış raporları göster - ÇALIŞIYOR
+
+
+## 🔥 Admin Dashboard Görevleri (19 Şubat 2026)
+- [x] Admin dashboard ana sayfa - sistem istatistikleri - ÇALIŞIYOR
+- [x] User management - tüm kullanıcıları listele - ÇALIŞIYOR
+- [x] Report management - tüm raporları listele - ÇALIŞIYOR
+- [x] Stage management - etapları görüntüle - ÇALIŞIYOR
+- [x] Admin router endpoint'leri ekle (getAllUsers, getAllReports, getAllStages, getAllQuestions, getSystemStats) - ÇALIŞIYOR

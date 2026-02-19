@@ -405,3 +405,16 @@ export async function createUserStage(data: { userId: number; stageId: number; s
     .limit(1);
   return userStage;
 }
+
+
+export async function getAllReports() {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(reports);
+}
+
+export async function getAllQuestions() {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(questions);
+}

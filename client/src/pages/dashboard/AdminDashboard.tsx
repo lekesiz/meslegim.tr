@@ -19,12 +19,16 @@ export default function AdminDashboard() {
   const { user } = useAuth();
 
   const { data: users, isLoading: usersLoading } = trpc.admin.getUsers.useQuery();
+  const { data: reports, isLoading: reportsLoading } = trpc.admin.getAllReports.useQuery();
+  const { data: stages, isLoading: stagesLoading } = trpc.admin.getAllStages.useQuery();
+  const { data: questions, isLoading: questionsLoading } = trpc.admin.getAllQuestions.useQuery();
+  const { data: stats } = trpc.admin.getSystemStats.useQuery();
 
   if (!user) {
     return null;
   }
 
-  if (usersLoading) {
+  if (usersLoading || reportsLoading || stagesLoading || questionsLoading) {
     return (
       <DashboardLayout>
         <div className="flex items-center justify-center h-64">
@@ -114,11 +118,14 @@ export default function AdminDashboard() {
             <TabsTrigger value="mentors">
               Mentorlar ({mentors.length})
             </TabsTrigger>
-            <TabsTrigger value="questions">
-              Sorular
+            <TabsTrigger value="reports">
+              Raporlar ({reports?.length || 0})
             </TabsTrigger>
             <TabsTrigger value="stages">
-              Etaplar
+              Etaplar ({stages?.length || 0})
+            </TabsTrigger>
+            <TabsTrigger value="questions">
+              Sorular ({questions?.length || 0})
             </TabsTrigger>
           </TabsList>
 
@@ -238,27 +245,70 @@ export default function AdminDashboard() {
             </Card>
           </TabsContent>
 
-          {/* Questions Tab */}
-          <TabsContent value="questions">
+          {/* Reports Tab */}
+          <TabsContent value="reports">
             <Card>
               <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle>Soru Bankası</CardTitle>
-                    <CardDescription>
-                      Etaplardaki soruları görüntüleyin ve yönetin
-                    </CardDescription>
-                  </div>
-                  <Button>
-                    <FileQuestion className="mr-2 h-4 w-4" />
-                    Yeni Soru Ekle
-                  </Button>
-                </div>
+                <CardTitle>Rapor Listesi</CardTitle>
+                <CardDescription>
+                  Sistemdeki tüm raporları görüntüleyin
+                </CardDescription>
               </CardHeader>
               <CardContent>
-                <p className="text-center text-muted-foreground py-8">
-                  Soru yönetimi yakında eklenecek...
-                </p>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>ID</TableHead>
+                      <TableHead>Kullanıcı ID</TableHead>
+                      <TableHead>Etap ID</TableHead>
+                      <TableHead>Tip</TableHead>
+                      <TableHead>Durum</TableHead>
+                      <TableHead>Oluşturulma</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {reports && reports.length > 0 ? (
+                      reports.map((report: any) => (
+                        <TableRow key={report.id}>
+                          <TableCell>{report.id}</TableCell>
+                          <TableCell>{report.userId}</TableCell>
+                          <TableCell>{report.stageId || '-'}</TableCell>
+                          <TableCell>
+                            <Badge variant="outline">
+                              {report.type === 'stage' ? 'Etap' : 'Final'}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <Badge
+                              variant={
+                                report.status === 'approved'
+                                  ? 'default'
+                                  : report.status === 'pending'
+                                  ? 'secondary'
+                                  : 'outline'
+                              }
+                            >
+                              {report.status === 'approved'
+                                ? 'Onaylandı'
+                                : report.status === 'pending'
+                                ? 'Beklemede'
+                                : 'Reddedildi'}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            {new Date(report.createdAt).toLocaleDateString('tr-TR')}
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    ) : (
+                      <TableRow>
+                        <TableCell colSpan={6} className="text-center text-muted-foreground">
+                          Henüz rapor bulunmamaktadır.
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
               </CardContent>
             </Card>
           </TabsContent>
@@ -267,23 +317,106 @@ export default function AdminDashboard() {
           <TabsContent value="stages">
             <Card>
               <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle>Etap Yönetimi</CardTitle>
-                    <CardDescription>
-                      Değerlendirme etaplarını görüntüleyin ve yönetin
-                    </CardDescription>
-                  </div>
-                  <Button>
-                    <Layers className="mr-2 h-4 w-4" />
-                    Yeni Etap Ekle
-                  </Button>
-                </div>
+                <CardTitle>Etap Listesi</CardTitle>
+                <CardDescription>
+                  Sistemdeki tüm etapları görüntüleyin
+                </CardDescription>
               </CardHeader>
               <CardContent>
-                <p className="text-center text-muted-foreground py-8">
-                  Etap yönetimi yakında eklenecek...
-                </p>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>ID</TableHead>
+                      <TableHead>Etap Adı</TableHead>
+                      <TableHead>Yaş Grubu</TableHead>
+                      <TableHead>Sıra</TableHead>
+                      <TableHead>Açıklama</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {stages && stages.length > 0 ? (
+                      stages.map((stage: any) => (
+                        <TableRow key={stage.id}>
+                          <TableCell>{stage.id}</TableCell>
+                          <TableCell className="font-medium">{stage.name}</TableCell>
+                          <TableCell>
+                            <Badge variant="outline">{stage.ageGroup}</Badge>
+                          </TableCell>
+                          <TableCell>{stage.order}</TableCell>
+                          <TableCell className="max-w-md truncate">
+                            {stage.description}
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    ) : (
+                      <TableRow>
+                        <TableCell colSpan={5} className="text-center text-muted-foreground">
+                          Henüz etap bulunmamaktadır.
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Questions Tab */}
+          <TabsContent value="questions">
+            <Card>
+              <CardHeader>
+                <CardTitle>Soru Bankası</CardTitle>
+                <CardDescription>
+                  Sistemdeki tüm soruları görüntüleyin
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>ID</TableHead>
+                      <TableHead>Soru Metni</TableHead>
+                      <TableHead>Etap ID</TableHead>
+                      <TableHead>Tip</TableHead>
+                      <TableHead>Zorunlu</TableHead>
+                      <TableHead>Sıra</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {questions && questions.length > 0 ? (
+                      questions.map((question: any) => (
+                        <TableRow key={question.id}>
+                          <TableCell>{question.id}</TableCell>
+                          <TableCell className="max-w-md truncate">
+                            {question.text}
+                          </TableCell>
+                          <TableCell>{question.stageId}</TableCell>
+                          <TableCell>
+                            <Badge variant="outline">
+                              {question.type === 'likert' ? 'Likert' : 
+                               question.type === 'multiple_choice' ? 'Çoktan Seçmeli' :
+                               question.type === 'ranking' ? 'Sıralama' : 'Metin'}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            {question.required ? (
+                              <Badge variant="default">Evet</Badge>
+                            ) : (
+                              <Badge variant="secondary">Hayır</Badge>
+                            )}
+                          </TableCell>
+                          <TableCell>{question.order}</TableCell>
+                        </TableRow>
+                      ))
+                    ) : (
+                      <TableRow>
+                        <TableCell colSpan={6} className="text-center text-muted-foreground">
+                          Henüz soru bulunmamaktadır.
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
               </CardContent>
             </Card>
           </TabsContent>
