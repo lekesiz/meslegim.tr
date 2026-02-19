@@ -158,6 +158,40 @@ export const appRouter = router({
         return { success: true };
       }),
     
+    getAllReports: adminProcedure.query(async () => {
+      return await db.getAllReports();
+    }),
+    
+    getAllStages: adminProcedure.query(async () => {
+      return await db.getAllStages();
+    }),
+    
+    getAllQuestions: adminProcedure.query(async () => {
+      return await db.getAllQuestions();
+    }),
+    
+    getSystemStats: adminProcedure.query(async () => {
+      const users = await db.getAllUsers();
+      const reports = await db.getAllReports();
+      const stages = await db.getAllStages();
+      
+      const students = users.filter(u => u.role === 'student');
+      const activeStudents = students.filter(s => s.status === 'active');
+      const pendingReports = reports.filter(r => r.status === 'pending');
+      const approvedReports = reports.filter(r => r.status === 'approved');
+      
+      return {
+        totalUsers: users.length,
+        totalStudents: students.length,
+        activeStudents: activeStudents.length,
+        totalMentors: users.filter(u => u.role === 'mentor').length,
+        totalReports: reports.length,
+        pendingReports: pendingReports.length,
+        approvedReports: approvedReports.length,
+        totalStages: stages.length,
+      };
+    }),
+    
     getStages: adminProcedure.query(async () => {
       return await db.getAllStages();
     }),
