@@ -14,6 +14,7 @@ import StudentDashboard from "./pages/dashboard/StudentDashboard";
 import StudentStageForm from "./pages/student/StageForm";
 import Login from "./pages/Login";
 import ReportView from "./pages/ReportView";
+import Dashboard from "./pages/Dashboard";
 
 function Router() {
   return (
@@ -21,13 +22,12 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/login" component={Login} />
       
-      {/* Admin routes */}
+      {/* Dashboard - role-based routing */}
+      <Route path="/dashboard" component={Dashboard} />
+      
+      {/* Legacy routes for backward compatibility */}
       <Route path="/dashboard/admin" component={AdminDashboard} />
-      
-      {/* Mentor routes */}
       <Route path="/dashboard/mentor" component={MentorDashboard} />
-      
-      {/* Student routes */}
       <Route path="/dashboard/student" component={StudentDashboard} />
       <Route path="/dashboard/student/stage/:stageId" component={StudentStageForm} />
       <Route path="/reports/:id" component={ReportView} />

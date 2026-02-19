@@ -5,7 +5,7 @@ type User = {
   id: number;
   name: string | null;
   email: string | null;
-  role: 'student' | 'mentor' | 'admin';
+  role: string;
   status: 'pending' | 'active' | 'inactive';
   ageGroup?: '14-17' | '18-21' | '22-24' | null;
   phone?: string | null;
