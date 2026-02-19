@@ -106,6 +106,13 @@ export async function generatePDF(
       border-bottom: 2px solid #e5e7eb;
     }
     
+    .logo {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 20px;
+      display: block;
+    }
+    
     .header h1 {
       margin: 0;
       border: none;
@@ -129,6 +136,7 @@ export async function generatePDF(
 </head>
 <body>
   <div class="header">
+    <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310419663028218705/cDCfxYGTnZmArwPn.png" alt="Meslegim.tr Logo" class="logo" />
     <h1>Meslegim.tr</h1>
     <p>Kariyer Değerlendirme Platformu</p>
     <p><strong>${title}</strong></p>

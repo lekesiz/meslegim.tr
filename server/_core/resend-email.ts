@@ -40,7 +40,8 @@ export function getRegistrationEmailTemplate(name: string, email: string): strin
       <style>
         body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
         .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-        .header { background: #3b82f6; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
+        .header { background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); color: white; padding: 30px 20px; text-align: center; border-radius: 8px 8px 0 0; }
+        .logo { width: 60px; height: 60px; margin: 0 auto 15px; }
         .content { padding: 30px; background: #f9fafb; border-radius: 0 0 8px 8px; }
         .button { display: inline-block; padding: 12px 24px; background: #3b82f6; color: white; text-decoration: none; border-radius: 6px; margin: 20px 0; }
         .footer { text-align: center; margin-top: 20px; color: #6b7280; font-size: 14px; }
@@ -49,8 +50,9 @@ export function getRegistrationEmailTemplate(name: string, email: string): strin
     <body>
       <div class="container">
         <div class="header">
-          <h1>Meslegim.tr</h1>
-          <p>Kariyer Değerlendirme Platformu</p>
+          <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310419663028218705/cDCfxYGTnZmArwPn.png" alt="Meslegim.tr Logo" class="logo" />
+          <h1 style="margin: 0 0 5px 0;">Meslegim.tr</h1>
+          <p style="margin: 0; opacity: 0.9;">Kariyer Değerlendirme Platformu</p>
         </div>
         <div class="content">
           <h2>Hoş Geldiniz, ${name}!</h2>
@@ -82,7 +84,8 @@ export function getApprovalEmailTemplate(name: string, loginUrl: string): string
       <style>
         body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
         .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-        .header { background: #10b981; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
+        .header { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 30px 20px; text-align: center; border-radius: 8px 8px 0 0; }
+        .logo { width: 60px; height: 60px; margin: 0 auto 15px; }
         .content { padding: 30px; background: #f9fafb; border-radius: 0 0 8px 8px; }
         .button { display: inline-block; padding: 12px 24px; background: #10b981; color: white; text-decoration: none; border-radius: 6px; margin: 20px 0; }
         .footer { text-align: center; margin-top: 20px; color: #6b7280; font-size: 14px; }
@@ -91,7 +94,8 @@ export function getApprovalEmailTemplate(name: string, loginUrl: string): string
     <body>
       <div class="container">
         <div class="header">
-          <h1>🎉 Başvurunuz Onaylandı!</h1>
+          <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310419663028218705/cDCfxYGTnZmArwPn.png" alt="Meslegim.tr Logo" class="logo" />
+          <h1 style="margin: 0;">🎉 Başvurunuz Onaylandı!</h1>
         </div>
         <div class="content">
           <h2>Tebrikler, ${name}!</h2>
@@ -128,7 +132,8 @@ export function getStageActivationEmailTemplate(name: string, stageName: string,
       <style>
         body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
         .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-        .header { background: #8b5cf6; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
+        .header { background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); color: white; padding: 30px 20px; text-align: center; border-radius: 8px 8px 0 0; }
+        .logo { width: 60px; height: 60px; margin: 0 auto 15px; }
         .content { padding: 30px; background: #f9fafb; border-radius: 0 0 8px 8px; }
         .button { display: inline-block; padding: 12px 24px; background: #8b5cf6; color: white; text-decoration: none; border-radius: 6px; margin: 20px 0; }
         .footer { text-align: center; margin-top: 20px; color: #6b7280; font-size: 14px; }
@@ -137,7 +142,8 @@ export function getStageActivationEmailTemplate(name: string, stageName: string,
     <body>
       <div class="container">
         <div class="header">
-          <h1>🚀 Yeni Etap Aktif!</h1>
+          <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310419663028218705/cDCfxYGTnZmArwPn.png" alt="Meslegim.tr Logo" class="logo" />
+          <h1 style="margin: 0;">🚀 Yeni Etap Aktif!</h1>
         </div>
         <div class="content">
           <h2>Merhaba, ${name}!</h2>
@@ -170,7 +176,8 @@ export function getReportReadyEmailTemplate(name: string, stageName: string, rep
       <style>
         body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
         .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-        .header { background: #f59e0b; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
+        .header { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; padding: 30px 20px; text-align: center; border-radius: 8px 8px 0 0; }
+        .logo { width: 60px; height: 60px; margin: 0 auto 15px; }
         .content { padding: 30px; background: #f9fafb; border-radius: 0 0 8px 8px; }
         .button { display: inline-block; padding: 12px 24px; background: #f59e0b; color: white; text-decoration: none; border-radius: 6px; margin: 20px 0; }
         .footer { text-align: center; margin-top: 20px; color: #6b7280; font-size: 14px; }
@@ -179,7 +186,8 @@ export function getReportReadyEmailTemplate(name: string, stageName: string, rep
     <body>
       <div class="container">
         <div class="header">
-          <h1>📊 Raporunuz Hazır!</h1>
+          <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310419663028218705/cDCfxYGTnZmArwPn.png" alt="Meslegim.tr Logo" class="logo" />
+          <h1 style="margin: 0;">📊 Raporunuz Hazır!</h1>
         </div>
         <div class="content">
           <h2>Merhaba, ${name}!</h2>
@@ -209,7 +217,8 @@ export function getReportApprovedEmailTemplate(name: string, stageName: string, 
       <style>
         body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
         .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-        .header { background: #10b981; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
+        .header { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 30px 20px; text-align: center; border-radius: 8px 8px 0 0; }
+        .logo { width: 60px; height: 60px; margin: 0 auto 15px; }
         .content { padding: 30px; background: #f9fafb; border-radius: 0 0 8px 8px; }
         .button { display: inline-block; padding: 12px 24px; background: #10b981; color: white; text-decoration: none; border-radius: 6px; margin: 20px 0; }
         .footer { text-align: center; margin-top: 20px; color: #6b7280; font-size: 14px; }
@@ -218,7 +227,8 @@ export function getReportApprovedEmailTemplate(name: string, stageName: string, 
     <body>
       <div class="container">
         <div class="header">
-          <h1>✅ Raporunuz Onaylandı!</h1>
+          <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310419663028218705/cDCfxYGTnZmArwPn.png" alt="Meslegim.tr Logo" class="logo" />
+          <h1 style="margin: 0;">✅ Raporunuz Onaylandı!</h1>
         </div>
         <div class="content">
           <h2>Merhaba, ${name}!</h2>
