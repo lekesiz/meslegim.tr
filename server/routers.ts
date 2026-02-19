@@ -6,6 +6,7 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import * as db from "./db";
 import { generateStageReportAsync } from './reportHelper';
+import { sendEmail, getRegistrationEmailTemplate, getApprovalEmailTemplate } from './_core/email';
 
 // Role-based procedures
 const studentProcedure = protectedProcedure.use(({ ctx, next }) => {
@@ -67,6 +68,18 @@ export const appRouter = router({
           role: 'student',
           status: 'pending',
         });
+        
+        // Send registration email
+        try {
+          await sendEmail({
+            to: input.email,
+            subject: 'Meslegim.tr - Başvurunuz Alındı',
+            html: getRegistrationEmailTemplate(input.name, input.email),
+          });
+        } catch (error) {
+          console.error('Failed to send registration email:', error);
+          // Don't fail the registration if email fails
+        }
         
         return { success: true, userId: newUser.id };
       }),
