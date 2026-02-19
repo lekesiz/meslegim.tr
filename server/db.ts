@@ -305,3 +305,66 @@ export async function approveReport(reportId: number, mentorId: number) {
     approvedAt: new Date()
   }).where(eq(reports.id, reportId));
 }
+
+
+export async function updateUserStage(userId: number, stageId: number, status: 'active' | 'completed') {
+  const db = await getDb();
+  if (!db) return;
+
+  await db.update(userStages)
+    .set({ 
+      status,
+      completedAt: status === 'completed' ? new Date() : null,
+      updatedAt: new Date(),
+    })
+    .where(and(eq(userStages.userId, userId), eq(userStages.stageId, stageId)));
+}
+
+export async function scheduleNextStage(userId: number, currentStageId: number) {
+  const db = await getDb();
+  if (!db) return;
+
+  // Get current stage
+  const allStages = await getAllStages();
+  const currentStage = allStages.find(s => s.id === currentStageId);
+  if (!currentStage) return;
+
+  // Find next stage in the same age group
+  const nextStage = allStages.find(s => 
+    s.ageGroup === currentStage.ageGroup && 
+    s.order === currentStage.order + 1
+  );
+
+  if (!nextStage) {
+    // No more stages, mark user as completed all stages
+    return;
+  }
+
+  // Schedule next stage activation (7 days from now)
+  const unlockedAt = new Date();
+  unlockedAt.setDate(unlockedAt.getDate() + 7);
+
+  await db.insert(userStages).values({
+    userId,
+    stageId: nextStage.id,
+    status: 'locked',
+    unlockedAt,
+  });
+}
+
+export async function getStageWithAnswers(userId: number, stageId: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const stage = (await getAllStages()).find(s => s.id === stageId);
+  if (!stage) return null;
+
+  const questions = await getQuestionsByStage(stageId);
+  const answers = await getAnswersByUserAndStage(userId, stageId);
+
+  return {
+    stage,
+    questions,
+    answers,
+  };
+}
