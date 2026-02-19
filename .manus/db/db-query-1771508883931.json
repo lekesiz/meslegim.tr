@@ -1,0 +1,19 @@
+{
+  "query": "\n-- 22-24 yaş grubu için stage'leri listele\nSELECT id, name, ageGroup, `order` FROM stages WHERE ageGroup = '22-24' ORDER BY `order` LIMIT 1;\n\n-- İlk stage'i ata\nINSERT INTO user_stages (userId, stageId, status) \nVALUES (240003, (SELECT id FROM stages WHERE ageGroup = '22-24' ORDER BY `order` LIMIT 1), 'active');\n\n-- Kontrol et\nSELECT us.id, us.userId, us.stageId, us.status, s.name \nFROM user_stages us \nJOIN stages s ON us.stageId = s.id \nWHERE us.userId = 240003;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute \n-- 22-24 yaş grubu için stage'leri listele\nSELECT id, name, ageGroup, `order` FROM stages WHERE ageGroup = '22-24' ORDER BY `order` LIMIT 1;\n\n-- İlk stage'i ata\nINSERT INTO user_stages (userId, stageId, status) \nVALUES (240003, (SELECT id FROM stages WHERE ageGroup = '22-24' ORDER BY `order` LIMIT 1), 'active');\n\n-- Kontrol et\nSELECT us.id, us.userId, us.stageId, us.status, s.name \nFROM user_stages us \nJOIN stages s ON us.stageId = s.id \nWHERE us.userId = 240003;\n",
+  "rows": [
+    {
+      "id": "60007",
+      "name": "Etap 1: Kariyer Geçiş ve Yetkinlik Değerlendirmesi",
+      "ageGroup": "22-24",
+      "order": "1"
+    }
+  ],
+  "messages": [
+    "id\tuserId\tstageId\tstatus\tname",
+    "30001\t240003\t60007\tactive\tEtap 1: Kariyer Geçiş ve Yetkinlik Değerlendirmesi"
+  ],
+  "stdout": "id\tname\tageGroup\torder\n60007\tEtap 1: Kariyer Geçiş ve Yetkinlik Değerlendirmesi\t22-24\t1\nid\tuserId\tstageId\tstatus\tname\n30001\t240003\t60007\tactive\tEtap 1: Kariyer Geçiş ve Yetkinlik Değerlendirmesi\n",
+  "stderr": "",
+  "execution_time_ms": 2031
+}

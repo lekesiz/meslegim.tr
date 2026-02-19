@@ -1,0 +1,18 @@
+{
+  "query": "\n-- Önce mentor ID'yi öğren\nSELECT id, name, email FROM users WHERE role = 'mentor' LIMIT 1;\n\n-- Sonra Mikail Lekesiz'e mentor ata\nUPDATE users SET mentorId = (SELECT id FROM users WHERE role = 'mentor' LIMIT 1) WHERE email = 'mikaillekesiz@gmail.com';\n\n-- Kontrol et\nSELECT id, name, email, mentorId, status FROM users WHERE email = 'mikaillekesiz@gmail.com';\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute \n-- Önce mentor ID'yi öğren\nSELECT id, name, email FROM users WHERE role = 'mentor' LIMIT 1;\n\n-- Sonra Mikail Lekesiz'e mentor ata\nUPDATE users SET mentorId = (SELECT id FROM users WHERE role = 'mentor' LIMIT 1) WHERE email = 'mikaillekesiz@gmail.com';\n\n-- Kontrol et\nSELECT id, name, email, mentorId, status FROM users WHERE email = 'mikaillekesiz@gmail.com';\n",
+  "rows": [
+    {
+      "id": "180023",
+      "name": "Test Mentor",
+      "email": "mentor@test.com"
+    }
+  ],
+  "messages": [
+    "id\tname\temail\tmentorId\tstatus",
+    "240003\tMikail Lekesiz\tmikaillekesiz@gmail.com\t180023\tpending"
+  ],
+  "stdout": "id\tname\temail\n180023\tTest Mentor\tmentor@test.com\nid\tname\temail\tmentorId\tstatus\n240003\tMikail Lekesiz\tmikaillekesiz@gmail.com\t180023\tpending\n",
+  "stderr": "",
+  "execution_time_ms": 2020
+}
