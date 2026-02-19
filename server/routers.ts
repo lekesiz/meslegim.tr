@@ -7,6 +7,8 @@ import { z } from "zod";
 import * as db from "./db";
 import { generateStageReportAsync } from './reportHelper';
 import { sendEmail, getRegistrationEmailTemplate, getApprovalEmailTemplate } from './_core/email';
+import bcrypt from 'bcryptjs';
+import { sdk } from './_core/sdk';
 
 // Role-based procedures
 const studentProcedure = protectedProcedure.use(({ ctx, next }) => {
@@ -43,6 +45,38 @@ export const appRouter = router({
       ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
       return { success: true } as const;
     }),
+    login: publicProcedure
+      .input(z.object({
+        email: z.string().email(),
+        password: z.string(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        // Find user by email
+        const user = await db.getUserByEmail(input.email);
+        if (!user || !user.password) {
+          throw new TRPCError({ code: 'UNAUTHORIZED', message: 'E-posta veya şifre hatalı' });
+        }
+        
+        // Verify password
+        const isValid = await bcrypt.compare(input.password, user.password);
+        if (!isValid) {
+          throw new TRPCError({ code: 'UNAUTHORIZED', message: 'E-posta veya şifre hatalı' });
+        }
+        
+        // Check if user is active
+        if (user.status !== 'active') {
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'Hesabınız henüz aktif değil. Mentor onayı bekleniyor.' });
+        }
+        
+        // Create session token
+        const sessionToken = await sdk.createSessionToken(user.openId || '', { name: user.name || '' });
+        
+        // Set session cookie
+        const cookieOptions = getSessionCookieOptions(ctx.req);
+        ctx.res.cookie(COOKIE_NAME, sessionToken, cookieOptions);
+        
+        return { success: true, user };
+      }),
     register: publicProcedure
       .input(z.object({
         name: z.string().min(1),
@@ -50,6 +84,7 @@ export const appRouter = router({
         phone: z.string().min(10),
         tcKimlik: z.string().length(11),
         ageGroup: z.enum(['14-17', '18-21', '22-24']),
+        password: z.string().min(6),
       }))
       .mutation(async ({ input }) => {
         // Check if user already exists
@@ -58,10 +93,14 @@ export const appRouter = router({
           throw new TRPCError({ code: 'CONFLICT', message: 'Bu e-posta adresi zaten kayıtlı' });
         }
         
+        // Hash password
+        const hashedPassword = await bcrypt.hash(input.password, 10);
+        
         // Create new student with pending status
         const newUser = await db.createUser({
           name: input.name,
           email: input.email,
+          password: hashedPassword,
           phone: input.phone,
           tcKimlik: input.tcKimlik,
           ageGroup: input.ageGroup,

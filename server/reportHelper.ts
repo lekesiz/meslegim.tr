@@ -1,4 +1,5 @@
 import { generateStageReport } from './_core/reportGeneration';
+import { convertMarkdownToPDF } from './_core/pdfExport';
 import * as db from './db';
 
 export async function generateStageReportAsync(userId: number, stageId: number) {
@@ -33,16 +34,18 @@ export async function generateStageReportAsync(userId: number, stageId: number) 
       formattedAnswers
     );
 
-    // Save report to database (content will be stored as PDF in S3)
-    // For now, we'll store the markdown content temporarily
-    // TODO: Convert markdown to PDF and upload to S3
+    // Convert markdown to PDF and upload to S3
+    const fileName = `stage-${stageId}-user-${userId}-${Date.now()}`;
+    const { fileUrl, fileKey } = await convertMarkdownToPDF(reportContent, fileName);
+    
+    // Save report to database
     await db.createReport({
       userId,
       stageId,
       type: 'stage',
       status: 'pending_approval',
-      fileUrl: null, // TODO: Generate PDF and upload to S3
-      fileKey: null,
+      fileUrl,
+      fileKey,
     });
 
     console.log(`Report generated for user ${userId}, stage ${stageId}`);
