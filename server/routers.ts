@@ -194,8 +194,20 @@ export const appRouter = router({
   // Student procedures
   student: router({
     getMyProgress: studentProcedure.query(async ({ ctx }) => {
-      const stages = await db.getUserStages(ctx.user.id);
-      return stages;
+      const userStages = await db.getUserStages(ctx.user.id);
+      const allStages = await db.getAllStages();
+      
+      // Join userStages with stages to get stage details
+      const progress = userStages.map(us => {
+        const stage = allStages.find(s => s.id === us.stageId);
+        return {
+          ...us,
+          stageName: stage?.name || '',
+          stageDescription: stage?.description || '',
+        };
+      });
+      
+      return progress;
     }),
     
     getActiveStage: studentProcedure.query(async ({ ctx }) => {
@@ -204,10 +216,19 @@ export const appRouter = router({
         return null;
       }
       
+      const allStages = await db.getAllStages();
+      const stage = allStages.find(s => s.id === userStage.stageId);
+      
       const questions = await db.getQuestionsByStage(userStage.stageId);
       const answers = await db.getAnswersByUserAndStage(ctx.user.id, userStage.stageId);
       
-      return { userStage, questions, answers };
+      return {
+        ...userStage,
+        stageName: stage?.name || '',
+        stageDescription: stage?.description || '',
+        questions,
+        answers,
+      };
     }),
     
     saveAnswer: studentProcedure

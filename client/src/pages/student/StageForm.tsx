@@ -76,7 +76,7 @@ export default function StageForm() {
     }
 
     submitStageMutation.mutate({
-      stageId: activeStage.userStage.stageId,
+      stageId: activeStage.stageId,
     });
   };
 

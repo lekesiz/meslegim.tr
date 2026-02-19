@@ -84,10 +84,10 @@
 - [ ] Créer tRPC procedures: `system.sendStageActivationEmail`, `system.sendReportReadyEmail`
 
 ## Phase 9: Banque de Questions Initiale
-- [ ] Créer script de seed pour les questions du groupe 14-17 ans (Etap 1, 2, 3)
+- [x] Créer script de seed pour les questions du groupe 14-17 ans (Etap 1, 2, 3)
 - [ ] Créer script de seed pour les questions du groupe 18-21 ans (Etap 1, 2, 3)
 - [ ] Créer script de seed pour les questions du groupe 22-24 ans (Etap 1, 2, 3)
-- [ ] Exécuter les scripts de seed
+- [x] Exécuter les scripts de seed
 
 ## Phase 10: UI/UX et Design
 - [ ] Choisir palette de couleurs et thème (light/dark)
