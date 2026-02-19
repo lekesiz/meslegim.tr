@@ -47,6 +47,11 @@
 - [ ] Rapor görüntüleme sayfası (student için)
 - [ ] PDF export özelliği (rapor indirme)
 
+## ✅ Tamamlanan Görevler (19 Şubat 2026 - Devam)
+- [x] 18-21 yaş grubu için soru bankası oluştur (18 soru, 3 etap)
+- [x] 22-24 yaş grubu için soru bankası oluştur (19 soru, 3 etap)
+- [x] Seed script'ını çalıştır - 60 soru database'e eklendi
+
 ## 🚀 Devam Eden Görevler (19 Şubat 2026)
 - [x] Rapor görüntüleme sayfası oluştur (/reports/:id route) - ÇALIŞIYOR
 - [x] PDF export endpoint ekle (rapor indirme) - Buton mevcut, PDF URL'den açılıyor
