@@ -319,11 +319,419 @@ async function seed() {
     },
   ]);
 
-  console.log("✅ Seed completed successfully!");
+  // Get stage IDs for 18-21 and 22-24
+  const stage1821_1 = allStages.find(s => s.ageGroup === "18-21" && s.order === 1)!;
+  const stage1821_2 = allStages.find(s => s.ageGroup === "18-21" && s.order === 2)!;
+  const stage1821_3 = allStages.find(s => s.ageGroup === "18-21" && s.order === 3)!;
+  const stage2224_1 = allStages.find(s => s.ageGroup === "22-24" && s.order === 1)!;
+  const stage2224_2 = allStages.find(s => s.ageGroup === "22-24" && s.order === 2)!;
+  const stage2224_3 = allStages.find(s => s.ageGroup === "22-24" && s.order === 3)!;
+
+  // Insert questions for 18-21 Age Group - Stage 1
+  console.log("Inserting questions for 18-21 Age Group - Stage 1...");
+  await db.insert(questions).values([
+    {
+      stageId: stage1821_1.id,
+      text: "Üniversite eğitiminiz için kariyer hazırlığınızı nasıl değerlendirirsiniz?",
+      type: "likert",
+      options: JSON.stringify(["1 - Hazır değilim", "2", "3", "4", "5 - Tamamen hazırım"]),
+      required: true,
+      order: 1,
+    },
+    {
+      stageId: stage1821_1.id,
+      text: "Profesyonel hedeflerinizi ne kadar net tanımlayabiliyorsunuz?",
+      type: "likert",
+      options: JSON.stringify(["1 - Hiç net değil", "2", "3", "4", "5 - Çok net"]),
+      required: true,
+      order: 2,
+    },
+    {
+      stageId: stage1821_1.id,
+      text: "Staj veya iş deneyiminiz var mı?",
+      type: "multiple_choice",
+      options: JSON.stringify([
+        "Hayır, hiç deneyimim yok",
+        "Kısa süreli staj (1-3 ay)",
+        "Uzun süreli staj (3+ ay)",
+        "Part-time iş deneyimi",
+        "Full-time iş deneyimi"
+      ]),
+      required: true,
+      order: 3,
+    },
+    {
+      stageId: stage1821_1.id,
+      text: "Aşağıdaki profesyonel becerilerde kendinizi nasıl değerlendirirsiniz? (Her biri için 1-5 arası puan verin)",
+      type: "ranking",
+      options: JSON.stringify([
+        "Zaman yönetimi",
+        "Takım çalışması",
+        "Sunum becerileri",
+        "Yazılı iletişim",
+        "Problem çözme"
+      ]),
+      required: true,
+      order: 4,
+    },
+    {
+      stageId: stage1821_1.id,
+      text: "Hangi sektörlerde çalışmak istersiniz? (Birden fazla seçebilirsiniz)",
+      type: "multiple_choice",
+      options: JSON.stringify([
+        "Teknoloji ve yazılım",
+        "Finans ve bankacılık",
+        "Sağlık ve tıp",
+        "Eğitim ve akademi",
+        "Pazarlama ve reklam",
+        "Mühendislik",
+        "Hukuk",
+        "Sanat ve tasarım"
+      ]),
+      required: true,
+      order: 5,
+    },
+    {
+      stageId: stage1821_1.id,
+      text: "Mezuniyet sonrası ilk 5 yıl için kariyer hedefiniz nedir?",
+      type: "text",
+      options: null,
+      required: true,
+      order: 6,
+    },
+  ]);
+
+  // Insert questions for 18-21 Age Group - Stage 2
+  console.log("Inserting questions for 18-21 Age Group - Stage 2...");
+  await db.insert(questions).values([
+    {
+      stageId: stage1821_2.id,
+      text: "Liderlik deneyiminizi nasıl değerlendirirsiniz?",
+      type: "likert",
+      options: JSON.stringify(["1 - Hiç deneyimim yok", "2", "3", "4", "5 - Çok deneyimliyim"]),
+      required: true,
+      order: 1,
+    },
+    {
+      stageId: stage1821_2.id,
+      text: "Hangi liderlik türlerine yakınsınız? (Birden fazla seçebilirsiniz)",
+      type: "multiple_choice",
+      options: JSON.stringify([
+        "Vizyoner liderlik",
+        "Demokratik liderlik",
+        "Mentor liderlik",
+        "Stratejik liderlik",
+        "Transformasyonel liderlik"
+      ]),
+      required: true,
+      order: 2,
+    },
+    {
+      stageId: stage1821_2.id,
+      text: "Profesyonel network (ağ) oluşturma becerinizi nasıl değerlendirirsiniz?",
+      type: "likert",
+      options: JSON.stringify(["1 - Çok zayıf", "2", "3", "4", "5 - Çok güçlü"]),
+      required: true,
+      order: 3,
+    },
+    {
+      stageId: stage1821_2.id,
+      text: "Aşağıdaki profesyonel becerilerde kendinizi nasıl değerlendirirsiniz? (Her biri için 1-5 arası puan verin)",
+      type: "ranking",
+      options: JSON.stringify([
+        "Müşteri ilişkileri yönetimi",
+        "Proje yönetimi",
+        "Veri analizi ve raporlama",
+        "Dijital pazarlama",
+        "Finansal okur yazarlık"
+      ]),
+      required: true,
+      order: 4,
+    },
+    {
+      stageId: stage1821_2.id,
+      text: "Girişimcilik ilginiz var mı?",
+      type: "multiple_choice",
+      options: JSON.stringify([
+        "Hayır, şirkette çalışmayı tercih ederim",
+        "Belki gelecekte düşünürüm",
+        "Evet, kısa vadede kendi işimi kurmak istiyorum",
+        "Evet, zaten bir iş fikrim var"
+      ]),
+      required: true,
+      order: 5,
+    },
+    {
+      stageId: stage1821_2.id,
+      text: "Profesyonel gelişiminiz için hangi alanlarda eğitim almak istersiniz?",
+      type: "text",
+      options: null,
+      required: true,
+      order: 6,
+    },
+  ]);
+
+  // Insert questions for 18-21 Age Group - Stage 3
+  console.log("Inserting questions for 18-21 Age Group - Stage 3...");
+  await db.insert(questions).values([
+    {
+      stageId: stage1821_3.id,
+      text: "Mezuniyet sonrası ilk işinizde ne kadar maaş bekliyorsunuz? (Aylık, TL)",
+      type: "text",
+      options: null,
+      required: true,
+      order: 1,
+    },
+    {
+      stageId: stage1821_3.id,
+      text: "5 yıl sonra ne kadar maaş almayı hedefliyorsunuz? (Aylık, TL)",
+      type: "text",
+      options: null,
+      required: true,
+      order: 2,
+    },
+    {
+      stageId: stage1821_3.id,
+      text: "Kariyer hedefinize ulaşmak için hangi adımları atmanız gerekiyor?",
+      type: "text",
+      options: null,
+      required: true,
+      order: 3,
+    },
+    {
+      stageId: stage1821_3.id,
+      text: "Yüksek lisans veya sertifika programı düşünüyor musunuz?",
+      type: "multiple_choice",
+      options: JSON.stringify([
+        "Hayır, düşünmüyorum",
+        "Belki gelecekte",
+        "Evet, kısa vadede planlama yapıyorum",
+        "Evet, başvuru sürecindeyim"
+      ]),
+      required: true,
+      order: 4,
+    },
+    {
+      stageId: stage1821_3.id,
+      text: "Uluslararası kariyer fırsatları ilginizi çekiyor mu?",
+      type: "multiple_choice",
+      options: JSON.stringify([
+        "Hayır, Türkiye'de çalışmak istiyorum",
+        "Kısa süreli deneyim için evet",
+        "Evet, uzun vadeli yurtdışı kariyer istiyorum"
+      ]),
+      required: true,
+      order: 5,
+    },
+    {
+      stageId: stage1821_3.id,
+      text: "Önümüzdeki 1 yıl içinde kariyer hedefiniz için atacağınız en önemli 3 adım nedir?",
+      type: "text",
+      options: null,
+      required: true,
+      order: 6,
+    },
+  ]);
+
+  // Insert questions for 22-24 Age Group - Stage 1
+  console.log("Inserting questions for 22-24 Age Group - Stage 1...");
+  await db.insert(questions).values([
+    {
+      stageId: stage2224_1.id,
+      text: "İş hayatına geçiş hazırlığınızı nasıl değerlendirirsiniz?",
+      type: "likert",
+      options: JSON.stringify(["1 - Hazır değilim", "2", "3", "4", "5 - Tamamen hazırım"]),
+      required: true,
+      order: 1,
+    },
+    {
+      stageId: stage2224_1.id,
+      text: "Mevcut iş durumunuz nedir?",
+      type: "multiple_choice",
+      options: JSON.stringify([
+        "Henüz çalışmıyorum",
+        "Part-time çalışıyorum",
+        "Full-time çalışıyorum (1 yıldan az)",
+        "Full-time çalışıyorum (1-2 yıl)",
+        "Full-time çalışıyorum (2+ yıl)"
+      ]),
+      required: true,
+      order: 2,
+    },
+    {
+      stageId: stage2224_1.id,
+      text: "Mevcut işinizden memnun musunuz?",
+      type: "likert",
+      options: JSON.stringify(["1 - Hiç memnun değilim", "2", "3", "4", "5 - Çok memnunum"]),
+      required: true,
+      order: 3,
+    },
+    {
+      stageId: stage2224_1.id,
+      text: "Aşağıdaki profesyonel becerilerde kendinizi nasıl değerlendirirsiniz? (Her biri için 1-5 arası puan verin)",
+      type: "ranking",
+      options: JSON.stringify([
+        "Stratejik düşünme",
+        "Takım liderliği",
+        "Müşateri ilişkileri",
+        "Proje yönetimi",
+        "Finansal planlama"
+      ]),
+      required: true,
+      order: 4,
+    },
+    {
+      stageId: stage2224_1.id,
+      text: "Kariyer değişikliği düşünüyor musunuz?",
+      type: "multiple_choice",
+      options: JSON.stringify([
+        "Hayır, mevcut kariyerimden memnunum",
+        "Belki, alternatifler araştırıyorum",
+        "Evet, aktif olarak değişiklik planlama yapıyorum",
+        "Evet, zaten değişiklik sürecindeyim"
+      ]),
+      required: true,
+      order: 5,
+    },
+    {
+      stageId: stage2224_1.id,
+      text: "5 yıl sonra kendinizi hangi pozisyonda görmek istersiniz?",
+      type: "text",
+      options: null,
+      required: true,
+      order: 6,
+    },
+  ]);
+
+  // Insert questions for 22-24 Age Group - Stage 2
+  console.log("Inserting questions for 22-24 Age Group - Stage 2...");
+  await db.insert(questions).values([
+    {
+      stageId: stage2224_2.id,
+      text: "Liderlik deneyiminizi nasıl değerlendirirsiniz?",
+      type: "likert",
+      options: JSON.stringify(["1 - Hiç deneyimim yok", "2", "3", "4", "5 - Çok deneyimliyim"]),
+      required: true,
+      order: 1,
+    },
+    {
+      stageId: stage2224_2.id,
+      text: "Hangi liderlik becerilerinde gelişmek istersiniz? (Birden fazla seçebilirsiniz)",
+      type: "multiple_choice",
+      options: JSON.stringify([
+        "Stratejik liderlik",
+        "Takım motivasyonu",
+        "Değişim yönetimi",
+        "Karar alma",
+        "Mentorluğ"
+      ]),
+      required: true,
+      order: 2,
+    },
+    {
+      stageId: stage2224_2.id,
+      text: "Profesyonel network (ağ) genişliğinizi nasıl değerlendirirsiniz?",
+      type: "likert",
+      options: JSON.stringify(["1 - Çok dar", "2", "3", "4", "5 - Çok geniş"]),
+      required: true,
+      order: 3,
+    },
+    {
+      stageId: stage2224_2.id,
+      text: "Yöneticilik pozisyonuna ne kadar hazırsınız?",
+      type: "likert",
+      options: JSON.stringify(["1 - Hazır değilim", "2", "3", "4", "5 - Tamamen hazırım"]),
+      required: true,
+      order: 4,
+    },
+    {
+      stageId: stage2224_2.id,
+      text: "Girişimcilik planınız var mı?",
+      type: "multiple_choice",
+      options: JSON.stringify([
+        "Hayır, kurumsal kariyere devam etmek istiyorum",
+        "Belki gelecekte düşünürüm",
+        "Evet, 1-2 yıl içinde kendi işimi kurmak istiyorum",
+        "Evet, zaten hazırlık aşamasındayım"
+      ]),
+      required: true,
+      order: 5,
+    },
+    {
+      stageId: stage2224_2.id,
+      text: "Profesyonel gelişiminiz için hangi sertifika veya eğitimleri planlama yapıyorsunuz?",
+      type: "text",
+      options: null,
+      required: true,
+      order: 6,
+    },
+  ]);
+
+  // Insert questions for 22-24 Age Group - Stage 3
+  console.log("Inserting questions for 22-24 Age Group - Stage 3...");
+  await db.insert(questions).values([
+    {
+      stageId: stage2224_3.id,
+      text: "Mevcut maaşınız hangi aralıkta? (Aylık, TL)",
+      type: "text",
+      options: null,
+      required: false,
+      order: 1,
+    },
+    {
+      stageId: stage2224_3.id,
+      text: "5 yıl sonra ne kadar maaş almayı hedefliyorsunuz? (Aylık, TL)",
+      type: "text",
+      options: null,
+      required: true,
+      order: 2,
+    },
+    {
+      stageId: stage2224_3.id,
+      text: "10 yıl sonra ne kadar maaş almayı hedefliyorsunuz? (Aylık, TL)",
+      type: "text",
+      options: null,
+      required: true,
+      order: 3,
+    },
+    {
+      stageId: stage2224_3.id,
+      text: "Uzun vadeli kariyer hedefiniz nedir?",
+      type: "text",
+      options: null,
+      required: true,
+      order: 4,
+    },
+    {
+      stageId: stage2224_3.id,
+      text: "Kariyer optimizasyonu için hangi alanlarda gelişmeniz gerektiğini düşünüyorsunuz?",
+      type: "text",
+      options: null,
+      required: true,
+      order: 5,
+    },
+    {
+      stageId: stage2224_3.id,
+      text: "Yönetici pozisyonuna ulaşmak için hangi adımları atmanız gerekiyor?",
+      type: "text",
+      options: null,
+      required: true,
+      order: 6,
+    },
+    {
+      stageId: stage2224_3.id,
+      text: "Önümüzdeki 2 yıl içinde kariyer hedefiniz için atacağınız en önemli 5 adım nedir?",
+      type: "text",
+      options: null,
+      required: true,
+      order: 7,
+    },
+  ]);
+
+  console.log("\u2705 Seed completed successfully!");
   console.log(`Total stages inserted: ${allStages.length}`);
-  console.log("Total questions inserted: 23 (for 14-17 age group)");
-  console.log("\nNote: Questions for 18-21 and 22-24 age groups will be added in the next iteration.");
-  
+  console.log("Total questions inserted: 60 (14-17: 23, 18-21: 18, 22-24: 19)");
+  console.log("\nAll age groups now have complete question sets!");  
   process.exit(0);
 }
 
