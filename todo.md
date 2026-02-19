@@ -79,3 +79,12 @@
 - [x] PDF'i S3'e yükleme entegrasyonu - TAMAMLANDI
 - [x] ReportView sayfasında PDF indirme butonunu aktif et - TAMAMLANDI
 - [x] PDF export testini yap - WeasyPrint test edildi ve çalışıyor
+
+
+## 🎨 Ana Sayfa Tasarım İyileştirmeleri (19 Şubat 2026)
+- [x] Hero section tasarla - başlık, açıklama, CTA butonları - TAMAMLANDI
+- [x] Özellikler bölümü ekle - 9 aşamalı değerlendirme, AI raporlama, mentor desteği - TAMAMLANDI
+- [x] Nasıl Çalışır bölümü ekle - kayıt, değerlendirme, rapor alma adımları - TAMAMLANDI
+- [ ] Testimonials/referanslar bölümü ekle - ATLANACAK (ilk versiyonda gerekli değil)
+- [x] Footer tasarla - iletişim bilgileri, sosyal medya linkleri - TAMAMLANDI
+- [ ] Logo oluştur ve navbar'a ekle
