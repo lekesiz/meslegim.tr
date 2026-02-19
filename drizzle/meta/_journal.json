@@ -15,6 +15,13 @@
       "when": 1771319843816,
       "tag": "0001_amused_leech",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1771500799880,
+      "tag": "0002_majestic_ink",
+      "breakpoints": true
     }
   ]
 }

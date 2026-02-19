@@ -20,6 +20,7 @@ export default function Home() {
     email: "",
     phone: "",
     tcKimlik: "",
+    password: "",
     ageGroup: "",
     kvkkConsent: false,
   });
@@ -33,6 +34,7 @@ export default function Home() {
         email: "",
         phone: "",
         tcKimlik: "",
+        password: "",
         ageGroup: "",
         kvkkConsent: false,
       });
@@ -60,6 +62,7 @@ export default function Home() {
       email: formData.email,
       phone: formData.phone,
       tcKimlik: formData.tcKimlik,
+      password: formData.password,
       ageGroup: formData.ageGroup as "14-17" | "18-21" | "22-24",
     });
   };
@@ -132,6 +135,21 @@ export default function Home() {
                   setFormData({ ...formData, tcKimlik: e.target.value })
                 }
                 placeholder="11 haneli TC kimlik numaranız"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="password">Şifre *</Label>
+              <Input
+                id="password"
+                type="password"
+                required
+                minLength={6}
+                value={formData.password}
+                onChange={(e) =>
+                  setFormData({ ...formData, password: e.target.value })
+                }
+                placeholder="En az 6 karakter"
               />
             </div>
 
@@ -218,13 +236,23 @@ export default function Home() {
             14-24 yaş arası gençler için özel olarak tasarlanmış kariyer
             değerlendirme platformuna hoş geldiniz.
           </p>
-          <Button
-            onClick={() => setShowForm(true)}
-            size="lg"
-            className="text-lg px-8"
-          >
-            Başvuru Yap
-          </Button>
+          <div className="flex gap-4 justify-center">
+            <Button
+              onClick={() => setShowForm(true)}
+              size="lg"
+              className="text-lg px-8"
+            >
+              Başvuru Yap
+            </Button>
+            <Button
+              onClick={() => window.location.href = '/login'}
+              size="lg"
+              variant="outline"
+              className="text-lg px-8"
+            >
+              Giriş Yap
+            </Button>
+          </div>
         </div>
 
         <div className="mt-12 grid md:grid-cols-3 gap-6">
