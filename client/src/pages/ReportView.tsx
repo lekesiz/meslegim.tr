@@ -17,6 +17,15 @@ export default function ReportView() {
     { enabled: !!id }
   );
 
+  const generatePDFMutation = trpc.student.generateReportPDF.useMutation({
+    onSuccess: (data) => {
+      window.open(data.pdfUrl, '_blank');
+    },
+    onError: (error) => {
+      alert('PDF oluşturulurken hata oluştu: ' + error.message);
+    },
+  });
+
   if (!user) {
     return null;
   }
@@ -52,15 +61,6 @@ export default function ReportView() {
       </div>
     );
   }
-
-  const generatePDFMutation = trpc.student.generateReportPDF.useMutation({
-    onSuccess: (data) => {
-      window.open(data.pdfUrl, '_blank');
-    },
-    onError: (error) => {
-      alert('PDF oluşturulurken hata oluştu: ' + error.message);
-    },
-  });
 
   const handleDownload = () => {
     if (report.fileUrl) {
