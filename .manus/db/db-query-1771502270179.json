@@ -1,0 +1,109 @@
+{
+  "query": "SELECT a.*, q.text as question_text FROM answers a JOIN questions q ON a.questionId = q.id WHERE a.userId = (SELECT id FROM users WHERE email = 'student@test.com') ORDER BY q.id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute SELECT a.*, q.text as question_text FROM answers a JOIN questions q ON a.questionId = q.id WHERE a.userId = (SELECT id FROM users WHERE email = 'student@test.com') ORDER BY q.id;",
+  "rows": [
+    {
+      "id": "1",
+      "userId": "180022",
+      "questionId": "30001",
+      "answer": "5 - Çok hevesliyim",
+      "createdAt": "2026-02-19 11:50:27",
+      "updatedAt": "2026-02-19 11:50:27",
+      "question_text": "Yeni şeyler öğrenmeye ne kadar heveslisiniz?"
+    },
+    {
+      "id": "2",
+      "userId": "180022",
+      "questionId": "30002",
+      "answer": "5 - Çok iyi alabiliyorum",
+      "createdAt": "2026-02-19 11:53:17",
+      "updatedAt": "2026-02-19 11:53:17",
+      "question_text": "Kendi başınıza karar alabiliyor musunuz?"
+    },
+    {
+      "id": "3",
+      "userId": "180022",
+      "questionId": "30003",
+      "answer": "4",
+      "createdAt": "2026-02-19 11:53:32",
+      "updatedAt": "2026-02-19 11:53:32",
+      "question_text": "Zorluklarla başa çıkma becerinizi nasıl değerlendirirsiniz?"
+    },
+    {
+      "id": "4",
+      "userId": "180022",
+      "questionId": "30004",
+      "answer": "5 - Çok kolay",
+      "createdAt": "2026-02-19 11:53:48",
+      "updatedAt": "2026-02-19 11:53:48",
+      "question_text": "Çevrenizde insanlarla ne kadar kolay iletişim kurabiliyorsunuz?"
+    },
+    {
+      "id": "5",
+      "userId": "180022",
+      "questionId": "30005",
+      "answer": "5 - Çok yüksek",
+      "createdAt": "2026-02-19 11:54:03",
+      "updatedAt": "2026-02-19 11:54:03",
+      "question_text": "Hedeflerinize ulaşmak için ne kadar motivasyonunuz var?"
+    },
+    {
+      "id": "6",
+      "userId": "180022",
+      "questionId": "30006",
+      "answer": "Sosyal (İnsanlarla çalışmak, yardım etmek)",
+      "createdAt": "2026-02-19 11:54:19",
+      "updatedAt": "2026-02-19 11:54:19",
+      "question_text": "Hangi mesleki ilgi alanlarına sahipsiniz? (Birden fazla seçebilirsiniz)"
+    },
+    {
+      "id": "7",
+      "userId": "180022",
+      "questionId": "30007",
+      "answer": "Yaratıcı, meraklı, azimli",
+      "createdAt": "2026-02-19 11:55:01",
+      "updatedAt": "2026-02-19 11:55:05",
+      "question_text": "Kendinizi hangi üç kelimeyle tanımlarsınız?"
+    },
+    {
+      "id": "8",
+      "userId": "180022",
+      "questionId": "30007",
+      "answer": "Yaratıcı, meraklı, azimli",
+      "createdAt": "2026-02-19 11:55:02",
+      "updatedAt": "2026-02-19 11:55:05",
+      "question_text": "Kendinizi hangi üç kelimeyle tanımlarsınız?"
+    },
+    {
+      "id": "9",
+      "userId": "180022",
+      "questionId": "30007",
+      "answer": "Yaratıcı, meraklı, azimli",
+      "createdAt": "2026-02-19 11:55:02",
+      "updatedAt": "2026-02-19 11:55:05",
+      "question_text": "Kendinizi hangi üç kelimeyle tanımlarsınız?"
+    },
+    {
+      "id": "10",
+      "userId": "180022",
+      "questionId": "30008",
+      "answer": "Yazılım geliştirme ve teknoloji alanında çalışmak istiyorum",
+      "createdAt": "2026-02-19 11:55:15",
+      "updatedAt": "2026-02-19 11:55:24",
+      "question_text": "Hayalinizdeki meslek veya çalışmak istediğiniz alan nedir?"
+    },
+    {
+      "id": "11",
+      "userId": "180022",
+      "questionId": "30008",
+      "answer": "Yazılım geliştirme ve teknoloji alanında çalışmak istiyorum",
+      "createdAt": "2026-02-19 11:55:16",
+      "updatedAt": "2026-02-19 11:55:24",
+      "question_text": "Hayalinizdeki meslek veya çalışmak istediğiniz alan nedir?"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuserId\tquestionId\tanswer\tcreatedAt\tupdatedAt\tquestion_text\n1\t180022\t30001\t5 - Çok hevesliyim\t2026-02-19 11:50:27\t2026-02-19 11:50:27\tYeni şeyler öğrenmeye ne kadar heveslisiniz?\n2\t180022\t30002\t5 - Çok iyi alabiliyorum\t2026-02-19 11:53:17\t2026-02-19 11:53:17\tKendi başınıza karar alabiliyor musunuz?\n3\t180022\t30003\t4\t2026-02-19 11:53:32\t2026-02-19 11:53:32\tZorluklarla başa çıkma becerinizi nasıl değerlendirirsiniz?\n4\t180022\t30004\t5 - Çok kolay\t2026-02-19 11:53:48\t2026-02-19 11:53:48\tÇevrenizde insanlarla ne kadar kolay iletişim kurabiliyorsunuz?\n5\t180022\t30005\t5 - Çok yüksek\t2026-02-19 11:54:03\t2026-02-19 11:54:03\tHedeflerinize ulaşmak için ne kadar motivasyonunuz var?\n6\t180022\t30006\tSosyal (İnsanlarla çalışmak, yardım etmek)\t2026-02-19 11:54:19\t2026-02-19 11:54:19\tHangi mesleki ilgi alanlarına sahipsiniz? (Birden fazla seçebilirsiniz)\n7\t180022\t30007\tYaratıcı, meraklı, azimli\t2026-02-19 11:55:01\t2026-02-19 11:55:05\tKendinizi hangi üç kelimeyle tanımlarsınız?\n8\t180022\t30007\tYaratıcı, meraklı, azimli\t2026-02-19 11:55:02\t2026-02-19 11:55:05\tKendinizi hangi üç kelimeyle tanımlarsınız?\n9\t180022\t30007\tYaratıcı, meraklı, azimli\t2026-02-19 11:55:02\t2026-02-19 11:55:05\tKendinizi hangi üç kelimeyle tanımlarsınız?\n10\t180022\t30008\tYazılım geliştirme ve teknoloji alanında çalışmak istiyorum\t2026-02-19 11:55:15\t2026-02-19 11:55:24\tHayalinizdeki meslek veya çalışmak istediğiniz alan nedir?\n11\t180022\t30008\tYazılım geliştirme ve teknoloji alanında çalışmak istiyorum\t2026-02-19 11:55:16\t2026-02-19 11:55:24\tHayalinizdeki meslek veya çalışmak istediğiniz alan nedir?\n",
+  "stderr": "",
+  "execution_time_ms": 1518
+}
