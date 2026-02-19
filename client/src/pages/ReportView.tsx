@@ -53,9 +53,22 @@ export default function ReportView() {
     );
   }
 
+  const generatePDFMutation = trpc.student.generateReportPDF.useMutation({
+    onSuccess: (data) => {
+      window.open(data.pdfUrl, '_blank');
+    },
+    onError: (error) => {
+      alert('PDF oluşturulurken hata oluştu: ' + error.message);
+    },
+  });
+
   const handleDownload = () => {
     if (report.fileUrl) {
+      // PDF already exists, download directly
       window.open(report.fileUrl, '_blank');
+    } else {
+      // Generate PDF first
+      generatePDFMutation.mutate({ reportId: report.id });
     }
   };
 
@@ -71,10 +84,22 @@ export default function ReportView() {
             <ArrowLeft className="mr-2 h-4 w-4" />
             Panele Dön
           </Button>
-          {report.status === 'approved' && report.fileUrl && (
-            <Button onClick={handleDownload}>
-              <Download className="mr-2 h-4 w-4" />
-              PDF İndir
+          {report.status === 'approved' && (
+            <Button 
+              onClick={handleDownload}
+              disabled={generatePDFMutation.isPending}
+            >
+              {generatePDFMutation.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  PDF Oluşturuluyor...
+                </>
+              ) : (
+                <>
+                  <Download className="mr-2 h-4 w-4" />
+                  PDF İndir
+                </>
+              )}
             </Button>
           )}
         </div>

@@ -6,6 +6,7 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import * as db from "./db";
 import { generateStageReportAsync } from './reportHelper';
+import { generatePDF } from './services/pdfGenerator';
 import { sendEmail, getRegistrationEmailTemplate, getApprovalEmailTemplate, getReportApprovedEmailTemplate } from './_core/resend-email';
 import bcrypt from 'bcryptjs';
 import { sdk } from './_core/sdk';
@@ -410,6 +411,33 @@ export const appRouter = router({
     getMyReports: studentProcedure.query(async ({ ctx }) => {
       return await db.getReportsByUser(ctx.user.id);
     }),
+    
+    generateReportPDF: studentProcedure
+      .input(z.object({ reportId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const report = await db.getReportById(input.reportId);
+        if (!report) {
+          throw new TRPCError({ code: 'NOT_FOUND', message: 'Rapor bulunamadı' });
+        }
+        if (report.userId !== ctx.user.id) {
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'Bu raporu görüntüleme yetkiniz yok' });
+        }
+        if (report.status !== 'approved') {
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'Sadece onaylanmış raporlar için PDF oluşturulabilir' });
+        }
+        
+        // Generate PDF
+        const pdfUrl = await generatePDF(
+          report.content || 'Rapor içeriği henüz hazır değil.',
+          'Kariyer Değerlendirme Raporu',
+          ctx.user.name || 'Öğrenci'
+        );
+        
+        // Update report with PDF URL
+        await db.updateReport(input.reportId, { fileUrl: pdfUrl });
+        
+        return { pdfUrl };
+      }),
     
     getReport: studentProcedure
       .input(z.object({ reportId: z.number() }))
