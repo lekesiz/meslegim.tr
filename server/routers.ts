@@ -6,7 +6,7 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import * as db from "./db";
 import { generateStageReportAsync } from './reportHelper';
-import { sendEmail, getRegistrationEmailTemplate, getApprovalEmailTemplate } from './_core/email';
+import { sendEmail, getRegistrationEmailTemplate, getApprovalEmailTemplate } from './_core/resend-email';
 import bcrypt from 'bcryptjs';
 import { sdk } from './_core/sdk';
 
