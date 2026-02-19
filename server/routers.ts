@@ -5,6 +5,7 @@ import { publicProcedure, router, protectedProcedure } from "./_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import * as db from "./db";
+import { generateStageReportAsync } from './reportHelper';
 
 // Role-based procedures
 const studentProcedure = protectedProcedure.use(({ ctx, next }) => {
@@ -244,12 +245,36 @@ export const appRouter = router({
     submitStage: studentProcedure
       .input(z.object({ stageId: z.number() }))
       .mutation(async ({ input, ctx }) => {
-        // TODO: Validate all required questions are answered
-        // TODO: Mark stage as completed
-        // TODO: Trigger report generation
-        // TODO: Schedule next stage activation (7 days)
+        const { stageId } = input;
+        const userId = ctx.user.id;
         
-        return { success: true };
+        // Validate all required questions are answered
+        const questions = await db.getQuestionsByStage(stageId);
+        const answers = await db.getAnswersByUserAndStage(userId, stageId);
+        
+        const requiredQuestions = questions.filter(q => q.required);
+        const answeredQuestionIds = answers.map(a => a.questionId);
+        const unanswered = requiredQuestions.filter(q => !answeredQuestionIds.includes(q.id));
+        
+        if (unanswered.length > 0) {
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: `Lütfen tüm zorunlu soruları cevaplayın (${unanswered.length} soru kaldı)`,
+          });
+        }
+        
+        // Mark stage as completed
+        await db.updateUserStage(userId, stageId, 'completed');
+        
+        // Trigger report generation (async, don't wait)
+        generateStageReportAsync(userId, stageId).catch(err => {
+          console.error('Report generation failed:', err);
+        });
+        
+        // Schedule next stage activation (7 days from now)
+        await db.scheduleNextStage(userId, stageId);
+        
+        return { success: true, message: 'Etap başarıyla tamamlandı!' };
       }),
     
     getMyReports: studentProcedure.query(async ({ ctx }) => {
