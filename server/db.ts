@@ -200,6 +200,13 @@ export async function getAllStages() {
   return await db.select().from(stages);
 }
 
+export async function getStageById(stageId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  const result = await db.select().from(stages).where(eq(stages.id, stageId));
+  return result[0] || null;
+}
+
 // Question functions
 export async function getQuestionsByStage(stageId: number) {
   const db = await getDb();
