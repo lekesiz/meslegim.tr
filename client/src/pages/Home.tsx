@@ -231,6 +231,28 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+      {/* Navbar */}
+      <nav className="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50">
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <img 
+              src="https://files.manuscdn.com/user_upload_by_module/session_file/310419663028218705/cDCfxYGTnZmArwPn.png" 
+              alt="Meslegim.tr Logo" 
+              className="h-10 w-10"
+            />
+            <span className="text-2xl font-bold text-gray-900">Meslegim.tr</span>
+          </div>
+          <div className="flex items-center gap-4">
+            <Button variant="ghost" asChild>
+              <a href="/login">Giriş Yap</a>
+            </Button>
+            <Button onClick={() => setShowForm(true)}>
+              Ücretsiz Başla
+            </Button>
+          </div>
+        </div>
+      </nav>
+      
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-20">
         <div className="max-w-4xl mx-auto text-center">
