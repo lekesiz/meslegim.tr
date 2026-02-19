@@ -6,7 +6,7 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import * as db from "./db";
 import { generateStageReportAsync } from './reportHelper';
-import { sendEmail, getRegistrationEmailTemplate, getApprovalEmailTemplate } from './_core/resend-email';
+import { sendEmail, getRegistrationEmailTemplate, getApprovalEmailTemplate, getReportApprovedEmailTemplate } from './_core/resend-email';
 import bcrypt from 'bcryptjs';
 import { sdk } from './_core/sdk';
 
@@ -231,8 +231,26 @@ export const appRouter = router({
         
         await db.updateUser(input.studentId, { status: 'active' });
         
-        // TODO: Initialize first stage for the student
-        // TODO: Send activation email
+        // Get student details for email
+        const student = await db.getUserById(input.studentId);
+        if (!student) {
+          throw new TRPCError({ code: 'NOT_FOUND', message: 'Student not found' });
+        }
+        
+        // Send activation email
+        if (student.email && student.name) {
+          try {
+            const loginUrl = `${process.env.VITE_FRONTEND_URL || 'http://localhost:3000'}/login`;
+            await sendEmail({
+              to: student.email,
+              subject: '🎉 Başvurunuz Onaylan dı - Meslegim.tr',
+              html: getApprovalEmailTemplate(student.name, loginUrl),
+            });
+          } catch (error) {
+            console.error('Failed to send activation email:', error);
+            // Don't fail the activation if email fails
+          }
+        }
         
         return { success: true };
       }),
@@ -272,8 +290,34 @@ export const appRouter = router({
     approveReport: mentorProcedure
       .input(z.object({ reportId: z.number() }))
       .mutation(async ({ input, ctx }) => {
-        // TODO: Verify the report belongs to one of mentor's students
+        // Get report details
+        const report = await db.getReportById(input.reportId);
+        if (!report) {
+          throw new TRPCError({ code: 'NOT_FOUND', message: 'Report not found' });
+        }
+        
+        // Approve the report
         await db.approveReport(input.reportId, ctx.user.id);
+        
+        // Get student and stage details for email
+        const student = report.userId ? await db.getUserById(report.userId) : null;
+        const stage = report.stageId ? await db.getStageById(report.stageId) : null;
+        
+        // Send approval email
+        if (student?.email && student?.name && stage?.name) {
+          try {
+            const reportUrl = `${process.env.VITE_FRONTEND_URL || 'http://localhost:3000'}/reports/${report.id}`;
+            await sendEmail({
+              to: student.email,
+              subject: '✅ Raporunuz Onaylan dı - Meslegim.tr',
+              html: getReportApprovedEmailTemplate(student.name, stage.name, reportUrl),
+            });
+          } catch (error) {
+            console.error('Failed to send report approval email:', error);
+            // Don't fail the approval if email fails
+          }
+        }
+        
         return { success: true };
       }),
   }),

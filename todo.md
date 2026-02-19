@@ -64,3 +64,11 @@
 - [x] Report management - tüm raporları listele - ÇALIŞIYOR
 - [x] Stage management - etapları görüntüle - ÇALIŞIYOR
 - [x] Admin router endpoint'leri ekle (getAllUsers, getAllReports, getAllStages, getAllQuestions, getSystemStats) - ÇALIŞIYOR
+
+
+## 📧 Email Notification Test Görevleri (19 Şubat 2026)
+- [x] Yeni kayıt email testi - gerçek Gmail adresi ile kayıt ol - BAŞARILI (mikaillekesiz@gmail.com'a email gönderildi ve alındı)
+- [ ] Mentor onay email testi - mentor olarak öğrenci aktif et
+- [ ] Etap aktivasyon email testi - otomatik etap aktivasyonu kontrolü
+- [ ] Rapor onay email testi - mentor rapor onayı sonrası email
+- [ ] Email template'lerini kontrol et - profesyonel görünüm

@@ -199,3 +199,42 @@ export function getReportReadyEmailTemplate(name: string, stageName: string, rep
     </html>
   `;
 }
+
+export function getReportApprovedEmailTemplate(name: string, stageName: string, reportUrl: string): string {
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: #10b981; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
+        .content { padding: 30px; background: #f9fafb; border-radius: 0 0 8px 8px; }
+        .button { display: inline-block; padding: 12px 24px; background: #10b981; color: white; text-decoration: none; border-radius: 6px; margin: 20px 0; }
+        .footer { text-align: center; margin-top: 20px; color: #6b7280; font-size: 14px; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1>✅ Raporunuz Onaylandı!</h1>
+        </div>
+        <div class="content">
+          <h2>Merhaba, ${name}!</h2>
+          <p><strong>${stageName}</strong> etabınız için hazırlanan değerlendirme raporunuz mentor tarafından onaylanmıştır.</p>
+          <p>Artık raporunuzu görüntüleyebilir ve indirebilirsiniz.</p>
+          <p>Rapor, kariyer gelişiminiz için önemli içgörüler ve öneriler içermektedir. Lütfen dikkatlice inceleyiniz.</p>
+          <p style="text-align: center;">
+            <a href="${reportUrl}" class="button">Raporu Görüntüle</a>
+          </p>
+          <div class="footer">
+            <p>Bu e-posta Meslegim.tr tarafından otomatik olarak gönderilmiştir.</p>
+            <p>© 2026 Meslegim.tr - Tüm hakları saklıdır.</p>
+          </div>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+}
