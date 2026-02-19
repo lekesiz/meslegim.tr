@@ -10,10 +10,11 @@ import { generatePDF } from './services/pdfGenerator';
 import { sendEmail, getRegistrationEmailTemplate, getApprovalEmailTemplate, getReportApprovedEmailTemplate } from './_core/resend-email';
 import bcrypt from 'bcryptjs';
 import { sdk } from './_core/sdk';
+import { hasRole, hasAnyRole } from './roleHelper';
 
 // Role-based procedures
 const studentProcedure = protectedProcedure.use(({ ctx, next }) => {
-  if (ctx.user.role !== 'student') {
+  if (!hasRole(ctx.user.role, 'student')) {
     throw new TRPCError({ code: 'FORBIDDEN', message: 'Cette action est réservée aux étudiants' });
   }
   if (ctx.user.status !== 'active') {
@@ -23,14 +24,14 @@ const studentProcedure = protectedProcedure.use(({ ctx, next }) => {
 });
 
 const mentorProcedure = protectedProcedure.use(({ ctx, next }) => {
-  if (ctx.user.role !== 'mentor' && ctx.user.role !== 'admin') {
+  if (!hasAnyRole(ctx.user.role, ['mentor', 'admin'])) {
     throw new TRPCError({ code: 'FORBIDDEN', message: 'Cette action est réservée aux mentors' });
   }
   return next({ ctx });
 });
 
 const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
-  if (ctx.user.role !== 'admin') {
+  if (!hasRole(ctx.user.role, 'admin')) {
     throw new TRPCError({ code: 'FORBIDDEN', message: 'Cette action est réservée aux administrateurs' });
   }
   return next({ ctx });
@@ -176,7 +177,7 @@ export const appRouter = router({
       const reports = await db.getAllReports();
       const stages = await db.getAllStages();
       
-      const students = users.filter(u => u.role === 'student');
+      const students = users.filter(u => hasRole(u.role, 'student'));
       const activeStudents = students.filter(s => s.status === 'active');
       const pendingReports = reports.filter(r => r.status === 'pending');
       const approvedReports = reports.filter(r => r.status === 'approved');
@@ -185,13 +186,42 @@ export const appRouter = router({
         totalUsers: users.length,
         totalStudents: students.length,
         activeStudents: activeStudents.length,
-        totalMentors: users.filter(u => u.role === 'mentor').length,
+        totalMentors: users.filter(u => hasRole(u.role, 'mentor')).length,
         totalReports: reports.length,
         pendingReports: pendingReports.length,
         approvedReports: approvedReports.length,
         totalStages: stages.length,
       };
     }),
+    
+    createMentor: adminProcedure
+      .input(z.object({
+        name: z.string().min(1),
+        email: z.string().email(),
+        password: z.string().min(6),
+      }))
+      .mutation(async ({ input }) => {
+        // Check if user already exists
+        const existingUser = await db.getUserByEmail(input.email);
+        if (existingUser) {
+          throw new TRPCError({ code: 'CONFLICT', message: 'Bu e-posta adresi zaten kayıtlı' });
+        }
+        
+        // Hash password
+        const hashedPassword = await bcrypt.hash(input.password, 10);
+        
+        // Create new mentor with active status
+        const newMentor = await db.createUser({
+          name: input.name,
+          email: input.email,
+          password: hashedPassword,
+          role: 'mentor',
+          status: 'active',
+          loginMethod: 'email',
+        });
+        
+        return { success: true, mentorId: newMentor.id };
+      }),
     
     getStages: adminProcedure.query(async () => {
       return await db.getAllStages();
@@ -212,7 +242,7 @@ export const appRouter = router({
   mentor: router({
     getPendingStudents: mentorProcedure.query(async ({ ctx }) => {
       // Mentors see only their assigned students, admins see all
-      const mentorId = ctx.user.role === 'mentor' ? ctx.user.id : undefined;
+      const mentorId = hasRole(ctx.user.role, 'mentor') && !hasRole(ctx.user.role, 'admin') ? ctx.user.id : undefined;
       return await db.getPendingStudents(mentorId);
     }),
     
@@ -220,7 +250,7 @@ export const appRouter = router({
       .input(z.object({ studentId: z.number() }))
       .mutation(async ({ input, ctx }) => {
         // Verify the student is assigned to this mentor (unless admin)
-        if (ctx.user.role === 'mentor') {
+        if (hasRole(ctx.user.role, 'mentor') && !hasRole(ctx.user.role, 'admin')) {
           const student = await db.getUserById(input.studentId);
           if (!student || student.mentorId !== ctx.user.id) {
             throw new TRPCError({ 
@@ -257,9 +287,9 @@ export const appRouter = router({
       }),
     
     getMyStudents: mentorProcedure.query(async ({ ctx }) => {
-      if (ctx.user.role === 'admin') {
+      if (hasRole(ctx.user.role, 'admin')) {
         // Admins see all students
-        return (await db.getAllUsers()).filter(u => u.role === 'student');
+        return (await db.getAllUsers()).filter(u => hasRole(u.role, 'student'));
       }
       return await db.getStudentsByMentor(ctx.user.id);
     }),
@@ -273,7 +303,7 @@ export const appRouter = router({
         }
         
         // Verify access
-        if (ctx.user.role === 'mentor' && student.mentorId !== ctx.user.id) {
+        if (hasRole(ctx.user.role, 'mentor') && !hasRole(ctx.user.role, 'admin') && student.mentorId !== ctx.user.id) {
           throw new TRPCError({ code: 'FORBIDDEN' });
         }
         
@@ -284,7 +314,7 @@ export const appRouter = router({
       }),
     
     getPendingReports: mentorProcedure.query(async ({ ctx }) => {
-      const mentorId = ctx.user.role === 'mentor' ? ctx.user.id : undefined;
+      const mentorId = hasRole(ctx.user.role, 'mentor') && !hasRole(ctx.user.role, 'admin') ? ctx.user.id : undefined;
       return await db.getPendingReports(mentorId);
     }),
     

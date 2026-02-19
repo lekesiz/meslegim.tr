@@ -13,7 +13,7 @@ export const users = mysqlTable("users", {
   phone: varchar("phone", { length: 20 }),
   tcKimlik: varchar("tcKimlik", { length: 11 }),
   loginMethod: varchar("loginMethod", { length: 64 }),
-  role: mysqlEnum("role", ["student", "mentor", "admin"]).default("student").notNull(),
+  role: varchar("role", { length: 50 }).default("student").notNull(),
   status: mysqlEnum("status", ["pending", "active", "inactive"]).default("pending").notNull(),
   ageGroup: mysqlEnum("ageGroup", ["14-17", "18-21", "22-24"]),
   mentorId: int("mentorId"),

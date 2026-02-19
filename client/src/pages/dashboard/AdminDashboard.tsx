@@ -13,7 +13,12 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { trpc } from '@/lib/trpc';
-import { Loader2, Users, FileQuestion, Layers } from 'lucide-react';
+import { Loader2, Users, FileQuestion, Layers, Plus } from 'lucide-react';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { useState } from 'react';
+import { toast } from 'sonner';
 
 export default function AdminDashboard() {
   const { user } = useAuth();
@@ -201,10 +206,15 @@ export default function AdminDashboard() {
           <TabsContent value="mentors">
             <Card>
               <CardHeader>
-                <CardTitle>Mentor Listesi</CardTitle>
-                <CardDescription>
-                  Sistemdeki tüm mentorları görüntüleyin ve yönetin
-                </CardDescription>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle>Mentor Listesi</CardTitle>
+                    <CardDescription>
+                      Sistemdeki tüm mentorları görüntüleyin ve yönetin
+                    </CardDescription>
+                  </div>
+                  <CreateMentorDialog />
+                </div>
               </CardHeader>
               <CardContent>
                 <Table>
@@ -423,5 +433,110 @@ export default function AdminDashboard() {
         </Tabs>
       </div>
     </DashboardLayout>
+  );
+}
+
+// CreateMentorDialog Component
+function CreateMentorDialog() {
+  const [open, setOpen] = useState(false);
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const utils = trpc.useUtils();
+
+  const createMentorMutation = trpc.admin.createMentor.useMutation({
+    onSuccess: () => {
+      toast.success('Mentor başarıyla oluşturuldu', {
+        description: 'Yeni mentor sisteme eklendi.',
+      });
+      utils.admin.getUsers.invalidate();
+      setOpen(false);
+      setName('');
+      setEmail('');
+      setPassword('');
+    },
+    onError: (error) => {
+      toast.error('Hata', {
+        description: error.message,
+      });
+    },
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    createMentorMutation.mutate({ name, email, password });
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button>
+          <Plus className="h-4 w-4 mr-2" />
+          Yeni Mentor Ekle
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Yeni Mentor Ekle</DialogTitle>
+          <DialogDescription>
+            Sisteme yeni bir mentor ekleyin. Mentor otomatik olarak aktif olacaktır.
+          </DialogDescription>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="name">Ad Soyad</Label>
+            <Input
+              id="name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Örn: Ahmet Yılmaz"
+              required
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="email">E-posta</Label>
+            <Input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Örn: ahmet@example.com"
+              required
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="password">Şifre</Label>
+            <Input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="En az 6 karakter"
+              required
+              minLength={6}
+            />
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setOpen(false)}
+            >
+              İptal
+            </Button>
+            <Button type="submit" disabled={createMentorMutation.isPending}>
+              {createMentorMutation.isPending ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Oluşturuluyor...
+                </>
+              ) : (
+                'Oluştur'
+              )}
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }

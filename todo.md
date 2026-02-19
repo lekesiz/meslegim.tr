@@ -104,3 +104,11 @@
 - [x] SEO meta tags ekle (description, keywords, Open Graph) - TAMAMLANDI
 - [x] Structured data ekle (Organization, WebSite schema) - TAMAMLANDI
 - [ ] Performance optimizasyonu (image lazy loading, code splitting)
+
+
+## 👥 Mentor Yönetimi İyileştirmeleri (19 Şubat 2026)
+- [x] mikaillekesiz@gmail.com hesabını admin + mentor rolü ile güncelle
+- [x] Admin panel'e "Yeni Mentor Ekle" özelliği ekle
+- [x] Mentor ekleme formu oluştur (Ad Soyad, Email, Şifre)
+- [x] Admin router'a createMentor endpoint ekle
+- [x] Test et: mikaillekesiz@gmail.com ile hem admin hem mentor işlemleri yapabilme
