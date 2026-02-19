@@ -38,3 +38,11 @@
 - [ ] Bundle size optimizasyonu
 - [ ] Performance optimization
 - [ ] Accessibility audit
+
+
+## 🔥 Yeni Görevler (Devam Ediliyor - 19 Şubat 2026)
+- [x] Mentor dashboard - pending students listesi oluştur - ÇALIŞIYOR
+- [x] Mentor dashboard - student activation butonu ekle - ÇALIŞIYOR
+- [x] Rapor onaylama sistemi (mentor için) - ÇALIŞIYOR
+- [ ] Rapor görüntüleme sayfası (student için)
+- [ ] PDF export özelliği (rapor indirme)
