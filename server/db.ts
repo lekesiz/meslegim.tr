@@ -368,3 +368,33 @@ export async function getStageWithAnswers(userId: number, stageId: number) {
     answers,
   };
 }
+
+
+export async function getFirstStageForAgeGroup(ageGroup: string) {
+  const dbInstance = await getDb();
+  if (!dbInstance) throw new Error('Database not initialized');
+  const [stage] = await dbInstance
+    .select()
+    .from(stages)
+    .where(eq(stages.order, 1))
+    .limit(1);
+  return stage;
+}
+
+export async function createUserStage(data: { userId: number; stageId: number; status: 'locked' | 'active' | 'completed' }) {
+  const dbInstance = await getDb();
+  if (!dbInstance) throw new Error('Database not initialized');
+  await dbInstance.insert(userStages).values({
+    userId: data.userId,
+    stageId: data.stageId,
+    status: data.status,
+    unlockedAt: data.status === 'active' ? new Date() : null,
+  });
+  // Return the created user stage
+  const [userStage] = await dbInstance
+    .select()
+    .from(userStages)
+    .where(and(eq(userStages.userId, data.userId), eq(userStages.stageId, data.stageId)))
+    .limit(1);
+  return userStage;
+}
