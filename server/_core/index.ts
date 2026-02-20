@@ -8,6 +8,11 @@ import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 import { initializeCronJobs } from "../services/cronJobs";
+import helmet from "helmet";
+import cors from "cors";
+import { rateLimit } from "express-rate-limit";
+import { initSentry, setupSentryErrorHandler } from "../utils/sentry";
+import logger, { logInfo, logError } from "../utils/logger";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -31,6 +36,63 @@ async function findAvailablePort(startPort: number = 3000): Promise<number> {
 async function startServer() {
   const app = express();
   const server = createServer(app);
+
+  // Trust proxy - Required for rate limiting behind reverse proxy
+  app.set('trust proxy', 1);
+
+  // Initialize Sentry (error tracking)
+  initSentry(app);
+
+  // Log server startup
+  logInfo('Server initialization started');
+
+  // Security middleware
+  // Helmet - Security headers
+  app.use(
+    helmet({
+      contentSecurityPolicy: {
+        directives: {
+          defaultSrc: ["'self'"],
+          styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+          fontSrc: ["'self'", "https://fonts.gstatic.com"],
+          scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"], // unsafe-eval needed for Vite HMR in dev
+          imgSrc: ["'self'", "data:", "https:"],
+          connectSrc: ["'self'", "https:"],
+        },
+      },
+      crossOriginEmbedderPolicy: false, // Needed for some external resources
+    })
+  );
+
+  // CORS configuration
+  app.use(
+    cors({
+      origin: process.env.NODE_ENV === "production" 
+        ? ["https://meslegim-tr.manus.space", "https://www.meslegim.tr"] 
+        : true,
+      credentials: true,
+    })
+  );
+
+  // Rate limiting - Global
+  const globalLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // Limit each IP to 100 requests per windowMs
+    message: "Çok fazla istek gönderdiniz. Lütfen daha sonra tekrar deneyin.",
+    standardHeaders: true,
+    legacyHeaders: false,
+  });
+  app.use(globalLimiter);
+
+  // Rate limiting - Strict for auth endpoints
+  const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 5, // 5 login attempts per 15 minutes
+    message: "Çok fazla giriş denemesi yaptınız. Lütfen 15 dakika sonra tekrar deneyin.",
+    skipSuccessfulRequests: true,
+  });
+  app.use("/api/oauth", authLimiter);
+
   // Configure body parser with larger size limit for file uploads
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
@@ -51,6 +113,9 @@ async function startServer() {
     serveStatic(app);
   }
 
+  // Sentry error handler - Must be after all routes
+  setupSentryErrorHandler(app);
+
   const preferredPort = parseInt(process.env.PORT || "3000");
   const port = await findAvailablePort(preferredPort);
 
@@ -59,7 +124,9 @@ async function startServer() {
   }
 
   server.listen(port, () => {
-    console.log(`Server running on http://localhost:${port}/`);
+    const message = `Server running on http://localhost:${port}/`;
+    console.log(message);
+    logInfo(message, { port });
     // Initialize cron jobs after server starts
     initializeCronJobs();
   });
