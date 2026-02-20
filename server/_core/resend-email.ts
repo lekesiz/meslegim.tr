@@ -11,7 +11,7 @@ export interface EmailOptions {
 export async function sendEmail(options: EmailOptions): Promise<boolean> {
   try {
     const { data, error } = await resend.emails.send({
-      from: 'Meslegim.tr <onboarding@resend.dev>', // Resend test domain
+      from: 'Meslegim.tr <noreply@meslegim.tr>',
       to: options.to,
       subject: options.subject,
       html: options.html,

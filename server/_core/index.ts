@@ -55,9 +55,9 @@ async function startServer() {
           defaultSrc: ["'self'"],
           styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
           fontSrc: ["'self'", "https://fonts.gstatic.com"],
-          scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"], // unsafe-eval needed for Vite HMR in dev
+          scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://manus-analytics.com"], // unsafe-eval needed for Vite HMR in dev
           imgSrc: ["'self'", "data:", "https:"],
-          connectSrc: ["'self'", "https:"],
+          connectSrc: ["'self'", "https:", "https://manus-analytics.com"],
         },
       },
       crossOriginEmbedderPolicy: false, // Needed for some external resources
@@ -74,13 +74,14 @@ async function startServer() {
     })
   );
 
-  // Rate limiting - Global
+  // Rate limiting - Global (relaxed for development)
   const globalLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // Limit each IP to 100 requests per windowMs
+    max: process.env.NODE_ENV === "production" ? 100 : 1000, // 1000 for dev, 100 for prod
     message: "Çok fazla istek gönderdiniz. Lütfen daha sonra tekrar deneyin.",
     standardHeaders: true,
     legacyHeaders: false,
+    skip: (req) => process.env.NODE_ENV === "development" && req.path.startsWith("/client"), // Skip static assets in dev
   });
   app.use(globalLimiter);
 

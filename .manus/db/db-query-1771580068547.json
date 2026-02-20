@@ -1,0 +1,18 @@
+{
+  "query": "SELECT id, name, email, role, status, password IS NOT NULL as has_password FROM users WHERE email = 'mikaillekesiz@gmail.com';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute SELECT id, name, email, role, status, password IS NOT NULL as has_password FROM users WHERE email = 'mikaillekesiz@gmail.com';",
+  "rows": [
+    {
+      "id": "240003",
+      "name": "Mikail Lekesiz",
+      "email": "mikaillekesiz@gmail.com",
+      "role": "admin,mentor",
+      "status": "active",
+      "has_password": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\trole\tstatus\thas_password\n240003\tMikail Lekesiz\tmikaillekesiz@gmail.com\tadmin,mentor\tactive\t1\n",
+  "stderr": "",
+  "execution_time_ms": 1546
+}
