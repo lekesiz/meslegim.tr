@@ -160,3 +160,7 @@
 - [x] Mentor dropdown listesi eklendi (öğrenci düzenleme için)
 - [x] Test edildi: Öğrenci bilgilerini güncelleme - BAŞARILI (Mehmet Demir -> Mehmet Demir (Edited))
 - [x] Test edildi: Mentor düzenleme dialog'u açılıyor ve tüm alanlar doğru dolu
+
+
+## 🐛 Bug Düzeltmeleri (20 Şubat 2026)
+- [x] Mentor Dashboard'da "Detayları Görüntüle" butonu çalışmıyor - BAŞARILI (StudentDetailView sayfası oluşturuldu, mentor.getStudentDetails endpoint kullanılıyor)

@@ -8,10 +8,12 @@ import { trpc } from '@/lib/trpc';
 import { Loader2, UserCheck, Users, FileText, CheckCircle } from 'lucide-react';
 import { DashboardSkeleton } from '@/components/DashboardSkeleton';
 import { toast } from 'sonner';
+import { useLocation } from 'wouter';
 
 export default function MentorDashboard() {
   const { user } = useAuth();
   const utils = trpc.useUtils();
+  const [, setLocation] = useLocation();
 
   const { data: pendingStudents, isLoading: pendingLoading } = trpc.mentor.getPendingStudents.useQuery();
   const { data: myStudents, isLoading: studentsLoading } = trpc.mentor.getMyStudents.useQuery();
@@ -199,7 +201,11 @@ export default function MentorDashboard() {
                       </p>
                     </div>
                     <div className="mt-4">
-                      <Button variant="outline" size="sm">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => setLocation(`/dashboard/student/${student.id}`)}
+                      >
                         Detayları Görüntüle
                       </Button>
                     </div>

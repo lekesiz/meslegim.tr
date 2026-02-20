@@ -12,6 +12,7 @@ import AdminDashboard from "./pages/dashboard/AdminDashboard";
 import MentorDashboard from "./pages/dashboard/MentorDashboard";
 import StudentDashboard from "./pages/dashboard/StudentDashboard";
 import StudentStageForm from "./pages/student/StageForm";
+import StudentDetailView from "./pages/student/StudentDetailView";
 import Login from "./pages/Login";
 import ReportView from "./pages/ReportView";
 import Dashboard from "./pages/Dashboard";
@@ -32,6 +33,7 @@ function Router() {
       <Route path="/dashboard/mentor" component={MentorDashboard} />
       <Route path="/dashboard/student" component={StudentDashboard} />
       <Route path="/dashboard/student/stage/:stageId" component={StudentStageForm} />
+      <Route path="/dashboard/student/:id" component={StudentDetailView} />
       <Route path="/reports/:id" component={ReportView} />
       
       <Route path="/404" component={NotFound} />
