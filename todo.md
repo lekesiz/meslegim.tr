@@ -136,3 +136,12 @@
 - [x] Ortalama tamamlama süreleri hesapla ve göster
 - [x] Toplu email gönderimi özelliği ekle (tüm öğrenciler, yaş grubuna göre)
 - [x] Toplu öğrenci aktifleştirme özelliği ekle (bekleyen öğrencileri toplu aktif et)
+
+
+## 🔐 Şifre Sıfırlama Özelliği (20 Şubat 2026)
+- [ ] Şifre sıfırlama backend endpoint'leri oluştur (requestPasswordReset, resetPassword)
+- [ ] Şifre sıfırlama email template'i oluştur
+- [ ] Login sayfasına "Şifremi Unuttum" linki ekle
+- [ ] Şifre sıfırlama sayfası oluştur (/reset-password/:token)
+- [ ] Token validation ve expiration logic
+- [ ] Test et: Email gönderimi, token validation, şifre güncelleme

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { useLocation } from "wouter";
 
@@ -12,6 +13,19 @@ export default function Login() {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
+  });
+  const [resetEmail, setResetEmail] = useState("");
+  const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
+
+  const resetPasswordMutation = trpc.auth.requestPasswordReset.useMutation({
+    onSuccess: (data) => {
+      toast.success(data.message);
+      setIsResetDialogOpen(false);
+      setResetEmail("");
+    },
+    onError: (error: any) => {
+      toast.error(error.message || "Şifre sıfırlama başarısız");
+    },
   });
 
   const loginMutation = trpc.auth.login.useMutation({
@@ -82,11 +96,48 @@ export default function Login() {
               {loginMutation.isPending ? "Giriş yapılıyor..." : "Giriş Yap"}
             </Button>
 
-            <div className="text-center text-sm text-muted-foreground">
+            <div className="flex items-center justify-between text-sm">
+              <Dialog open={isResetDialogOpen} onOpenChange={setIsResetDialogOpen}>
+                <DialogTrigger asChild>
+                  <button
+                    type="button"
+                    className="text-primary hover:underline"
+                  >
+                    Şifremi Unuttum
+                  </button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Şifre Sıfırlama</DialogTitle>
+                    <DialogDescription>
+                      E-posta adresinizi girin, size şifre sıfırlama linki gönderelim.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4 py-4">
+                    <div>
+                      <Label htmlFor="reset-email">E-posta</Label>
+                      <Input
+                        id="reset-email"
+                        type="email"
+                        value={resetEmail}
+                        onChange={(e) => setResetEmail(e.target.value)}
+                        placeholder="ornek@email.com"
+                      />
+                    </div>
+                    <Button
+                      onClick={() => resetPasswordMutation.mutate({ email: resetEmail })}
+                      disabled={!resetEmail || resetPasswordMutation.isPending}
+                      className="w-full"
+                    >
+                      {resetPasswordMutation.isPending ? "Gönderiliyor..." : "Şifre Sıfırlama Linki Gönder"}
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
               <button
                 type="button"
                 onClick={() => setLocation('/')}
-                className="text-primary hover:underline"
+                className="text-muted-foreground hover:underline"
               >
                 Ana sayfaya dön
               </button>

@@ -79,6 +79,85 @@ export const appRouter = router({
         
         return { success: true, user };
       }),
+    requestPasswordReset: publicProcedure
+      .input(z.object({
+        email: z.string().email(),
+      }))
+      .mutation(async ({ input }) => {
+        const user = await db.getUserByEmail(input.email);
+        if (!user) {
+          // Don't reveal if email exists or not (security best practice)
+          return { success: true, message: 'Eğer bu e-posta kayıtlıysa, şifre sıfırlama linki gönderildi' };
+        }
+        
+        // Generate reset token (valid for 1 hour)
+        const resetToken = await sdk.createSessionToken(user.openId || '', { 
+          name: user.name || '',
+          expiresInMs: 3600000
+        });
+        
+        // Send password reset email
+        const resetUrl = `${process.env.VITE_APP_URL || 'http://localhost:3000'}/reset-password/${resetToken}`;
+        await sendEmail({
+          to: user.email || '',
+          subject: 'Meslegim.tr - Şifre Sıfırlama',
+          html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+              <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 20px; text-align: center;">
+                <img src="https://meslegim-tr.manus.space/logo.png" alt="Meslegim.tr Logo" style="height: 50px; margin-bottom: 20px;" />
+                <h1 style="color: white; margin: 0;">Meslegim.tr</h1>
+                <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0 0;">Kariyer Değerlendirme Platformu</p>
+              </div>
+              <div style="padding: 40px 20px; background: white;">
+                <h2 style="color: #333; margin-top: 0;">Şifre Sıfırlama Talebi</h2>
+                <p style="color: #666; line-height: 1.6;">Merhaba ${user.name},</p>
+                <p style="color: #666; line-height: 1.6;">Şifrenizi sıfırlamak için aşağıdaki butona tıklayın. Bu link 1 saat geçerlidir.</p>
+                <div style="text-align: center; margin: 30px 0;">
+                  <a href="${resetUrl}" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 40px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: bold;">Şifremi Sıfırla</a>
+                </div>
+                <p style="color: #999; font-size: 14px; line-height: 1.6;">Eğer bu talebi siz yapmadıysanız, bu e-postayı görmezden gelebilirsiniz.</p>
+              </div>
+              <div style="background: #f5f5f5; padding: 20px; text-align: center; color: #999; font-size: 12px;">
+                <p style="margin: 0;">Bu e-posta Meslegim.tr tarafından otomatik olarak gönderilmiştir.</p>
+                <p style="margin: 10px 0 0 0;">© 2026 Meslegim.tr - Tüm hakları saklıdır.</p>
+              </div>
+            </div>
+          `,
+        });
+        
+        return { success: true, message: 'Şifre sıfırlama linki e-posta adresinize gönderildi' };
+      }),
+    resetPassword: publicProcedure
+      .input(z.object({
+        token: z.string(),
+        newPassword: z.string().min(6),
+      }))
+      .mutation(async ({ input }) => {
+        // Verify token and get user
+        let userOpenId: string;
+        try {
+          const session = await sdk.verifySession(input.token);
+          if (!session || !session.openId) {
+            throw new Error('Invalid session');
+          }
+          userOpenId = session.openId;
+        } catch (error) {
+          throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Geçersiz veya süresi dolmuş link' });
+        }
+        
+        const user = await db.getUserByOpenId(userOpenId);
+        if (!user) {
+          throw new TRPCError({ code: 'NOT_FOUND', message: 'Kullanıcı bulunamadı' });
+        }
+        
+        // Hash new password
+        const hashedPassword = await bcrypt.hash(input.newPassword, 10);
+        
+        // Update password
+        await db.updateUserPassword(user.id, hashedPassword);
+        
+        return { success: true, message: 'Şifreniz başarıyla güncellendi' };
+      }),
     register: publicProcedure
       .input(z.object({
         name: z.string().min(1),

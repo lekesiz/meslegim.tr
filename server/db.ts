@@ -440,3 +440,12 @@ export async function updateReport(reportId: number, data: Partial<{ fileUrl: st
     .set(data)
     .where(eq(reports.id, reportId));
 }
+
+export async function updateUserPassword(userId: number, hashedPassword: string) {
+  const dbInstance = await getDb();
+  if (!dbInstance) throw new Error('Database not initialized');
+  await dbInstance
+    .update(users)
+    .set({ password: hashedPassword })
+    .where(eq(users.id, userId));
+}

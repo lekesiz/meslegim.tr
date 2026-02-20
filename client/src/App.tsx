@@ -15,12 +15,14 @@ import StudentStageForm from "./pages/student/StageForm";
 import Login from "./pages/Login";
 import ReportView from "./pages/ReportView";
 import Dashboard from "./pages/Dashboard";
+import ResetPassword from "./pages/ResetPassword";
 
 function Router() {
   return (
     <Switch>
       <Route path="/" component={Home} />
       <Route path="/login" component={Login} />
+      <Route path="/reset-password/:token" component={ResetPassword} />
       
       {/* Dashboard - role-based routing */}
       <Route path="/dashboard" component={Dashboard} />
