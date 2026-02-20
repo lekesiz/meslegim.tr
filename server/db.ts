@@ -1,4 +1,4 @@
-import { eq, and, or } from "drizzle-orm";
+import { eq, and, or, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { InsertUser, users, stages, questions, answers, userStages, reports } from "../drizzle/schema";
 import { ENV } from './_core/env';
@@ -448,4 +448,132 @@ export async function updateUserPassword(userId: number, hashedPassword: string)
     .update(users)
     .set({ password: hashedPassword })
     .where(eq(users.id, userId));
+}
+
+
+/**
+ * Calculate student progress percentage based on completed stages
+ * @param userId - Student user ID
+ * @returns Progress percentage (0-100) and completed/total stage counts
+ */
+export async function calculateStudentProgress(userId: number): Promise<{
+  progressPercentage: number;
+  completedStages: number;
+  totalStages: number;
+  stageProgress: Array<{ stageId: number; stageName: string; status: string; completedAt: Date | null }>;
+}> {
+  const dbInstance = await getDb();
+  if (!dbInstance) {
+    return { progressPercentage: 0, completedStages: 0, totalStages: 0, stageProgress: [] };
+  }
+
+  // Get user's age group to filter relevant stages
+  const user = await getUserById(userId);
+  if (!user) {
+    return { progressPercentage: 0, completedStages: 0, totalStages: 0, stageProgress: [] };
+  }
+
+  // Get all stages for user's age group
+  const allStages = await dbInstance
+    .select()
+    .from(stages)
+    .where(eq(stages.ageGroup, user.ageGroup || '14-17'));
+
+  const totalStages = allStages.length;
+
+  // Get user's stage progress
+  const userStageProgress = await dbInstance
+    .select({
+      stageId: userStages.stageId,
+      status: userStages.status,
+      completedAt: userStages.completedAt,
+      stageName: stages.name,
+    })
+    .from(userStages)
+    .innerJoin(stages, eq(userStages.stageId, stages.id))
+    .where(eq(userStages.userId, userId));
+
+  const completedStages = userStageProgress.filter(s => s.status === 'completed').length;
+  const progressPercentage = totalStages > 0 ? Math.round((completedStages / totalStages) * 100) : 0;
+
+  const stageProgress = userStageProgress.map(s => ({
+    stageId: s.stageId,
+    stageName: s.stageName,
+    status: s.status,
+    completedAt: s.completedAt,
+  }));
+
+  return {
+    progressPercentage,
+    completedStages,
+    totalStages,
+    stageProgress,
+  };
+}
+
+
+/**
+ * Mentor Notes CRUD operations
+ */
+export async function getMentorNotesByStudent(studentId: number): Promise<any[]> {
+  const dbInstance = await getDb();
+  if (!dbInstance) return [];
+  
+  const { mentorNotes } = await import('../drizzle/schema');
+  return await dbInstance
+    .select()
+    .from(mentorNotes)
+    .where(eq(mentorNotes.studentId, studentId))
+    .orderBy(desc(mentorNotes.createdAt));
+}
+
+export async function createMentorNote(data: { mentorId: number; studentId: number; note: string }) {
+  const dbInstance = await getDb();
+  if (!dbInstance) throw new Error('Database not initialized');
+  
+  const { mentorNotes } = await import('../drizzle/schema');
+  await dbInstance.insert(mentorNotes).values(data);
+  
+  // Return the created note
+  const [note] = await dbInstance
+    .select()
+    .from(mentorNotes)
+    .where(and(eq(mentorNotes.mentorId, data.mentorId), eq(mentorNotes.studentId, data.studentId)))
+    .orderBy(desc(mentorNotes.createdAt))
+    .limit(1);
+  return note;
+}
+
+export async function updateMentorNote(noteId: number, note: string) {
+  const dbInstance = await getDb();
+  if (!dbInstance) throw new Error('Database not initialized');
+  
+  const { mentorNotes } = await import('../drizzle/schema');
+  await dbInstance
+    .update(mentorNotes)
+    .set({ note, updatedAt: new Date() })
+    .where(eq(mentorNotes.id, noteId));
+}
+
+export async function deleteMentorNote(noteId: number) {
+  const dbInstance = await getDb();
+  if (!dbInstance) throw new Error('Database not initialized');
+  
+  const { mentorNotes } = await import('../drizzle/schema');
+  await dbInstance
+    .delete(mentorNotes)
+    .where(eq(mentorNotes.id, noteId));
+}
+
+export async function getMentorNoteById(noteId: number) {
+  const dbInstance = await getDb();
+  if (!dbInstance) return null;
+  
+  const { mentorNotes } = await import('../drizzle/schema');
+  const [note] = await dbInstance
+    .select()
+    .from(mentorNotes)
+    .where(eq(mentorNotes.id, noteId))
+    .limit(1);
+  return note;
 }

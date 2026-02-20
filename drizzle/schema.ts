@@ -126,3 +126,21 @@ export const reports = mysqlTable("reports", {
 
 export type Report = typeof reports.$inferSelect;
 export type InsertReport = typeof reports.$inferInsert;
+
+/**
+ * Mentor notes table - stores mentor's private notes about students
+ */
+export const mentorNotes = mysqlTable("mentor_notes", {
+  id: int("id").autoincrement().primaryKey(),
+  mentorId: int("mentorId").notNull(),
+  studentId: int("studentId").notNull(),
+  note: text("note").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  mentorIdIdx: index("mentor_id_idx").on(table.mentorId),
+  studentIdIdx: index("student_id_idx").on(table.studentId),
+}));
+
+export type MentorNote = typeof mentorNotes.$inferSelect;
+export type InsertMentorNote = typeof mentorNotes.$inferInsert;

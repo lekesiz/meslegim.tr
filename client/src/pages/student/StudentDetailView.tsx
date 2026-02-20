@@ -5,7 +5,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { trpc } from '@/lib/trpc';
-import { Loader2, ArrowLeft, FileText, CheckCircle, Clock } from 'lucide-react';
+import { Loader2, ArrowLeft, FileText, CheckCircle, Clock, TrendingUp, StickyNote, Plus, Edit, Trash2 } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
+import { Textarea } from '@/components/ui/textarea';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { useState } from 'react';
+import { toast } from 'sonner';
 import { DashboardSkeleton } from '@/components/DashboardSkeleton';
 
 export default function StudentDetailView() {
@@ -21,6 +26,84 @@ export default function StudentDetailView() {
   const student = data?.student;
   const stages = data?.stages;
   const reports = data?.reports;
+  const progress = data?.progress;
+  
+  // Mentor notes state
+  const [noteDialogOpen, setNoteDialogOpen] = useState(false);
+  const [editingNote, setEditingNote] = useState<{ id: number; note: string } | null>(null);
+  const [noteText, setNoteText] = useState('');
+  
+  // Fetch mentor notes
+  const { data: notes, refetch: refetchNotes } = trpc.mentor.getNotesByStudent.useQuery(
+    { studentId: parseInt(id || '0') },
+    { enabled: !!id }
+  );
+  
+  const createNoteMutation = trpc.mentor.createNote.useMutation({
+    onSuccess: () => {
+      toast.success('Not başarıyla eklendi');
+      setNoteDialogOpen(false);
+      setNoteText('');
+      refetchNotes();
+    },
+    onError: (error) => {
+      toast.error('Not eklenirken hata oluştu: ' + error.message);
+    },
+  });
+  
+  const updateNoteMutation = trpc.mentor.updateNote.useMutation({
+    onSuccess: () => {
+      toast.success('Not başarıyla güncellendi');
+      setNoteDialogOpen(false);
+      setEditingNote(null);
+      setNoteText('');
+      refetchNotes();
+    },
+    onError: (error) => {
+      toast.error('Not güncellenirken hata oluştu: ' + error.message);
+    },
+  });
+  
+  const deleteNoteMutation = trpc.mentor.deleteNote.useMutation({
+    onSuccess: () => {
+      toast.success('Not başarıyla silindi');
+      refetchNotes();
+    },
+    onError: (error) => {
+      toast.error('Not silinirken hata oluştu: ' + error.message);
+    },
+  });
+  
+  const handleSaveNote = () => {
+    if (!noteText.trim()) {
+      toast.error('Not boş olamaz');
+      return;
+    }
+    
+    if (editingNote) {
+      updateNoteMutation.mutate({ noteId: editingNote.id, note: noteText });
+    } else {
+      createNoteMutation.mutate({ studentId: parseInt(id || '0'), note: noteText });
+    }
+  };
+  
+  const handleEditNote = (note: any) => {
+    setEditingNote({ id: note.id, note: note.note });
+    setNoteText(note.note);
+    setNoteDialogOpen(true);
+  };
+  
+  const handleDeleteNote = (noteId: number) => {
+    if (confirm('Bu notu silmek istediğinizden emin misiniz?')) {
+      deleteNoteMutation.mutate({ noteId });
+    }
+  };
+  
+  const handleCloseDialog = () => {
+    setNoteDialogOpen(false);
+    setEditingNote(null);
+    setNoteText('');
+  };
 
   if (!user) {
     return null;
@@ -93,6 +176,50 @@ export default function StudentDetailView() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Progress Overview */}
+        {progress && (
+          <Card>
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <TrendingUp className="h-5 w-5 text-primary" />
+                <CardTitle>İlerleme Durumu</CardTitle>
+              </div>
+              <CardDescription>
+                Öğrencinin genel ilerleme yüzdesi ve tamamlanan etaplar
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium">Genel İlerleme</span>
+                    <span className="text-2xl font-bold text-primary">
+                      {progress.progressPercentage}%
+                    </span>
+                  </div>
+                  <Progress value={progress.progressPercentage} className="h-3" />
+                </div>
+                <div className="grid gap-4 md:grid-cols-3">
+                  <div className="rounded-lg border p-3">
+                    <p className="text-sm font-medium text-muted-foreground">Tamamlanan</p>
+                    <p className="text-2xl font-bold text-green-600">{progress.completedStages}</p>
+                  </div>
+                  <div className="rounded-lg border p-3">
+                    <p className="text-sm font-medium text-muted-foreground">Toplam Etap</p>
+                    <p className="text-2xl font-bold">{progress.totalStages}</p>
+                  </div>
+                  <div className="rounded-lg border p-3">
+                    <p className="text-sm font-medium text-muted-foreground">Kalan</p>
+                    <p className="text-2xl font-bold text-orange-600">
+                      {progress.totalStages - progress.completedStages}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Stages Progress */}
         <Card>
@@ -185,6 +312,106 @@ export default function StudentDetailView() {
               </div>
             ) : (
               <p className="text-center text-muted-foreground">Henüz rapor bulunmamaktadır.</p>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Mentor Notes */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <StickyNote className="h-5 w-5 text-primary" />
+                <CardTitle>Mentor Notları</CardTitle>
+              </div>
+              <Dialog open={noteDialogOpen} onOpenChange={(open) => {
+                if (!open) handleCloseDialog();
+                else setNoteDialogOpen(true);
+              }}>
+                <DialogTrigger asChild>
+                  <Button size="sm">
+                    <Plus className="mr-2 h-4 w-4" />
+                    Not Ekle
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>{editingNote ? 'Notu Düzenle' : 'Yeni Not Ekle'}</DialogTitle>
+                    <DialogDescription>
+                      {student?.name} hakkında özel notlarınızı ekleyin.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <Textarea
+                    value={noteText}
+                    onChange={(e) => setNoteText(e.target.value)}
+                    placeholder="Notunuzu buraya yazın..."
+                    rows={5}
+                  />
+                  <DialogFooter>
+                    <Button variant="outline" onClick={handleCloseDialog}>
+                      İptal
+                    </Button>
+                    <Button 
+                      onClick={handleSaveNote}
+                      disabled={createNoteMutation.isPending || updateNoteMutation.isPending}
+                    >
+                      {createNoteMutation.isPending || updateNoteMutation.isPending ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Kaydediliyor...
+                        </>
+                      ) : (
+                        'Kaydet'
+                      )}
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </div>
+            <CardDescription>Öğrenci hakkında özel notlar ve gözlemler</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {notes && notes.length > 0 ? (
+              <div className="space-y-4">
+                {notes.map((note: any) => (
+                  <div
+                    key={note.id}
+                    className="rounded-lg border p-4 space-y-2"
+                  >
+                    <div className="flex items-start justify-between">
+                      <p className="text-sm text-muted-foreground">
+                        {new Date(note.createdAt).toLocaleDateString('tr-TR', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                      </p>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleEditNote(note)}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDeleteNote(note.id)}
+                          disabled={deleteNoteMutation.isPending}
+                        >
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      </div>
+                    </div>
+                    <p className="text-base whitespace-pre-wrap">{note.note}</p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-center text-muted-foreground">Henüz not bulunmamaktadır.</p>
             )}
           </CardContent>
         </Card>

@@ -203,3 +203,21 @@
 - AI: OpenAI GPT-4 (rapor oluşturma)
 - PDF: WeasyPrint (markdown → PDF)
 - Storage: S3 (logo, PDF dosyaları)
+
+
+## 📊 Öğrenci İlerleme Takibi Özelliği (20 Şubat 2026)
+- [x] Backend'de öğrenci ilerleme yüzdesini hesaplayan helper fonksiyon ekle - TAMAMLANDI (calculateStudentProgress)
+- [x] mentor.getStudentDetails endpoint'ine ilerleme yüzdesi ekle - TAMAMLANDI
+- [x] StudentDetailView'a ilerleme yüzdesi gösterimi ekle (progress bar) - TAMAMLANDI
+- [x] StudentDetailView'a etap bazlı ilerleme grafiği ekle - TAMAMLANDI (İlerleme Durumu kartı ile)
+- [x] Test edildi: İlerleme yüzdesi hesaplama - BAŞARILI (0% tamamlanan: 0, toplam: 3, kalan: 3)
+- [x] Test edildi: Grafik görselleştirme - BAŞARILI (progress bar ve istatistik kartları)
+
+## 📝 Mentor Notları Özelliği (20 Şubat 2026)
+- [x] Database schema'ya mentor_notes tablosu ekle - TAMAMLANDI (migration başarılı)
+- [x] Backend'de mentor notları CRUD endpoint'leri oluştur - TAMAMLANDI (getNotesByStudent, createNote, updateNote, deleteNote)
+- [x] StudentDetailView'a mentor notları bölümü ekle - TAMAMLANDI
+- [x] Mentor notu ekleme/düzenleme dialog'u oluştur - TAMAMLANDI
+- [x] Mentor notlarını listeleme ve silme özellikleri ekle - TAMAMLANDI
+- [x] Test edildi: Not ekleme - BAŞARILI (Mehmet Demir için not eklendi)
+- [x] Test edildi: Not görüntüleme - BAŞARILI (tarih, düzenleme ve silme butonları görünüyor)
