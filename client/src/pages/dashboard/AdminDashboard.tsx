@@ -21,9 +21,13 @@ import { useState } from 'react';
 import { ProgressAnalytics } from '@/components/ProgressAnalytics';
 import { BulkOperations } from '@/components/BulkOperations';
 import { toast } from 'sonner';
+import { EditStudentDialog } from '@/components/EditStudentDialog';
+import { EditMentorDialog } from '@/components/EditMentorDialog';
 
 export default function AdminDashboard() {
   const { user } = useAuth();
+  const [editingStudent, setEditingStudent] = useState<any>(null);
+  const [editingMentor, setEditingMentor] = useState<any>(null);
 
   const { data: users, isLoading: usersLoading } = trpc.admin.getUsers.useQuery();
   const { data: reports, isLoading: reportsLoading } = trpc.admin.getAllReports.useQuery();
@@ -206,7 +210,7 @@ export default function AdminDashboard() {
                             <Button 
                               variant="outline" 
                               size="sm"
-                              onClick={() => toast.info(`Öğrenci düzenleme özelliği yakında eklenecek: ${student.name}`)}
+                              onClick={() => setEditingStudent(student)}
                             >
                               Düzenle
                             </Button>
@@ -263,7 +267,7 @@ export default function AdminDashboard() {
                             <Button 
                               variant="outline" 
                               size="sm"
-                              onClick={() => toast.info(`Mentor düzenleme özelliği yakında eklenecek: ${mentor.name}`)}
+                              onClick={() => setEditingMentor(mentor)}
                             >
                               Düzenle
                             </Button>
@@ -460,6 +464,24 @@ export default function AdminDashboard() {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Edit Student Dialog */}
+      {editingStudent && (
+        <EditStudentDialog
+          open={!!editingStudent}
+          onOpenChange={(open) => !open && setEditingStudent(null)}
+          student={editingStudent}
+        />
+      )}
+
+      {/* Edit Mentor Dialog */}
+      {editingMentor && (
+        <EditMentorDialog
+          open={!!editingMentor}
+          onOpenChange={(open) => !open && setEditingMentor(null)}
+          mentor={editingMentor}
+        />
+      )}
     </DashboardLayout>
   );
 }
