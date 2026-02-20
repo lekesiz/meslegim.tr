@@ -144,3 +144,23 @@ export const mentorNotes = mysqlTable("mentor_notes", {
 
 export type MentorNote = typeof mentorNotes.$inferSelect;
 export type InsertMentorNote = typeof mentorNotes.$inferInsert;
+
+/**
+ * Messages table - stores student-mentor communication
+ */
+export const messages = mysqlTable("messages", {
+  id: int("id").autoincrement().primaryKey(),
+  senderId: int("senderId").notNull(),
+  receiverId: int("receiverId").notNull(),
+  message: text("message").notNull(),
+  isRead: boolean("isRead").default(false).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+  senderIdIdx: index("sender_id_idx").on(table.senderId),
+  receiverIdIdx: index("receiver_id_idx").on(table.receiverId),
+  isReadIdx: index("is_read_idx").on(table.isRead),
+}));
+
+export type Message = typeof messages.$inferSelect;
+export type InsertMessage = typeof messages.$inferInsert;
+

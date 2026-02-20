@@ -1,6 +1,6 @@
 import { eq, and, or, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, stages, questions, answers, userStages, reports } from "../drizzle/schema";
+import { InsertUser, users, stages, questions, answers, userStages, reports, mentorNotes, messages } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -634,4 +634,86 @@ export async function getMentorStats(mentorId: number) {
     pendingReports: pendingReports.length,
     avgResponseTimeDays: avgResponseTime,
   };
+}
+
+// ============================================================
+// Messages Functions
+// ============================================================
+
+export async function sendMessage(data: { senderId: number; receiverId: number; message: string }) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not initialized');
+  const [newMessage] = await db.insert(messages).values(data);
+  return newMessage;
+}
+
+export async function getConversation(userId1: number, userId2: number) {
+  const db = await getDb();
+  if (!db) return [];
+  const conversation = await db.select().from(messages).where(
+    or(
+      and(eq(messages.senderId, userId1), eq(messages.receiverId, userId2)),
+      and(eq(messages.senderId, userId2), eq(messages.receiverId, userId1))
+    )
+  ).orderBy(messages.createdAt);
+  
+  return conversation;
+}
+
+export async function markMessagesAsRead(userId: number, otherUserId: number) {
+  const db = await getDb();
+  if (!db) return;
+  await db.update(messages)
+    .set({ isRead: true })
+    .where(
+      and(
+        eq(messages.senderId, otherUserId),
+        eq(messages.receiverId, userId),
+        eq(messages.isRead, false)
+      )
+    );
+}
+
+export async function getUnreadCount(userId: number) {
+  const db = await getDb();
+  if (!db) return 0;
+  const unreadMessages = await db.select().from(messages).where(
+    and(
+      eq(messages.receiverId, userId),
+      eq(messages.isRead, false)
+    )
+  );
+  
+  return unreadMessages.length;
+}
+
+export async function getConversations(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  // Get all unique users this user has conversations with
+  const sentMessages = await db.select({ otherUserId: messages.receiverId }).from(messages).where(eq(messages.senderId, userId));
+  const receivedMessages = await db.select({ otherUserId: messages.senderId }).from(messages).where(eq(messages.receiverId, userId));
+  
+  const uniqueUserIds = Array.from(new Set([
+    ...sentMessages.map((m: { otherUserId: number }) => m.otherUserId),
+    ...receivedMessages.map((m: { otherUserId: number }) => m.otherUserId)
+  ]));
+  
+  // Get user details and last message for each conversation
+  const conversations = await Promise.all(
+    uniqueUserIds.map(async (otherUserId) => {
+      const otherUser = await getUserById(otherUserId);
+      const conversation = await getConversation(userId, otherUserId);
+      const lastMessage = conversation[conversation.length - 1];
+      const unread = conversation.filter((m: any) => m.receiverId === userId && !m.isRead).length;
+      
+      return {
+        otherUser,
+        lastMessage,
+        unreadCount: unread,
+      };
+    })
+  );
+  
+  return conversations;
 }
