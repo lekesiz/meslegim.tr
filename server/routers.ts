@@ -616,6 +616,11 @@ export const appRouter = router({
         return { success: true };
       }),
     
+    // Mentor Performance Statistics
+    getMyStats: mentorProcedure.query(async ({ ctx }) => {
+      return await db.getMentorStats(ctx.user.id);
+    }),
+    
     // Mentor Notes endpoints
     getNotesByStudent: mentorProcedure
       .input(z.object({ studentId: z.number() }))
@@ -769,6 +774,39 @@ export const appRouter = router({
         
         // Schedule next stage activation (7 days from now)
         await db.scheduleNextStage(userId, stageId);
+        
+        // Send notification to mentor (async, don't wait)
+        const student = await db.getUserById(userId);
+        const stage = await db.getStageById(stageId);
+        if (student && student.mentorId && stage) {
+          const mentor = await db.getUserById(student.mentorId);
+          if (mentor && mentor.email) {
+            sendEmail({
+              to: mentor.email,
+              subject: `🎉 ${student.name} bir etabı tamamladı!`,
+              html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                  <h2 style="color: #4F46E5;">🎉 Etap Tamamlandı!</h2>
+                  <p>Merhaba ${mentor.name},</p>
+                  <p>Öğrenciniz <strong>${student.name}</strong> bir etabı başarıyla tamamladı!</p>
+                  <div style="background-color: #F3F4F6; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                    <p style="margin: 0;"><strong>Etap:</strong> ${stage.name}</p>
+                    <p style="margin: 10px 0 0 0;"><strong>Tamamlanma Tarihi:</strong> ${new Date().toLocaleDateString('tr-TR')}</p>
+                  </div>
+                  <p>Öğrencinin ilerlemesini kontrol etmek ve raporu onaylamak için lütfen platforma giriş yapın.</p>
+                  <a href="${process.env.VITE_APP_URL || 'http://localhost:3000'}/dashboard/mentor" style="display: inline-block; background-color: #4F46E5; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin-top: 20px;">
+                    Mentor Paneline Git
+                  </a>
+                  <p style="color: #6B7280; font-size: 14px; margin-top: 30px;">
+                    Bu bir otomatik bildirimdir. Lütfen yanıtlamayın.
+                  </p>
+                </div>
+              `,
+            }).catch(err => {
+              console.error('Failed to send mentor notification:', err);
+            });
+          }
+        }
         
         return { success: true, message: 'Etap başarıyla tamamlandı!' };
       }),
