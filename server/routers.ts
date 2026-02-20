@@ -577,6 +577,50 @@ export const appRouter = router({
         return { student, stages, reports, progress };
       }),
     
+    initiateStudentStages: mentorProcedure
+      .input(z.object({ studentId: z.number() }))
+      .mutation(async ({ input, ctx }) => {
+        const student = await db.getUserById(input.studentId);
+        if (!student) {
+          throw new TRPCError({ code: 'NOT_FOUND', message: 'Étudiant non trouvé' });
+        }
+        
+        // Verify access
+        if (hasRole(ctx.user.role, 'mentor') && !hasRole(ctx.user.role, 'admin') && student.mentorId !== ctx.user.id) {
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'Vous ne pouvez initier que vos propres étudiants' });
+        }
+        
+        // Check if student has an age group
+        if (!student.ageGroup) {
+          throw new TRPCError({ code: 'BAD_REQUEST', message: 'Öğrencinin yaş grubu tanımlı değil' });
+        }
+        
+        // Check if stages already exist for this student
+        const existingStages = await db.getUserStages(student.id);
+        if (existingStages.length > 0) {
+          throw new TRPCError({ code: 'BAD_REQUEST', message: 'Öğrencinin etapları zaten başlatılmış' });
+        }
+        
+        // Get all stages for student's age group
+        const stages = await db.getStagesByAgeGroup(student.ageGroup);
+        if (stages.length === 0) {
+          throw new TRPCError({ code: 'NOT_FOUND', message: 'Bu yaş grubu için etap bulunamadı' });
+        }
+        
+        // Create user_stages entries - first stage active, rest locked
+        const sortedStages = stages.sort((a, b) => a.order - b.order);
+        for (let i = 0; i < sortedStages.length; i++) {
+          const stage = sortedStages[i];
+          await db.createUserStage({
+            userId: student.id,
+            stageId: stage.id,
+            status: i === 0 ? 'active' : 'locked', // First stage active, rest locked
+          });
+        }
+        
+        return { success: true, stagesCreated: stages.length };
+      }),
+    
     getPendingReports: mentorProcedure.query(async ({ ctx }) => {
       const mentorId = hasRole(ctx.user.role, 'mentor') && !hasRole(ctx.user.role, 'admin') ? ctx.user.id : undefined;
       return await db.getPendingReports(mentorId);

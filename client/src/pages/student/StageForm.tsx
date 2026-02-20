@@ -23,6 +23,11 @@ export default function StageForm() {
   const [, setLocation] = useLocation();
   const { user } = useAuth();
   const [answers, setAnswers] = useState<Answer>({});
+  
+  // Debug: answers state değişikliklerini izle
+  useEffect(() => {
+    console.log('📊 answers state changed:', JSON.stringify(answers, null, 2));
+  }, [answers]);
   const [isSaving, setIsSaving] = useState(false);
 
   const { data: activeStage, isLoading } = trpc.student.getActiveStage.useQuery();
@@ -46,7 +51,6 @@ export default function StageForm() {
       setAnswers(initialAnswers);
     }
   }, [activeStage]);
-
   if (!user || isLoading) {
     return (
       <DashboardLayout>
@@ -111,7 +115,7 @@ export default function StageForm() {
 
   const renderQuestion = (question: any) => {
     const options = question.options ? JSON.parse(question.options) : [];
-    const currentAnswer = answers[question.id] || '';
+    const currentAnswer = String(answers[question.id] || '');
 
     switch (question.type) {
       case 'text':
@@ -127,12 +131,13 @@ export default function StageForm() {
       case 'multiple_choice':
         return (
           <RadioGroup
+            key={`mc-${question.id}-${currentAnswer}`}
             value={currentAnswer}
             onValueChange={(value) => handleAnswerChange(question.id, value)}
           >
             {options.map((option: string, index: number) => (
               <div key={index} className="flex items-center space-x-2">
-                <RadioGroupItem value={option} id={`${question.id}-${index}`} />
+                <RadioGroupItem value={String(option)} id={`${question.id}-${index}`} />
                 <Label htmlFor={`${question.id}-${index}`}>{option}</Label>
               </div>
             ))}
@@ -148,13 +153,14 @@ export default function StageForm() {
               <span>Kesinlikle Katılıyorum</span>
             </div>
             <RadioGroup
+              key={`likert-${question.id}-${currentAnswer}`}
               value={currentAnswer}
               onValueChange={(value) => handleAnswerChange(question.id, value)}
               className="flex justify-between"
             >
               {likertOptions.map((option: string) => (
                 <div key={option} className="flex flex-col items-center space-y-2">
-                  <RadioGroupItem value={option} id={`${question.id}-${option}`} />
+                  <RadioGroupItem value={String(option)} id={`${question.id}-${option}`} />
                   <Label htmlFor={`${question.id}-${option}`} className="text-xs">
                     {option}
                   </Label>
@@ -234,9 +240,9 @@ export default function StageForm() {
         </Card>
 
         {/* Questions */}
-        <div className="space-y-4">
+        <div className="space-y-4" key={JSON.stringify(Object.keys(answers).sort())}>
           {questions.map((question: any, index: number) => (
-            <Card key={question.id}>
+            <Card key={`q-${question.id}-${answers[question.id] || 'empty'}`}>
               <CardHeader>
                 <CardTitle className="text-lg">
                   Soru {index + 1}

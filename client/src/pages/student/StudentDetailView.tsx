@@ -14,6 +14,35 @@ import { toast } from 'sonner';
 import { DashboardSkeleton } from '@/components/DashboardSkeleton';
 import { ChatDialog } from '@/components/ChatDialog';
 
+// Initiate Stages Button Component
+function InitiateStagesButton({ studentId, onSuccess }: { studentId: number; onSuccess: () => void }) {
+  const initiateMutation = trpc.mentor.initiateStudentStages.useMutation({
+    onSuccess: () => {
+      toast.success('Öğrenci etapları başarıyla başlatıldı');
+      onSuccess();
+    },
+    onError: (error) => {
+      toast.error('Etaplar başlatılırken hata oluştu: ' + error.message);
+    },
+  });
+
+  return (
+    <Button
+      onClick={() => initiateMutation.mutate({ studentId })}
+      disabled={initiateMutation.isPending}
+    >
+      {initiateMutation.isPending ? (
+        <>
+          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          Başlatılıyor...
+        </>
+      ) : (
+        'Öğrenci Etaplarını Başlat'
+      )}
+    </Button>
+  );
+}
+
 export default function StudentDetailView() {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
@@ -238,8 +267,15 @@ export default function StudentDetailView() {
         {/* Stages Progress */}
         <Card>
           <CardHeader>
-            <CardTitle>Etap İlerlemesi</CardTitle>
-            <CardDescription>Öğrencinin tamamladığı ve devam eden etaplar</CardDescription>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle>Etap İlerlemesi</CardTitle>
+                <CardDescription>Öğrencinin tamamladığı ve devam eden etaplar</CardDescription>
+              </div>
+              {stages && stages.length === 0 && (
+                <InitiateStagesButton studentId={parseInt(id || '0')} onSuccess={() => window.location.reload()} />
+              )}
+            </div>
           </CardHeader>
           <CardContent>
             {stages && stages.length > 0 ? (

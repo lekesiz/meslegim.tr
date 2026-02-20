@@ -1,0 +1,74 @@
+{
+  "query": "SELECT * FROM answers WHERE userId = 660002 ORDER BY createdAt DESC LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute SELECT * FROM answers WHERE userId = 660002 ORDER BY createdAt DESC LIMIT 10;",
+  "rows": [
+    {
+      "id": "30006",
+      "userId": "660002",
+      "questionId": "60029",
+      "answer": "Mezuniyet sonrası ilk 5 yıl içinde yazılım geliştirme alanında uzmanlaşmayı ve bir teknoloji şirketinde senior developer pozisyonuna ulaşmayı hedefliyorum. Ayrıca açık kaynak projelere katkıda bulunarak topluluk içinde tanınmak istiyorum.",
+      "createdAt": "2026-02-20 16:52:19",
+      "updatedAt": "2026-02-20 16:52:42"
+    },
+    {
+      "id": "30008",
+      "userId": "660002",
+      "questionId": "60029",
+      "answer": "Mezuniyet sonrası ilk 5 yıl içinde yazılım geliştirme alanında uzmanlaşmayı ve bir teknoloji şirketinde senior developer pozisyonuna ulaşmayı hedefliyorum. Ayrıca açık kaynak projelere katkıda bulunarak topluluk içinde tanınmak istiyorum.",
+      "createdAt": "2026-02-20 16:52:19",
+      "updatedAt": "2026-02-20 16:52:42"
+    },
+    {
+      "id": "30007",
+      "userId": "660002",
+      "questionId": "60029",
+      "answer": "Mezuniyet sonrası ilk 5 yıl içinde yazılım geliştirme alanında uzmanlaşmayı ve bir teknoloji şirketinde senior developer pozisyonuna ulaşmayı hedefliyorum. Ayrıca açık kaynak projelere katkıda bulunarak topluluk içinde tanınmak istiyorum.",
+      "createdAt": "2026-02-20 16:52:19",
+      "updatedAt": "2026-02-20 16:52:42"
+    },
+    {
+      "id": "30005",
+      "userId": "660002",
+      "questionId": "60028",
+      "answer": "Teknoloji ve yazılım",
+      "createdAt": "2026-02-20 16:51:51",
+      "updatedAt": "2026-02-20 16:51:51"
+    },
+    {
+      "id": "30004",
+      "userId": "660002",
+      "questionId": "60027",
+      "answer": "Zaman yönetimi,Problem çözme",
+      "createdAt": "2026-02-20 16:51:20",
+      "updatedAt": "2026-02-20 16:51:36"
+    },
+    {
+      "id": "30003",
+      "userId": "660002",
+      "questionId": "60026",
+      "answer": "Kısa süreli staj (1-3 ay)",
+      "createdAt": "2026-02-20 16:50:58",
+      "updatedAt": "2026-02-20 16:50:58"
+    },
+    {
+      "id": "30002",
+      "userId": "660002",
+      "questionId": "60025",
+      "answer": "3",
+      "createdAt": "2026-02-20 16:50:43",
+      "updatedAt": "2026-02-20 16:50:43"
+    },
+    {
+      "id": "30001",
+      "userId": "660002",
+      "questionId": "60024",
+      "answer": "4",
+      "createdAt": "2026-02-20 16:50:22",
+      "updatedAt": "2026-02-20 16:50:22"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuserId\tquestionId\tanswer\tcreatedAt\tupdatedAt\n30006\t660002\t60029\tMezuniyet sonrası ilk 5 yıl içinde yazılım geliştirme alanında uzmanlaşmayı ve bir teknoloji şirketinde senior developer pozisyonuna ulaşmayı hedefliyorum. Ayrıca açık kaynak projelere katkıda bulunarak topluluk içinde tanınmak istiyorum.\t2026-02-20 16:52:19\t2026-02-20 16:52:42\n30008\t660002\t60029\tMezuniyet sonrası ilk 5 yıl içinde yazılım geliştirme alanında uzmanlaşmayı ve bir teknoloji şirketinde senior developer pozisyonuna ulaşmayı hedefliyorum. Ayrıca açık kaynak projelere katkıda bulunarak topluluk içinde tanınmak istiyorum.\t2026-02-20 16:52:19\t2026-02-20 16:52:42\n30007\t660002\t60029\tMezuniyet sonrası ilk 5 yıl içinde yazılım geliştirme alanında uzmanlaşmayı ve bir teknoloji şirketinde senior developer pozisyonuna ulaşmayı hedefliyorum. Ayrıca açık kaynak projelere katkıda bulunarak topluluk içinde tanınmak istiyorum.\t2026-02-20 16:52:19\t2026-02-20 16:52:42\n30005\t660002\t60028\tTeknoloji ve yazılım\t2026-02-20 16:51:51\t2026-02-20 16:51:51\n30004\t660002\t60027\tZaman yönetimi,Problem çözme\t2026-02-20 16:51:20\t2026-02-20 16:51:36\n30003\t660002\t60026\tKısa süreli staj (1-3 ay)\t2026-02-20 16:50:58\t2026-02-20 16:50:58\n30002\t660002\t60025\t3\t2026-02-20 16:50:43\t2026-02-20 16:50:43\n30001\t660002\t60024\t4\t2026-02-20 16:50:22\t2026-02-20 16:50:22\n",
+  "stderr": "",
+  "execution_time_ms": 1512
+}

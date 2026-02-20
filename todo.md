@@ -377,3 +377,21 @@ Platform **minimum seviyede sağlıklı** çalışıyor. Tüm temel özellikler 
 - ✅ test.network@test.com kullanıcısı başarıyla oluşturuldu
 
 **Not:** Gerçek kullanıcılar için sorun yok! Sadece automated test'te dikkat edilmeli.
+
+- [ ] Mentor'un öğrenci etaplarını başlatması/aktifleştirmesi özelliği (initiateStudentStages endpoint + UI button)
+
+- [x] Mentor'un öğrenci etaplarını başlatması/aktifleştirmesi özelliği (initiateStudentStages endpoint + UI button) - TAMAMLANDI
+- [ ] Öğrencinin etap sorularını yanıtlayıp tamamlaması için backend endpoint (student.submitStageAnswers)
+
+## 🐛 Browser Test Sonrası Tespit Edilen Sorunlar (20 Şubat 2026)
+- [ ] Radio/Checkbox yanıtlarının form'a yüklenmesi sorunu (StageForm.tsx useEffect hook'u)
+- [ ] "Etabı Tamamla" butonu validation logic'i sorunu (tüm sorular yanıtlanmış olmasına rağmen çalışmıyor)
+
+## 🐛 Browser Test Sonrası Düzeltmeler
+
+- [ ] Radio/Checkbox görsel sorunu - Radix UI re-rendering düzelt
+- [ ] Debug log'larını temizle (production-ready)
+- [ ] Final test ve checkpoint
+
+- [x] Radio/Checkbox görsel sorunu - Radix UI re-rendering düzelt (key prop eklendi)
+- [x] Debug log'larını temizle (production-ready)

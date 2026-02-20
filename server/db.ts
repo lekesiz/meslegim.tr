@@ -218,7 +218,29 @@ export async function getQuestionsByStage(stageId: number) {
 export async function getUserStages(userId: number) {
   const db = await getDb();
   if (!db) return [];
-  return await db.select().from(userStages).where(eq(userStages.userId, userId));
+  
+  // Join with stages table to get stage details
+  const result = await db
+    .select({
+      id: userStages.id,
+      userId: userStages.userId,
+      stageId: userStages.stageId,
+      status: userStages.status,
+      unlockedAt: userStages.unlockedAt,
+      completedAt: userStages.completedAt,
+      createdAt: userStages.createdAt,
+      updatedAt: userStages.updatedAt,
+      name: stages.name,
+      description: stages.description,
+      ageGroup: stages.ageGroup,
+      order: stages.order,
+    })
+    .from(userStages)
+    .leftJoin(stages, eq(userStages.stageId, stages.id))
+    .where(eq(userStages.userId, userId))
+    .orderBy(stages.order);
+  
+  return result;
 }
 
 export async function getAllUserStages() {
