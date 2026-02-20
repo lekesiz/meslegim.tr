@@ -112,3 +112,19 @@
 - [x] Mentor ekleme formu oluştur (Ad Soyad, Email, Şifre)
 - [x] Admin router'a createMentor endpoint ekle
 - [x] Test et: mikaillekesiz@gmail.com ile hem admin hem mentor işlemleri yapabilme
+
+
+## 📧 Email Sistemi Domain Sorunu (19 Şubat 2026)
+- [ ] Resend domain doğrulaması yap (meslegim.tr domain'i veya alternatif)
+- [ ] Email gönderim adresini onboarding@resend.dev yerine doğrulanmış domain ile değiştir
+- [ ] Tüm email template'lerinde from adresini güncelle
+- [ ] Gerçek kullanıcılara email gönderimini test et
+
+**Not:** Şu anda Resend test modu sadece mikaillekesiz@gmail.com'a email gönderiyor. Diğer kullanıcılara email göndermek için domain doğrulaması gerekli.
+
+
+## 🚀 Eksik Görevler Tamamlanıyor (20 Şubat 2026)
+- [x] Otomatik etap aktivasyonu cron job sistemi kur (7 gün sonra) - ZATEN MEVCUT
+- [x] Responsive design kontrol et ve düzelt (mobil/tablet) - Tailwind responsive class'ları kullanılmış, mobilde iyi görünüyor
+- [x] Error handling ve toast notifications iyileştir - ErrorBoundary mevcut, toast notifications tüm mutation'larda kullanılıyor
+- [x] Loading states ve skeletons ekle (tüm sayfalarda) - DashboardSkeleton component oluşturuldu, Student ve Mentor dashboard'lara eklendi

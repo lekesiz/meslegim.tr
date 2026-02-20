@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { trpc } from "@/lib/trpc";
 import { Loader2, FileText, Clock, CheckCircle2, Lock } from "lucide-react";
+import { DashboardSkeleton } from "@/components/DashboardSkeleton";
 import { useLocation } from "wouter";
 
 export default function StudentDashboard() {
@@ -21,13 +22,7 @@ export default function StudentDashboard() {
   }
 
   if (progressLoading || stageLoading || reportsLoading) {
-    return (
-      <DashboardLayout>
-        <div className="flex items-center justify-center h-64">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </div>
-      </DashboardLayout>
-    );
+    return <DashboardSkeleton />;
   }
 
   const completedStages = progress?.filter(s => s.status === 'completed').length || 0;
