@@ -151,3 +151,12 @@
 - [ ] Role-based routing düzelt - admin rolü varsa /dashboard/admin'e yönlendir (şu an /dashboard/student'a gidiyor)
 - [ ] Admin panelinde "Düzenle" butonu çalışmıyor - fonksiyon ekle
 - [ ] mikaillekesiz@gmail.com kullanıcısı admin+mentor rolüne sahip olmalı (database'de "admin,mentor" olarak kayıtlı)
+
+
+## ✏️ Öğrenci/Mentor Düzenleme Özellikleri (20 Şubat 2026)
+- [x] Backend updateUser endpoint'i zaten mevcut (ad, email, yaş grubu, durum, mentor atama)
+- [x] Öğrenci düzenleme dialog'u oluşturuldu (EditStudentDialog component - form validation ile)
+- [x] Mentor düzenleme dialog'u oluşturuldu (EditMentorDialog component - form validation ile)
+- [x] Mentor dropdown listesi eklendi (öğrenci düzenleme için)
+- [x] Test edildi: Öğrenci bilgilerini güncelleme - BAŞARILI (Mehmet Demir -> Mehmet Demir (Edited))
+- [x] Test edildi: Mentor düzenleme dialog'u açılıyor ve tüm alanlar doğru dolu
