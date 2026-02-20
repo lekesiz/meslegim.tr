@@ -66,7 +66,6 @@ export default function Home() {
       toast.error("Lütfen yaş grubunuzu seçiniz");
       return;
     }
-
     registerMutation.mutate({
       name: formData.name,
       email: formData.email,

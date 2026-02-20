@@ -1,0 +1,8 @@
+{
+  "query": "SELECT * FROM user WHERE email = 'test.simulasyon@test.com';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute SELECT * FROM user WHERE email = 'test.simulasyon@test.com';",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1146 (42S02) at line 1: Table 'jipvnqahrug9h2uzgxux3j.user' doesn't exist"
+  ]
+}
