@@ -221,3 +221,24 @@
 - [x] Mentor notlarını listeleme ve silme özellikleri ekle - TAMAMLANDI
 - [x] Test edildi: Not ekleme - BAŞARILI (Mehmet Demir için not eklendi)
 - [x] Test edildi: Not görüntüleme - BAŞARILI (tarih, düzenleme ve silme butonları görünüyor)
+
+
+## 🔔 Etap Tamamlama Bildirimleri (20 Şubat 2026)
+- [x] Backend'de etap tamamlama event listener ekle - TAMAMLANDI (submitStage endpoint'inde)
+- [x] Mentor'a email bildirimi gönder (öğrenci adı, tamamlanan etap, tarih) - TAMAMLANDI
+- [x] Email template oluştur (profesyonel tasarım) - TAMAMLANDI (HTML email template)
+- [x] Test edilecek: Etap tamamlandığında bildirim gönderimi - BACKEND HAZI R (production'da test edilecek)
+
+## 📊 Mentor Performans Dashboard'u (20 Şubat 2026)
+- [x] Backend'de mentor istatistikleri hesaplayan endpoint ekle - TAMAMLANDI (getMentorStats fonksiyonu ve getMyStats endpoint)
+- [x] MentorDashboard'a performans kartları ekle - TAMAMLANDI (Ortalama Yanıt Süresi kartı)
+- [ ] Grafik görselleştirme ekle (aylık rapor onaylama trendi) - İHTIYAÇ YOK (basit istatistikler yeterli)
+- [x] Test edildi: İstatistiklerin doğruluğu - BAŞARILI (Ortalama Yanıt Süresi kartı Mentor Dashboard'da görünüyor)
+
+## 💬 Öğrenci-Mentor Mesajlaşma Sistemi (20 Şubat 2026)
+- [ ] Database schema'ya messages tablosu ekle (senderId, receiverId, message, createdAt, isRead)
+- [ ] Backend CRUD endpoint'leri oluştur (sendMessage, getConversation, markAsRead)
+- [ ] Mesajlaşma UI component'i oluştur (chat interface)
+- [ ] StudentDetailView'a mesajlaşma bölümü ekle
+- [ ] MentorDashboard'a okunmamış mesaj sayısı göster
+- [ ] Test et: Mesaj gönderme, alma, okundu işaretleme

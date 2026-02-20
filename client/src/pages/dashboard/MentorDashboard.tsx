@@ -18,6 +18,7 @@ export default function MentorDashboard() {
   const { data: pendingStudents, isLoading: pendingLoading } = trpc.mentor.getPendingStudents.useQuery();
   const { data: myStudents, isLoading: studentsLoading } = trpc.mentor.getMyStudents.useQuery();
   const { data: pendingReports, isLoading: reportsLoading } = trpc.mentor.getPendingReports.useQuery();
+  const { data: stats, isLoading: statsLoading } = trpc.mentor.getMyStats.useQuery();
 
   const activateStudentMutation = trpc.mentor.activateStudent.useMutation({
     onSuccess: () => {
@@ -44,7 +45,7 @@ export default function MentorDashboard() {
     return null;
   }
 
-  if (pendingLoading || studentsLoading || reportsLoading) {
+  if (pendingLoading || studentsLoading || reportsLoading || statsLoading) {
     return <DashboardSkeleton />;
   }
 
@@ -60,7 +61,7 @@ export default function MentorDashboard() {
         </div>
 
         {/* Stats */}
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Bekleyen Onaylar</CardTitle>
@@ -96,6 +97,19 @@ export default function MentorDashboard() {
               <div className="text-2xl font-bold">{pendingReports?.length || 0}</div>
               <p className="text-xs text-muted-foreground">
                 Onay bekleyen rapor
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Ortalama Yanıt Süresi</CardTitle>
+              <CheckCircle className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats?.avgResponseTimeDays || 0} gün</div>
+              <p className="text-xs text-muted-foreground">
+                Rapor onaylama süresi
               </p>
             </CardContent>
           </Card>

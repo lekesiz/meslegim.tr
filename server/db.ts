@@ -577,3 +577,61 @@ export async function getMentorNoteById(noteId: number) {
     .limit(1);
   return note;
 }
+
+
+// Mentor performance statistics
+export async function getMentorStats(mentorId: number) {
+  const dbInstance = await getDb();
+  if (!dbInstance) {
+    return {
+      totalStudents: 0,
+      approvedReports: 0,
+      pendingReports: 0,
+      avgResponseTimeDays: 0,
+    };
+  }
+  
+  // Total students
+  const students = await dbInstance.select().from(users).where(
+    and(
+      eq(users.mentorId, mentorId),
+      eq(users.role, 'student')
+    )
+  );
+  
+  // Get student IDs for this mentor
+  const studentIds = students.map(s => s.id);
+  
+  // Approved reports count
+  const allReports = await dbInstance.select().from(reports);
+  const approvedReports = allReports.filter(r => 
+    studentIds.includes(r.userId) && r.status === 'approved'
+  );
+  
+  // Pending reports count
+  const pendingReports = allReports.filter(r => 
+    studentIds.includes(r.userId) && r.status === 'pending'
+  );
+  
+  // Average response time (days) - from report creation to approval
+  const reportsWithApproval = approvedReports.filter(r => r.approvedAt !== null);
+  
+  let avgResponseTime = 0;
+  if (reportsWithApproval.length > 0) {
+    const totalDays = reportsWithApproval.reduce((sum, report) => {
+      if (!report.approvedAt) return sum;
+      const days = Math.floor(
+        (new Date(report.approvedAt).getTime() - new Date(report.createdAt).getTime()) / (1000 * 60 * 60 * 24)
+      );
+      return sum + days;
+    }, 0);
+    avgResponseTime = Math.round(totalDays / reportsWithApproval.length);
+  }
+  
+  return {
+    totalStudents: students.length,
+    approvedReports: approvedReports.length,
+    pendingReports: pendingReports.length,
+    avgResponseTimeDays: avgResponseTime,
+  };
+}
