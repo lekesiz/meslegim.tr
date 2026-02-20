@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { trpc } from "@/lib/trpc";
 import { Loader2, FileText, Clock, CheckCircle2, Lock } from "lucide-react";
 import { DashboardSkeleton } from "@/components/DashboardSkeleton";
+import { EmptyState } from "@/components/EmptyState";
 import { useLocation } from "wouter";
 
 export default function StudentDashboard() {
@@ -87,9 +88,11 @@ export default function StudentDashboard() {
               <CardTitle>Aktif Etap</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground">
-                Şu anda aktif bir etabınız bulunmamaktadır. Bir önceki etabı tamamladıktan sonra 7 gün içinde yeni etap otomatik olarak aktif hale gelecektir.
-              </p>
+              <EmptyState
+                icon={Clock}
+                title="Aktif Etap Yok"
+                description="Şu anda aktif bir etabınız bulunmamaktadır. Bir önceki etabı tamamladıktan sonra 7 gün içinde yeni etap otomatik olarak aktif hale gelecektir."
+              />
             </CardContent>
           </Card>
         )}
