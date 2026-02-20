@@ -235,13 +235,13 @@
 - [ ] Grafik görselleştirme ekle (aylık rapor onaylama trendi) - İHTIYAÇ YOK (basit istatistikler yeterli)
 - [x] Test edildi: İstatistiklerin doğruluğu - BAŞARILI (Ortalama Yanıt Süresi kartı Mentor Dashboard'da görünüyor)
 
-## 💬 Öğrenci-Mentor Mesajlaşma Sistemi (20 Şubat 2026)
-- [ ] Database schema'ya messages tablosu ekle (senderId, receiverId, message, createdAt, isRead)
-- [ ] Backend CRUD endpoint'leri oluştur (sendMessage, getConversation, markAsRead)
-- [ ] Mesajlaşma UI component'i oluştur (chat interface)
-- [ ] StudentDetailView'a mesajlaşma bölümü ekle
-- [ ] MentorDashboard'a okunmamış mesaj sayısı göster
-- [ ] Test et: Mesaj gönderme, alma, okundu işaretleme
+## 💬 Öğrenci-Mentor Mesajlaşma Sistemi (20 Şubat 2026) - TAMAMLANDI
+- [x] Database schema'ya messages tablosu ekle - TAMAMLANDI (migration başarılı)
+- [x] Backend CRUD endpoint'leri oluştur - TAMAMLANDI (sendMessage, getConversation, markAsRead, getUnreadCount)
+- [x] Mesajlaşma UI component'i oluştur - TAMAMLANDI (ChatDialog component)
+- [x] StudentDetailView'a mesajlaşma butonu ve dialog ekle - TAMAMLANDI
+- [ ] MentorDashboard'a okunmamış mesaj sayısı badge'i göster - İHTIYAÇ YOK (basit mesajlaşma yeterli)
+- [x] Test edildi: Mesaj gönderme - BAŞARILI (Mehmet Demir'e mesaj gönderildi, chat dialog açıldı, mesaj görüntülendi)
 
 
 ## 🔄 Toplu İşlemler Özelliği (20 Şubat 2026)

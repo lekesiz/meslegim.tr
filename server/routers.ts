@@ -691,6 +691,34 @@ export const appRouter = router({
         await db.deleteMentorNote(input.noteId);
         return { success: true };
       }),
+    
+    // Messaging endpoints
+    sendMessage: mentorProcedure
+      .input(z.object({ receiverId: z.number(), message: z.string().min(1) }))
+      .mutation(async ({ input, ctx }) => {
+        return await db.sendMessage({
+          senderId: ctx.user.id,
+          receiverId: input.receiverId,
+          message: input.message,
+        });
+      }),
+    
+    getConversation: mentorProcedure
+      .input(z.object({ otherUserId: z.number() }))
+      .query(async ({ input, ctx }) => {
+        return await db.getConversation(ctx.user.id, input.otherUserId);
+      }),
+    
+    markMessagesAsRead: mentorProcedure
+      .input(z.object({ otherUserId: z.number() }))
+      .mutation(async ({ input, ctx }) => {
+        await db.markMessagesAsRead(ctx.user.id, input.otherUserId);
+        return { success: true };
+      }),
+    
+    getUnreadCount: mentorProcedure.query(async ({ ctx }) => {
+      return await db.getUnreadCount(ctx.user.id);
+    }),
   }),
 
   // Student procedures
@@ -851,6 +879,34 @@ export const appRouter = router({
         }
         return report;
       }),
+    
+    // Messaging endpoints
+    sendMessage: studentProcedure
+      .input(z.object({ receiverId: z.number(), message: z.string().min(1) }))
+      .mutation(async ({ input, ctx }) => {
+        return await db.sendMessage({
+          senderId: ctx.user.id,
+          receiverId: input.receiverId,
+          message: input.message,
+        });
+      }),
+    
+    getConversation: studentProcedure
+      .input(z.object({ otherUserId: z.number() }))
+      .query(async ({ input, ctx }) => {
+        return await db.getConversation(ctx.user.id, input.otherUserId);
+      }),
+    
+    markMessagesAsRead: studentProcedure
+      .input(z.object({ otherUserId: z.number() }))
+      .mutation(async ({ input, ctx }) => {
+        await db.markMessagesAsRead(ctx.user.id, input.otherUserId);
+        return { success: true };
+      }),
+    
+    getUnreadCount: studentProcedure.query(async ({ ctx }) => {
+      return await db.getUnreadCount(ctx.user.id);
+    }),
   }),
 });
 

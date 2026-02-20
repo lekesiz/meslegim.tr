@@ -5,13 +5,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { trpc } from '@/lib/trpc';
-import { Loader2, ArrowLeft, FileText, CheckCircle, Clock, TrendingUp, StickyNote, Plus, Edit, Trash2 } from 'lucide-react';
+import { Loader2, ArrowLeft, FileText, CheckCircle, Clock, TrendingUp, StickyNote, Plus, Edit, Trash2, MessageCircle } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { DashboardSkeleton } from '@/components/DashboardSkeleton';
+import { ChatDialog } from '@/components/ChatDialog';
 
 export default function StudentDetailView() {
   const { id } = useParams<{ id: string }>();
@@ -32,6 +33,9 @@ export default function StudentDetailView() {
   const [noteDialogOpen, setNoteDialogOpen] = useState(false);
   const [editingNote, setEditingNote] = useState<{ id: number; note: string } | null>(null);
   const [noteText, setNoteText] = useState('');
+  
+  // Chat state
+  const [chatDialogOpen, setChatDialogOpen] = useState(false);
   
   // Fetch mentor notes
   const { data: notes, refetch: refetchNotes } = trpc.mentor.getNotesByStudent.useQuery(
@@ -148,9 +152,19 @@ export default function StudentDetailView() {
                 <CardTitle className="text-2xl">{student.name}</CardTitle>
                 <CardDescription className="mt-2">{student.email}</CardDescription>
               </div>
-              <Badge variant={student.status === 'active' ? 'default' : 'secondary'}>
-                {student.status === 'active' ? 'Aktif' : student.status === 'pending' ? 'Beklemede' : 'İnaktif'}
-              </Badge>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setChatDialogOpen(true)}
+                >
+                  <MessageCircle className="mr-2 h-4 w-4" />
+                  Mesaj Gönder
+                </Button>
+                <Badge variant={student.status === 'active' ? 'default' : 'secondary'}>
+                  {student.status === 'active' ? 'Aktif' : student.status === 'pending' ? 'Beklemede' : 'İnaktif'}
+                </Badge>
+              </div>
             </div>
           </CardHeader>
           <CardContent>
@@ -416,6 +430,16 @@ export default function StudentDetailView() {
           </CardContent>
         </Card>
       </div>
+      
+      {/* Chat Dialog */}
+      {student && (
+        <ChatDialog
+          open={chatDialogOpen}
+          onOpenChange={setChatDialogOpen}
+          otherUser={{ id: student.id, name: student.name }}
+          currentUserRole={user.role}
+        />
+      )}
     </DashboardLayout>
   );
 }
