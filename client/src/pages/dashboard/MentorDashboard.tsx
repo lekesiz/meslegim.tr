@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { trpc } from '@/lib/trpc';
 import { Loader2, UserCheck, Users, FileText, CheckCircle } from 'lucide-react';
+import { DashboardSkeleton } from '@/components/DashboardSkeleton';
 import { toast } from 'sonner';
 
 export default function MentorDashboard() {
@@ -42,13 +43,7 @@ export default function MentorDashboard() {
   }
 
   if (pendingLoading || studentsLoading || reportsLoading) {
-    return (
-      <DashboardLayout>
-        <div className="flex items-center justify-center h-64">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </div>
-      </DashboardLayout>
-    );
+    return <DashboardSkeleton />;
   }
 
   return (
