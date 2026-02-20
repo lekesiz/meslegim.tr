@@ -572,8 +572,9 @@ export const appRouter = router({
         
         const stages = await db.getUserStages(student.id);
         const reports = await db.getReportsByUser(student.id);
+        const progress = await db.calculateStudentProgress(student.id);
         
-        return { student, stages, reports };
+        return { student, stages, reports, progress };
       }),
     
     getPendingReports: mentorProcedure.query(async ({ ctx }) => {
@@ -612,6 +613,77 @@ export const appRouter = router({
           }
         }
         
+        return { success: true };
+      }),
+    
+    // Mentor Notes endpoints
+    getNotesByStudent: mentorProcedure
+      .input(z.object({ studentId: z.number() }))
+      .query(async ({ input, ctx }) => {
+        // Verify access
+        const student = await db.getUserById(input.studentId);
+        if (!student) {
+          throw new TRPCError({ code: 'NOT_FOUND', message: 'Étudiant non trouvé' });
+        }
+        
+        if (hasRole(ctx.user.role, 'mentor') && !hasRole(ctx.user.role, 'admin') && student.mentorId !== ctx.user.id) {
+          throw new TRPCError({ code: 'FORBIDDEN' });
+        }
+        
+        return await db.getMentorNotesByStudent(input.studentId);
+      }),
+    
+    createNote: mentorProcedure
+      .input(z.object({ studentId: z.number(), note: z.string().min(1) }))
+      .mutation(async ({ input, ctx }) => {
+        // Verify access
+        const student = await db.getUserById(input.studentId);
+        if (!student) {
+          throw new TRPCError({ code: 'NOT_FOUND', message: 'Étudiant non trouvé' });
+        }
+        
+        if (hasRole(ctx.user.role, 'mentor') && !hasRole(ctx.user.role, 'admin') && student.mentorId !== ctx.user.id) {
+          throw new TRPCError({ code: 'FORBIDDEN' });
+        }
+        
+        return await db.createMentorNote({
+          mentorId: ctx.user.id,
+          studentId: input.studentId,
+          note: input.note,
+        });
+      }),
+    
+    updateNote: mentorProcedure
+      .input(z.object({ noteId: z.number(), note: z.string().min(1) }))
+      .mutation(async ({ input, ctx }) => {
+        // Verify ownership
+        const note = await db.getMentorNoteById(input.noteId);
+        if (!note) {
+          throw new TRPCError({ code: 'NOT_FOUND', message: 'Note non trouvée' });
+        }
+        
+        if (note.mentorId !== ctx.user.id && !hasRole(ctx.user.role, 'admin')) {
+          throw new TRPCError({ code: 'FORBIDDEN' });
+        }
+        
+        await db.updateMentorNote(input.noteId, input.note);
+        return { success: true };
+      }),
+    
+    deleteNote: mentorProcedure
+      .input(z.object({ noteId: z.number() }))
+      .mutation(async ({ input, ctx }) => {
+        // Verify ownership
+        const note = await db.getMentorNoteById(input.noteId);
+        if (!note) {
+          throw new TRPCError({ code: 'NOT_FOUND', message: 'Note non trouvée' });
+        }
+        
+        if (note.mentorId !== ctx.user.id && !hasRole(ctx.user.role, 'admin')) {
+          throw new TRPCError({ code: 'FORBIDDEN' });
+        }
+        
+        await db.deleteMentorNote(input.noteId);
         return { success: true };
       }),
   }),
