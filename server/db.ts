@@ -221,6 +221,12 @@ export async function getUserStages(userId: number) {
   return await db.select().from(userStages).where(eq(userStages.userId, userId));
 }
 
+export async function getAllUserStages() {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(userStages);
+}
+
 export async function getActiveStage(userId: number) {
   const db = await getDb();
   if (!db) return undefined;

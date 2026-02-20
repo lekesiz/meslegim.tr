@@ -194,6 +194,190 @@ export const appRouter = router({
       };
     }),
     
+    getProgressStats: adminProcedure.query(async () => {
+      const userStages = await db.getAllUserStages();
+      const stages = await db.getAllStages();
+      const users = await db.getAllUsers();
+      const students = users.filter(u => hasRole(u.role, 'student'));
+      
+      // Stage completion stats
+      const stageStats = stages.map(stage => {
+        const stageUserStages = userStages.filter(us => us.stageId === stage.id);
+        const completed = stageUserStages.filter(us => us.status === 'completed').length;
+        const inProgress = stageUserStages.filter(us => us.status === 'active').length;
+        const notStarted = students.length - stageUserStages.length;
+        
+        return {
+          stageId: stage.id,
+          stageName: stage.name,
+          ageGroup: stage.ageGroup,
+          completed,
+          inProgress,
+          notStarted,
+          total: students.length,
+        };
+      });
+      
+      // Average completion time per stage
+      const completionTimes = userStages
+        .filter(us => us.status === 'completed' && us.completedAt && us.unlockedAt)
+        .map(us => ({
+          stageId: us.stageId,
+          days: Math.floor((new Date(us.completedAt!).getTime() - new Date(us.unlockedAt!).getTime()) / (1000 * 60 * 60 * 24)),
+        }));
+      
+      const avgCompletionByStage = stages.map(stage => {
+        const stageTimes = completionTimes.filter(ct => ct.stageId === stage.id);
+        const avgDays = stageTimes.length > 0
+          ? Math.round(stageTimes.reduce((sum, ct) => sum + ct.days, 0) / stageTimes.length)
+          : 0;
+        return {
+          stageId: stage.id,
+          stageName: stage.name,
+          avgDays,
+        };
+      });
+      
+      // Dropout analysis - students who haven't completed any stage in 30+ days
+      const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+      const activeStudents = students.filter(s => s.status === 'active');
+      const inactiveStudents = activeStudents.filter(student => {
+        const studentStages = userStages.filter(us => us.userId === student.id);
+        const lastActivity = studentStages
+          .filter(us => us.completedAt)
+          .sort((a, b) => new Date(b.completedAt!).getTime() - new Date(a.completedAt!).getTime())[0];
+        
+        if (!lastActivity) return true; // Never completed any stage
+        return new Date(lastActivity.completedAt!).getTime() < thirtyDaysAgo.getTime();
+      });
+      
+      return {
+        stageStats,
+        avgCompletionByStage,
+        dropoutRate: activeStudents.length > 0 ? Math.round((inactiveStudents.length / activeStudents.length) * 100) : 0,
+        inactiveStudents: inactiveStudents.length,
+      };
+    }),
+    
+    sendBulkEmail: adminProcedure
+      .input(z.object({
+        subject: z.string().min(1),
+        message: z.string().min(1),
+        targetGroup: z.enum(['all', '14-17', '18-21', '22-24', 'pending', 'active']),
+      }))
+      .mutation(async ({ input }) => {
+        const users = await db.getAllUsers();
+        let targetUsers = users.filter(u => hasRole(u.role, 'student'));
+        
+        // Filter by target group
+        if (input.targetGroup !== 'all') {
+          if (['14-17', '18-21', '22-24'].includes(input.targetGroup)) {
+            targetUsers = targetUsers.filter(u => u.ageGroup === input.targetGroup);
+          } else if (input.targetGroup === 'pending' || input.targetGroup === 'active') {
+            targetUsers = targetUsers.filter(u => u.status === input.targetGroup);
+          }
+        }
+        
+        // Send emails
+        let successCount = 0;
+        let failCount = 0;
+        
+        for (const user of targetUsers) {
+          if (user.email) {
+            try {
+              await sendEmail({
+                to: user.email,
+                subject: input.subject,
+                html: `
+                  <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center;">
+                      <h1 style="color: white; margin: 0;">Meslegim.tr</h1>
+                      <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0 0;">Kariyer Değerlendirme Platformu</p>
+                    </div>
+                    <div style="padding: 30px; background: #f9fafb;">
+                      <p style="color: #374151; font-size: 16px; line-height: 1.6;">
+                        Merhaba ${user.name},
+                      </p>
+                      <div style="color: #374151; font-size: 16px; line-height: 1.6; white-space: pre-wrap;">
+                        ${input.message}
+                      </div>
+                    </div>
+                    <div style="padding: 20px; text-align: center; color: #9ca3af; font-size: 12px;">
+                      <p>Bu e-posta Meslegim.tr tarafından otomatik olarak gönderilmiştir.</p>
+                      <p>© 2026 Meslegim.tr - Tüm hakları saklıdır.</p>
+                    </div>
+                  </div>
+                `,
+              });
+              successCount++;
+            } catch (error) {
+              console.error(`Failed to send email to ${user.email}:`, error);
+              failCount++;
+            }
+          }
+        }
+        
+        return {
+          success: true,
+          totalTargeted: targetUsers.length,
+          successCount,
+          failCount,
+        };
+      }),
+    
+    bulkActivateStudents: adminProcedure
+      .input(z.object({
+        studentIds: z.array(z.number()).optional(),
+        activateAll: z.boolean().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        let studentsToActivate: number[] = [];
+        
+        if (input.activateAll) {
+          const users = await db.getAllUsers();
+          const pendingStudents = users.filter(u => hasRole(u.role, 'student') && u.status === 'pending');
+          studentsToActivate = pendingStudents.map(s => s.id);
+        } else if (input.studentIds) {
+          studentsToActivate = input.studentIds;
+        }
+        
+        let successCount = 0;
+        let failCount = 0;
+        
+        for (const studentId of studentsToActivate) {
+          try {
+            await db.updateUser(studentId, { status: 'active' });
+            
+            // Send activation email
+            const student = await db.getUserById(studentId);
+            if (student?.email && student?.name) {
+              try {
+                const loginUrl = `${process.env.VITE_FRONTEND_URL || 'http://localhost:3000'}/login`;
+                await sendEmail({
+                  to: student.email,
+                  subject: '🎉 Başvurunuz Onaylandı - Meslegim.tr',
+                  html: getApprovalEmailTemplate(student.name, loginUrl),
+                });
+              } catch (error) {
+                console.error('Failed to send activation email:', error);
+              }
+            }
+            
+            successCount++;
+          } catch (error) {
+            console.error(`Failed to activate student ${studentId}:`, error);
+            failCount++;
+          }
+        }
+        
+        return {
+          success: true,
+          totalTargeted: studentsToActivate.length,
+          successCount,
+          failCount,
+        };
+      }),
+    
     createMentor: adminProcedure
       .input(z.object({
         name: z.string().min(1),

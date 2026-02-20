@@ -13,11 +13,13 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { trpc } from '@/lib/trpc';
-import { Loader2, Users, FileQuestion, Layers, Plus } from 'lucide-react';
+import { Loader2, Users, FileQuestion, Layers, Plus, TrendingUp, Zap } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useState } from 'react';
+import { ProgressAnalytics } from '@/components/ProgressAnalytics';
+import { BulkOperations } from '@/components/BulkOperations';
 import { toast } from 'sonner';
 
 export default function AdminDashboard() {
@@ -115,8 +117,12 @@ export default function AdminDashboard() {
         </div>
 
         {/* Tabs */}
-        <Tabs defaultValue="students" className="space-y-4">
+        <Tabs defaultValue="analytics" className="space-y-4">
           <TabsList>
+            <TabsTrigger value="analytics">
+              <TrendingUp className="h-4 w-4 mr-2" />
+              İlerleme Analizi
+            </TabsTrigger>
             <TabsTrigger value="students">
               Öğrenciler ({students.length})
             </TabsTrigger>
@@ -132,7 +138,21 @@ export default function AdminDashboard() {
             <TabsTrigger value="questions">
               Sorular ({questions?.length || 0})
             </TabsTrigger>
+            <TabsTrigger value="bulk">
+              <Zap className="h-4 w-4 mr-2" />
+              Toplu İşlemler
+            </TabsTrigger>
           </TabsList>
+
+          {/* Analytics Tab */}
+          <TabsContent value="analytics">
+            <ProgressAnalytics />
+          </TabsContent>
+
+          {/* Bulk Operations Tab */}
+          <TabsContent value="bulk">
+            <BulkOperations />
+          </TabsContent>
 
           {/* Students Tab */}
           <TabsContent value="students">

@@ -128,3 +128,11 @@
 - [x] Responsive design kontrol et ve düzelt (mobil/tablet) - Tailwind responsive class'ları kullanılmış, mobilde iyi görünüyor
 - [x] Error handling ve toast notifications iyileştir - ErrorBoundary mevcut, toast notifications tüm mutation'larda kullanılıyor
 - [x] Loading states ve skeletons ekle (tüm sayfalarda) - DashboardSkeleton component oluşturuldu, Student ve Mentor dashboard'lara eklendi
+
+
+## 📊 Öğrenci İlerleme Takibi ve Toplu İşlemler (20 Şubat 2026)
+- [x] Öğrenci ilerleme istatistikleri endpoint'leri oluştur (getProgressStats)
+- [x] Admin dashboard'a ilerleme grafikleri ekle (Chart.js - etap tamamlama, dropout oranları)
+- [x] Ortalama tamamlama süreleri hesapla ve göster
+- [x] Toplu email gönderimi özelliği ekle (tüm öğrenciler, yaş grubuna göre)
+- [x] Toplu öğrenci aktifleştirme özelliği ekle (bekleyen öğrencileri toplu aktif et)
