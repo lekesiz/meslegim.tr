@@ -32,14 +32,8 @@ export default function Login() {
     onSuccess: (data) => {
       toast.success("Giriş başarılı!");
       
-      // Redirect based on role
-      if (data.user.role === 'admin') {
-        setLocation('/dashboard/admin');
-      } else if (data.user.role === 'mentor') {
-        setLocation('/dashboard/mentor');
-      } else {
-        setLocation('/dashboard/student');
-      }
+      // Redirect to dashboard - role-based routing will handle the rest
+      setLocation('/dashboard');
     },
     onError: (error: any) => {
       toast.error(error.message || "Giriş başarısız");

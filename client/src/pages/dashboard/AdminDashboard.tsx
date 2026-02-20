@@ -203,7 +203,11 @@ export default function AdminDashboard() {
                             {student.mentorId ? `Mentor #${student.mentorId}` : '-'}
                           </TableCell>
                           <TableCell>
-                            <Button variant="outline" size="sm">
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => toast.info(`Öğrenci düzenleme özelliği yakında eklenecek: ${student.name}`)}
+                            >
                               Düzenle
                             </Button>
                           </TableCell>
@@ -256,7 +260,11 @@ export default function AdminDashboard() {
                             <Badge variant="default">Aktif</Badge>
                           </TableCell>
                           <TableCell>
-                            <Button variant="outline" size="sm">
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => toast.info(`Mentor düzenleme özelliği yakında eklenecek: ${mentor.name}`)}
+                            >
                               Düzenle
                             </Button>
                           </TableCell>

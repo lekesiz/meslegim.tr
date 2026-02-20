@@ -145,3 +145,9 @@
 - [ ] Şifre sıfırlama sayfası oluştur (/reset-password/:token)
 - [ ] Token validation ve expiration logic
 - [ ] Test et: Email gönderimi, token validation, şifre güncelleme
+
+
+## 🔧 Admin Dashboard Sorunları (20 Şubat 2026)
+- [ ] Role-based routing düzelt - admin rolü varsa /dashboard/admin'e yönlendir (şu an /dashboard/student'a gidiyor)
+- [ ] Admin panelinde "Düzenle" butonu çalışmıyor - fonksiyon ekle
+- [ ] mikaillekesiz@gmail.com kullanıcısı admin+mentor rolüne sahip olmalı (database'de "admin,mentor" olarak kayıtlı)
