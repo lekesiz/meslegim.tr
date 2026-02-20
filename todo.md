@@ -242,3 +242,14 @@
 - [ ] StudentDetailView'a mesajlaşma bölümü ekle
 - [ ] MentorDashboard'a okunmamış mesaj sayısı göster
 - [ ] Test et: Mesaj gönderme, alma, okundu işaretleme
+
+
+## 🔄 Toplu İşlemler Özelliği (20 Şubat 2026)
+- [x] Backend'de toplu aktifleştirme endpoint'i ekle (bulkActivateStudents) - ZATEN MEVCUT
+- [x] Backend'de toplu email gönderimi endpoint'i ekle (bulkSendEmail) - ZATEN MEVCUT
+- [x] Admin Dashboard'a Toplu İşlemler tab'ı ekle - ZATEN MEVCUT (BulkOperations component)
+- [x] Toplu email gönderimi UI ekle (hedef grup, konu, mesaj) - ZATEN MEVCUT
+- [x] Toplu aktifleştirme UI ekle (açıklama ve buton) - ZATEN MEVCUT
+- [x] Test edildi: Toplu İşlemler tab'ı - BAŞARILI (Email Gönderimi ve Aktifleştirme UI'ları görünüyor)
+- [ ] Test edilecek: Toplu email gönderimi fonksiyonu (production'da)
+- [ ] Test edilecek: Toplu aktifleştirme fonksiyonu (production'da)
