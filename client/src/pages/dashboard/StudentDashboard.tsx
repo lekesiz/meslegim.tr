@@ -150,8 +150,15 @@ export default function StudentDashboard() {
         {reports && reports.length > 0 && (
           <Card>
             <CardHeader>
-              <CardTitle>Raporlarım</CardTitle>
-              <CardDescription>Tamamlanan etaplarınızın raporları</CardDescription>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>Raporlarım</CardTitle>
+                  <CardDescription>Tamamlanan etaplarınızın raporları</CardDescription>
+                </div>
+                <Button variant="outline" size="sm" onClick={() => setLocation('/dashboard/student/reports')}>
+                  Tümünü Gör
+                </Button>
+              </div>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
@@ -180,7 +187,7 @@ export default function StudentDashboard() {
                       {report.status === 'approved' && (
                         <Button
                           size="sm"
-                          onClick={() => setLocation(`/reports/${report.id}`)}
+                          onClick={() => setLocation(`/dashboard/student/reports/${report.id}`)}
                         >
                           Görüntüle
                         </Button>

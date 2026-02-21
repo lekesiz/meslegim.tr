@@ -242,7 +242,7 @@ export default function StageForm() {
         {/* Questions */}
         <div className="space-y-4" key={JSON.stringify(Object.keys(answers).sort())}>
           {questions.map((question: any, index: number) => (
-            <Card key={`q-${question.id}-${answers[question.id] || 'empty'}`}>
+            <Card key={`q-${question.id}-${answers[question.id] || 'empty'}-${Object.keys(answers).length}`}>
               <CardHeader>
                 <CardTitle className="text-lg">
                   Soru {index + 1}

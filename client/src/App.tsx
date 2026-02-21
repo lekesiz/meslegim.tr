@@ -13,6 +13,8 @@ import MentorDashboard from "./pages/dashboard/MentorDashboard";
 import StudentDashboard from "./pages/dashboard/StudentDashboard";
 import StudentStageForm from "./pages/student/StageForm";
 import StudentDetailView from "./pages/student/StudentDetailView";
+import MyReports from "./pages/student/MyReports";
+import StudentReportView from "./pages/student/ReportView";
 import Login from "./pages/Login";
 import ReportView from "./pages/ReportView";
 import Dashboard from "./pages/Dashboard";
@@ -32,6 +34,8 @@ function Router() {
       <Route path="/dashboard/admin" component={AdminDashboard} />
       <Route path="/dashboard/mentor" component={MentorDashboard} />
       <Route path="/dashboard/student" component={StudentDashboard} />
+      <Route path="/dashboard/student/reports" component={MyReports} />
+      <Route path="/dashboard/student/reports/:id" component={StudentReportView} />
       <Route path="/dashboard/student/stage/:stageId" component={StudentStageForm} />
       <Route path="/dashboard/student/:id" component={StudentDetailView} />
       <Route path="/reports/:id" component={ReportView} />
