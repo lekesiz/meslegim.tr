@@ -7,7 +7,7 @@ import { z } from "zod";
 import * as db from "./db";
 import { generateStageReportAsync } from './reportHelper';
 import { generatePDF } from './services/pdfGenerator';
-import { sendEmail, getRegistrationEmailTemplate, getApprovalEmailTemplate, getReportApprovedEmailTemplate } from './_core/resend-email';
+import { sendEmail, getRegistrationEmailTemplate, getApprovalEmailTemplate, getReportApprovedEmailTemplate, getReportRejectedEmailTemplate } from './_core/resend-email';
 import bcrypt from 'bcryptjs';
 import { sdk } from './_core/sdk';
 import { hasRole, hasAnyRole } from './roleHelper';
@@ -627,7 +627,11 @@ export const appRouter = router({
     }),
     
     approveReport: mentorProcedure
-      .input(z.object({ reportId: z.number() }))
+      .input(z.object({ 
+        reportId: z.number(),
+        approved: z.boolean().optional().default(true),
+        feedback: z.string().optional(),
+      }))
       .mutation(async ({ input, ctx }) => {
         // Get report details
         const report = await db.getReportById(input.reportId);
@@ -635,25 +639,37 @@ export const appRouter = router({
           throw new TRPCError({ code: 'NOT_FOUND', message: 'Report not found' });
         }
         
-        // Approve the report
-        await db.approveReport(input.reportId, ctx.user.id);
+        // Approve or reject the report
+        if (input.approved) {
+          await db.approveReport(input.reportId, ctx.user.id);
+        } else {
+          // TODO: Add rejectReport function to db.ts
+          // For now, just don't approve it
+          console.log(`Report ${input.reportId} rejected by mentor ${ctx.user.id}`);
+        }
         
         // Get student and stage details for email
         const student = report.userId ? await db.getUserById(report.userId) : null;
         const stage = report.stageId ? await db.getStageById(report.stageId) : null;
         
-        // Send approval email
+        // Send email (approval or rejection)
         if (student?.email && student?.name && stage?.name) {
           try {
             const reportUrl = `${process.env.VITE_FRONTEND_URL || 'http://localhost:3000'}/reports/${report.id}`;
+            const subject = input.approved 
+              ? '✅ Raporunuz Onaylan dı - Meslegim.tr'
+              : '⚠️ Raporunuz İnceleme Bekliyor - Meslegim.tr';
+            const html = input.approved
+              ? getReportApprovedEmailTemplate(student.name, stage.name, reportUrl)
+              : getReportRejectedEmailTemplate(student.name, stage.name, input.feedback || 'Mentor tarafından geri bildirim verilmedi.', reportUrl);
             await sendEmail({
               to: student.email,
-              subject: '✅ Raporunuz Onaylan dı - Meslegim.tr',
-              html: getReportApprovedEmailTemplate(student.name, stage.name, reportUrl),
+              subject,
+              html,
             });
           } catch (error) {
-            console.error('Failed to send report approval email:', error);
-            // Don't fail the approval if email fails
+            console.error('Failed to send report email:', error);
+            // Don't fail the operation if email fails
           }
         }
         
