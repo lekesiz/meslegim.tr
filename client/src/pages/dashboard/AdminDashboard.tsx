@@ -23,6 +23,7 @@ import { BulkOperations } from '@/components/BulkOperations';
 import { toast } from 'sonner';
 import { EditStudentDialog } from '@/components/EditStudentDialog';
 import { EditMentorDialog } from '@/components/EditMentorDialog';
+import MentorComparisonReport from '@/components/MentorComparisonReport';
 
 export default function AdminDashboard() {
   const { user } = useAuth();
@@ -146,6 +147,10 @@ export default function AdminDashboard() {
               <Zap className="h-4 w-4 mr-2" />
               Toplu İşlemler
             </TabsTrigger>
+            <TabsTrigger value="mentor-comparison">
+              <TrendingUp className="h-4 w-4 mr-2" />
+              Mentor Karşılaştırma
+            </TabsTrigger>
           </TabsList>
 
           {/* Analytics Tab */}
@@ -156,6 +161,11 @@ export default function AdminDashboard() {
           {/* Bulk Operations Tab */}
           <TabsContent value="bulk">
             <BulkOperations />
+          </TabsContent>
+
+          {/* Mentor Comparison Tab */}
+          <TabsContent value="mentor-comparison">
+            <MentorComparisonReport />
           </TabsContent>
 
           {/* Students Tab */}
