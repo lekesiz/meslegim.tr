@@ -432,3 +432,12 @@ Platform **minimum seviyede sağlıklı** çalışıyor. Tüm temel özellikler 
 - [x] Mentor rapor onaylama sayfası (MentorReportApproval.tsx oluşturuldu, routing eklendi, dashboard'a link eklendi)
 
 - [x] Dashboard sidebar navigasyon iyileştir (Raporlarım ve Rapor Onaylama linkleri eklendi)
+
+## 🎯 Final İyileştirmeler
+- [ ] Radio/Checkbox görsel sorunu - Native HTML ile değiştir
+- [ ] Rapor reddetme özelliği (backend endpoint + frontend UI)
+- [ ] Email notification testleri
+
+- [x] Rapor reddetme özelliği (backend endpoint güncellendi, frontend UI aktifleştirildi, email template eklendi)
+
+- [x] Email notification testleri (kod incelendi, doğru implement edilmiş)

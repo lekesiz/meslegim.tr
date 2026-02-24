@@ -27,8 +27,12 @@ export default function MentorReportApproval() {
     },
   });
 
-  const handleApprove = (reportId: number) => {
-    approveReportMutation.mutate({ reportId });
+  const handleApprove = (reportId: number, approved: boolean) => {
+    approveReportMutation.mutate({ 
+      reportId, 
+      approved,
+      feedback: feedback || undefined 
+    });
   };
 
   if (isLoading) {
@@ -133,7 +137,7 @@ export default function MentorReportApproval() {
                   {selectedReport === report.id ? (
                     <>
                       <Button
-                        onClick={() => handleApprove(report.id)}
+                        onClick={() => handleApprove(report.id, true)}
                         disabled={approveReportMutation.isPending}
                         className="flex-1"
                       >
@@ -150,11 +154,7 @@ export default function MentorReportApproval() {
                         )}
                       </Button>
                       <Button
-                        onClick={() => {
-                          setSelectedReport(null);
-                          setFeedback('');
-                          toast.info('Rapor reddetme özelliği yakında eklenecek');
-                        }}
+                        onClick={() => handleApprove(report.id, false)}
                         disabled={approveReportMutation.isPending}
                         variant="destructive"
                         className="flex-1"
