@@ -9,6 +9,7 @@ import { Loader2, UserCheck, Users, FileText, CheckCircle } from 'lucide-react';
 import { DashboardSkeleton } from '@/components/DashboardSkeleton';
 import { toast } from 'sonner';
 import { useLocation } from 'wouter';
+import MentorStatsChart from '@/components/MentorStatsChart';
 
 export default function MentorDashboard() {
   const { user } = useAuth();
@@ -59,6 +60,11 @@ export default function MentorDashboard() {
             Öğrencilerinizi yönetin ve raporları onaylayın
           </p>
         </div>
+
+        {/* Stats Charts */}
+        {stats && (
+          <MentorStatsChart stats={stats} />
+        )}
 
         {/* Stats */}
         <div className="grid gap-4 md:grid-cols-4">

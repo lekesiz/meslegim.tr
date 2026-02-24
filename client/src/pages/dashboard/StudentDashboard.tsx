@@ -9,6 +9,7 @@ import { Loader2, FileText, Clock, CheckCircle2, Lock } from "lucide-react";
 import { DashboardSkeleton } from "@/components/DashboardSkeleton";
 import { EmptyState } from "@/components/EmptyState";
 import { useLocation } from "wouter";
+import StudentProgressTimeline from "@/components/StudentProgressTimeline";
 
 export default function StudentDashboard() {
   const { user } = useAuth();
@@ -40,6 +41,20 @@ export default function StudentDashboard() {
             Kariyer değerlendirme sürecinizi buradan takip edebilirsiniz.
           </p>
         </div>
+
+        {/* Progress Timeline */}
+        {progress && progress.length > 0 && (
+          <StudentProgressTimeline
+            stages={progress.map((p: any) => ({
+              id: p.stageId,
+              name: p.stageName,
+              description: p.stageDescription || '',
+              status: p.status,
+              completedAt: p.completedAt,
+              scheduledAt: p.scheduledAt,
+            }))}
+          />
+        )}
 
         {/* Progress Card */}
         <Card>

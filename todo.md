@@ -441,3 +441,12 @@ Platform **minimum seviyede sağlıklı** çalışıyor. Tüm temel özellikler 
 - [x] Rapor reddetme özelliği (backend endpoint güncellendi, frontend UI aktifleştirildi, email template eklendi)
 
 - [x] Email notification testleri (kod incelendi, doğru implement edilmiş)
+
+## 🚀 Son İyileştirmeler
+- [ ] Radio/Checkbox görsel sorunu - Radix UI optimize et
+- [ ] Mentor dashboard istatistikleri - Görsel grafikler ekle
+- [ ] Öğrenci ilerleme timeline görünümü oluştur
+
+- [x] Mentor dashboard istatistikleri - Görsel grafikler ekle (Bar chart + Pie chart)
+
+- [x] Öğrenci ilerleme timeline görünümü oluştur (Timeline component + StudentDashboard entegrasyonu)
