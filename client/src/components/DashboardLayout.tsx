@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/sidebar";
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { LayoutDashboard, LogOut, PanelLeft, Users } from "lucide-react";
+import { LayoutDashboard, LogOut, PanelLeft, Users, FileText, CheckCircle } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
@@ -34,12 +34,13 @@ const getMenuItems = (role: string) => {
   ];
   
   const mentorItems = [
-    { icon: LayoutDashboard, label: "Tableau de bord", path: "/dashboard/mentor" },
-    { icon: Users, label: "Étudiants en attente", path: "/dashboard/mentor/pending" },
+    { icon: LayoutDashboard, label: "Panel", path: "/dashboard/mentor" },
+    { icon: CheckCircle, label: "Rapor Onaylama", path: "/dashboard/mentor/reports" },
   ];
   
   const studentItems = [
-    { icon: LayoutDashboard, label: "Tableau de bord", path: "/dashboard/student" },
+    { icon: LayoutDashboard, label: "Panel", path: "/dashboard/student" },
+    { icon: FileText, label: "Raporlarım", path: "/dashboard/student/reports" },
   ];
   
   if (role === 'admin') return adminItems;

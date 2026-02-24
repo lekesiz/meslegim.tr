@@ -98,6 +98,16 @@ export default function MentorDashboard() {
               <p className="text-xs text-muted-foreground">
                 Onay bekleyen rapor
               </p>
+              {(pendingReports?.length || 0) > 0 && (
+                <Button
+                  variant="link"
+                  size="sm"
+                  onClick={() => setLocation('/dashboard/mentor/reports')}
+                  className="mt-2 p-0 h-auto"
+                >
+                  Tümünü Gör →
+                </Button>
+              )}
             </CardContent>
           </Card>
 

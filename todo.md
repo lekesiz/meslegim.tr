@@ -423,3 +423,12 @@ Platform **minimum seviyede sağlıklı** çalışıyor. Tüm temel özellikler 
 - [x] UI/UX iyileştirmeleri (toast notifications, error handling, loading states zaten mevcut)
 
 - [x] Test coverage (vitest) - 3 test dosyası, 6 test case, tümü geçti
+
+## 🎯 Kalan İyileştirmeler (Devam)
+- [ ] Radio/Checkbox görsel sorunu - Native HTML ile değiştir
+- [ ] Mentor rapor onaylama sayfası
+- [ ] Dashboard sidebar navigasyon iyileştir (Raporlarım, Mesajlarım linkleri)
+
+- [x] Mentor rapor onaylama sayfası (MentorReportApproval.tsx oluşturuldu, routing eklendi, dashboard'a link eklendi)
+
+- [x] Dashboard sidebar navigasyon iyileştir (Raporlarım ve Rapor Onaylama linkleri eklendi)
