@@ -5,7 +5,7 @@ import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { trpc } from "@/lib/trpc";
-import { Loader2, FileText, Clock, CheckCircle2, Lock } from "lucide-react";
+import { Loader2, FileText, Clock, CheckCircle2, Lock, Award } from "lucide-react";
 import { DashboardSkeleton } from "@/components/DashboardSkeleton";
 import { EmptyState } from "@/components/EmptyState";
 import { useLocation } from "wouter";
@@ -18,6 +18,14 @@ export default function StudentDashboard() {
   const { data: progress, isLoading: progressLoading } = trpc.student.getMyProgress.useQuery();
   const { data: activeStage, isLoading: stageLoading } = trpc.student.getActiveStage.useQuery();
   const { data: reports, isLoading: reportsLoading } = trpc.student.getMyReports.useQuery();
+  const { data: certificate } = trpc.student.getMyCertificate.useQuery();
+  const { data: isEligible } = trpc.student.checkCertificateEligibility.useQuery();
+  
+  const generateCertificate = trpc.student.generateCertificate.useMutation({
+    onSuccess: () => {
+      trpc.useUtils().student.getMyCertificate.invalidate();
+    },
+  });
 
   if (!user) {
     return null;
@@ -73,6 +81,53 @@ export default function StudentDashboard() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Certificate Section */}
+        {(isEligible || certificate) && (
+          <Card className="border-primary/50 bg-gradient-to-br from-primary/5 to-transparent">
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <Award className="h-5 w-5 text-primary" />
+                <CardTitle>Tebrikler! Sertifika Kazandınız 🎉</CardTitle>
+              </div>
+              <CardDescription>
+                Tüm etapları başarıyla tamamladınız
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {certificate ? (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between p-4 bg-background rounded-lg border">
+                    <div>
+                      <p className="font-medium">Sertifika Numarası</p>
+                      <p className="text-sm text-muted-foreground font-mono">{certificate.certificateNumber}</p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Düzenlenme: {new Date(certificate.issueDate).toLocaleDateString('tr-TR')}
+                      </p>
+                    </div>
+                    {certificate.pdfUrl && (
+                      <Button asChild>
+                        <a href={certificate.pdfUrl} target="_blank" rel="noopener noreferrer">
+                          <Award className="h-4 w-4 mr-2" />
+                          Sertifikayı İndir
+                        </a>
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                <Button 
+                  onClick={() => generateCertificate.mutate()}
+                  disabled={generateCertificate.isPending}
+                  size="lg"
+                >
+                  <Award className="h-4 w-4 mr-2" />
+                  {generateCertificate.isPending ? "Oluşturuluyor..." : "Sertifikamı Oluştur"}
+                </Button>
+              )}
+            </CardContent>
+          </Card>
+        )}
 
         {/* Active Stage Card */}
         {activeStage ? (
