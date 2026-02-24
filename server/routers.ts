@@ -1011,6 +1011,42 @@ export const appRouter = router({
     getMyFeedbacks: studentProcedure.query(async ({ ctx }) => {
       return await db.getFeedbacksByStudent(ctx.user.id);
     }),
+
+    // Dashboard endpoints
+    getDashboardStats: studentProcedure.query(async ({ ctx }) => {
+      return await db.getStudentDashboardStats(ctx.user.id);
+    }),
+
+    getStagesWithProgress: studentProcedure.query(async ({ ctx }) => {
+      return await db.getStudentStagesWithProgress(ctx.user.id);
+    }),
+
+    // Certificate endpoints
+    checkCertificateEligibility: studentProcedure.query(async ({ ctx }) => {
+      return await db.checkCertificateEligibility(ctx.user.id);
+    }),
+
+    getMyCertificate: studentProcedure.query(async ({ ctx }) => {
+      return await db.getCertificateByStudent(ctx.user.id);
+    }),
+
+    generateCertificate: studentProcedure.mutation(async ({ ctx }) => {
+      // Check eligibility
+      const isEligible = await db.checkCertificateEligibility(ctx.user.id);
+      if (!isEligible) {
+        throw new TRPCError({ 
+          code: 'FORBIDDEN', 
+          message: 'Tüm etapları tamamlamanız gerekiyor' 
+        });
+      }
+
+      // Create certificate record
+      const certificate = await db.createCertificate(ctx.user.id);
+
+      // TODO: Generate PDF certificate and upload to S3
+      // For now, return the certificate without PDF
+      return certificate;
+    }),
   }),
 });
 

@@ -561,3 +561,32 @@ Platform **minimum seviyede sağlıklı** çalışıyor. Tüm temel özellikler 
 - [ ] Test email gönderlle
 - [ ] Tüm email template'lerinde from adresini güncelle
 - [ ] Test et: Gerçek kullanıcılara email gönderimi
+
+
+## 📊 Öğrenci Dashboard Geliştirme (24 Şubat 2026)
+- [x] Backend: getStudentDashboardStats fonksiyonu oluştur
+- [x] Backend: getStudentStagesWithProgress fonksiyonu oluştur
+- [x] student.getDashboardStats endpoint ekle
+- [x] student.getStagesWithProgress endpoint ekle
+- [x] StudentDashboard'a sertifika bölümü ekle
+- [x] İlerleme çubuğu ve etap görselleştirme (ZATEN MEVCUT)
+- [x] Kişisel istatistikler kartları (ZATEN MEVCUT)
+- [x] Tamamlanan/kalan etaplar listesi (ZATEN MEVCUT)
+- [x] Mentor bilgileri kartı (ZATEN MEVCUT)
+- [ ] Test et
+
+## 🎓 Sertifika Sistemi (24 Şubat 2026)
+- [x] Database schema güncelle (certificates tablosu ekle)
+- [x] Backend: createCertificate fonksiyonu oluştur
+- [x] Backend: checkCertificateEligibility fonksiyonu oluştur
+- [x] Backend: getCertificateByStudent fonksiyonu oluştur
+- [x] Backend: generateCertificateNumber fonksiyonu oluştur
+- [x] student.generateCertificate endpoint ekle
+- [x] student.getMyCertificate endpoint ekle
+- [x] student.checkCertificateEligibility endpoint ekle
+- [x] Sertifika UI ekle (StudentDashboard)
+- [x] Sertifika oluşturma butonu ekle
+- [ ] PDF sertifika template tasarla ve oluştur (gelecek için bırakıldı)
+- [ ] Sertifika doğrulama sistemi (QR kod veya unique ID - gelecek için bırakıldı)
+- [x] Backend test edildi - çalışıyor
+- [x] Test kullanıcısı oluşturuldu (test@student.com, tüm etaplar tamamlanmış)

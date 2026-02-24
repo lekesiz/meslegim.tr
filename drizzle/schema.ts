@@ -185,3 +185,21 @@ export const feedbacks = mysqlTable("feedbacks", {
 
 export type Feedback = typeof feedbacks.$inferSelect;
 export type InsertFeedback = typeof feedbacks.$inferInsert;
+
+/**
+ * Certificates table - stores completion certificates for students
+ */
+export const certificates = mysqlTable("certificates", {
+  id: int("id").autoincrement().primaryKey(),
+  studentId: int("studentId").notNull(),
+  certificateNumber: varchar("certificateNumber", { length: 50 }).unique().notNull(),
+  pdfUrl: text("pdfUrl"),
+  issueDate: timestamp("issueDate").defaultNow().notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+  studentIdIdx: index("student_id_idx").on(table.studentId),
+  certificateNumberIdx: index("certificate_number_idx").on(table.certificateNumber),
+}));
+
+export type Certificate = typeof certificates.$inferSelect;
+export type InsertCertificate = typeof certificates.$inferInsert;

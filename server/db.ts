@@ -1,6 +1,6 @@
 import { eq, and, or, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, stages, questions, answers, userStages, reports, mentorNotes, messages, feedbacks } from "../drizzle/schema";
+import { InsertUser, users, stages, questions, answers, userStages, reports, mentorNotes, messages, feedbacks, certificates } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -983,5 +983,247 @@ export async function getMentorFeedbackStats(mentorId: number) {
     totalFeedbacks: mentorFeedbacks.length,
     averageRating,
     ratingDistribution,
+  };
+}
+
+
+// ============================================
+// Student Dashboard Functions
+// ============================================
+
+export async function getStudentDashboardStats(studentId: number) {
+  const dbInstance = await getDb();
+  if (!dbInstance) {
+    return {
+      totalStages: 0,
+      completedStages: 0,
+      activeStage: null,
+      progress: 0,
+      totalReports: 0,
+      approvedReports: 0,
+      mentor: null,
+    };
+  }
+
+  // Get student info with mentor
+  const student = await dbInstance
+    .select()
+    .from(users)
+    .where(eq(users.id, studentId))
+    .limit(1);
+
+  if (student.length === 0) {
+    throw new Error("Student not found");
+  }
+
+  const studentData = student[0];
+
+  // Get mentor info
+  let mentorData = null;
+  if (studentData.mentorId) {
+    const mentor = await dbInstance
+      .select()
+      .from(users)
+      .where(eq(users.id, studentData.mentorId))
+      .limit(1);
+    
+    if (mentor.length > 0) {
+      mentorData = {
+        id: mentor[0].id,
+        name: mentor[0].name,
+        email: mentor[0].email,
+      };
+    }
+  }
+
+  // Get progress stats
+  const progressStats = await calculateStudentProgress(studentId);
+
+  // Get reports stats
+  const studentReports = await dbInstance
+    .select()
+    .from(reports)
+    .where(eq(reports.userId, studentId));
+
+  const approvedReports = studentReports.filter(r => r.status === 'approved').length;
+
+  // Get active stage
+  const activeStages = await dbInstance
+    .select()
+    .from(userStages)
+    .innerJoin(stages, eq(userStages.stageId, stages.id))
+    .where(and(
+      eq(userStages.userId, studentId),
+      eq(userStages.status, 'active')
+    ))
+    .limit(1);
+
+  const activeStage = activeStages.length > 0 ? {
+    id: activeStages[0].stages.id,
+    name: activeStages[0].stages.name,
+    description: activeStages[0].stages.description,
+    order: activeStages[0].stages.order,
+  } : null;
+
+  return {
+    totalStages: progressStats.totalStages,
+    completedStages: progressStats.completedStages,
+    activeStage,
+    progress: progressStats.progressPercentage,
+    totalReports: studentReports.length,
+    approvedReports,
+    mentor: mentorData,
+  };
+}
+
+export async function getStudentStagesWithProgress(studentId: number) {
+  const dbInstance = await getDb();
+  if (!dbInstance) return [];
+
+  const student = await dbInstance
+    .select()
+    .from(users)
+    .where(eq(users.id, studentId))
+    .limit(1);
+
+  if (student.length === 0) {
+    throw new Error("Student not found");
+  }
+
+  const ageGroup = student[0].ageGroup;
+  if (!ageGroup) {
+    return [];
+  }
+
+  // Get all stages for age group
+  const allStages = await dbInstance
+    .select()
+    .from(stages)
+    .where(eq(stages.ageGroup, ageGroup))
+    .orderBy(stages.order);
+
+  // Get user stages
+  const userStagesData = await dbInstance
+    .select()
+    .from(userStages)
+    .where(eq(userStages.userId, studentId));
+
+  // Combine data
+  return allStages.map(stage => {
+    const userStage = userStagesData.find(us => us.stageId === stage.id);
+    return {
+      ...stage,
+      status: userStage?.status || 'locked',
+      unlockedAt: userStage?.unlockedAt || null,
+      completedAt: userStage?.completedAt || null,
+    };
+  });
+}
+
+// ============================================
+// Certificate Functions
+// ============================================
+
+export async function checkCertificateEligibility(studentId: number): Promise<boolean> {
+  const dbInstance = await getDb();
+  if (!dbInstance) return false;
+
+  const progressStats = await calculateStudentProgress(studentId);
+  return progressStats.progressPercentage === 100;
+}
+
+export async function generateCertificateNumber(studentId: number): Promise<string> {
+  const timestamp = Date.now();
+  const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+  return `MSLGM-${studentId}-${timestamp}-${random}`;
+}
+
+export async function createCertificate(studentId: number, pdfUrl?: string) {
+  const dbInstance = await getDb();
+  if (!dbInstance) {
+    throw new Error("Database not available");
+  }
+
+  // Check if certificate already exists
+  const existing = await dbInstance
+    .select()
+    .from(certificates)
+    .where(eq(certificates.studentId, studentId))
+    .limit(1);
+
+  if (existing.length > 0) {
+    return existing[0];
+  }
+
+  // Check eligibility
+  const isEligible = await checkCertificateEligibility(studentId);
+  if (!isEligible) {
+    throw new Error("Student has not completed all stages");
+  }
+
+  // Generate certificate number
+  const certificateNumber = await generateCertificateNumber(studentId);
+
+  // Create certificate
+  await dbInstance.insert(certificates).values({
+    studentId,
+    certificateNumber,
+    pdfUrl: pdfUrl || null,
+  });
+
+  const newCertificate = await dbInstance
+    .select()
+    .from(certificates)
+    .where(eq(certificates.certificateNumber, certificateNumber))
+    .limit(1);
+
+  return newCertificate[0];
+}
+
+export async function getCertificateByStudent(studentId: number) {
+  const dbInstance = await getDb();
+  if (!dbInstance) return null;
+
+  const result = await dbInstance
+    .select()
+    .from(certificates)
+    .where(eq(certificates.studentId, studentId))
+    .limit(1);
+
+  return result.length > 0 ? result[0] : null;
+}
+
+export async function updateCertificatePdf(certificateId: number, pdfUrl: string) {
+  const dbInstance = await getDb();
+  if (!dbInstance) {
+    throw new Error("Database not available");
+  }
+
+  await dbInstance
+    .update(certificates)
+    .set({ pdfUrl })
+    .where(eq(certificates.id, certificateId));
+}
+
+export async function getCertificateByNumber(certificateNumber: string) {
+  const dbInstance = await getDb();
+  if (!dbInstance) return null;
+
+  const result = await dbInstance
+    .select()
+    .from(certificates)
+    .innerJoin(users, eq(certificates.studentId, users.id))
+    .where(eq(certificates.certificateNumber, certificateNumber))
+    .limit(1);
+
+  if (result.length === 0) return null;
+
+  return {
+    ...result[0].certificates,
+    student: {
+      id: result[0].users.id,
+      name: result[0].users.name,
+      email: result[0].users.email,
+    },
   };
 }
