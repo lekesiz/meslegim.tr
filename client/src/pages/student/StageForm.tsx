@@ -31,7 +31,14 @@ export default function StageForm() {
   const [isSaving, setIsSaving] = useState(false);
 
   const { data: activeStage, isLoading } = trpc.student.getActiveStage.useQuery();
-  const saveAnswerMutation = trpc.student.saveAnswer.useMutation();
+  const saveAnswerMutation = trpc.student.saveAnswer.useMutation({
+    onSuccess: () => {
+      // Silent success - auto-save feedback
+    },
+    onError: (error) => {
+      toast.error(`Yanıt kaydedilemedi: ${error.message}`);
+    },
+  });
   const submitStageMutation = trpc.student.submitStage.useMutation({
     onSuccess: () => {
       toast.success('Etap başarıyla tamamlandı! Raporunuz hazırlanıyor.');

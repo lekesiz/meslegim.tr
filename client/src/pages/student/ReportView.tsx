@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, Download, Loader2, CheckCircle, Clock, XCircle } from 'lucide-react';
 import { useLocation, useRoute } from 'wouter';
 import { useEffect } from 'react';
-// Toast removed - using console for now
+import { toast } from 'sonner';
 
 export default function ReportView() {
   const [, params] = useRoute('/dashboard/student/reports/:id');
@@ -22,12 +22,11 @@ export default function ReportView() {
     onSuccess: (data) => {
       if (data.pdfUrl) {
         window.open(data.pdfUrl, '_blank');
-        console.log('PDF created successfully');
+        toast.success('PDF başarıyla oluşturuldu ve indiriliyor!');
       }
     },
     onError: (error) => {
-      console.error('PDF generation failed:', error.message);
-      alert(error.message || 'PDF oluşturulurken bir hata oluştu.');
+      toast.error(`PDF oluşturulurken hata: ${error.message}`);
     },
   });
 
