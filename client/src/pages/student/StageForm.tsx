@@ -6,8 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Checkbox } from '@/components/ui/checkbox';
+// Native HTML radio and checkbox will be used instead of Radix UI
 import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import { trpc } from '@/lib/trpc';
@@ -137,18 +136,26 @@ export default function StageForm() {
 
       case 'multiple_choice':
         return (
-          <RadioGroup
-            key={`mc-${question.id}-${currentAnswer}`}
-            value={currentAnswer}
-            onValueChange={(value) => handleAnswerChange(question.id, value)}
-          >
+          <div className="space-y-3">
             {options.map((option: string, index: number) => (
-              <div key={index} className="flex items-center space-x-2">
-                <RadioGroupItem value={String(option)} id={`${question.id}-${index}`} />
-                <Label htmlFor={`${question.id}-${index}`}>{option}</Label>
-              </div>
+              <label
+                key={index}
+                htmlFor={`${question.id}-${index}`}
+                className="flex items-center space-x-3 p-3 rounded-lg border border-border hover:bg-accent cursor-pointer transition-colors"
+              >
+                <input
+                  type="radio"
+                  id={`${question.id}-${index}`}
+                  name={`question-${question.id}`}
+                  value={String(option)}
+                  checked={currentAnswer === String(option)}
+                  onChange={(e) => handleAnswerChange(question.id, e.target.value)}
+                  className="w-4 h-4 text-primary border-gray-300 focus:ring-2 focus:ring-primary"
+                />
+                <span className="text-sm font-medium">{option}</span>
+              </label>
             ))}
-          </RadioGroup>
+          </div>
         );
 
       case 'likert':
@@ -159,21 +166,26 @@ export default function StageForm() {
               <span>Kesinlikle Katılmıyorum</span>
               <span>Kesinlikle Katılıyorum</span>
             </div>
-            <RadioGroup
-              key={`likert-${question.id}-${currentAnswer}`}
-              value={currentAnswer}
-              onValueChange={(value) => handleAnswerChange(question.id, value)}
-              className="flex justify-between"
-            >
+            <div className="flex justify-between">
               {likertOptions.map((option: string) => (
-                <div key={option} className="flex flex-col items-center space-y-2">
-                  <RadioGroupItem value={String(option)} id={`${question.id}-${option}`} />
-                  <Label htmlFor={`${question.id}-${option}`} className="text-xs">
-                    {option}
-                  </Label>
-                </div>
+                <label
+                  key={option}
+                  htmlFor={`${question.id}-${option}`}
+                  className="flex flex-col items-center space-y-2 cursor-pointer"
+                >
+                  <input
+                    type="radio"
+                    id={`${question.id}-${option}`}
+                    name={`question-${question.id}`}
+                    value={String(option)}
+                    checked={currentAnswer === String(option)}
+                    onChange={(e) => handleAnswerChange(question.id, e.target.value)}
+                    className="w-4 h-4 text-primary border-gray-300 focus:ring-2 focus:ring-primary"
+                  />
+                  <span className="text-xs font-medium">{option}</span>
+                </label>
               ))}
-            </RadioGroup>
+            </div>
           </div>
         );
 
@@ -181,24 +193,30 @@ export default function StageForm() {
         // For ranking, we'll use checkboxes with multiple selection
         const selectedOptions = currentAnswer ? currentAnswer.split(',') : [];
         return (
-          <div className="space-y-2">
+          <div className="space-y-3">
             {options.map((option: string, index: number) => (
-              <div key={index} className="flex items-center space-x-2">
-                <Checkbox
+              <label
+                key={index}
+                htmlFor={`${question.id}-${index}`}
+                className="flex items-center space-x-3 p-3 rounded-lg border border-border hover:bg-accent cursor-pointer transition-colors"
+              >
+                <input
+                  type="checkbox"
                   id={`${question.id}-${index}`}
                   checked={selectedOptions.includes(option)}
-                  onCheckedChange={(checked) => {
+                  onChange={(e) => {
                     let newSelected = [...selectedOptions];
-                    if (checked) {
+                    if (e.target.checked) {
                       newSelected.push(option);
                     } else {
                       newSelected = newSelected.filter(o => o !== option);
                     }
                     handleAnswerChange(question.id, newSelected.join(','));
                   }}
+                  className="w-4 h-4 text-primary border-gray-300 rounded focus:ring-2 focus:ring-primary"
                 />
-                <Label htmlFor={`${question.id}-${index}`}>{option}</Label>
-              </div>
+                <span className="text-sm font-medium">{option}</span>
+              </label>
             ))}
           </div>
         );

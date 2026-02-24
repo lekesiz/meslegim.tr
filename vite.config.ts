@@ -24,6 +24,25 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
+    // Performance optimizations
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Vendor chunks for better caching
+          'react-vendor': ['react', 'react-dom', 'react/jsx-runtime'],
+          'router': ['wouter'],
+          'trpc': ['@trpc/client', '@trpc/react-query', '@tanstack/react-query'],
+          'ui': ['lucide-react', 'sonner'],
+          'charts': ['recharts'],
+        },
+      },
+    },
+    // Minification settings
+    minify: 'esbuild', // esbuild is faster than terser
+    // Chunk size warnings
+    chunkSizeWarningLimit: 1000,
+    // Source maps for debugging (disable in production if not needed)
+    sourcemap: false,
   },
   server: {
     host: true,
