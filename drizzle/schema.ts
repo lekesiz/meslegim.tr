@@ -164,3 +164,24 @@ export const messages = mysqlTable("messages", {
 export type Message = typeof messages.$inferSelect;
 export type InsertMessage = typeof messages.$inferInsert;
 
+/**
+ * Feedbacks table - stores student feedback on mentors and reports
+ */
+export const feedbacks = mysqlTable("feedbacks", {
+  id: int("id").autoincrement().primaryKey(),
+  studentId: int("studentId").notNull(),
+  mentorId: int("mentorId").notNull(),
+  reportId: int("reportId"),
+  rating: int("rating").notNull(), // 1-5 stars
+  comment: text("comment"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  studentIdIdx: index("student_id_idx").on(table.studentId),
+  mentorIdIdx: index("mentor_id_idx").on(table.mentorId),
+  reportIdIdx: index("report_id_idx").on(table.reportId),
+  ratingIdx: index("rating_idx").on(table.rating),
+}));
+
+export type Feedback = typeof feedbacks.$inferSelect;
+export type InsertFeedback = typeof feedbacks.$inferInsert;

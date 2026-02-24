@@ -1,6 +1,6 @@
 import { eq, and, or, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, stages, questions, answers, userStages, reports, mentorNotes, messages } from "../drizzle/schema";
+import { InsertUser, users, stages, questions, answers, userStages, reports, mentorNotes, messages, feedbacks } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -826,4 +826,162 @@ export async function getConversations(userId: number) {
   );
   
   return conversations;
+}
+
+// Mentor Comparison Report
+export async function getMentorComparison() {
+  const dbInstance = await getDb();
+  if (!dbInstance) {
+    return [];
+  }
+  
+  // Get all mentors
+  const allUsers = await dbInstance.select().from(users);
+  const mentors = allUsers.filter(u => u.role === 'mentor' || (u.role && u.role.includes('mentor')));
+  
+  // Get all students, reports, and user stages
+  const students = allUsers.filter(u => u.role === 'student');
+  const allReports = await dbInstance.select().from(reports);
+  const allUserStages = await dbInstance.select().from(userStages);
+  
+  // Calculate stats for each mentor
+  const mentorStats = mentors.map(mentor => {
+    // Students assigned to this mentor
+    const mentorStudents = students.filter(s => s.mentorId === mentor.id);
+    const studentIds = mentorStudents.map(s => s.id);
+    
+    // Reports for this mentor's students
+    const mentorReports = allReports.filter(r => studentIds.includes(r.userId));
+    const approvedReports = mentorReports.filter(r => r.status === 'approved');
+    const pendingReports = mentorReports.filter(r => r.status === 'pending');
+    
+    // Average approval time (in days)
+    let avgApprovalTime = 0;
+    if (approvedReports.length > 0) {
+      const totalDays = approvedReports.reduce((sum, report) => {
+        if (report.approvedAt && report.createdAt) {
+          const days = Math.floor((new Date(report.approvedAt).getTime() - new Date(report.createdAt).getTime()) / (1000 * 60 * 60 * 24));
+          return sum + days;
+        }
+        return sum;
+      }, 0);
+      avgApprovalTime = totalDays / approvedReports.length;
+    }
+    
+    // Completed stages for this mentor's students
+    const completedStages = allUserStages.filter(us => 
+      studentIds.includes(us.userId) && us.status === 'completed'
+    );
+    
+    // Active students (status = 'active')
+    const activeStudents = mentorStudents.filter(s => s.status === 'active');
+    
+    return {
+      mentorId: mentor.id,
+      mentorName: mentor.name || 'İsimsiz Mentor',
+      mentorEmail: mentor.email,
+      totalStudents: mentorStudents.length,
+      activeStudents: activeStudents.length,
+      pendingStudents: mentorStudents.filter(s => s.status === 'pending').length,
+      totalReports: mentorReports.length,
+      approvedReports: approvedReports.length,
+      pendingReports: pendingReports.length,
+      avgApprovalTimeDays: Math.round(avgApprovalTime * 10) / 10,
+      completedStages: completedStages.length,
+      approvalRate: mentorReports.length > 0 ? Math.round((approvedReports.length / mentorReports.length) * 100) : 0,
+    };
+  });
+  
+  // Sort by total students (descending)
+  return mentorStats.sort((a, b) => b.totalStudents - a.totalStudents);
+}
+
+// ============================================================
+// Feedback Functions
+// ============================================================
+
+export async function createFeedback(data: { studentId: number; mentorId: number; reportId?: number; rating: number; comment?: string }) {
+  const dbInstance = await getDb();
+  if (!dbInstance) throw new Error('Database not initialized');
+  
+  await dbInstance.insert(feedbacks).values(data);
+  
+  // Return the created feedback
+  const [feedback] = await dbInstance
+    .select()
+    .from(feedbacks)
+    .where(and(eq(feedbacks.studentId, data.studentId), eq(feedbacks.mentorId, data.mentorId)))
+    .orderBy(desc(feedbacks.createdAt))
+    .limit(1);
+  return feedback;
+}
+
+export async function getFeedbacksByMentor(mentorId: number) {
+  const dbInstance = await getDb();
+  if (!dbInstance) return [];
+  
+  return await dbInstance
+    .select()
+    .from(feedbacks)
+    .where(eq(feedbacks.mentorId, mentorId))
+    .orderBy(desc(feedbacks.createdAt));
+}
+
+export async function getFeedbacksByStudent(studentId: number) {
+  const dbInstance = await getDb();
+  if (!dbInstance) return [];
+  
+  return await dbInstance
+    .select()
+    .from(feedbacks)
+    .where(eq(feedbacks.studentId, studentId))
+    .orderBy(desc(feedbacks.createdAt));
+}
+
+export async function getAllFeedbacks() {
+  const dbInstance = await getDb();
+  if (!dbInstance) return [];
+  
+  return await dbInstance
+    .select()
+    .from(feedbacks)
+    .orderBy(desc(feedbacks.createdAt));
+}
+
+export async function getMentorFeedbackStats(mentorId: number) {
+  const dbInstance = await getDb();
+  if (!dbInstance) {
+    return {
+      totalFeedbacks: 0,
+      averageRating: 0,
+      ratingDistribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
+    };
+  }
+  
+  const mentorFeedbacks = await dbInstance
+    .select()
+    .from(feedbacks)
+    .where(eq(feedbacks.mentorId, mentorId));
+  
+  if (mentorFeedbacks.length === 0) {
+    return {
+      totalFeedbacks: 0,
+      averageRating: 0,
+      ratingDistribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
+    };
+  }
+  
+  const totalRating = mentorFeedbacks.reduce((sum, f) => sum + f.rating, 0);
+  const averageRating = Math.round((totalRating / mentorFeedbacks.length) * 10) / 10;
+  
+  const ratingDistribution = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+  mentorFeedbacks.forEach(f => {
+    ratingDistribution[f.rating as 1 | 2 | 3 | 4 | 5]++;
+  });
+  
+  return {
+    totalFeedbacks: mentorFeedbacks.length,
+    averageRating,
+    ratingDistribution,
+  };
 }

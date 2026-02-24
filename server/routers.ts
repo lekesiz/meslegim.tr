@@ -499,6 +499,14 @@ export const appRouter = router({
         // TODO: Implement getAllQuestions if needed
         return [];
       }),
+    
+    getMentorComparison: adminProcedure.query(async () => {
+      return await db.getMentorComparison();
+    }),
+    
+    getAllFeedbacks: adminProcedure.query(async () => {
+      return await db.getAllFeedbacks();
+    }),
   }),
 
   // Mentor procedures
@@ -783,6 +791,15 @@ export const appRouter = router({
     getUnreadCount: mentorProcedure.query(async ({ ctx }) => {
       return await db.getUnreadCount(ctx.user.id);
     }),
+    
+    // Feedback endpoints
+    getMyFeedbacks: mentorProcedure.query(async ({ ctx }) => {
+      return await db.getFeedbacksByMentor(ctx.user.id);
+    }),
+    
+    getFeedbackStats: mentorProcedure.query(async ({ ctx }) => {
+      return await db.getMentorFeedbackStats(ctx.user.id);
+    }),
   }),
 
   // Student procedures
@@ -970,6 +987,29 @@ export const appRouter = router({
     
     getUnreadCount: studentProcedure.query(async ({ ctx }) => {
       return await db.getUnreadCount(ctx.user.id);
+    }),
+    
+    // Feedback endpoints
+    submitFeedback: studentProcedure
+      .input(z.object({
+        mentorId: z.number(),
+        reportId: z.number().optional(),
+        rating: z.number().min(1).max(5),
+        comment: z.string().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const feedback = await db.createFeedback({
+          studentId: ctx.user.id,
+          mentorId: input.mentorId,
+          reportId: input.reportId,
+          rating: input.rating,
+          comment: input.comment,
+        });
+        return { success: true, feedback };
+      }),
+    
+    getMyFeedbacks: studentProcedure.query(async ({ ctx }) => {
+      return await db.getFeedbacksByStudent(ctx.user.id);
     }),
   }),
 });

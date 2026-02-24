@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 import { useLocation } from 'wouter';
 import MentorStatsChart from '@/components/MentorStatsChart';
 import { MentorPerformanceTrends } from '@/components/MentorPerformanceTrends';
+import MentorFeedbackStats from '@/components/MentorFeedbackStats';
 
 export default function MentorDashboard() {
   const { user } = useAuth();
@@ -146,6 +147,9 @@ export default function MentorDashboard() {
             </TabsTrigger>
             <TabsTrigger value="reports">
               Bekleyen Raporlar ({pendingReports?.length || 0})
+            </TabsTrigger>
+            <TabsTrigger value="feedback">
+              Geri Bildirimler
             </TabsTrigger>
           </TabsList>
 
@@ -321,6 +325,11 @@ export default function MentorDashboard() {
                 </CardContent>
               </Card>
             )}
+          </TabsContent>
+
+          {/* Feedback Tab */}
+          <TabsContent value="feedback">
+            <MentorFeedbackStats />
           </TabsContent>
         </Tabs>
       </div>

@@ -525,3 +525,39 @@ Platform **minimum seviyede sağlıklı** çalışıyor. Tüm temel özellikler 
 - [x] MentorDashboard'a entegre et - TAMAMLANDI
 - [x] Test et: Grafikler doğru görüntüleniyor - BAŞARILI
 - [x] Resend email doğrulaması tamamlandı - BAŞARILI
+
+
+## 📊 Mentor Karşılaştırma Raporu (24 Şubat 2026)
+- [x] Backend getMentorComparison fonksiyonu oluştur
+- [x] admin.getMentorComparison endpoint ekle
+- [x] MentorComparisonReport component oluştur
+- [x] Mentor performans karşılaştırma tablosu ekle
+- [x] En aktif mentor, en hızlı onaylayan mentor istatistikleri
+- [x] Mentor başına öğrenci dağılımı grafikleri
+- [x] Admin dashboard'a entegre et
+- [x] Test et
+
+## 💬 Öğrenci Geri Bildirim Sistemi (24 Şubat 2026)
+- [x] Database schema güncelle (feedback tablosu ekle)
+- [x] Backend createFeedback, getFeedbacks fonksiyonları oluştur
+- [x] student.submitFeedback endpoint ekle
+- [x] mentor.getMyFeedbacks, getFeedbackStats endpoints ekle
+- [x] admin.getAllFeedbacks endpoint ekle
+- [x] FeedbackForm component oluştur (5 yıldızlı rating)
+- [x] MentorFeedbackStats component oluştur
+- [x] Mentor dashboard'a feedback tabı ekle
+- [ ] ReportView sayfasına feedback formu ekle (optional)
+- [ ] Admin dashboard'a feedback özeti ekle (optional)
+- [x] Test et
+
+### 📧 Email Domain Doğrulaması (24 Şubat 2026)
+- [x] Email domain doğrulama rehberi oluştur (EMAIL_DOMAIN_VERIFICATION_GUIDE.md)
+- [ ] Resend Dashboard'da meslegim.tr domain'ini ekle (MANUEL)
+- [ ] DNS kayıtlarını ekle: SPF, DKIM, MX (MANUEL)
+- [ ] DMARC kaydı ekle (MANUEL - opsiyonel)
+- [ ] DNS propagation bekle (birkaç dakika - 72 saat)
+- [ ] Resend'de domain doğrulamasını tamamla (MANUEL)
+- [ ] Test email endpoint'i oluştur
+- [ ] Test email gönderlle
+- [ ] Tüm email template'lerinde from adresini güncelle
+- [ ] Test et: Gerçek kullanıcılara email gönderimi
