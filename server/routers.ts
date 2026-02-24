@@ -47,6 +47,11 @@ export const appRouter = router({
       ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
       return { success: true } as const;
     }),
+    verifyCertificate: publicProcedure
+      .input(z.object({ certificateNumber: z.string() }))
+      .query(async ({ input }) => {
+        return await db.verifyCertificate(input.certificateNumber);
+      }),
     login: publicProcedure
       .input(z.object({
         email: z.string().email(),
@@ -506,6 +511,10 @@ export const appRouter = router({
     
     getAllFeedbacks: adminProcedure.query(async () => {
       return await db.getAllFeedbacks();
+    }),
+
+    getAllFeedbacksWithStats: adminProcedure.query(async () => {
+      return await db.getAllFeedbacksWithStats();
     }),
   }),
 
@@ -1043,8 +1052,22 @@ export const appRouter = router({
       // Create certificate record
       const certificate = await db.createCertificate(ctx.user.id);
 
-      // TODO: Generate PDF certificate and upload to S3
-      // For now, return the certificate without PDF
+      // Send certificate ready email
+      if (ctx.user.email && ctx.user.name) {
+        try {
+          const certificateUrl = `${process.env.VITE_FRONTEND_URL || 'http://localhost:3000'}/dashboard`;
+          const { getCertificateReadyEmailTemplate } = await import('./_core/resend-email');
+          await sendEmail({
+            to: ctx.user.email,
+            subject: '🎓 Sertifikanız Hazır - Meslegim.tr',
+            html: getCertificateReadyEmailTemplate(ctx.user.name, certificateUrl),
+          });
+        } catch (error) {
+          console.error('Failed to send certificate email:', error);
+          // Don't fail the operation if email fails
+        }
+      }
+
       return certificate;
     }),
   }),

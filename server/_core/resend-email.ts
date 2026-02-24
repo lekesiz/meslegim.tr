@@ -294,3 +294,51 @@ export function getReportApprovedEmailTemplate(name: string, stageName: string, 
     </html>
   `;
 }
+
+export function getCertificateReadyEmailTemplate(name: string, certificateUrl: string): string {
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); color: white; padding: 30px 20px; text-align: center; border-radius: 8px 8px 0 0; }
+        .logo { width: 60px; height: 60px; margin: 0 auto 15px; }
+        .content { padding: 30px; background: #f9fafb; border-radius: 0 0 8px 8px; }
+        .button { display: inline-block; padding: 12px 24px; background: #fbbf24; color: white; text-decoration: none; border-radius: 6px; margin: 20px 0; }
+        .footer { text-align: center; margin-top: 20px; color: #6b7280; font-size: 14px; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310419663028218705/cDCfxYGTnZmArwPn.png" alt="Meslegim.tr Logo" class="logo" />
+          <h1 style="margin: 0;">🎓 Sertifikanız Hazır!</h1>
+        </div>
+        <div class="content">
+          <h2>Tebrikler, ${name}!</h2>
+          <p>Tüm kariyer değerlendirme etaplarını başarıyla tamamladınız!</p>
+          <p>Meslegim.tr Kariyer Değerlendirme Sertifikanız hazırlanmıştır ve artık görüntüleyebilir, indirebilirsiniz.</p>
+          <p><strong>Sertifikanızda:</strong></p>
+          <ul>
+            <li>Tamamlanan tüm etaplar</li>
+            <li>Benzersiz sertifika numarası</li>
+            <li>Doğrulama QR kodu</li>
+            <li>Resmi onay damgası</li>
+          </ul>
+          <p style="text-align: center;">
+            <a href="${certificateUrl}" class="button">Sertifikayı Görüntüle</a>
+          </p>
+          <p><em>Bu sertifika, kariyer gelişim sürecinizi ve yeteneklerinizi belgeleyen resmi bir dokümandır.</em></p>
+          <div class="footer">
+            <p>Bu e-posta Meslegim.tr tarafından otomatik olarak gönderilmiştir.</p>
+            <p>© 2026 Meslegim.tr - Tüm hakları saklıdır.</p>
+          </div>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+}

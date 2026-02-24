@@ -1,5 +1,6 @@
 import PDFDocument from "pdfkit";
 import { storagePut } from "./storage";
+import QRCode from "qrcode";
 
 interface CertificateData {
   studentName: string;
@@ -160,16 +161,49 @@ export async function generateCertificatePDF(data: CertificateData): Promise<{ u
         width: doc.page.width,
       });
 
-    // Footer
-    doc
-      .fontSize(10)
-      .font("Helvetica")
-      .fillColor("#9CA3AF")
-      .text("Bu sertifika meslegim.tr platformu tarafından dijital olarak oluşturulmuştur.", 0, doc.page.height - 40, {
-        align: "center",
-        width: doc.page.width,
-      });
+    // QR Code (async operation)
+    const verifyUrl = `https://meslegim.tr/verify-certificate/${data.certificateNumber}`;
+    QRCode.toDataURL(verifyUrl, { width: 100 })
+      .then((qrDataUrl) => {
+        // Add QR code image to PDF
+        const qrX = doc.page.width - 130;
+        const qrY = doc.page.height - 130;
+        doc.image(qrDataUrl, qrX, qrY, { width: 80, height: 80 });
 
-    doc.end();
+        // QR code label
+        doc
+          .fontSize(8)
+          .font("Helvetica")
+          .fillColor("#6B7280")
+          .text("Doğrulama", qrX, qrY + 85, {
+            width: 80,
+            align: "center",
+          });
+
+        // Footer
+        doc
+          .fontSize(10)
+          .font("Helvetica")
+          .fillColor("#9CA3AF")
+          .text("Bu sertifika meslegim.tr platformu tarafından dijital olarak oluşturulmuştur.", 0, doc.page.height - 40, {
+            align: "center",
+            width: doc.page.width,
+          });
+
+        doc.end();
+      })
+      .catch((error) => {
+        console.error("QR code generation failed:", error);
+        // Continue without QR code
+        doc
+          .fontSize(10)
+          .font("Helvetica")
+          .fillColor("#9CA3AF")
+          .text("Bu sertifika meslegim.tr platformu tarafından dijital olarak oluşturulmuştur.", 0, doc.page.height - 40, {
+            align: "center",
+            width: doc.page.width,
+          });
+        doc.end();
+      });
   });
 }

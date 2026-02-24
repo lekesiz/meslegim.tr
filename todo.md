@@ -654,3 +654,28 @@ Platform **minimum seviyede sağlıklı** çalışıyor. Tüm temel özellikler 
 - [x] Sadece onaylanmış raporlarda görünsün
 - [x] Mentor bilgilerini report'tan al (getReportById güncellendi)
 - [ ] Test et
+
+
+## 📧 Email Bildirim Sistemi (24 Şubat 2026)
+- [x] Rapor onaylandığında öğrenciye email gönder (ZATEN MEVCUT)
+- [x] Yeni etap açıldığında öğrenciye email gönder (ZATEN MEVCUT - cronJobs.ts)
+- [x] Sertifika hazır olduğunda öğrenciye email gönder (EKLENDİ)
+- [x] Email template'lerini oluştur (getCertificateReadyEmailTemplate)
+- [ ] Test et
+
+## 📊 Admin Dashboard Feedback Özeti (24 Şubat 2026)
+- [x] Backend: getAllFeedbacksWithStats fonksiyonu oluştur
+- [x] Admin dashboard'a Feedback Özeti tab'ı ekle
+- [x] Platform geneli memnuniyet istatistikleri göster
+- [x] Mentor başına feedback özeti tablosu ekle
+- [x] AdminFeedbackSummary component oluştur (chart + tablo + son feedbackler)
+- [ ] Test et
+
+## 🔐 Sertifika QR Kod Doğrulama (24 Şubat 2026)
+- [x] QR kod oluşturma paketi yükle (qrcode)
+- [x] PDF sertifikaya QR kod ekle (pdfCertificate.ts)
+- [x] Sertifika doğrulama sayfası oluştur (/verify-certificate/:id)
+- [x] Backend: verifyCertificate endpoint ekle (auth.verifyCertificate)
+- [x] Backend: verifyCertificate db fonksiyonu oluştur
+- [x] App.tsx'e route ekle
+- [ ] Test et
