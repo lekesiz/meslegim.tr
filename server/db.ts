@@ -2,6 +2,7 @@ import { eq, and, or, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { InsertUser, users, stages, questions, answers, userStages, reports, mentorNotes, messages, feedbacks, certificates } from "../drizzle/schema";
 import { ENV } from './_core/env';
+import { sql } from 'drizzle-orm';
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
@@ -315,8 +316,28 @@ export async function getReportsByUser(userId: number) {
 export async function getReportById(reportId: number) {
   const db = await getDb();
   if (!db) return null;
+  
+  // Get report
   const result = await db.select().from(reports).where(eq(reports.id, reportId)).limit(1);
-  return result[0] || null;
+  const report = result[0];
+  if (!report) return null;
+  
+  // Get student to find mentor
+  const student = await getUserById(report.userId);
+  if (!student) return report;
+  
+  // Get mentor info if exists
+  let mentorName = null;
+  if (student.mentorId) {
+    const mentor = await getUserById(student.mentorId);
+    mentorName = mentor?.name || null;
+  }
+  
+  return {
+    ...report,
+    mentorId: student.mentorId,
+    mentorName
+  };
 }
 
 export async function getPendingReports(mentorId?: number) {

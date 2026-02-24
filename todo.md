@@ -622,3 +622,35 @@ Platform **minimum seviyede sağlıklı** çalışıyor. Tüm temel özellikler 
 - [ ] Admin akışı: Kullanıcı yönetimi → Rapor yönetimi → İstatistikler → Mentor karşılaştırma
 - [ ] Tüm hataları ve eksiklikleri raporla
 - [ ] Düzeltmeleri yap ve tekrar test et
+
+
+## 🔧 Email/Password Login Düzeltme (24 Şubat 2026)
+- [x] Login sayfasında form submit sorununu tespit et - ÇALIŞIYOR
+- [x] tRPC client bağlantısını kontrol et - SORUN YOK
+- [x] Network isteklerini debug et - SORUN YOK
+- [x] Login endpoint'ini test et - BAŞARILI
+- [x] Düzeltmeyi test et (admin hesabı) - BAŞARILI
+
+## 🔔 Bildirim Sistemi (24 Şubat 2026)
+- [ ] Database schema güncelle (notifications tablosu ekle)
+- [ ] Backend notification CRUD fonksiyonları oluştur
+- [ ] Email gönderim fonksiyonu ekle (Resend)
+- [ ] Rapor onayı bildirimi ekle
+- [ ] Yeni etap açılması bildirimi ekle
+- [ ] Sertifika hazır bildirimi ekle
+- [ ] In-app notification UI component oluştur
+- [ ] Test et
+
+## 💬 Rapor Sayfasına Feedback Formu (24 Şubat 2026)
+- [ ] ReportView sayfasını bul ve oku
+- [ ] FeedbackForm component'ini entegre et
+- [ ] Sadece tamamlanmış raporlarda göster
+- [ ] Zaten feedback verilmişse gösterme
+- [ ] Test et
+
+
+## ✅ Rapor Sayfasına Feedback Formu Eklendi (24 Şubat 2026)
+- [x] ReportView sayfasına FeedbackForm component'ini ekle
+- [x] Sadece onaylanmış raporlarda görünsün
+- [x] Mentor bilgilerini report'tan al (getReportById güncellendi)
+- [ ] Test et
