@@ -6,6 +6,7 @@ import { ArrowLeft, Download, Loader2, CheckCircle, Clock, XCircle } from 'lucid
 import { useLocation, useRoute } from 'wouter';
 import { useEffect } from 'react';
 import { toast } from 'sonner';
+import FeedbackForm from '@/components/FeedbackForm';
 
 export default function ReportView() {
   const [, params] = useRoute('/dashboard/student/reports/:id');
@@ -164,6 +165,17 @@ export default function ReportView() {
           )}
         </CardContent>
       </Card>
+
+      {/* Feedback Form - Sadece onaylanmış raporlarda göster */}
+      {report.status === 'approved' && 'mentorId' in report && report.mentorId && (
+        <div className="mt-6">
+          <FeedbackForm 
+            reportId={reportId} 
+            mentorId={report.mentorId}
+            mentorName={('mentorName' in report && report.mentorName) ? report.mentorName : 'Mentor'}
+          />
+        </div>
+      )}
     </div>
   );
 }
