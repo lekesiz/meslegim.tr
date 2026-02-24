@@ -13,7 +13,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { trpc } from '@/lib/trpc';
-import { Loader2, Users, FileQuestion, Layers, Plus, TrendingUp, Zap } from 'lucide-react';
+import { Loader2, Users, FileQuestion, Layers, Plus, TrendingUp, Zap, MessageSquare } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -24,6 +24,7 @@ import { toast } from 'sonner';
 import { EditStudentDialog } from '@/components/EditStudentDialog';
 import { EditMentorDialog } from '@/components/EditMentorDialog';
 import MentorComparisonReport from '@/components/MentorComparisonReport';
+import { AdminFeedbackSummary } from '@/components/AdminFeedbackSummary';
 
 export default function AdminDashboard() {
   const { user } = useAuth();
@@ -151,6 +152,10 @@ export default function AdminDashboard() {
               <TrendingUp className="h-4 w-4 mr-2" />
               Mentor Karşılaştırma
             </TabsTrigger>
+            <TabsTrigger value="feedback-summary">
+              <MessageSquare className="h-4 w-4 mr-2" />
+              Feedback Özeti
+            </TabsTrigger>
           </TabsList>
 
           {/* Analytics Tab */}
@@ -166,6 +171,11 @@ export default function AdminDashboard() {
           {/* Mentor Comparison Tab */}
           <TabsContent value="mentor-comparison">
             <MentorComparisonReport />
+          </TabsContent>
+
+          {/* Feedback Summary Tab */}
+          <TabsContent value="feedback-summary">
+            <AdminFeedbackSummary />
           </TabsContent>
 
           {/* Students Tab */}

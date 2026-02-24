@@ -1268,3 +1268,79 @@ export async function getCertificateByNumber(certificateNumber: string) {
     },
   };
 }
+
+
+// Get all feedbacks with stats for admin dashboard
+export async function getAllFeedbacksWithStats() {
+  const db = await getDb();
+  if (!db) return null;
+
+  // Get all feedbacks with student and mentor info
+  const allFeedbacks = await db.select({
+    id: feedbacks.id,
+    rating: feedbacks.rating,
+    comment: feedbacks.comment,
+    createdAt: feedbacks.createdAt,
+    studentName: sql<string>`(SELECT name FROM ${users} WHERE id = ${feedbacks.studentId})`,
+    mentorName: sql<string>`(SELECT name FROM ${users} WHERE id = ${feedbacks.mentorId})`,
+    mentorId: feedbacks.mentorId,
+  })
+  .from(feedbacks)
+  .orderBy(desc(feedbacks.createdAt));
+
+  // Calculate overall stats
+  const totalFeedbacks = allFeedbacks.length;
+  const averageRating = totalFeedbacks > 0 
+    ? allFeedbacks.reduce((sum, f) => sum + f.rating, 0) / totalFeedbacks 
+    : 0;
+
+  // Group by mentor
+  const mentorStats = allFeedbacks.reduce((acc, feedback) => {
+    const mentorId = feedback.mentorId;
+    if (!acc[mentorId]) {
+      acc[mentorId] = {
+        mentorId,
+        mentorName: feedback.mentorName,
+        totalFeedbacks: 0,
+        averageRating: 0,
+        ratings: [] as number[],
+      };
+    }
+    acc[mentorId].totalFeedbacks++;
+    acc[mentorId].ratings.push(feedback.rating);
+    return acc;
+  }, {} as Record<number, any>);
+
+  // Calculate average for each mentor
+  Object.values(mentorStats).forEach((mentor: any) => {
+    mentor.averageRating = mentor.ratings.reduce((sum: number, r: number) => sum + r, 0) / mentor.ratings.length;
+    delete mentor.ratings; // Remove ratings array from final output
+  });
+
+  return {
+    totalFeedbacks,
+    averageRating: Math.round(averageRating * 10) / 10,
+    mentorStats: Object.values(mentorStats),
+    recentFeedbacks: allFeedbacks.slice(0, 10), // Last 10 feedbacks
+  };
+}
+
+
+// Verify certificate by certificate number
+export async function verifyCertificate(certificateNumber: string) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const result = await db.select({
+    id: certificates.id,
+    certificateNumber: certificates.certificateNumber,
+    issueDate: certificates.issueDate,
+    studentName: sql<string>`(SELECT name FROM ${users} WHERE id = ${certificates.studentId})`,
+    studentAgeGroup: sql<string>`(SELECT ageGroup FROM ${users} WHERE id = ${certificates.studentId})`,
+  })
+  .from(certificates)
+  .where(eq(certificates.certificateNumber, certificateNumber))
+  .limit(1);
+
+  return result[0] || null;
+}
