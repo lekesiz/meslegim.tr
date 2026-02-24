@@ -15,6 +15,7 @@ import StudentStageForm from "./pages/student/StageForm";
 import StudentDetailView from "./pages/student/StudentDetailView";
 import MyReports from "./pages/student/MyReports";
 import StudentReportView from "./pages/student/ReportView";
+import MentorReportApproval from "./pages/mentor/MentorReportApproval";
 import Login from "./pages/Login";
 import ReportView from "./pages/ReportView";
 import Dashboard from "./pages/Dashboard";
@@ -33,6 +34,7 @@ function Router() {
       {/* Legacy routes for backward compatibility */}
       <Route path="/dashboard/admin" component={AdminDashboard} />
       <Route path="/dashboard/mentor" component={MentorDashboard} />
+      <Route path="/dashboard/mentor/reports" component={MentorReportApproval} />
       <Route path="/dashboard/student" component={StudentDashboard} />
       <Route path="/dashboard/student/reports" component={MyReports} />
       <Route path="/dashboard/student/reports/:id" component={StudentReportView} />
