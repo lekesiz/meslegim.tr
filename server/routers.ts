@@ -681,6 +681,10 @@ export const appRouter = router({
       return await db.getMentorStats(ctx.user.id);
     }),
     
+    getPerformanceTrends: mentorProcedure.query(async ({ ctx }) => {
+      return await db.getMentorPerformanceTrends(ctx.user.id);
+    }),
+    
     // Mentor Notes endpoints
     getNotesByStudent: mentorProcedure
       .input(z.object({ studentId: z.number() }))

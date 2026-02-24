@@ -10,6 +10,7 @@ import { DashboardSkeleton } from '@/components/DashboardSkeleton';
 import { toast } from 'sonner';
 import { useLocation } from 'wouter';
 import MentorStatsChart from '@/components/MentorStatsChart';
+import { MentorPerformanceTrends } from '@/components/MentorPerformanceTrends';
 
 export default function MentorDashboard() {
   const { user } = useAuth();
@@ -65,6 +66,9 @@ export default function MentorDashboard() {
         {stats && (
           <MentorStatsChart stats={stats} />
         )}
+
+        {/* Performance Trends */}
+        <MentorPerformanceTrends />
 
         {/* Stats */}
         <div className="grid gap-4 md:grid-cols-4">

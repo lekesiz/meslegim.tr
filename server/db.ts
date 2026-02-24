@@ -658,6 +658,94 @@ export async function getMentorStats(mentorId: number) {
   };
 }
 
+export async function getMentorPerformanceTrends(mentorId: number) {
+  const dbInstance = await getDb();
+  if (!dbInstance) {
+    return {
+      studentGrowth: [],
+      approvalSpeed: [],
+      stageCompletion: [],
+    };
+  }
+  
+  // Get students for this mentor
+  const students = await dbInstance.select().from(users).where(
+    and(
+      eq(users.mentorId, mentorId),
+      eq(users.role, 'student')
+    )
+  );
+  const studentIds = students.map(s => s.id);
+  
+  // Get all reports for these students
+  const allReports = await dbInstance.select().from(reports);
+  const mentorReports = allReports.filter(r => studentIds.includes(r.userId));
+  
+  // Get all user stages for these students
+  const allUserStages = await dbInstance.select().from(userStages);
+  const mentorUserStages = allUserStages.filter(us => studentIds.includes(us.userId));
+  
+  // Generate last 6 months data
+  const now = new Date();
+  const months = [];
+  for (let i = 5; i >= 0; i--) {
+    const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    months.push({
+      month: date.toLocaleDateString('tr-TR', { month: 'short', year: '2-digit' }),
+      monthStart: new Date(date.getFullYear(), date.getMonth(), 1),
+      monthEnd: new Date(date.getFullYear(), date.getMonth() + 1, 0, 23, 59, 59),
+    });
+  }
+  
+  // Student Growth (new students per month)
+  const studentGrowth = months.map(m => {
+    const count = students.filter(s => {
+      const createdAt = new Date(s.createdAt);
+      return createdAt >= m.monthStart && createdAt <= m.monthEnd;
+    }).length;
+    return { month: m.month, count };
+  });
+  
+  // Approval Speed (average days to approve reports per month)
+  const approvalSpeed = months.map(m => {
+    const monthReports = mentorReports.filter(r => {
+      if (!r.approvedAt) return false;
+      const approvedAt = new Date(r.approvedAt);
+      return approvedAt >= m.monthStart && approvedAt <= m.monthEnd;
+    });
+    
+    if (monthReports.length === 0) {
+      return { month: m.month, avgDays: 0 };
+    }
+    
+    const totalDays = monthReports.reduce((sum, report) => {
+      if (!report.approvedAt) return sum;
+      const days = Math.floor(
+        (new Date(report.approvedAt).getTime() - new Date(report.createdAt).getTime()) / (1000 * 60 * 60 * 24)
+      );
+      return sum + days;
+    }, 0);
+    
+    return { month: m.month, avgDays: Math.round(totalDays / monthReports.length) };
+  });
+  
+  // Stage Completion (completed stages per month)
+  const stageCompletion = months.map(m => {
+    const count = mentorUserStages.filter(us => {
+      if (us.status !== 'completed' || !us.completedAt) return false;
+      const completedAt = new Date(us.completedAt);
+      return completedAt >= m.monthStart && completedAt <= m.monthEnd;
+    }).length;
+    return { month: m.month, count };
+  });
+  
+  return {
+    studentGrowth,
+    approvalSpeed,
+    stageCompletion,
+  };
+}
+
 // ============================================================
 // Messages Functions
 // ============================================================
