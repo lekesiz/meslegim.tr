@@ -1138,7 +1138,7 @@ export async function generateCertificateNumber(studentId: number): Promise<stri
   return `MSLGM-${studentId}-${timestamp}-${random}`;
 }
 
-export async function createCertificate(studentId: number, pdfUrl?: string) {
+export async function createCertificate(studentId: number) {
   const dbInstance = await getDb();
   if (!dbInstance) {
     throw new Error("Database not available");
@@ -1161,14 +1161,34 @@ export async function createCertificate(studentId: number, pdfUrl?: string) {
     throw new Error("Student has not completed all stages");
   }
 
+  // Get student info
+  const student = await dbInstance
+    .select()
+    .from(users)
+    .where(eq(users.id, studentId))
+    .limit(1);
+
+  if (student.length === 0) {
+    throw new Error("Student not found");
+  }
+
   // Generate certificate number
   const certificateNumber = await generateCertificateNumber(studentId);
+
+  // Generate PDF
+  const { generateCertificatePDF } = await import("./pdfCertificate");
+  const { url: pdfUrl } = await generateCertificatePDF({
+    studentName: student[0].name || "Öğrenci",
+    certificateNumber,
+    completionDate: new Date(),
+    ageGroup: student[0].ageGroup || "18-21",
+  });
 
   // Create certificate
   await dbInstance.insert(certificates).values({
     studentId,
     certificateNumber,
-    pdfUrl: pdfUrl || null,
+    pdfUrl,
   });
 
   const newCertificate = await dbInstance

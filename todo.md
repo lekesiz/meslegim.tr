@@ -590,3 +590,35 @@ Platform **minimum seviyede sağlıklı** çalışıyor. Tüm temel özellikler 
 - [ ] Sertifika doğrulama sistemi (QR kod veya unique ID - gelecek için bırakıldı)
 - [x] Backend test edildi - çalışıyor
 - [x] Test kullanıcısı oluşturuldu (test@student.com, tüm etaplar tamamlanmış)
+
+
+## 📄 PDF Sertifika Template (24 Şubat 2026)
+- [x] PDF sertifika template tasarla (profesyonel görünüm)
+- [x] PDF oluşturma fonksiyonu implement et (server-side - pdfkit)
+- [x] createCertificate fonksiyonunu güncelle - PDF oluşturma entegre edildi
+- [x] StudentDashboard'da indirme butonu (ZATEN MEVCUT)
+- [ ] QR kod ile doğrulama sistemi ekle (gelecek için bırakıldı)
+- [ ] Test et
+
+## 🔔 Bildirim Sistemi (24 Şubat 2026)
+- [ ] Database schema güncelle (notifications tablosu)
+- [ ] Backend: createNotification, getNotifications fonksiyonları
+- [ ] Email template'leri oluştur (rapor onayı, yeni etap, sertifika hazır)
+- [ ] Resend entegrasyonu ile email gönderimi
+- [ ] In-app bildirim UI component'i
+- [ ] Bildirim tetikleyicileri ekle (rapor onayı, etap tamamlama, vb.)
+- [ ] Test et
+
+## 💬 Rapor Sayfasına Feedback Formu (24 Şubat 2026)
+- [ ] ReportView sayfasını bul ve oku
+- [ ] FeedbackForm component'ini ReportView'a entegre et
+- [ ] Sadece tamamlanmış raporlar için feedback formu göster
+- [ ] Feedback gönderildikten sonra teşekkür mesajı göster
+- [ ] Test et
+
+## 🧪 A-Z Kullanıcı Simülasyon Testi (24 Şubat 2026)
+- [ ] Öğrenci akışı: Kayıt → Etap tamamlama → Rapor görüntüleme → Feedback → Sertifika
+- [ ] Mentor akışı: Giriş → Rapor onaylama → Öğrenci mesajlaşma → Feedback görüntüleme
+- [ ] Admin akışı: Kullanıcı yönetimi → Rapor yönetimi → İstatistikler → Mentor karşılaştırma
+- [ ] Tüm hataları ve eksiklikleri raporla
+- [ ] Düzeltmeleri yap ve tekrar test et
