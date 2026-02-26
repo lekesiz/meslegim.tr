@@ -1,0 +1,40 @@
+{
+  "query": "SELECT q.text as question, a.answer, q.type\nFROM answers a\nJOIN questions q ON a.questionId = q.id\nWHERE a.userId = (SELECT id FROM users WHERE email = 'test.ogrenci2@gmail.com')\nAND q.stageId = 60004\nORDER BY q.order;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute SELECT q.text as question, a.answer, q.type\nFROM answers a\nJOIN questions q ON a.questionId = q.id\nWHERE a.userId = (SELECT id FROM users WHERE email = 'test.ogrenci2@gmail.com')\nAND q.stageId = 60004\nORDER BY q.order;",
+  "rows": [
+    {
+      "question": "Üniversite eğitiminiz için kariyer hazırlığınızı nasıl değerlendirirsiniz?",
+      "answer": "4",
+      "type": "likert"
+    },
+    {
+      "question": "Profesyonel hedeflerinizi ne kadar net tanımlayabiliyorsunuz?",
+      "answer": "5 - Çok net",
+      "type": "likert"
+    },
+    {
+      "question": "Staj veya iş deneyiminiz var mı?",
+      "answer": "Hayır, hiç deneyimim yok",
+      "type": "multiple_choice"
+    },
+    {
+      "question": "Aşağıdaki profesyonel becerilerde kendinizi nasıl değerlendirirsiniz? (Her biri için 1-5 arası puan verin)",
+      "answer": "Zaman yönetimi",
+      "type": "ranking"
+    },
+    {
+      "question": "Hangi sektörlerde çalışmak istersiniz? (Birden fazla seçebilirsiniz)",
+      "answer": "Teknoloji ve yazılım",
+      "type": "multiple_choice"
+    },
+    {
+      "question": "Mezuniyet sonrası ilk 5 yıl için kariyer hedefiniz nedir?",
+      "answer": "Yazılım geliştirme alanında uzmanlaşmak ve teknoloji şirketlerinde liderlik pozisyonlarına ulaşmak istiyorum.",
+      "type": "text"
+    }
+  ],
+  "messages": [],
+  "stdout": "question\tanswer\ttype\nÜniversite eğitiminiz için kariyer hazırlığınızı nasıl değerlendirirsiniz?\t4\tlikert\nProfesyonel hedeflerinizi ne kadar net tanımlayabiliyorsunuz?\t5 - Çok net\tlikert\nStaj veya iş deneyiminiz var mı?\tHayır, hiç deneyimim yok\tmultiple_choice\nAşağıdaki profesyonel becerilerde kendinizi nasıl değerlendirirsiniz? (Her biri için 1-5 arası puan verin)\tZaman yönetimi\tranking\nHangi sektörlerde çalışmak istersiniz? (Birden fazla seçebilirsiniz)\tTeknoloji ve yazılım\tmultiple_choice\nMezuniyet sonrası ilk 5 yıl için kariyer hedefiniz nedir?\tYazılım geliştirme alanında uzmanlaşmak ve teknoloji şirketlerinde liderlik pozisyonlarına ulaşmak istiyorum.\ttext\n",
+  "stderr": "",
+  "execution_time_ms": 1677
+}

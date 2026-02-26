@@ -765,5 +765,5 @@ Platform **minimum seviyede sağlıklı** çalışıyor. Tüm temel özellikler 
 - [x] Auto-save sorunu - Öğrenci soru yanıtları kaydedilmiyor (saveAnswerMutation başarısız) - SEBEP BULUNDU: Session expiration, authentication middleware sorunu - ÇÖZÜLDİ
 - [x] Frontend cache sorunu - Database güncellemeleri frontend'de görünmüyor (7/8 yerine 8/8 görünmeli) - ÇÖZÜLDİ: Query invalidation eklendi
 - [ ] Email domain doğrulama - Resend'de meslegim.tr domain'i doğrulanmalı - MANUEL İŞLEM GEREKİYOR
-- [x] AI Rapor Oluşturma Bug - Etap tamamlandığında generateStageReportAsync fonksiyonu çalışmıyor veya sessizce başarısız oluyor (reports tablosunda kayıt yok) - ÇÖZÜLDÜ: PDF oluşturma optional yapıldı, rapor markdown formatında kaydediliyor
+- [ ] AI Rapor Oluşturma Bug - Etap tamamlandığında generateStageReportAsync fonksiyonu çalışmıyor veya sessizce başarısız oluyor (reports tablosunda kayıt yok) - KİSMEN ÇÖZÜLDÜ: PDF oluşturma optional yapıldı ama rapor hala oluşturulmuyor, daha fazla debug gerekiyor
 - [ ] Etap Tamamlama Butonu - browser_click ile çalışmıyor, JavaScript ile programatik click gerekiyor (React event handling sorunu olabilir) - DÜŞÜK ÖNCELİK: Kullanıcılar için sorun yok, sadece test automation sorunu

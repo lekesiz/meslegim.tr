@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { notifyOwner } from "./notification";
 import { adminProcedure, publicProcedure, router } from "./trpc";
+import { generateStageReportAsync } from "../reportHelper";
 
 export const systemRouter = router({
   health: publicProcedure
@@ -25,5 +26,22 @@ export const systemRouter = router({
       return {
         success: delivered,
       } as const;
+    }),
+
+  // Test endpoint - manuel rapor oluşturma
+  generateReportTest: adminProcedure
+    .input(
+      z.object({
+        userId: z.number(),
+        stageId: z.number(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      try {
+        await generateStageReportAsync(input.userId, input.stageId);
+        return { success: true, message: 'Report generated successfully' };
+      } catch (error: any) {
+        return { success: false, message: error.message };
+      }
     }),
 });
