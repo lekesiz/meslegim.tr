@@ -34,19 +34,30 @@ export async function generateStageReportAsync(userId: number, stageId: number) 
       formattedAnswers
     );
 
-    // Convert markdown to PDF and upload to S3
-    const fileName = `stage-${stageId}-user-${userId}-${Date.now()}`;
-    const { fileUrl, fileKey } = await convertMarkdownToPDF(reportContent, fileName);
+    // Convert markdown to PDF and upload to S3 (optional - if fails, still save report)
+    let fileUrl: string | undefined;
+    let fileKey: string | undefined;
     
-    // Save report to database
+    try {
+      const fileName = `stage-${stageId}-user-${userId}-${Date.now()}`;
+      const result = await convertMarkdownToPDF(reportContent, fileName);
+      fileUrl = result.fileUrl;
+      fileKey = result.fileKey;
+      console.log(`PDF generated successfully for user ${userId}, stage ${stageId}`);
+    } catch (pdfError) {
+      console.error('PDF generation failed, saving report without PDF:', pdfError);
+      // Continue without PDF - report content is still valuable
+    }
+    
+    // Save report to database (with or without PDF)
     await db.createReport({
       userId,
       stageId,
       type: 'stage',
       content: reportContent,
       status: 'pending',
-      fileUrl,
-      fileKey,
+      fileUrl: fileUrl || null,
+      fileKey: fileKey || null,
     });
 
     console.log(`Report generated for user ${userId}, stage ${stageId}`);

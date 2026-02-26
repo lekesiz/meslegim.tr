@@ -30,13 +30,27 @@ export default function StageForm() {
   const [isSaving, setIsSaving] = useState(false);
 
   const { data: activeStage, isLoading } = trpc.student.getActiveStage.useQuery();
+  const utils = trpc.useUtils();
   const saveAnswerMutation = trpc.student.saveAnswer.useMutation({
     onSuccess: () => {
       // Silent success - auto-save feedback
+      // Query invalidation - frontend cache'i güncelle
+      utils.student.getActiveStage.invalidate();
     },
     onError: (error) => {
-      toast.error(`Yanıt kaydedilemedi: ${error.message}`);
+      console.error('Auto-save error:', error);
+      
+      // Session expiration kontrolü
+      if (error.message.includes('UNAUTHORIZED') || error.message.includes('Unauthorized') || error.message.includes('session')) {
+        toast.error('Oturumunuz sonlandı. Lütfen tekrar giriş yapın.');
+        setTimeout(() => {
+          setLocation('/login');
+        }, 2000);
+      } else {
+        toast.error(`Yanıt kaydedilemedi: ${error.message}`);
+      }
     },
+    retry: 2, // 2 kez tekrar dene
   });
   const submitStageMutation = trpc.student.submitStage.useMutation({
     onSuccess: () => {

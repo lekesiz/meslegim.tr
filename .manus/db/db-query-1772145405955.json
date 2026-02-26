@@ -1,0 +1,42 @@
+{
+  "query": "SELECT us.id, us.userId, us.stageId, us.status, us.completedAt, s.name as stageName \nFROM user_stages us \nJOIN stages s ON us.stageId = s.id \nWHERE us.userId = (SELECT id FROM users WHERE email = 'test.ogrenci2@gmail.com') \nORDER BY s.order;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute SELECT us.id, us.userId, us.stageId, us.status, us.completedAt, s.name as stageName \nFROM user_stages us \nJOIN stages s ON us.stageId = s.id \nWHERE us.userId = (SELECT id FROM users WHERE email = 'test.ogrenci2@gmail.com') \nORDER BY s.order;",
+  "rows": [
+    {
+      "id": "150004",
+      "userId": "930012",
+      "stageId": "60004",
+      "status": "completed",
+      "completedAt": "2026-02-26 22:32:48",
+      "stageName": "Etap 1: Kariyer Hazırlık ve Yetkinlik Değerlendirmesi"
+    },
+    {
+      "id": "180001",
+      "userId": "930012",
+      "stageId": "60005",
+      "status": "locked",
+      "completedAt": "NULL",
+      "stageName": "Etap 2: Profesyonel Yetenek ve Eğilim Analizi"
+    },
+    {
+      "id": "150005",
+      "userId": "930012",
+      "stageId": "60005",
+      "status": "locked",
+      "completedAt": "NULL",
+      "stageName": "Etap 2: Profesyonel Yetenek ve Eğilim Analizi"
+    },
+    {
+      "id": "150006",
+      "userId": "930012",
+      "stageId": "60006",
+      "status": "locked",
+      "completedAt": "NULL",
+      "stageName": "Etap 3: Kariyer Stratejisi ve Eylem Planı"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuserId\tstageId\tstatus\tcompletedAt\tstageName\n150004\t930012\t60004\tcompleted\t2026-02-26 22:32:48\tEtap 1: Kariyer Hazırlık ve Yetkinlik Değerlendirmesi\n180001\t930012\t60005\tlocked\tNULL\tEtap 2: Profesyonel Yetenek ve Eğilim Analizi\n150005\t930012\t60005\tlocked\tNULL\tEtap 2: Profesyonel Yetenek ve Eğilim Analizi\n150006\t930012\t60006\tlocked\tNULL\tEtap 3: Kariyer Stratejisi ve Eylem Planı\n",
+  "stderr": "",
+  "execution_time_ms": 1667
+}

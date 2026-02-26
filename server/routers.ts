@@ -858,6 +858,10 @@ export const appRouter = router({
       const questions = await db.getQuestionsByStage(userStage.stageId);
       const answers = await db.getAnswersByUserAndStage(ctx.user.id, userStage.stageId);
       
+      // Debug log
+      console.log(`[getActiveStage] userId=${ctx.user.id}, stageId=${userStage.stageId}, questions=${questions.length}, answers=${answers.length}`);
+      console.log(`[getActiveStage] Answer IDs:`, answers.map((a: any) => ({ qId: a.questionId, answer: a.answer?.substring(0, 20) })));
+      
       return {
         ...userStage,
         stageName: stage?.name || '',
