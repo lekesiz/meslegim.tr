@@ -1,0 +1,42 @@
+{
+  "query": "\n-- Kullanıcı istatistikleri\nSELECT role, status, COUNT(*) as count FROM users GROUP BY role, status;\n\n-- Toplam kullanıcı sayısı\nSELECT COUNT(*) as total_users FROM users;\n\n-- Toplam soru sayısı\nSELECT COUNT(*) as total_questions FROM questions;\n\n-- Toplam etap sayısı\nSELECT COUNT(*) as total_stages FROM stages;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute \n-- Kullanıcı istatistikleri\nSELECT role, status, COUNT(*) as count FROM users GROUP BY role, status;\n\n-- Toplam kullanıcı sayısı\nSELECT COUNT(*) as total_users FROM users;\n\n-- Toplam soru sayısı\nSELECT COUNT(*) as total_questions FROM questions;\n\n-- Toplam etap sayısı\nSELECT COUNT(*) as total_stages FROM stages;\n",
+  "rows": [
+    {
+      "role": "student",
+      "status": "active",
+      "count": "9"
+    },
+    {
+      "role": "student",
+      "status": "pending",
+      "count": "3"
+    },
+    {
+      "role": "admin",
+      "status": "active",
+      "count": "2"
+    },
+    {
+      "role": "admin,mentor",
+      "status": "active",
+      "count": "1"
+    },
+    {
+      "role": "mentor",
+      "status": "active",
+      "count": "3"
+    }
+  ],
+  "messages": [
+    "total_users",
+    "18",
+    "total_questions",
+    "180",
+    "total_stages",
+    "9"
+  ],
+  "stdout": "role\tstatus\tcount\nstudent\tactive\t9\nstudent\tpending\t3\nadmin\tactive\t2\nadmin,mentor\tactive\t1\nmentor\tactive\t3\ntotal_users\n18\ntotal_questions\n180\ntotal_stages\n9\n",
+  "stderr": "",
+  "execution_time_ms": 2349
+}

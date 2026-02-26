@@ -753,3 +753,9 @@ Platform **minimum seviyede sağlıklı** çalışıyor. Tüm temel özellikler 
 - [ ] Tespit edilen sorunları listele
 - [ ] Tüm sorunları düzelt
 - [ ] Final test yap
+
+
+## 🔴 Kritik Bug'lar (26 Şubat 2026 - Test Sırasında Tespit Edildi)
+- [x] Auto-save sorunu - Öğrenci soru yanıtları kaydedilmiyor (saveAnswerMutation başarısız) - SEBEP BULUNDU: Session expiration, authentication middleware sorunu
+- [ ] Frontend cache sorunu - Database güncellemeleri frontend'de görünmüyor (7/8 yerine 8/8 görünmeli) - DEVAM EDİYOR: getActiveStage endpoint'i tüm yanıtları çekemiyor
+- [ ] Email domain doğrulama - Resend'de meslegim.tr domain'i doğrulanmalı - MANUEL İŞLEM GEREKİYOR

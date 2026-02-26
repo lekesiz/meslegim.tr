@@ -1,0 +1,9 @@
+{
+  "query": "\n-- Test öğrenci 1'in ID'sini al ve user_stages'ı kontrol et\nSELECT us.id, us.userId, us.stageId, us.status, us.unlockedAt, us.completedAt, s.name as stageName, s.order\nFROM user_stages us\nJOIN stages s ON us.stageId = s.id\nJOIN users u ON us.userId = u.id\nWHERE u.email = 'test.ogrenci1@gmail.com'\nORDER BY s.order;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute \n-- Test öğrenci 1'in ID'sini al ve user_stages'ı kontrol et\nSELECT us.id, us.userId, us.stageId, us.status, us.unlockedAt, us.completedAt, s.name as stageName, s.order\nFROM user_stages us\nJOIN stages s ON us.stageId = s.id\nJOIN users u ON us.userId = u.id\nWHERE u.email = 'test.ogrenci1@gmail.com'\nORDER BY s.order;\n",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1630
+}

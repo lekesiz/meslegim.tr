@@ -1,0 +1,13 @@
+{
+  "query": "\n-- Soru 1-6 yanıtlarını ekle\nINSERT INTO answers (userId, questionId, answer, createdAt, updatedAt) VALUES\n(10001, 60001, '4', NOW(), NOW()),\n(10001, 60002, '4', NOW(), NOW()),\n(10001, 60003, '5 - Çok güçlü', NOW(), NOW()),\n(10001, 60004, '4', NOW(), NOW()),\n(10001, 60005, '5 - Çok yüksek', NOW(), NOW()),\n(10001, 60006, 'Sosyal (İnsanlarla çalışmak, yardım etmek)', NOW(), NOW())\nON DUPLICATE KEY UPDATE answer = VALUES(answer), updatedAt = NOW();\n\n-- Kontrol et\nSELECT COUNT(*) as total_answers FROM answers WHERE userId = 10001;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute \n-- Soru 1-6 yanıtlarını ekle\nINSERT INTO answers (userId, questionId, answer, createdAt, updatedAt) VALUES\n(10001, 60001, '4', NOW(), NOW()),\n(10001, 60002, '4', NOW(), NOW()),\n(10001, 60003, '5 - Çok güçlü', NOW(), NOW()),\n(10001, 60004, '4', NOW(), NOW()),\n(10001, 60005, '5 - Çok yüksek', NOW(), NOW()),\n(10001, 60006, 'Sosyal (İnsanlarla çalışmak, yardım etmek)', NOW(), NOW())\nON DUPLICATE KEY UPDATE answer = VALUES(answer), updatedAt = NOW();\n\n-- Kontrol et\nSELECT COUNT(*) as total_answers FROM answers WHERE userId = 10001;\n",
+  "rows": [
+    {
+      "total_answers": "8"
+    }
+  ],
+  "messages": [],
+  "stdout": "total_answers\n8\n",
+  "stderr": "",
+  "execution_time_ms": 1893
+}

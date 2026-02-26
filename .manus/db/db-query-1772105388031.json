@@ -1,0 +1,32 @@
+{
+  "query": "\n-- Tablo yapısını kontrol et\nSHOW CREATE TABLE answers;\n\n-- Tüm yanıtları kontrol et\nSELECT * FROM answers WHERE userId = 10001 ORDER BY questionId;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute \n-- Tablo yapısını kontrol et\nSHOW CREATE TABLE answers;\n\n-- Tüm yanıtları kontrol et\nSELECT * FROM answers WHERE userId = 10001 ORDER BY questionId;\n",
+  "rows": [
+    {
+      "Table": "answers",
+      "Create Table": "CREATE TABLE `answers` ("
+    }
+  ],
+  "messages": [
+    "  `id` int(11) NOT NULL AUTO_INCREMENT,",
+    "  `userId` int(11) NOT NULL,",
+    "  `questionId` int(11) NOT NULL,",
+    "  `answer` text COLLATE utf8mb4_unicode_ci NOT NULL,",
+    "  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,",
+    "  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,",
+    "  PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */",
+    ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci AUTO_INCREMENT=120001",
+    "id\tuserId\tquestionId\tanswer\tcreatedAt\tupdatedAt",
+    "90010\t10001\t60001\t4\t2026-02-26 11:28:12\t2026-02-26 11:28:12",
+    "90011\t10001\t60002\t4\t2026-02-26 11:28:12\t2026-02-26 11:28:12",
+    "90012\t10001\t60003\t5 - Çok güçlü\t2026-02-26 11:28:12\t2026-02-26 11:28:12",
+    "90013\t10001\t60004\t4\t2026-02-26 11:28:12\t2026-02-26 11:28:12",
+    "90014\t10001\t60005\t5 - Çok yüksek\t2026-02-26 11:28:12\t2026-02-26 11:28:12",
+    "90015\t10001\t60006\tSosyal (İnsanlarla çalışmak, yardım etmek)\t2026-02-26 11:28:12\t2026-02-26 11:28:12",
+    "90008\t10001\t60007\tYaratıcı, analitik, hırslı\t2026-02-26 11:27:19\t2026-02-26 11:27:19",
+    "90009\t10001\t60008\tYazılım geliştirme ve teknoloji alanında çalışmak istiyorum\t2026-02-26 11:27:19\t2026-02-26 11:27:19"
+  ],
+  "stdout": "Table\tCreate Table\nanswers\tCREATE TABLE `answers` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `userId` int(11) NOT NULL,\n  `questionId` int(11) NOT NULL,\n  `answer` text COLLATE utf8mb4_unicode_ci NOT NULL,\n  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci AUTO_INCREMENT=120001\nid\tuserId\tquestionId\tanswer\tcreatedAt\tupdatedAt\n90010\t10001\t60001\t4\t2026-02-26 11:28:12\t2026-02-26 11:28:12\n90011\t10001\t60002\t4\t2026-02-26 11:28:12\t2026-02-26 11:28:12\n90012\t10001\t60003\t5 - Çok güçlü\t2026-02-26 11:28:12\t2026-02-26 11:28:12\n90013\t10001\t60004\t4\t2026-02-26 11:28:12\t2026-02-26 11:28:12\n90014\t10001\t60005\t5 - Çok yüksek\t2026-02-26 11:28:12\t2026-02-26 11:28:12\n90015\t10001\t60006\tSosyal (İnsanlarla çalışmak, yardım etmek)\t2026-02-26 11:28:12\t2026-02-26 11:28:12\n90008\t10001\t60007\tYaratıcı, analitik, hırslı\t2026-02-26 11:27:19\t2026-02-26 11:27:19\n90009\t10001\t60008\tYazılım geliştirme ve teknoloji alanında çalışmak istiyorum\t2026-02-26 11:27:19\t2026-02-26 11:27:19\n",
+  "stderr": "",
+  "execution_time_ms": 2007
+}

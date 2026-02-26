@@ -75,8 +75,8 @@ export const appRouter = router({
           throw new TRPCError({ code: 'FORBIDDEN', message: 'Hesabınız henüz aktif değil. Mentor onayı bekleniyor.' });
         }
         
-        // Create session token
-        const sessionToken = await sdk.createSessionToken(user.openId || '', { name: user.name || '' });
+    // Create session token
+    const sessionToken = await sdk.createSessionToken(user.openId || '', { name: user.name || user.email || 'User' });
         
         // Set session cookie
         const cookieOptions = getSessionCookieOptions(ctx.req);
@@ -544,6 +544,22 @@ export const appRouter = router({
         
         // Get student details for email
         const student = await db.getUserById(input.studentId);
+        
+        // Initialize user stages for the student
+        if (student && student.ageGroup) {
+          // Get all stages for this age group
+          const ageGroupStages = await db.getStagesByAgeGroup(student.ageGroup);
+          
+          // Create user_stages records for all stages
+          for (const stage of ageGroupStages) {
+            const isFirstStage = stage.order === 1;
+            await db.createUserStage({
+              userId: student.id,
+              stageId: stage.id,
+              status: isFirstStage ? 'active' : 'locked',
+            });
+          }
+        }
         if (!student) {
           throw new TRPCError({ code: 'NOT_FOUND', message: 'Student not found' });
         }
