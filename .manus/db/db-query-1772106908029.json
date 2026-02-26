@@ -1,0 +1,26 @@
+{
+  "query": "SELECT * FROM answers WHERE userId = 10001 AND questionId IN (60007, 60008);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute SELECT * FROM answers WHERE userId = 10001 AND questionId IN (60007, 60008);",
+  "rows": [
+    {
+      "id": "90008",
+      "userId": "10001",
+      "questionId": "60007",
+      "answer": "Yaratıcı, analitik, hırslı",
+      "createdAt": "2026-02-26 11:27:19",
+      "updatedAt": "2026-02-26 11:27:19"
+    },
+    {
+      "id": "90009",
+      "userId": "10001",
+      "questionId": "60008",
+      "answer": "Yazılım geliştirme ve teknoloji alanında çalışmak istiyorum",
+      "createdAt": "2026-02-26 11:27:19",
+      "updatedAt": "2026-02-26 11:27:19"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuserId\tquestionId\tanswer\tcreatedAt\tupdatedAt\n90008\t10001\t60007\tYaratıcı, analitik, hırslı\t2026-02-26 11:27:19\t2026-02-26 11:27:19\n90009\t10001\t60008\tYazılım geliştirme ve teknoloji alanında çalışmak istiyorum\t2026-02-26 11:27:19\t2026-02-26 11:27:19\n",
+  "stderr": "",
+  "execution_time_ms": 1688
+}

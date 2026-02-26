@@ -1,0 +1,28 @@
+{
+  "query": "\nSELECT a.*, q.text as question_text \nFROM answers a \nLEFT JOIN questions q ON a.questionId = q.id\nWHERE a.userId = 10001 \nORDER BY a.questionId;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute \nSELECT a.*, q.text as question_text \nFROM answers a \nLEFT JOIN questions q ON a.questionId = q.id\nWHERE a.userId = 10001 \nORDER BY a.questionId;\n",
+  "rows": [
+    {
+      "id": "90008",
+      "userId": "10001",
+      "questionId": "60007",
+      "answer": "Yaratıcı, analitik, hırslı",
+      "createdAt": "2026-02-26 11:27:19",
+      "updatedAt": "2026-02-26 11:27:19",
+      "question_text": "Kendinizi hangi üç kelimeyle tanımlarsınız?"
+    },
+    {
+      "id": "90009",
+      "userId": "10001",
+      "questionId": "60008",
+      "answer": "Yazılım geliştirme ve teknoloji alanında çalışmak istiyorum",
+      "createdAt": "2026-02-26 11:27:19",
+      "updatedAt": "2026-02-26 11:27:19",
+      "question_text": "Hayalinizdeki meslek veya çalışmak istediğiniz alan nedir?"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuserId\tquestionId\tanswer\tcreatedAt\tupdatedAt\tquestion_text\n90008\t10001\t60007\tYaratıcı, analitik, hırslı\t2026-02-26 11:27:19\t2026-02-26 11:27:19\tKendinizi hangi üç kelimeyle tanımlarsınız?\n90009\t10001\t60008\tYazılım geliştirme ve teknoloji alanında çalışmak istiyorum\t2026-02-26 11:27:19\t2026-02-26 11:27:19\tHayalinizdeki meslek veya çalışmak istediğiniz alan nedir?\n",
+  "stderr": "",
+  "execution_time_ms": 1638
+}

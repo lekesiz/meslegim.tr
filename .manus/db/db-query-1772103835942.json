@@ -1,0 +1,19 @@
+{
+  "query": "\nSELECT id, name, email, role, status, password, openId FROM users WHERE email = 'test.mentor@gmail.com';\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute \nSELECT id, name, email, role, status, password, openId FROM users WHERE email = 'test.mentor@gmail.com';\n",
+  "rows": [
+    {
+      "id": "930014",
+      "name": "Test Mentor",
+      "email": "test.mentor@gmail.com",
+      "role": "mentor",
+      "status": "active",
+      "password": "$2b$10$gNo54bQjtVOHyxH6XcQPUufzx73bUxGfH/hnu3PdfDYaGq4kPUT22",
+      "openId": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\trole\tstatus\tpassword\topenId\n930014\tTest Mentor\ttest.mentor@gmail.com\tmentor\tactive\t$2b$10$gNo54bQjtVOHyxH6XcQPUufzx73bUxGfH/hnu3PdfDYaGq4kPUT22\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 1636
+}

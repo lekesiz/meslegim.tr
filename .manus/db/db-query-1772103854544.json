@@ -1,0 +1,9 @@
+{
+  "query": "\n-- Test kullanıcılarına openId ekle\nUPDATE users SET openId = 'test-mentor-openid-001' WHERE email = 'test.mentor@gmail.com';\nUPDATE users SET openId = 'test-student-1-openid-001' WHERE email = 'test.ogrenci1@gmail.com';\nUPDATE users SET openId = 'test-student-2-openid-001' WHERE email = 'test.ogrenci2@gmail.com';\nUPDATE users SET openId = 'test-student-3-openid-001' WHERE email = 'test.ogrenci3@gmail.com';\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute \n-- Test kullanıcılarına openId ekle\nUPDATE users SET openId = 'test-mentor-openid-001' WHERE email = 'test.mentor@gmail.com';\nUPDATE users SET openId = 'test-student-1-openid-001' WHERE email = 'test.ogrenci1@gmail.com';\nUPDATE users SET openId = 'test-student-2-openid-001' WHERE email = 'test.ogrenci2@gmail.com';\nUPDATE users SET openId = 'test-student-3-openid-001' WHERE email = 'test.ogrenci3@gmail.com';\n",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 2498
+}
