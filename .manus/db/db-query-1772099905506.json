@@ -1,0 +1,55 @@
+{
+  "query": "SELECT \n  s.ageGroup,\n  s.name as stageName,\n  COUNT(q.id) as questionCount\nFROM stages s\nLEFT JOIN questions q ON s.id = q.stageId\nGROUP BY s.id, s.ageGroup, s.name\nORDER BY s.ageGroup, s.order;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute SELECT \n  s.ageGroup,\n  s.name as stageName,\n  COUNT(q.id) as questionCount\nFROM stages s\nLEFT JOIN questions q ON s.id = q.stageId\nGROUP BY s.id, s.ageGroup, s.name\nORDER BY s.ageGroup, s.order;",
+  "rows": [
+    {
+      "ageGroup": "14-17",
+      "stageName": "Etap 1: Meslek Seçimi Yetkinlik Değerlendirmesi",
+      "questionCount": "8"
+    },
+    {
+      "ageGroup": "14-17",
+      "stageName": "Etap 2: Yetenek Keşfi ve Mesleki Eğilim Analizi",
+      "questionCount": "6"
+    },
+    {
+      "ageGroup": "14-17",
+      "stageName": "Etap 3: Gerçeklik Kontrolü ve Eylem Planı",
+      "questionCount": "9"
+    },
+    {
+      "ageGroup": "18-21",
+      "stageName": "Etap 1: Kariyer Hazırlık ve Yetkinlik Değerlendirmesi",
+      "questionCount": "6"
+    },
+    {
+      "ageGroup": "18-21",
+      "stageName": "Etap 2: Profesyonel Yetenek ve Eğilim Analizi",
+      "questionCount": "6"
+    },
+    {
+      "ageGroup": "18-21",
+      "stageName": "Etap 3: Kariyer Stratejisi ve Eylem Planı",
+      "questionCount": "6"
+    },
+    {
+      "ageGroup": "22-24",
+      "stageName": "Etap 1: Kariyer Geçiş ve Yetkinlik Değerlendirmesi",
+      "questionCount": "6"
+    },
+    {
+      "ageGroup": "22-24",
+      "stageName": "Etap 2: Profesyonel Gelişim ve Liderlik Analizi",
+      "questionCount": "6"
+    },
+    {
+      "ageGroup": "22-24",
+      "stageName": "Etap 3: Kariyer Optimizasyonu ve Uzun Vadeli Planlama",
+      "questionCount": "7"
+    }
+  ],
+  "messages": [],
+  "stdout": "ageGroup\tstageName\tquestionCount\n14-17\tEtap 1: Meslek Seçimi Yetkinlik Değerlendirmesi\t8\n14-17\tEtap 2: Yetenek Keşfi ve Mesleki Eğilim Analizi\t6\n14-17\tEtap 3: Gerçeklik Kontrolü ve Eylem Planı\t9\n18-21\tEtap 1: Kariyer Hazırlık ve Yetkinlik Değerlendirmesi\t6\n18-21\tEtap 2: Profesyonel Yetenek ve Eğilim Analizi\t6\n18-21\tEtap 3: Kariyer Stratejisi ve Eylem Planı\t6\n22-24\tEtap 1: Kariyer Geçiş ve Yetkinlik Değerlendirmesi\t6\n22-24\tEtap 2: Profesyonel Gelişim ve Liderlik Analizi\t6\n22-24\tEtap 3: Kariyer Optimizasyonu ve Uzun Vadeli Planlama\t7\n",
+  "stderr": "",
+  "execution_time_ms": 2082
+}

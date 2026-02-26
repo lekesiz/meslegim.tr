@@ -21,10 +21,10 @@
 ## 🟡 Yüksek Öncelik
 - [ ] 18-21 yaş grubu için sorular ekle
 - [ ] 22-24 yaş grubu için sorular ekle
-- [ ] Mentor dashboard - pending students listesi
-- [ ] Mentor dashboard - student activation butonu
-- [ ] Admin dashboard - user management
-- [ ] Otomatik etap aktivasyonu (7 gün sonra)
+- [x] Mentor dashboard - pending students listesi (ZATEN MEVCUT)
+- [x] Mentor dashboard - student activation butonu (ZATEN MEVCUT)
+- [x] Admin dashboard - user management (EKLENDİ - UserManagement component)
+- [ ] Otomatik etap aktivasyonu (7 gün sonra - kontrol edilecek)
 
 ## 🟢 Orta Öncelik
 - [ ] Email templates (Welcome, Stage Complete, Report Ready)
@@ -679,3 +679,53 @@ Platform **minimum seviyede sağlıklı** çalışıyor. Tüm temel özellikler 
 - [x] Backend: verifyCertificate db fonksiyonu oluştur
 - [x] App.tsx'e route ekle
 - [ ] Test et
+
+
+## 🔴 Yüksek Öncelik (26 Şubat 2026)
+- [x] 18-21 yaş grubu için sorular ekle (60 soru - 3 etap x 20 soru)
+- [x] 22-24 yaş grubu için sorular ekle (60 soru - 3 etap x 20 soru)
+- [x] Mentor dashboard - pending students listesi (ZATEN MEVCUT)
+- [x] Mentor dashboard - student activation butonu (ZATEN MEVCUT)
+- [x] Admin dashboard - user management (EKLENDİ - UserManagement component)
+- [ ] Otomatik etap aktivasyonu (7 gün sonra - kontrol edilecek)
+
+## 🟢 Orta Öncelik (26 Şubat 2026)
+- [ ] Email templates (Welcome, Stage Complete, Report Ready)
+- [ ] PDF export testi
+- [ ] Responsive design kontrol (mobil/tablet)
+- [ ] Error handling ve toast notifications
+- [ ] Loading states ve skeletons
+
+## 🔍 A-Z Kullanıcı Simülasyon Testi ve Sorun Giderme (26 Şubat 2026)
+
+### Tespit Edilen Sorunlar:
+- [ ] Login sonrası yönlendirme çalışmıyor (dashboard'a gitmiyor)
+
+### Test Senaryoları:
+**Admin Senaryoları:**
+- [ ] Login ve dashboard yönlendirme
+- [ ] Kullanıcı listesi görüntüleme
+- [ ] Yeni kullanıcı ekleme
+- [ ] Kullanıcı düzenleme/silme
+- [ ] Rapor listesi ve onaylama
+- [ ] İstatistikler ve grafikler
+- [ ] Mentor karşılaştırma
+- [ ] Feedback özeti
+
+**Mentor Senaryoları:**
+- [ ] Login ve dashboard yönlendirme
+- [ ] Bekleyen raporları görüntüleme
+- [ ] Rapor onaylama/reddetme
+- [ ] Öğrenci listesi görüntüleme
+- [ ] Feedback'leri görüntüleme
+- [ ] İstatistikler ve performans grafikleri
+
+**Öğrenci Senaryoları:**
+- [ ] Login ve dashboard yönlendirme
+- [ ] Etap formunu doldurma
+- [ ] Rapor gönderme
+- [ ] Raporları görüntüleme
+- [ ] Onaylanmış rapora feedback verme
+- [ ] Sertifika oluşturma
+- [ ] Sertifika indirme
+- [ ] İlerleme takibi
