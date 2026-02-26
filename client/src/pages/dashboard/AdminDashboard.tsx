@@ -25,6 +25,7 @@ import { EditStudentDialog } from '@/components/EditStudentDialog';
 import { EditMentorDialog } from '@/components/EditMentorDialog';
 import MentorComparisonReport from '@/components/MentorComparisonReport';
 import { AdminFeedbackSummary } from '@/components/AdminFeedbackSummary';
+import { UserManagement } from '@/components/UserManagement';
 
 export default function AdminDashboard() {
   const { user } = useAuth();
@@ -156,6 +157,10 @@ export default function AdminDashboard() {
               <MessageSquare className="h-4 w-4 mr-2" />
               Feedback Özeti
             </TabsTrigger>
+            <TabsTrigger value="user-management">
+              <Users className="h-4 w-4 mr-2" />
+              Kullanıcı Yönetimi
+            </TabsTrigger>
           </TabsList>
 
           {/* Analytics Tab */}
@@ -176,6 +181,11 @@ export default function AdminDashboard() {
           {/* Feedback Summary Tab */}
           <TabsContent value="feedback-summary">
             <AdminFeedbackSummary />
+          </TabsContent>
+
+          {/* User Management Tab */}
+          <TabsContent value="user-management">
+            <UserManagement />
           </TabsContent>
 
           {/* Students Tab */}
