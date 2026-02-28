@@ -1,0 +1,14 @@
+{
+  "query": "SELECT u.id as userId, us.stageId FROM users u JOIN user_stages us ON u.id = us.userId WHERE u.email = 'test.ogrenci3@gmail.com' AND us.status = 'active';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute SELECT u.id as userId, us.stageId FROM users u JOIN user_stages us ON u.id = us.userId WHERE u.email = 'test.ogrenci3@gmail.com' AND us.status = 'active';",
+  "rows": [
+    {
+      "userId": "930013",
+      "stageId": "60007"
+    }
+  ],
+  "messages": [],
+  "stdout": "userId\tstageId\n930013\t60007\n",
+  "stderr": "",
+  "execution_time_ms": 1545
+}

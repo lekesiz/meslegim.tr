@@ -1,0 +1,8 @@
+{
+  "query": "INSERT IGNORE INTO answers (userId, questionId, stageId, answer, createdAt, updatedAt)\nSELECT 21, q.id, q.stageId, '4', NOW(), NOW()\nFROM questions q\nWHERE q.stageId = 60007;\n\nSELECT COUNT(*) as answerCount FROM answers WHERE userId = 21 AND stageId = 60007;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute INSERT IGNORE INTO answers (userId, questionId, stageId, answer, createdAt, updatedAt)\nSELECT 21, q.id, q.stageId, '4', NOW(), NOW()\nFROM questions q\nWHERE q.stageId = 60007;\n\nSELECT COUNT(*) as answerCount FROM answers WHERE userId = 21 AND stageId = 60007;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'stageId' in 'field list'"
+  ]
+}

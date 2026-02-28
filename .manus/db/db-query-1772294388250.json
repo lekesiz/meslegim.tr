@@ -1,0 +1,46 @@
+{
+  "query": "SELECT q.id, q.text, q.type, q.required FROM questions q JOIN user_stages us ON q.stageId = us.stageId WHERE us.userId = (SELECT id FROM users WHERE email = 'test.ogrenci3@gmail.com') AND us.status = 'active' ORDER BY q.id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute SELECT q.id, q.text, q.type, q.required FROM questions q JOIN user_stages us ON q.stageId = us.stageId WHERE us.userId = (SELECT id FROM users WHERE email = 'test.ogrenci3@gmail.com') AND us.status = 'active' ORDER BY q.id;",
+  "rows": [
+    {
+      "id": "60042",
+      "text": "İş hayatına geçiş hazırlığınızı nasıl değerlendirirsiniz?",
+      "type": "likert",
+      "required": "1"
+    },
+    {
+      "id": "60043",
+      "text": "Mevcut iş durumunuz nedir?",
+      "type": "multiple_choice",
+      "required": "1"
+    },
+    {
+      "id": "60044",
+      "text": "Mevcut işinizden memnun musunuz?",
+      "type": "likert",
+      "required": "1"
+    },
+    {
+      "id": "60045",
+      "text": "Aşağıdaki profesyonel becerilerde kendinizi nasıl değerlendirirsiniz? (Her biri için 1-5 arası puan verin)",
+      "type": "ranking",
+      "required": "1"
+    },
+    {
+      "id": "60046",
+      "text": "Kariyer değişikliği düşünüyor musunuz?",
+      "type": "multiple_choice",
+      "required": "1"
+    },
+    {
+      "id": "60047",
+      "text": "5 yıl sonra kendinizi hangi pozisyonda görmek istersiniz?",
+      "type": "text",
+      "required": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttext\ttype\trequired\n60042\tİş hayatına geçiş hazırlığınızı nasıl değerlendirirsiniz?\tlikert\t1\n60043\tMevcut iş durumunuz nedir?\tmultiple_choice\t1\n60044\tMevcut işinizden memnun musunuz?\tlikert\t1\n60045\tAşağıdaki profesyonel becerilerde kendinizi nasıl değerlendirirsiniz? (Her biri için 1-5 arası puan verin)\tranking\t1\n60046\tKariyer değişikliği düşünüyor musunuz?\tmultiple_choice\t1\n60047\t5 yıl sonra kendinizi hangi pozisyonda görmek istersiniz?\ttext\t1\n",
+  "stderr": "",
+  "execution_time_ms": 1583
+}

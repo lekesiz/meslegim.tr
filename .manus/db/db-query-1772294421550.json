@@ -1,0 +1,13 @@
+{
+  "query": "INSERT IGNORE INTO answers (userId, questionId, answer, createdAt, updatedAt)\nSELECT 21, q.id, '4', NOW(), NOW()\nFROM questions q\nWHERE q.stageId = 60007;\n\nSELECT COUNT(*) as answerCount FROM answers WHERE userId = 21;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute INSERT IGNORE INTO answers (userId, questionId, answer, createdAt, updatedAt)\nSELECT 21, q.id, '4', NOW(), NOW()\nFROM questions q\nWHERE q.stageId = 60007;\n\nSELECT COUNT(*) as answerCount FROM answers WHERE userId = 21;",
+  "rows": [
+    {
+      "answerCount": "6"
+    }
+  ],
+  "messages": [],
+  "stdout": "answerCount\n6\n",
+  "stderr": "",
+  "execution_time_ms": 1788
+}

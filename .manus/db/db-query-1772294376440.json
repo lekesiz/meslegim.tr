@@ -1,0 +1,34 @@
+{
+  "query": "SELECT us.id, us.userId, us.stageId, us.status, s.name as stageName, s.ageGroup FROM user_stages us JOIN stages s ON us.stageId = s.id WHERE us.userId = (SELECT id FROM users WHERE email = 'test.ogrenci3@gmail.com') ORDER BY us.id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute SELECT us.id, us.userId, us.stageId, us.status, s.name as stageName, s.ageGroup FROM user_stages us JOIN stages s ON us.stageId = s.id WHERE us.userId = (SELECT id FROM users WHERE email = 'test.ogrenci3@gmail.com') ORDER BY us.id;",
+  "rows": [
+    {
+      "id": "150007",
+      "userId": "930013",
+      "stageId": "60007",
+      "status": "active",
+      "stageName": "Etap 1: Kariyer Geçiş ve Yetkinlik Değerlendirmesi",
+      "ageGroup": "22-24"
+    },
+    {
+      "id": "150008",
+      "userId": "930013",
+      "stageId": "60008",
+      "status": "locked",
+      "stageName": "Etap 2: Profesyonel Gelişim ve Liderlik Analizi",
+      "ageGroup": "22-24"
+    },
+    {
+      "id": "150009",
+      "userId": "930013",
+      "stageId": "60009",
+      "status": "locked",
+      "stageName": "Etap 3: Kariyer Optimizasyonu ve Uzun Vadeli Planlama",
+      "ageGroup": "22-24"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuserId\tstageId\tstatus\tstageName\tageGroup\n150007\t930013\t60007\tactive\tEtap 1: Kariyer Geçiş ve Yetkinlik Değerlendirmesi\t22-24\n150008\t930013\t60008\tlocked\tEtap 2: Profesyonel Gelişim ve Liderlik Analizi\t22-24\n150009\t930013\t60009\tlocked\tEtap 3: Kariyer Optimizasyonu ve Uzun Vadeli Planlama\t22-24\n",
+  "stderr": "",
+  "execution_time_ms": 1505
+}
