@@ -273,7 +273,7 @@ export default function MentorDashboard() {
                           {report.type === 'stage' ? 'Etap Raporu' : 'Final Raporu'}
                         </CardTitle>
                         <CardDescription className="mt-2">
-                          Öğrenci: {report.user?.name || 'Bilinmiyor'}
+                          Öğrenci: {report.studentName || report.user?.name || 'Bilinmiyor'}
                         </CardDescription>
                       </div>
                       <Badge variant="secondary">Beklemede</Badge>

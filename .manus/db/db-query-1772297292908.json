@@ -1,0 +1,31 @@
+{
+  "query": "SELECT id, name, email, role, status FROM users WHERE role = 'mentor';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute SELECT id, name, email, role, status FROM users WHERE role = 'mentor';",
+  "rows": [
+    {
+      "id": "180023",
+      "name": "Test Mentor",
+      "email": "mentor@test.com",
+      "role": "mentor",
+      "status": "active"
+    },
+    {
+      "id": "570040",
+      "name": "Hilal Lekesiz",
+      "email": "hilallekesizkilic@gmail.com",
+      "role": "mentor",
+      "status": "active"
+    },
+    {
+      "id": "930014",
+      "name": "Test Mentor",
+      "email": "test.mentor@gmail.com",
+      "role": "mentor",
+      "status": "active"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\trole\tstatus\n180023\tTest Mentor\tmentor@test.com\tmentor\tactive\n570040\tHilal Lekesiz\thilallekesizkilic@gmail.com\tmentor\tactive\n930014\tTest Mentor\ttest.mentor@gmail.com\tmentor\tactive\n",
+  "stderr": "",
+  "execution_time_ms": 1528
+}

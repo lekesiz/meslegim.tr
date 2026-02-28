@@ -7,6 +7,7 @@ import { useLocation, useRoute } from 'wouter';
 import { useEffect } from 'react';
 import { toast } from 'sonner';
 import FeedbackForm from '@/components/FeedbackForm';
+import { Streamdown } from 'streamdown';
 
 export default function ReportView() {
   const [, params] = useRoute('/dashboard/student/reports/:id');
@@ -103,7 +104,7 @@ export default function ReportView() {
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <CardTitle className="text-2xl mb-2">
-                Etap {report.stageId} Raporu
+                {(report as any).stageName || `Etap ${report.stageId} Raporu`}
               </CardTitle>
               <p className="text-sm text-muted-foreground">
                 Oluşturulma: {new Date(report.createdAt).toLocaleDateString('tr-TR', {
@@ -139,8 +140,12 @@ export default function ReportView() {
             </div>
           )}
 
-          <div className="prose prose-sm max-w-none mb-6">
-            <div dangerouslySetInnerHTML={{ __html: report.content || '<p>Rapor içeriği henüz hazır değil.</p>' }} />
+          <div className="prose prose-sm max-w-none dark:prose-invert mb-6">
+            {report.content ? (
+              <Streamdown>{report.content}</Streamdown>
+            ) : (
+              <p className="text-muted-foreground">Rapor içeriği henüz hazır değil.</p>
+            )}
           </div>
 
           {report.status === 'approved' && (

@@ -1,0 +1,25 @@
+{
+  "query": "\n-- Önce mevcut mentor'u bul\nSELECT id, email, name FROM users WHERE role = 'mentor' LIMIT 3;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute \n-- Önce mevcut mentor'u bul\nSELECT id, email, name FROM users WHERE role = 'mentor' LIMIT 3;\n",
+  "rows": [
+    {
+      "id": "180023",
+      "email": "mentor@test.com",
+      "name": "Test Mentor"
+    },
+    {
+      "id": "570040",
+      "email": "hilallekesizkilic@gmail.com",
+      "name": "Hilal Lekesiz"
+    },
+    {
+      "id": "930014",
+      "email": "test.mentor@gmail.com",
+      "name": "Test Mentor"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\temail\tname\n180023\tmentor@test.com\tTest Mentor\n570040\thilallekesizkilic@gmail.com\tHilal Lekesiz\n930014\ttest.mentor@gmail.com\tTest Mentor\n",
+  "stderr": "",
+  "execution_time_ms": 1665
+}

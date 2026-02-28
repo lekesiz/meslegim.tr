@@ -310,7 +310,19 @@ export async function createReport(data: typeof reports.$inferInsert) {
 export async function getReportsByUser(userId: number) {
   const db = await getDb();
   if (!db) return [];
-  return await db.select().from(reports).where(eq(reports.userId, userId));
+  const userReports = await db.select().from(reports).where(eq(reports.userId, userId));
+  
+  // Enrich with stage name
+  const enriched = await Promise.all(userReports.map(async (r) => {
+    let stageName = null;
+    if (r.stageId) {
+      const stageInfo = await db.select({ name: stages.name }).from(stages).where(eq(stages.id, r.stageId)).limit(1);
+      if (stageInfo[0]) stageName = stageInfo[0].name;
+    }
+    return { ...r, stageName };
+  }));
+  
+  return enriched;
 }
 
 export async function getReportById(reportId: number) {
@@ -333,10 +345,18 @@ export async function getReportById(reportId: number) {
     mentorName = mentor?.name || null;
   }
   
+  // Get stage name
+  let stageName = null;
+  if (report.stageId) {
+    const stageInfo = await db.select({ name: stages.name }).from(stages).where(eq(stages.id, report.stageId)).limit(1);
+    if (stageInfo[0]) stageName = stageInfo[0].name;
+  }
+  
   return {
     ...report,
     mentorId: student.mentorId,
-    mentorName
+    mentorName,
+    stageName
   };
 }
 
@@ -344,19 +364,66 @@ export async function getPendingReports(mentorId?: number) {
   const db = await getDb();
   if (!db) return [];
   
-  // Get reports that are pending approval
-  const pendingReports = await db.select().from(reports).where(
-    eq(reports.status, 'pending')
-  );
+  // Get reports that are pending approval with student and stage info
+  const pendingReports = await db
+    .select({
+      id: reports.id,
+      userId: reports.userId,
+      stageId: reports.stageId,
+      type: reports.type,
+      content: reports.content,
+      fileUrl: reports.fileUrl,
+      status: reports.status,
+      mentorFeedback: reports.mentorFeedback,
+      approvedBy: reports.approvedBy,
+      approvedAt: reports.approvedAt,
+      createdAt: reports.createdAt,
+      updatedAt: reports.updatedAt,
+      studentName: users.name,
+      studentEmail: users.email,
+    })
+    .from(reports)
+    .leftJoin(users, eq(reports.userId, users.id))
+    .where(eq(reports.status, 'pending'));
+  
+  // Enrich with stage info and summary
+  const enriched = await Promise.all(pendingReports.map(async (r) => {
+    let stageName = 'Etap';
+    let completedAt: Date | null = null;
+    let summary: string | null = null;
+    
+    if (r.stageId) {
+      const stageInfo = await db.select({ name: stages.name, order: stages.order })
+        .from(stages)
+        .where(eq(stages.id, r.stageId))
+        .limit(1);
+      if (stageInfo[0]) stageName = stageInfo[0].name || `Etap ${stageInfo[0].order}`;
+      
+      // Get completion date from user_stages
+      const userStage = await db.select({ completedAt: userStages.completedAt })
+        .from(userStages)
+        .where(and(eq(userStages.userId, r.userId), eq(userStages.stageId, r.stageId)))
+        .limit(1);
+      if (userStage[0]) completedAt = userStage[0].completedAt;
+    }
+    
+    // Extract summary from content (first 200 chars of non-markdown text)
+    if (r.content) {
+      const plainText = r.content.replace(/#{1,6}\s+/g, '').replace(/\*\*/g, '').replace(/\n+/g, ' ').trim();
+      summary = plainText.substring(0, 200) + (plainText.length > 200 ? '...' : '');
+    }
+    
+    return { ...r, stageName, completedAt, summary };
+  }));
   
   // If mentorId is provided, filter by students assigned to this mentor
   if (mentorId) {
     const mentorStudents = await getStudentsByMentor(mentorId);
     const studentIds = mentorStudents.map(s => s.id);
-    return pendingReports.filter(r => studentIds.includes(r.userId));
+    return enriched.filter(r => studentIds.includes(r.userId));
   }
   
-  return pendingReports;
+  return enriched;
 }
 
 export async function approveReport(reportId: number, mentorId: number) {
@@ -447,6 +514,28 @@ export async function getFirstStageForAgeGroup(ageGroup: string) {
 export async function createUserStage(data: { userId: number; stageId: number; status: 'locked' | 'active' | 'completed' }) {
   const dbInstance = await getDb();
   if (!dbInstance) throw new Error('Database not initialized');
+  
+  // Check if user stage already exists to prevent duplicates
+  const [existing] = await dbInstance
+    .select()
+    .from(userStages)
+    .where(and(eq(userStages.userId, data.userId), eq(userStages.stageId, data.stageId)))
+    .limit(1);
+  
+  if (existing) {
+    // Update status if needed (e.g., locked -> active)
+    if (existing.status !== data.status) {
+      await dbInstance.update(userStages)
+        .set({ 
+          status: data.status,
+          unlockedAt: data.status === 'active' ? new Date() : existing.unlockedAt,
+          updatedAt: new Date(),
+        })
+        .where(and(eq(userStages.userId, data.userId), eq(userStages.stageId, data.stageId)));
+    }
+    return existing;
+  }
+  
   await dbInstance.insert(userStages).values({
     userId: data.userId,
     stageId: data.stageId,

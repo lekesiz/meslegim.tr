@@ -1,0 +1,26 @@
+{
+  "query": "SELECT id, name, email, role, status, mentorId FROM users WHERE id IN (930101, 930014) ORDER BY id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute SELECT id, name, email, role, status, mentorId FROM users WHERE id IN (930101, 930014) ORDER BY id;",
+  "rows": [
+    {
+      "id": "930014",
+      "name": "Test Mentor",
+      "email": "test.mentor@gmail.com",
+      "role": "mentor",
+      "status": "active",
+      "mentorId": "NULL"
+    },
+    {
+      "id": "930101",
+      "name": "Zeynep Arslan",
+      "email": "zeynep.arslan.beta@gmail.com",
+      "role": "student",
+      "status": "active",
+      "mentorId": "930010"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\trole\tstatus\tmentorId\n930014\tTest Mentor\ttest.mentor@gmail.com\tmentor\tactive\tNULL\n930101\tZeynep Arslan\tzeynep.arslan.beta@gmail.com\tstudent\tactive\t930010\n",
+  "stderr": "",
+  "execution_time_ms": 1605
+}

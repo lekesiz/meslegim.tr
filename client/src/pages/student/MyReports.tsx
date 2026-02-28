@@ -62,7 +62,7 @@ export default function MyReports() {
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <CardTitle className="text-xl mb-2">
-                      Etap {report.stageId} Raporu
+                      {report.stageName || `Etap ${report.stageId} Raporu`}
                     </CardTitle>
                     <CardDescription>
                       Oluşturulma: {new Date(report.createdAt).toLocaleDateString('tr-TR', {

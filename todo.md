@@ -774,3 +774,23 @@ Platform **minimum seviyede sağlıklı** çalışıyor. Tüm temel özellikler 
 - [x] Hata durumunda sessizce başarısız olmak yerine log'a yaz - TAMAMLANDI
 - [x] End-to-end test: etap tamamla → rapor otomatik oluşsun - BAŞARILI (Test Öğrenci 3)
 - [x] Checkpoint oluştur - TAMAMLANDI
+
+
+## 🧪 Gerçek Kullanıcı Beta Testi (28 Şubat 2026)
+- [ ] Yeni beta test kullanıcıları oluştur (2 öğrenci, 1 mentor - farklı yaş grupları)
+- [ ] Öğrenci beta testi: Kayıt → Etap tamamlama → Rapor görüntüleme → Feedback → Sertifika
+- [ ] Mentor beta testi: Giriş → Öğrenci aktivasyonu → Rapor onaylama → İstatistikler
+- [ ] Admin beta testi: Kullanıcı yönetimi → Raporlar → İstatistikler → Mentor karşılaştırma
+- [ ] Tespit edilen sorunları düzelt
+- [ ] Final beta test raporu hazırla
+
+
+## 🐛 Beta Test Bug Düzeltmeleri (28 Şubat 2026)
+- [x] Mentor sayfasında "Invalid Date" sorunu - completedAt alanı eklendi getPendingReports'a - DÜZELTILDI
+- [x] Mentor sayfasında "summary" eksik sorunu - content'ten özet çıkarma eklendi - DÜZELTILDI
+- [x] Rapor görüntüleme sayfasında markdown rendering sorunu - dangerouslySetInnerHTML yerine Streamdown kullanıldı - DÜZELTILDI
+- [x] Duplicate Etap 2 sorunu - tüm kullanıcılarda duplicate user_stages kayıtları temizlendi (5 kullanıcı) - DÜZELTILDI
+- [x] createUserStage fonksiyonuna duplicate kontrolü eklendi - tekrar oluşmaması için - DÜZELTILDI
+- [x] Mentor dashboard'da öğrenci adı "Bilinmiyor" sorunu - report.studentName kullanıldı - DÜZELTILDI
+- [x] Rapor başlığında "Etap 60004 Raporu" sorunu - getReportsByUser ve getReportById'e stageName eklendi - DÜZELTILDI
+- [x] MyReports.tsx ve ReportView.tsx'de stageName gösterimi eklendi - DÜZELTILDI
