@@ -15,24 +15,24 @@ import { hasRole, hasAnyRole } from './roleHelper';
 // Role-based procedures
 const studentProcedure = protectedProcedure.use(({ ctx, next }) => {
   if (!hasRole(ctx.user.role, 'student')) {
-    throw new TRPCError({ code: 'FORBIDDEN', message: 'Cette action est réservée aux étudiants' });
+    throw new TRPCError({ code: 'FORBIDDEN', message: 'Bu işlem yalnızca öğrencilere özeldir' });
   }
   if (ctx.user.status !== 'active') {
-    throw new TRPCError({ code: 'FORBIDDEN', message: 'Votre compte doit être activé par un mentor' });
+    throw new TRPCError({ code: 'FORBIDDEN', message: 'Hesabınızın bir mentor tarafından aktive edilmesi gerekiyor' });
   }
   return next({ ctx });
 });
 
 const mentorProcedure = protectedProcedure.use(({ ctx, next }) => {
   if (!hasAnyRole(ctx.user.role, ['mentor', 'admin'])) {
-    throw new TRPCError({ code: 'FORBIDDEN', message: 'Cette action est réservée aux mentors' });
+    throw new TRPCError({ code: 'FORBIDDEN', message: 'Bu işlem yalnızca mentorlara özeldir' });
   }
   return next({ ctx });
 });
 
 const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
   if (!hasRole(ctx.user.role, 'admin')) {
-    throw new TRPCError({ code: 'FORBIDDEN', message: 'Cette action est réservée aux administrateurs' });
+    throw new TRPCError({ code: 'FORBIDDEN', message: 'Bu işlem yalnızca yöneticilere özeldir' });
   }
   return next({ ctx });
 });
@@ -501,8 +501,7 @@ export const appRouter = router({
         if (input?.stageId) {
           return await db.getQuestionsByStage(input.stageId);
         }
-        // TODO: Implement getAllQuestions if needed
-        return [];
+        return await db.getAllQuestions();
       }),
     
     getMentorComparison: adminProcedure.query(async () => {
@@ -535,7 +534,7 @@ export const appRouter = router({
           if (!student || student.mentorId !== ctx.user.id) {
             throw new TRPCError({ 
               code: 'FORBIDDEN', 
-              message: 'Vous ne pouvez activer que vos propres étudiants' 
+              message: 'Yalnızca kendi öğrencilerinizi aktive edebilirsiniz' 
             });
           }
         }
@@ -570,7 +569,7 @@ export const appRouter = router({
             const loginUrl = `${process.env.VITE_FRONTEND_URL || 'http://localhost:3000'}/login`;
             await sendEmail({
               to: student.email,
-              subject: '🎉 Başvurunuz Onaylan dı - Meslegim.tr',
+              subject: '🎉 Başvurunuz Onaylandı - Meslegim.tr',
               html: getApprovalEmailTemplate(student.name, loginUrl),
             });
           } catch (error) {
@@ -595,7 +594,7 @@ export const appRouter = router({
       .query(async ({ input, ctx }) => {
         const student = await db.getUserById(input.studentId);
         if (!student) {
-          throw new TRPCError({ code: 'NOT_FOUND', message: 'Étudiant non trouvé' });
+          throw new TRPCError({ code: 'NOT_FOUND', message: 'Öğrenci bulunamadı' });
         }
         
         // Verify access
@@ -615,12 +614,12 @@ export const appRouter = router({
       .mutation(async ({ input, ctx }) => {
         const student = await db.getUserById(input.studentId);
         if (!student) {
-          throw new TRPCError({ code: 'NOT_FOUND', message: 'Étudiant non trouvé' });
+          throw new TRPCError({ code: 'NOT_FOUND', message: 'Öğrenci bulunamadı' });
         }
         
         // Verify access
         if (hasRole(ctx.user.role, 'mentor') && !hasRole(ctx.user.role, 'admin') && student.mentorId !== ctx.user.id) {
-          throw new TRPCError({ code: 'FORBIDDEN', message: 'Vous ne pouvez initier que vos propres étudiants' });
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'Yalnızca kendi öğrencilerinizin etaplarını başlatabilirsiniz' });
         }
         
         // Check if student has an age group
@@ -676,9 +675,15 @@ export const appRouter = router({
         if (input.approved) {
           await db.approveReport(input.reportId, ctx.user.id);
         } else {
-          // TODO: Add rejectReport function to db.ts
-          // For now, just don't approve it
-          console.log(`Report ${input.reportId} rejected by mentor ${ctx.user.id}`);
+          // Reject the report - update status to 'rejected' and save feedback
+          await db.updateReport(input.reportId, { 
+            status: 'rejected',
+            mentorFeedback: input.feedback || 'Mentor tarafından reddedildi'
+          });
+          // Unlock the stage so student can redo it
+          if (report.stageId && report.userId) {
+            await db.updateUserStage(report.userId, report.stageId, 'active');
+          }
         }
         
         // Get student and stage details for email
@@ -690,7 +695,7 @@ export const appRouter = router({
           try {
             const reportUrl = `${process.env.VITE_FRONTEND_URL || 'http://localhost:3000'}/reports/${report.id}`;
             const subject = input.approved 
-              ? '✅ Raporunuz Onaylan dı - Meslegim.tr'
+              ? '✅ Raporunuz Onaylandı - Meslegim.tr'
               : '⚠️ Raporunuz İnceleme Bekliyor - Meslegim.tr';
             const html = input.approved
               ? getReportApprovedEmailTemplate(student.name, stage.name, reportUrl)
@@ -725,7 +730,7 @@ export const appRouter = router({
         // Verify access
         const student = await db.getUserById(input.studentId);
         if (!student) {
-          throw new TRPCError({ code: 'NOT_FOUND', message: 'Étudiant non trouvé' });
+          throw new TRPCError({ code: 'NOT_FOUND', message: 'Öğrenci bulunamadı' });
         }
         
         if (hasRole(ctx.user.role, 'mentor') && !hasRole(ctx.user.role, 'admin') && student.mentorId !== ctx.user.id) {
@@ -741,7 +746,7 @@ export const appRouter = router({
         // Verify access
         const student = await db.getUserById(input.studentId);
         if (!student) {
-          throw new TRPCError({ code: 'NOT_FOUND', message: 'Étudiant non trouvé' });
+          throw new TRPCError({ code: 'NOT_FOUND', message: 'Öğrenci bulunamadı' });
         }
         
         if (hasRole(ctx.user.role, 'mentor') && !hasRole(ctx.user.role, 'admin') && student.mentorId !== ctx.user.id) {
@@ -761,7 +766,7 @@ export const appRouter = router({
         // Verify ownership
         const note = await db.getMentorNoteById(input.noteId);
         if (!note) {
-          throw new TRPCError({ code: 'NOT_FOUND', message: 'Note non trouvée' });
+          throw new TRPCError({ code: 'NOT_FOUND', message: 'Not bulunamadı' });
         }
         
         if (note.mentorId !== ctx.user.id && !hasRole(ctx.user.role, 'admin')) {
@@ -778,7 +783,7 @@ export const appRouter = router({
         // Verify ownership
         const note = await db.getMentorNoteById(input.noteId);
         if (!note) {
-          throw new TRPCError({ code: 'NOT_FOUND', message: 'Note non trouvée' });
+          throw new TRPCError({ code: 'NOT_FOUND', message: 'Not bulunamadı' });
         }
         
         if (note.mentorId !== ctx.user.id && !hasRole(ctx.user.role, 'admin')) {

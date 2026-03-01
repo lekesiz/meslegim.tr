@@ -2,8 +2,10 @@ import { trpc } from '@/lib/trpc';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { FileText, Download, Clock, CheckCircle, XCircle } from 'lucide-react';
+import { FileText, Download, Clock, CheckCircle, XCircle, AlertCircle, RefreshCw, Loader2 } from 'lucide-react';
 import { useLocation } from 'wouter';
+import DashboardLayout from '@/components/DashboardLayout';
+import { toast } from 'sonner';
 
 export default function MyReports() {
   const [, setLocation] = useLocation();
@@ -11,21 +13,21 @@ export default function MyReports() {
 
   if (isLoading) {
     return (
-      <div className="container py-8">
+      <DashboardLayout>
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+            <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto mb-4" />
             <p className="text-muted-foreground">Raporlar yükleniyor...</p>
           </div>
         </div>
-      </div>
+      </DashboardLayout>
     );
   }
 
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'approved':
-        return <Badge className="bg-green-500"><CheckCircle className="w-3 h-3 mr-1" />Onaylandı</Badge>;
+        return <Badge className="bg-green-500 text-white"><CheckCircle className="w-3 h-3 mr-1" />Onaylandı</Badge>;
       case 'pending':
         return <Badge variant="secondary"><Clock className="w-3 h-3 mr-1" />Onay Bekliyor</Badge>;
       case 'rejected':
@@ -36,71 +38,105 @@ export default function MyReports() {
   };
 
   return (
-    <div className="container py-8 max-w-4xl">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Raporlarım</h1>
-        <p className="text-muted-foreground">
-          Tamamladığınız etapların değerlendirme raporlarını buradan görüntüleyebilirsiniz.
-        </p>
-      </div>
-
-      {!reports || reports.length === 0 ? (
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-12">
-            <FileText className="w-16 h-16 text-muted-foreground mb-4" />
-            <h3 className="text-lg font-semibold mb-2">Henüz Rapor Yok</h3>
-            <p className="text-muted-foreground text-center">
-              Etapları tamamladıkça raporlarınız burada görünecektir.
-            </p>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="space-y-4">
-          {reports.map((report: any) => (
-            <Card key={report.id} className="hover:shadow-md transition-shadow">
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <CardTitle className="text-xl mb-2">
-                      {report.stageName || `Etap ${report.stageId} Raporu`}
-                    </CardTitle>
-                    <CardDescription>
-                      Oluşturulma: {new Date(report.createdAt).toLocaleDateString('tr-TR', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                      })}
-                    </CardDescription>
-                  </div>
-                  <div>
-                    {getStatusBadge(report.status)}
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="flex gap-2">
-                  <Button
-                    onClick={() => setLocation(`/dashboard/student/reports/${report.id}`)}
-                    variant="default"
-                  >
-                    <FileText className="w-4 h-4 mr-2" />
-                    Raporu Görüntüle
-                  </Button>
-                  {report.status === 'approved' && (
-                    <Button
-                      onClick={() => setLocation(`/dashboard/student/reports/${report.id}?download=true`)}
-                      variant="outline"
-                    >
-                      <Download className="w-4 h-4 mr-2" />
-                      PDF İndir
-                    </Button>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+    <DashboardLayout>
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold">Raporlarım</h1>
+          <p className="text-muted-foreground mt-2">
+            Tamamladığınız etapların değerlendirme raporlarını buradan görüntüleyebilirsiniz.
+          </p>
         </div>
-      )}
-    </div>
+
+        {!reports || reports.length === 0 ? (
+          <Card>
+            <CardContent className="flex flex-col items-center justify-center py-12">
+              <FileText className="w-16 h-16 text-muted-foreground mb-4" />
+              <h3 className="text-lg font-semibold mb-2">Henüz Rapor Yok</h3>
+              <p className="text-muted-foreground text-center">
+                Etapları tamamladıkça raporlarınız burada görünecektir.
+              </p>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="space-y-4">
+            {reports.map((report: any) => (
+              <Card key={report.id} className={`hover:shadow-md transition-shadow ${report.status === 'rejected' ? 'border-red-200' : ''}`}>
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <CardTitle className="text-xl mb-2">
+                        {report.stageName || (report.type === 'stage' ? 'Etap Raporu' : 'Final Raporu')}
+                      </CardTitle>
+                      <CardDescription>
+                        Oluşturulma: {new Date(report.createdAt).toLocaleDateString('tr-TR', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
+                        })}
+                      </CardDescription>
+                    </div>
+                    <div>
+                      {getStatusBadge(report.status)}
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {/* Mentor Feedback for rejected reports */}
+                  {report.status === 'rejected' && report.mentorFeedback && (
+                    <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                      <div className="flex items-center gap-2 text-red-700 mb-2">
+                        <AlertCircle className="w-4 h-4" />
+                        <span className="font-semibold text-sm">Mentor Geri Bildirimi</span>
+                      </div>
+                      <p className="text-sm text-red-800">{report.mentorFeedback}</p>
+                    </div>
+                  )}
+
+                  {/* Pending status info */}
+                  {report.status === 'pending' && (
+                    <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+                      <p className="text-sm text-amber-800">
+                        Raporunuz mentorunuz tarafından inceleniyor. Onaylandığında e-posta ile bildirim alacaksınız.
+                      </p>
+                    </div>
+                  )}
+
+                  <div className="flex flex-wrap gap-2">
+                    {report.status !== 'pending' && (
+                      <Button
+                        onClick={() => setLocation(`/dashboard/student/reports/${report.id}`)}
+                        variant={report.status === 'approved' ? 'default' : 'outline'}
+                      >
+                        <FileText className="w-4 h-4 mr-2" />
+                        Raporu Görüntüle
+                      </Button>
+                    )}
+                    {report.status === 'approved' && report.fileUrl && (
+                      <Button
+                        onClick={() => window.open(report.fileUrl, '_blank')}
+                        variant="outline"
+                      >
+                        <Download className="w-4 h-4 mr-2" />
+                        PDF İndir
+                      </Button>
+                    )}
+                    {report.status === 'rejected' && (
+                      <Button
+                        onClick={() => setLocation(`/dashboard/student/stage/${report.stageId}`)}
+                        variant="default"
+                        className="bg-amber-600 hover:bg-amber-700"
+                      >
+                        <RefreshCw className="w-4 h-4 mr-2" />
+                        Etabı Yeniden Tamamla
+                      </Button>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
+    </DashboardLayout>
   );
 }

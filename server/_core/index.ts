@@ -77,22 +77,30 @@ async function startServer() {
   // Rate limiting - Global (relaxed for development)
   const globalLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: process.env.NODE_ENV === "production" ? 100 : 1000, // 1000 for dev, 100 for prod
+    max: process.env.NODE_ENV === "production" ? 200 : 2000, // 2000 for dev, 200 for prod
     message: "Çok fazla istek gönderdiniz. Lütfen daha sonra tekrar deneyin.",
     standardHeaders: true,
     legacyHeaders: false,
-    skip: (req) => process.env.NODE_ENV === "development" && req.path.startsWith("/client"), // Skip static assets in dev
+    skip: (req) => {
+      // Skip static assets and health checks
+      if (req.path.startsWith("/client") || req.path === "/health") return true;
+      // Skip rate limiting in development
+      if (process.env.NODE_ENV !== "production") return true;
+      return false;
+    },
   });
   app.use(globalLimiter);
 
-  // Rate limiting - Strict for auth endpoints
-  const authLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 5, // 5 login attempts per 15 minutes
-    message: "Çok fazla giriş denemesi yaptınız. Lütfen 15 dakika sonra tekrar deneyin.",
-    skipSuccessfulRequests: true,
-  });
-  app.use("/api/oauth", authLimiter);
+  // Rate limiting - Strict for auth endpoints (only in production)
+  if (process.env.NODE_ENV === "production") {
+    const authLimiter = rateLimit({
+      windowMs: 15 * 60 * 1000,
+      max: 20, // 20 login attempts per 15 minutes
+      message: "Çok fazla giriş denemesi yaptınız. Lütfen 15 dakika sonra tekrar deneyin.",
+      skipSuccessfulRequests: true,
+    });
+    app.use("/api/oauth", authLimiter);
+  }
 
   // Configure body parser with larger size limit for file uploads
   app.use(express.json({ limit: "50mb" }));

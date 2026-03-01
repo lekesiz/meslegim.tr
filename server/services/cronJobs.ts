@@ -2,7 +2,8 @@ import cron from 'node-cron';
 import { getDb } from '../db';
 import { userStages, stages, users } from '../../drizzle/schema';
 import { eq, and, lt, isNull } from 'drizzle-orm';
-import { sendEmail, getNewStageActivatedEmailTemplate } from './emailService';
+import { sendEmail } from '../_core/resend-email';
+import { getNewStageActivatedEmailTemplate } from './emailService';
 
 /**
  * Check and activate stages that should be unlocked (7 days after previous stage completion)

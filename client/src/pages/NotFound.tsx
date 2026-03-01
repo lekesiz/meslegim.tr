@@ -1,14 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { AlertCircle, Home } from "lucide-react";
+import { AlertCircle, Home, ArrowLeft } from "lucide-react";
 import { useLocation } from "wouter";
 
 export default function NotFound() {
-  const [, setLocation] = useLocation();
-
-  const handleGoHome = () => {
-    setLocation("/");
-  };
+  const [location, setLocation] = useLocation();
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100">
@@ -21,28 +17,33 @@ export default function NotFound() {
             </div>
           </div>
 
-          <h1 className="text-4xl font-bold text-slate-900 mb-2">404</h1>
+          <h1 className="text-6xl font-bold text-slate-900 mb-2">404</h1>
 
           <h2 className="text-xl font-semibold text-slate-700 mb-4">
-            Page Not Found
+            Sayfa Bulunamadı
           </h2>
 
           <p className="text-slate-600 mb-8 leading-relaxed">
-            Sorry, the page you are looking for doesn't exist.
+            Aradığınız sayfa mevcut değil veya taşınmış olabilir.
             <br />
-            It may have been moved or deleted.
+            Lütfen URL'yi kontrol edin veya ana sayfaya dönün.
           </p>
 
-          <div
-            id="not-found-button-group"
-            className="flex flex-col sm:flex-row gap-3 justify-center"
-          >
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Button
-              onClick={handleGoHome}
+              variant="outline"
+              onClick={() => window.history.back()}
+              className="px-6 py-2.5 rounded-lg"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Geri Dön
+            </Button>
+            <Button
+              onClick={() => setLocation("/")}
               className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg"
             >
               <Home className="w-4 h-4 mr-2" />
-              Go Home
+              Ana Sayfaya Dön
             </Button>
           </div>
         </CardContent>

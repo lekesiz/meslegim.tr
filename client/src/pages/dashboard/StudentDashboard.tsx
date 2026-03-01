@@ -5,7 +5,9 @@ import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { trpc } from "@/lib/trpc";
-import { Loader2, FileText, Clock, CheckCircle2, Lock, Award } from "lucide-react";
+import { Loader2, FileText, Clock, CheckCircle2, Lock, Award, MessageCircle, User } from "lucide-react";
+import { ChatDialog } from "@/components/ChatDialog";
+import { useState } from "react";
 import { DashboardSkeleton } from "@/components/DashboardSkeleton";
 import { EmptyState } from "@/components/EmptyState";
 import { useLocation } from "wouter";
@@ -26,6 +28,7 @@ export default function StudentDashboard() {
       trpc.useUtils().student.getMyCertificate.invalidate();
     },
   });
+  const [chatOpen, setChatOpen] = useState(false);
 
   if (!user) {
     return null;
@@ -131,23 +134,39 @@ export default function StudentDashboard() {
 
         {/* Active Stage Card */}
         {activeStage ? (
-          <Card className="border-primary">
+          <Card className="border-primary shadow-sm">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle>Aktif Etap</CardTitle>
-                  <CardDescription className="mt-2">
+                  <div className="flex items-center gap-2">
+                    <CardTitle>Aktif Etap</CardTitle>
+                    {progress && (
+                      <Badge variant="outline" className="text-xs">
+                        {(progress.findIndex((s: any) => s.stageId === activeStage.stageId) + 1)}/{progress.length}
+                      </Badge>
+                    )}
+                  </div>
+                  <CardDescription className="mt-2 text-base font-medium text-foreground">
                     {activeStage.stageName}
                   </CardDescription>
                 </div>
-                <Badge variant="default">Aktif</Badge>
+                <Badge variant="default" className="bg-blue-600">Aktif</Badge>
               </div>
             </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground mb-4">
+            <CardContent className="space-y-4">
+              <p className="text-sm text-muted-foreground">
                 {activeStage.stageDescription}
               </p>
-              <Button onClick={() => setLocation(`/dashboard/student/stage/${activeStage.stageId}`)}>
+              {totalStages > 0 && (
+                <div className="space-y-1">
+                  <div className="flex justify-between text-xs text-muted-foreground">
+                    <span>Genel İlerleme</span>
+                    <span>%{progressPercentage.toFixed(0)}</span>
+                  </div>
+                  <Progress value={progressPercentage} className="h-2" />
+                </div>
+              )}
+              <Button onClick={() => setLocation(`/dashboard/student/stage/${activeStage.stageId}`)} className="w-full sm:w-auto">
                 Etabı Başlat
               </Button>
             </CardContent>
@@ -232,7 +251,7 @@ export default function StudentDashboard() {
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {reports.map((report) => (
+                {reports.slice(0, 3).map((report: any) => (
                   <div
                     key={report.id}
                     className="flex items-center justify-between p-4 border rounded-lg"
@@ -241,7 +260,7 @@ export default function StudentDashboard() {
                       <FileText className="h-5 w-5 text-primary" />
                       <div>
                         <p className="font-medium">
-                          {report.type === 'stage' ? 'Etap Raporu' : 'Final Raporu'}
+                          {(report as any).stageName || (report.type === 'stage' ? 'Etap Raporu' : 'Final Raporu')}
                         </p>
                         <p className="text-sm text-muted-foreground">
                           {new Date(report.createdAt).toLocaleDateString('tr-TR')}
@@ -250,9 +269,9 @@ export default function StudentDashboard() {
                     </div>
                     <div className="flex items-center gap-2">
                       <Badge
-                        variant={report.status === 'approved' ? 'default' : 'secondary'}
+                        variant={report.status === 'approved' ? 'default' : report.status === 'rejected' ? 'destructive' : 'secondary'}
                       >
-                        {report.status === 'approved' ? 'Onaylandı' : 'Beklemede'}
+                        {report.status === 'approved' ? 'Onaylandı' : report.status === 'rejected' ? 'Reddedildi' : 'Beklemede'}
                       </Badge>
                       {report.status === 'approved' && (
                         <Button
@@ -266,6 +285,39 @@ export default function StudentDashboard() {
                   </div>
                 ))}
               </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Mentor Contact */}
+        {user.mentorId && (
+          <Card className="border-indigo-200 bg-indigo-50/50">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <User className="h-5 w-5 text-indigo-600" />
+                  <CardTitle className="text-base">Mentorünüze Ulaşın</CardTitle>
+                </div>
+              </div>
+              <CardDescription>
+                Sorularınız için mentorünüze mesaj gönderebilirsiniz
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button
+                variant="outline"
+                className="border-indigo-300 text-indigo-700 hover:bg-indigo-100"
+                onClick={() => setChatOpen(true)}
+              >
+                <MessageCircle className="mr-2 h-4 w-4" />
+                Mentor ile Mesajlaş
+              </Button>
+              <ChatDialog
+                open={chatOpen}
+                onOpenChange={setChatOpen}
+                otherUser={{ id: user.mentorId, name: 'Mentörünüz' }}
+                currentUserRole="student"
+              />
             </CardContent>
           </Card>
         )}

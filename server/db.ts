@@ -158,7 +158,26 @@ export async function createUser(data: Omit<InsertUser, 'openId'> & { openId?: s
 export async function getAllUsers() {
   const db = await getDb();
   if (!db) return [];
-  return await db.select().from(users);
+  const mentors = users as any;
+  const rows = await db
+    .select({
+      id: users.id,
+      name: users.name,
+      email: users.email,
+      role: users.role,
+      status: users.status,
+      ageGroup: users.ageGroup,
+      mentorId: users.mentorId,
+      createdAt: users.createdAt,
+    })
+    .from(users)
+    .orderBy(users.createdAt);
+  // Attach mentor names
+  const mentorMap = new Map(rows.filter(u => u.role === 'mentor').map(m => [m.id, m.name]));
+  return rows.map(u => ({
+    ...u,
+    mentorName: u.mentorId ? (mentorMap.get(u.mentorId) || null) : null,
+  }));
 }
 
 export async function updateUser(id: number, data: Partial<InsertUser>) {
@@ -555,7 +574,26 @@ export async function createUserStage(data: { userId: number; stageId: number; s
 export async function getAllReports() {
   const db = await getDb();
   if (!db) return [];
-  return await db.select().from(reports);
+  const rows = await db
+    .select({
+      id: reports.id,
+      userId: reports.userId,
+      stageId: reports.stageId,
+      type: reports.type,
+      status: reports.status,
+      content: reports.content,
+      summary: reports.summary,
+      fileUrl: reports.fileUrl,
+      mentorFeedback: reports.mentorFeedback,
+      createdAt: reports.createdAt,
+      studentName: users.name,
+      stageName: stages.name,
+    })
+    .from(reports)
+    .leftJoin(users, eq(reports.userId, users.id))
+    .leftJoin(stages, eq(reports.stageId, stages.id))
+    .orderBy(reports.createdAt);
+  return rows;
 }
 
 export async function getAllQuestions() {

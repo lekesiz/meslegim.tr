@@ -111,6 +111,7 @@ export const reports = mysqlTable("reports", {
   stageId: int("stageId"), // NULL for final report
   type: mysqlEnum("type", ["stage", "final"]).notNull(),
   content: text("content"), // AI-generated report content (markdown)
+  summary: text("summary"), // Short summary of the report
   fileUrl: varchar("fileUrl", { length: 500 }),
   fileKey: varchar("fileKey", { length: 500 }),
   status: mysqlEnum("status", ["pending", "approved", "rejected"]).default("pending").notNull(),

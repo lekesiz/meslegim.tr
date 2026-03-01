@@ -794,3 +794,35 @@ Platform **minimum seviyede sağlıklı** çalışıyor. Tüm temel özellikler 
 - [x] Mentor dashboard'da öğrenci adı "Bilinmiyor" sorunu - report.studentName kullanıldı - DÜZELTILDI
 - [x] Rapor başlığında "Etap 60004 Raporu" sorunu - getReportsByUser ve getReportById'e stageName eklendi - DÜZELTILDI
 - [x] MyReports.tsx ve ReportView.tsx'de stageName gösterimi eklendi - DÜZELTILDI
+
+
+## 🔥 KAPSAMLİ ANALİZ - YENİ YAPILACAKLAR LİSTESİ (28 Şubat 2026)
+
+### P1 - KRİTİK (Kullanıcı deneyimini doğrudan etkileyen)
+- [x] Fransızca hata mesajlarını Türkçeye çevir (routers.ts'de 10+ Fransızca mesaj var) - DÜZELTILDI
+- [ ] Email subject'lerindeki yazım hatası düzelt: "Onaylan dı" → "Onaylandı" (2 yerde)
+- [x] Rapor reddetme backend'i implement et (TODO yorumu var, sadece log yazıyor) - DÜZELTILDI
+- [x] Login sayfasına "Hesabınız yok mu? Kayıt Ol" linki ekle - DÜZELTILDI
+- [x] Mentor rapor onaylama sayfasında rapor içeriğini görüntüleme ekle (şu an sadece özet var) - DÜZELTILDI
+
+### P2 - YÜKSEK (Önemli eksik özellikler)
+- [x] MentorDashboard reports tab'ında reddetme butonu ekle (şu an sadece onayla var) - DÜZELTILDI
+- [x] Öğrenci dashboard'da mentor ile mesajlaşma butonu ekle (ChatDialog var ama kullanılmıyor) - DÜZELTILDI
+- [x] Mentor dashboard'da öğrenci ile mesajlaşma butonu ekle (ChatDialog var ama kullanılmıyor) - DÜZELTILDI
+- [x] Admin dashboard'da rapor içeriğini görüntüleme ekle - DÜZELTILDI (PDF butonu eklendi)
+- [x] KVKK/Gizlilik politikası sayfası oluştur (footer'da link var ama sayfa yok) - DÜZELTILDI
+- [x] Kullanım şartları sayfası oluştur - DÜZELTILDI
+
+### P3 - ORTA (UX iyileştirmeleri)
+- [x] Ana sayfa footer'a KVKK ve Gizlilik linki ekle (şu an sadece copyright var) - DÜZELTILDI
+- [x] Login sayfasına logo ve daha iyi tasarım ekle - DÜZELTILDI
+- [x] Öğrenci dashboard'da raporlar bölümüne link ekle (raporlarım sayfasına) - ZATEN MEVCUT
+- [x] Mentor rapor onaylama sayfasında rapor içeriğini tam görüntüle (şu an sadece özet) - DÜZELTILDI
+- [x] Etap tamamlandıktan sonra "Rapor hazırlanıyor" sayfasını iyileştir - Toast mesajı zaten mevcut ve yeterli
+- [x] 404 sayfasını iyileştir - DÜZELTILDI (Türkçeye çevrildi, Geri Dön butonu eklendi)
+
+### P4 - DÜŞÜK (Teknik borç)
+- [x] Admin getQuestions endpoint'ini implement et (TODO yorumu var) - DÜZELTILDI
+- [x] reportGenerator.ts'deki TODO'yu temizle - Gerekli değil, kod çalışıyor
+- [ ] Tüm console.log debug loglarını temizle
+- [ ] Unit test coverage artır

@@ -13,7 +13,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { trpc } from '@/lib/trpc';
-import { Loader2, Users, FileQuestion, Layers, Plus, TrendingUp, Zap, MessageSquare } from 'lucide-react';
+import { Loader2, Users, FileQuestion, Layers, Plus, TrendingUp, Zap, MessageSquare, Eye } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -234,7 +234,7 @@ export default function AdminDashboard() {
                             </Badge>
                           </TableCell>
                           <TableCell>
-                            {student.mentorId ? `Mentor #${student.mentorId}` : '-'}
+                            {student.mentorName || (student.mentorId ? `Mentor #${student.mentorId}` : '-')}
                           </TableCell>
                           <TableCell>
                             <Button 
@@ -331,11 +331,12 @@ export default function AdminDashboard() {
                   <TableHeader>
                     <TableRow>
                       <TableHead>ID</TableHead>
-                      <TableHead>Kullanıcı ID</TableHead>
-                      <TableHead>Etap ID</TableHead>
+                      <TableHead>Öğrenci</TableHead>
+                      <TableHead>Etap</TableHead>
                       <TableHead>Tip</TableHead>
                       <TableHead>Durum</TableHead>
                       <TableHead>Oluşturulma</TableHead>
+                      <TableHead>İşlem</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -343,8 +344,8 @@ export default function AdminDashboard() {
                       reports.map((report: any) => (
                         <TableRow key={report.id}>
                           <TableCell>{report.id}</TableCell>
-                          <TableCell>{report.userId}</TableCell>
-                          <TableCell>{report.stageId || '-'}</TableCell>
+                          <TableCell>{(report as any).studentName || report.userId}</TableCell>
+                          <TableCell>{(report as any).stageName || report.stageId || '-'}</TableCell>
                           <TableCell>
                             <Badge variant="outline">
                               {report.type === 'stage' ? 'Etap' : 'Final'}
@@ -369,6 +370,18 @@ export default function AdminDashboard() {
                           </TableCell>
                           <TableCell>
                             {new Date(report.createdAt).toLocaleDateString('tr-TR')}
+                          </TableCell>
+                          <TableCell>
+                            {report.pdfUrl && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => window.open(report.pdfUrl, '_blank')}
+                              >
+                                <Eye className="h-4 w-4 mr-1" />
+                                PDF
+                              </Button>
+                            )}
                           </TableCell>
                         </TableRow>
                       ))

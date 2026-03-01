@@ -119,7 +119,7 @@ describe("mentor.initiateStudentStages", () => {
       caller.mentor.initiateStudentStages({
         studentId: 999,
       })
-    ).rejects.toThrow("Étudiant non trouvé");
+    ).rejects.toThrow("Öğrenci bulunamadı");
   });
 
   it("throws error if student already has stages", async () => {

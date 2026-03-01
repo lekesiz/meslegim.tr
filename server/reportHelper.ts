@@ -60,6 +60,10 @@ export async function generateStageReportAsync(userId: number, stageId: number) 
       // Continue without PDF - report content is still valuable
     }
     
+    // Extract summary from report content (first paragraph after first heading)
+    const summaryMatch = reportContent.match(/##[^\n]*\n+([^\n#]{50,300})/);
+    const summary = summaryMatch ? summaryMatch[1].trim().substring(0, 300) : reportContent.substring(0, 300).trim();
+    
     // Save report to database (with or without PDF)
     console.log(`[ReportGen] Saving report to database...`);
     await db.createReport({
@@ -67,6 +71,7 @@ export async function generateStageReportAsync(userId: number, stageId: number) 
       stageId,
       type: 'stage',
       content: reportContent,
+      summary,
       status: 'pending',
       fileUrl: fileUrl || null,
       fileKey: fileKey || null,

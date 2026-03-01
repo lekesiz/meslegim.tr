@@ -5,10 +5,15 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { trpc } from '@/lib/trpc';
-import { Loader2, UserCheck, Users, FileText, CheckCircle } from 'lucide-react';
+import { Loader2, UserCheck, Users, FileText, CheckCircle, XCircle, ExternalLink, MessageSquare } from 'lucide-react';
 import { DashboardSkeleton } from '@/components/DashboardSkeleton';
 import { toast } from 'sonner';
 import { useLocation } from 'wouter';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { useState } from 'react';
+import { ChatDialog } from '@/components/ChatDialog';
 import MentorStatsChart from '@/components/MentorStatsChart';
 import { MentorPerformanceTrends } from '@/components/MentorPerformanceTrends';
 import MentorFeedbackStats from '@/components/MentorFeedbackStats';
@@ -17,6 +22,11 @@ export default function MentorDashboard() {
   const { user } = useAuth();
   const utils = trpc.useUtils();
   const [, setLocation] = useLocation();
+  const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
+  const [rejectReportId, setRejectReportId] = useState<number | null>(null);
+  const [rejectFeedback, setRejectFeedback] = useState('');
+  const [chatOpen, setChatOpen] = useState(false);
+  const [chatStudent, setChatStudent] = useState<{ id: number; name: string | null } | null>(null);
 
   const { data: pendingStudents, isLoading: pendingLoading } = trpc.mentor.getPendingStudents.useQuery();
   const { data: myStudents, isLoading: studentsLoading } = trpc.mentor.getMyStudents.useQuery();
@@ -35,8 +45,12 @@ export default function MentorDashboard() {
   });
 
   const approveReportMutation = trpc.mentor.approveReport.useMutation({
-    onSuccess: () => {
-      toast.success('Rapor başarıyla onaylandı!');
+    onSuccess: (_, variables) => {
+      if (variables.approved === false) {
+        toast.success('Rapor reddedildi ve öğrenci bilgilendirildi.');
+      } else {
+        toast.success('Rapor başarıyla onaylandı!');
+      }
       utils.mentor.getPendingReports.invalidate();
     },
     onError: (error) => {
@@ -53,6 +67,7 @@ export default function MentorDashboard() {
   }
 
   return (
+    <>
     <DashboardLayout>
       <div className="space-y-6">
         {/* Header */}
@@ -238,13 +253,24 @@ export default function MentorDashboard() {
                         Aktif Edilme: {student.updatedAt ? new Date(student.updatedAt).toLocaleDateString('tr-TR') : '-'}
                       </p>
                     </div>
-                    <div className="mt-4">
+                    <div className="mt-4 flex gap-2">
                       <Button 
                         variant="outline" 
                         size="sm"
                         onClick={() => setLocation(`/dashboard/student/${student.id}`)}
                       >
                         Detayları Görüntüle
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setChatStudent({ id: student.id, name: student.name });
+                          setChatOpen(true);
+                        }}
+                      >
+                        <MessageSquare className="h-4 w-4 mr-1" />
+                        Mesaj Gönder
                       </Button>
                     </div>
                   </CardContent>
@@ -263,54 +289,77 @@ export default function MentorDashboard() {
 
           {/* Pending Reports Tab */}
           <TabsContent value="reports" className="space-y-4">
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-muted-foreground">
+                {pendingReports?.length || 0} rapor onay bekliyor
+              </p>
+              <Button variant="outline" size="sm" onClick={() => setLocation('/dashboard/mentor/reports')}>
+                <ExternalLink className="mr-2 h-4 w-4" />
+                Tüm Raporları Gör
+              </Button>
+            </div>
             {pendingReports && pendingReports.length > 0 ? (
               pendingReports.map((report: any) => (
                 <Card key={report.id}>
                   <CardHeader>
                     <div className="flex items-center justify-between">
                       <div>
-                        <CardTitle>
-                          {report.type === 'stage' ? 'Etap Raporu' : 'Final Raporu'}
+                        <CardTitle className="text-base">
+                          {report.stageName || (report.type === 'stage' ? 'Etap Raporu' : 'Final Raporu')}
                         </CardTitle>
-                        <CardDescription className="mt-2">
-                          Öğrenci: {report.studentName || report.user?.name || 'Bilinmiyor'}
+                        <CardDescription className="mt-1">
+                          Öğrenci: <span className="font-medium text-foreground">{report.studentName || 'Bilinmiyor'}</span>
+                        </CardDescription>
+                        <CardDescription>
+                          Tamamlanma: {report.completedAt ? new Date(report.completedAt).toLocaleDateString('tr-TR') : new Date(report.createdAt).toLocaleDateString('tr-TR')}
                         </CardDescription>
                       </div>
                       <Badge variant="secondary">Beklemede</Badge>
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-2">
-                      <p className="text-sm text-muted-foreground">
-                        Oluşturulma: {new Date(report.createdAt).toLocaleDateString('tr-TR')}
-                      </p>
-                    </div>
-                    <div className="mt-4 flex gap-2">
+                    {report.summary && (
+                      <div className="bg-muted p-3 rounded-lg mb-4">
+                        <p className="text-xs font-semibold mb-1 text-muted-foreground uppercase tracking-wide">Rapor Özeti</p>
+                        <p className="text-sm">{report.summary}</p>
+                      </div>
+                    )}
+                    <div className="flex flex-wrap gap-2">
                       {report.fileUrl && (
                         <Button
                           variant="outline"
                           size="sm"
                           onClick={() => window.open(report.fileUrl, '_blank')}
                         >
+                          <ExternalLink className="mr-2 h-3 w-3" />
                           Raporu Görüntüle
                         </Button>
                       )}
                       <Button
                         size="sm"
-                        onClick={() => approveReportMutation.mutate({ reportId: report.id })}
+                        onClick={() => approveReportMutation.mutate({ reportId: report.id, approved: true })}
                         disabled={approveReportMutation.isPending}
+                        className="bg-green-600 hover:bg-green-700"
                       >
                         {approveReportMutation.isPending ? (
-                          <>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Onaylanıyor...
-                          </>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                         ) : (
-                          <>
-                            <CheckCircle className="mr-2 h-4 w-4" />
-                            Onayla
-                          </>
+                          <CheckCircle className="mr-2 h-4 w-4" />
                         )}
+                        Onayla
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => {
+                          setRejectReportId(report.id);
+                          setRejectFeedback('');
+                          setRejectDialogOpen(true);
+                        }}
+                        disabled={approveReportMutation.isPending}
+                      >
+                        <XCircle className="mr-2 h-4 w-4" />
+                        Reddet
                       </Button>
                     </div>
                   </CardContent>
@@ -334,5 +383,56 @@ export default function MentorDashboard() {
         </Tabs>
       </div>
     </DashboardLayout>
+
+    {/* Reject Dialog */}
+    <Dialog open={rejectDialogOpen} onOpenChange={setRejectDialogOpen}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Raporu Reddet</DialogTitle>
+          <DialogDescription>
+            Öğrenciye iletilecek geri bildirimi yazın. Bu mesaj öğrenciye e-posta ile gönderilecektir.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-3 py-2">
+          <Label htmlFor="reject-feedback">Geri Bildirim <span className="text-destructive">*</span></Label>
+          <Textarea
+            id="reject-feedback"
+            placeholder="Raporun neden reddedildiğini ve öğrencinin ne yapması gerektiğini açıklayın..."
+            value={rejectFeedback}
+            onChange={(e) => setRejectFeedback(e.target.value)}
+            rows={4}
+          />
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setRejectDialogOpen(false)}>İptal</Button>
+          <Button
+            variant="destructive"
+            disabled={!rejectFeedback.trim() || approveReportMutation.isPending}
+            onClick={() => {
+              if (rejectReportId && rejectFeedback.trim()) {
+                approveReportMutation.mutate(
+                  { reportId: rejectReportId, approved: false, feedback: rejectFeedback },
+                  { onSuccess: () => setRejectDialogOpen(false) }
+                );
+              }
+            }}
+          >
+            {approveReportMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <XCircle className="mr-2 h-4 w-4" />}
+            Reddet ve Bildir
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+
+    {/* Chat Dialog */}
+    {chatStudent && (
+      <ChatDialog
+        open={chatOpen}
+        onOpenChange={setChatOpen}
+        otherUser={chatStudent}
+        currentUserRole={user.role}
+      />
+    )}
+    </>
   );
 }

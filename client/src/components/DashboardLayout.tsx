@@ -29,8 +29,8 @@ import { Button } from "./ui/button";
 
 const getMenuItems = (role: string) => {
   const adminItems = [
-    { icon: LayoutDashboard, label: "Tableau de bord", path: "/dashboard/admin" },
-    { icon: Users, label: "Utilisateurs", path: "/dashboard/admin/users" },
+    { icon: LayoutDashboard, label: "Panel", path: "/dashboard/admin" },
+    { icon: Users, label: "Kullanıcı Yönetimi", path: "/dashboard/admin" },
   ];
   
   const mentorItems = [
@@ -188,7 +188,7 @@ function DashboardLayoutContent({
               {!isCollapsed ? (
                 <div className="flex items-center gap-2 min-w-0">
                   <span className="font-semibold tracking-tight truncate">
-                    Navigation
+                    Mesleğim.tr
                   </span>
                 </div>
               ) : null}
@@ -243,7 +243,7 @@ function DashboardLayoutContent({
                   className="cursor-pointer text-destructive focus:text-destructive"
                 >
                   <LogOut className="mr-2 h-4 w-4" />
-                  <span>Sign out</span>
+                  <span>Çıkış Yap</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

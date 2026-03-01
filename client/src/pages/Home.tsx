@@ -443,7 +443,21 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="container mx-auto px-4 py-8 border-t border-gray-200">
-        <div className="text-center text-gray-600 text-sm">
+        <div className="text-center text-gray-600 text-sm space-y-3">
+          <div className="flex items-center justify-center gap-6 flex-wrap">
+            <a href="/gizlilik-politikasi" className="hover:text-indigo-600 transition-colors">
+              Gizlilik Politikası
+            </a>
+            <a href="/kullanim-sartlari" className="hover:text-indigo-600 transition-colors">
+              Kullanım Şartları
+            </a>
+            <a href="/gizlilik-politikasi" className="hover:text-indigo-600 transition-colors">
+              KVKK Aydınlatma Metni
+            </a>
+            <a href="mailto:destek@meslegim.tr" className="hover:text-indigo-600 transition-colors">
+              İletişim
+            </a>
+          </div>
           <p>© 2026 Meslegim.tr - Tüm hakları saklıdır.</p>
         </div>
       </footer>

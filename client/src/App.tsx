@@ -21,6 +21,8 @@ import ReportView from "./pages/ReportView";
 import Dashboard from "./pages/Dashboard";
 import ResetPassword from "./pages/ResetPassword";
 import VerifyCertificate from "./pages/VerifyCertificate";
+import GizlilikPolitikasi from "./pages/GizlilikPolitikasi";
+import KullanimSartlari from "./pages/KullanimSartlari";
 
 function Router() {
   return (
@@ -29,6 +31,8 @@ function Router() {
       <Route path="/login" component={Login} />
       <Route path="/reset-password/:token" component={ResetPassword} />
       <Route path="/verify-certificate/:id" component={VerifyCertificate} />
+      <Route path="/gizlilik-politikasi" component={GizlilikPolitikasi} />
+      <Route path="/kullanim-sartlari" component={KullanimSartlari} />
       
       {/* Dashboard - role-based routing */}
       <Route path="/dashboard" component={Dashboard} />
