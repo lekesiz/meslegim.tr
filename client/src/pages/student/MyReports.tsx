@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { trpc } from '@/lib/trpc';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -9,7 +10,37 @@ import { toast } from 'sonner';
 
 export default function MyReports() {
   const [, setLocation] = useLocation();
-  const { data: reports, isLoading } = trpc.student.getMyReports.useQuery();
+  const [generatingPdf, setGeneratingPdf] = useState<number | null>(null);
+  const { data: reports, isLoading, refetch } = trpc.student.getMyReports.useQuery();
+  const utils = trpc.useUtils();
+
+  const generatePdfMutation = trpc.student.generateReportPDF.useMutation({
+    onSuccess: async (data, variables) => {
+      toast.success('PDF başarıyla oluşturuldu!');
+      await refetch();
+      // Open the PDF in a new tab
+      if (data.pdfUrl) {
+        window.open(data.pdfUrl, '_blank');
+      }
+    },
+    onError: (error) => {
+      toast.error('PDF oluşturulurken hata: ' + error.message);
+    },
+    onSettled: () => {
+      setGeneratingPdf(null);
+    }
+  });
+
+  const handleDownloadPdf = async (report: any) => {
+    if (report.fileUrl) {
+      // Already generated, open directly
+      window.open(report.fileUrl, '_blank');
+    } else {
+      // Generate PDF first
+      setGeneratingPdf(report.id);
+      generatePdfMutation.mutate({ reportId: report.id });
+    }
+  };
 
   if (isLoading) {
     return (
@@ -111,13 +142,23 @@ export default function MyReports() {
                         Raporu Görüntüle
                       </Button>
                     )}
-                    {report.status === 'approved' && report.fileUrl && (
+                    {report.status === 'approved' && (
                       <Button
-                        onClick={() => window.open(report.fileUrl, '_blank')}
+                        onClick={() => handleDownloadPdf(report)}
                         variant="outline"
+                        disabled={generatingPdf === report.id}
                       >
-                        <Download className="w-4 h-4 mr-2" />
-                        PDF İndir
+                        {generatingPdf === report.id ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            PDF Oluşturuluyor...
+                          </>
+                        ) : (
+                          <>
+                            <Download className="w-4 h-4 mr-2" />
+                            {report.fileUrl ? 'PDF İndir' : 'PDF Oluştur & İndir'}
+                          </>
+                        )}
                       </Button>
                     )}
                     {report.status === 'rejected' && (

@@ -75,8 +75,16 @@ export const appRouter = router({
           throw new TRPCError({ code: 'FORBIDDEN', message: 'Hesabınız henüz aktif değil. Mentor onayı bekleniyor.' });
         }
         
-    // Create session token
-    const sessionToken = await sdk.createSessionToken(user.openId || '', { name: user.name || user.email || 'User' });
+        // If user has no openId (email/password registered users), assign one
+        let effectiveOpenId = user.openId;
+        if (!effectiveOpenId) {
+          effectiveOpenId = `email:${user.email}`;
+          // Persist the openId so future lookups work
+          await db.updateUser(user.id, { openId: effectiveOpenId });
+        }
+        
+        // Create session token
+        const sessionToken = await sdk.createSessionToken(effectiveOpenId, { name: user.name || user.email || 'User' });
         
         // Set session cookie
         const cookieOptions = getSessionCookieOptions(ctx.req);

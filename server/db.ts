@@ -1402,18 +1402,19 @@ export async function getAllFeedbacksWithStats() {
   const db = await getDb();
   if (!db) return null;
 
-  // Get all feedbacks with student and mentor info
-  const allFeedbacks = await db.select({
-    id: feedbacks.id,
-    rating: feedbacks.rating,
-    comment: feedbacks.comment,
-    createdAt: feedbacks.createdAt,
-    studentName: sql<string>`(SELECT name FROM ${users} WHERE id = ${feedbacks.studentId})`,
-    mentorName: sql<string>`(SELECT name FROM ${users} WHERE id = ${feedbacks.mentorId})`,
-    mentorId: feedbacks.mentorId,
-  })
-  .from(feedbacks)
-  .orderBy(desc(feedbacks.createdAt));
+  // Get all feedbacks with student and mentor info using raw SQL to avoid Drizzle subquery issues
+  const conn = await import('mysql2/promise').then(m => m.createConnection(process.env.DATABASE_URL!));
+  const [rawFeedbacks] = await conn.execute<any[]>(`
+    SELECT f.id, f.rating, f.comment, f.createdAt, f.mentorId,
+      s.name as studentName,
+      m.name as mentorName
+    FROM feedbacks f
+    LEFT JOIN users s ON f.studentId = s.id
+    LEFT JOIN users m ON f.mentorId = m.id
+    ORDER BY f.createdAt DESC
+  `);
+  await conn.end();
+  const allFeedbacks = rawFeedbacks as Array<{id: number, rating: number, comment: string|null, createdAt: Date, mentorId: number, studentName: string|null, mentorName: string|null}>;
 
   // Calculate overall stats
   const totalFeedbacks = allFeedbacks.length;

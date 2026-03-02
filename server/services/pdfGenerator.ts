@@ -2,14 +2,14 @@ import { marked } from "marked";
 import { storagePut } from "../storage";
 import { exec } from "child_process";
 import { promisify } from "util";
-import { writeFile, unlink } from "fs/promises";
+import { writeFile, unlink, readFile } from "fs/promises";
 import path from "path";
 import { randomBytes } from "crypto";
 
 const execAsync = promisify(exec);
 
 /**
- * Generate PDF from markdown content using WeasyPrint
+ * Generate PDF from markdown content using Chromium headless
  * @param markdown - Markdown content to convert
  * @param title - Report title
  * @param studentName - Student name for header
@@ -26,7 +26,7 @@ export async function generatePDF(
 
   try {
     // Convert markdown to HTML
-    const htmlContent = marked(markdown);
+    const htmlContent = await marked(markdown);
 
     // Create full HTML document with styling
     const fullHtml = `
@@ -40,16 +40,6 @@ export async function generatePDF(
     @page {
       size: A4;
       margin: 2cm;
-      @top-center {
-        content: "Meslegim.tr - Kariyer Değerlendirme Raporu";
-        font-size: 10pt;
-        color: #666;
-      }
-      @bottom-center {
-        content: counter(page) " / " counter(pages);
-        font-size: 10pt;
-        color: #666;
-      }
     }
     
     body {
@@ -132,6 +122,10 @@ export async function generatePDF(
       color: #666;
       font-size: 9pt;
     }
+
+    .page-number::after {
+      content: counter(page);
+    }
   </style>
 </head>
 <body>
@@ -156,19 +150,24 @@ export async function generatePDF(
     // Write HTML to temp file
     await writeFile(htmlPath, fullHtml, "utf-8");
 
-    // Generate PDF using WeasyPrint
-    await execAsync(`weasyprint ${htmlPath} ${pdfPath}`);
+    // Generate PDF using Chromium headless
+    await execAsync(
+      `chromium-browser --headless --no-sandbox --disable-gpu --disable-dev-shm-usage --print-to-pdf="${pdfPath}" "file://${htmlPath}"`,
+      { timeout: 30000 }
+    );
 
     // Read PDF file
-    const pdfBuffer = await require("fs/promises").readFile(pdfPath);
+    const pdfBuffer = await readFile(pdfPath);
 
     // Upload to S3
     const fileKey = `reports/report-${tempId}.pdf`;
     const { url } = await storagePut(fileKey, pdfBuffer, "application/pdf");
 
     // Cleanup temp files
-    await unlink(htmlPath);
-    await unlink(pdfPath);
+    try {
+      await unlink(htmlPath);
+      await unlink(pdfPath);
+    } catch {}
 
     return url;
   } catch (error) {
@@ -179,6 +178,6 @@ export async function generatePDF(
     } catch {}
 
     console.error("PDF generation error:", error);
-    throw new Error("Failed to generate PDF");
+    throw new Error("PDF oluşturulamadı. Lütfen tekrar deneyin.");
   }
 }

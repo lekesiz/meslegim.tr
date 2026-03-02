@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { toast } from "sonner";
+import { toast, Toaster } from "sonner";
 import { 
   Target, 
   Brain, 
@@ -24,7 +24,12 @@ import {
 } from "lucide-react";
 
 export default function Home() {
-  const [showForm, setShowForm] = useState(false);
+  const [showForm, setShowForm] = useState(() => {
+    // URL'de ?kayit=1 parametresi varsa formu otomatik aç
+    return window.location.search.includes('kayit=1');
+  });
+  const [formError, setFormError] = useState("");
+  const [formSuccess, setFormSuccess] = useState("");
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -37,8 +42,12 @@ export default function Home() {
 
   const registerMutation = trpc.auth.register.useMutation({
     onSuccess: () => {
-      toast.success("Başvurunuz alındı! Mentor onayından sonra e-posta ile bilgilendirileceksiniz.");
-      setShowForm(false);
+      setFormSuccess("Başvurunuz alındı! Mentor onayından sonra e-posta ile bilgilendirileceksiniz.");
+      setFormError("");
+      setTimeout(() => {
+        setShowForm(false);
+        setFormSuccess("");
+      }, 3000);
       setFormData({
         name: "",
         email: "",
@@ -50,20 +59,21 @@ export default function Home() {
       });
     },
     onError: (error: any) => {
-      toast.error(error.message || "Kayıt sırasında bir hata oluştu");
+      setFormError(error.message || "Kayıt sırasında bir hata oluştu");
     },
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setFormError("");
 
     if (!formData.kvkkConsent) {
-      toast.error("KVKK metnini onaylamanız gerekmektedir");
+      setFormError("KVKK metnini onaylamanız gerekmektedir");
       return;
     }
 
     if (!formData.ageGroup) {
-      toast.error("Lütfen yaş grubunuzu seçiniz");
+      setFormError("Lütfen yaş grubunuzu seçiniz");
       return;
     }
     registerMutation.mutate({
@@ -79,6 +89,7 @@ export default function Home() {
   if (showForm) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center p-4">
+        <Toaster position="top-center" richColors />
         <div className="max-w-2xl w-full bg-white rounded-2xl shadow-2xl p-8">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
@@ -205,6 +216,16 @@ export default function Home() {
               </div>
             </div>
 
+            {formError && (
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm font-medium">
+                ⚠️ {formError}
+              </div>
+            )}
+            {formSuccess && (
+              <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg text-sm font-medium">
+                ✅ {formSuccess}
+              </div>
+            )}
             <div className="flex gap-4">
               <Button
                 type="button"

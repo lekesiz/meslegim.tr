@@ -1,0 +1,19 @@
+{
+  "query": "SELECT f.id, f.studentId, f.mentorId, f.rating, f.comment, u.name as student_name, m.name as mentor_name FROM feedbacks f LEFT JOIN users u ON f.studentId = u.id LEFT JOIN users m ON f.mentorId = m.id LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute SELECT f.id, f.studentId, f.mentorId, f.rating, f.comment, u.name as student_name, m.name as mentor_name FROM feedbacks f LEFT JOIN users u ON f.studentId = u.id LEFT JOIN users m ON f.mentorId = m.id LIMIT 10;",
+  "rows": [
+    {
+      "id": "1",
+      "studentId": "930102",
+      "mentorId": "930014",
+      "rating": "5",
+      "comment": "Mentorun geri bildirimleri çok faydalıydı. Kariyer hedeflerimi netleştirmeme yardımcı oldu.",
+      "student_name": "Emre Kaya",
+      "mentor_name": "Test Mentor"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tstudentId\tmentorId\trating\tcomment\tstudent_name\tmentor_name\n1\t930102\t930014\t5\tMentorun geri bildirimleri çok faydalıydı. Kariyer hedeflerimi netleştirmeme yardımcı oldu.\tEmre Kaya\tTest Mentor\n",
+  "stderr": "",
+  "execution_time_ms": 1538
+}

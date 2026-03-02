@@ -1,0 +1,17 @@
+{
+  "query": "SELECT f.id, f.mentorId, u.id as user_id, u.name, u.role FROM feedbacks f LEFT JOIN users u ON f.mentorId = u.id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute SELECT f.id, f.mentorId, u.id as user_id, u.name, u.role FROM feedbacks f LEFT JOIN users u ON f.mentorId = u.id;",
+  "rows": [
+    {
+      "id": "1",
+      "mentorId": "930014",
+      "user_id": "930014",
+      "name": "Test Mentor",
+      "role": "mentor"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tmentorId\tuser_id\tname\trole\n1\t930014\t930014\tTest Mentor\tmentor\n",
+  "stderr": "",
+  "execution_time_ms": 1513
+}

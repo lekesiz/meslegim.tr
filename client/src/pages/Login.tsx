@@ -5,9 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { toast } from "sonner";
 import { useLocation } from "wouter";
-import { Briefcase, ArrowLeft } from "lucide-react";
+import { Briefcase, ArrowLeft, AlertCircle, CheckCircle } from "lucide-react";
 
 export default function Login() {
   const [, setLocation] = useLocation();
@@ -17,30 +16,46 @@ export default function Login() {
   });
   const [resetEmail, setResetEmail] = useState("");
   const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [resetSuccess, setResetSuccess] = useState("");
+  const [resetError, setResetError] = useState("");
 
   const resetPasswordMutation = trpc.auth.requestPasswordReset.useMutation({
     onSuccess: (data) => {
-      toast.success(data.message);
+      setResetSuccess(data.message || "Şifre sıfırlama linki e-posta adresinize gönderildi.");
+      setResetError("");
       setIsResetDialogOpen(false);
       setResetEmail("");
     },
     onError: (error: any) => {
-      toast.error(error.message || "Şifre sıfırlama başarısız");
+      setResetError(error.message || "Şifre sıfırlama başarısız. Lütfen tekrar deneyin.");
+      setResetSuccess("");
     },
   });
 
   const loginMutation = trpc.auth.login.useMutation({
     onSuccess: () => {
-      toast.success("Giriş başarılı!");
-      setLocation('/dashboard');
+      setErrorMessage("");
+      // Hard redirect so auth state is fully refreshed
+      window.location.replace('/dashboard');
     },
     onError: (error: any) => {
-      toast.error(error.message || "Giriş başarısız");
+      const msg = error.message || "";
+      if (msg.includes("onay") || msg.includes("pending") || msg.includes("approved")) {
+        setErrorMessage("Hesabınız henüz onaylanmamış. Mentor onayından sonra e-posta ile bilgilendirileceksiniz.");
+      } else if (msg.includes("şifre") || msg.includes("password") || msg.includes("credentials") || msg.includes("Invalid")) {
+        setErrorMessage("E-posta veya şifre hatalı. Lütfen tekrar deneyin.");
+      } else if (msg.includes("bulunamadı") || msg.includes("not found")) {
+        setErrorMessage("Bu e-posta adresiyle kayıtlı bir hesap bulunamadı.");
+      } else {
+        setErrorMessage(msg || "Giriş başarısız. Lütfen bilgilerinizi kontrol edin.");
+      }
     },
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMessage("");
     loginMutation.mutate(formData);
   };
 
@@ -66,6 +81,14 @@ export default function Login() {
             <CardDescription>E-posta ve şifrenizle devam edin</CardDescription>
           </CardHeader>
           <CardContent>
+            {/* Şifre sıfırlama başarı mesajı */}
+            {resetSuccess && (
+              <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg flex items-start gap-2">
+                <CheckCircle className="w-4 h-4 text-green-600 mt-0.5 shrink-0" />
+                <p className="text-sm text-green-700">{resetSuccess}</p>
+              </div>
+            )}
+
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email">E-posta</Label>
@@ -74,9 +97,10 @@ export default function Login() {
                   type="email"
                   required
                   value={formData.email}
-                  onChange={(e) =>
-                    setFormData({ ...formData, email: e.target.value })
-                  }
+                  onChange={(e) => {
+                    setFormData({ ...formData, email: e.target.value });
+                    setErrorMessage("");
+                  }}
                   placeholder="ornek@email.com"
                   className="h-11"
                 />
@@ -89,13 +113,22 @@ export default function Login() {
                   type="password"
                   required
                   value={formData.password}
-                  onChange={(e) =>
-                    setFormData({ ...formData, password: e.target.value })
-                  }
+                  onChange={(e) => {
+                    setFormData({ ...formData, password: e.target.value });
+                    setErrorMessage("");
+                  }}
                   placeholder="••••••••"
                   className="h-11"
                 />
               </div>
+
+              {/* Hata mesajı */}
+              {errorMessage && (
+                <div className="p-3 bg-red-50 border border-red-200 rounded-lg flex items-start gap-2">
+                  <AlertCircle className="w-4 h-4 text-red-600 mt-0.5 shrink-0" />
+                  <p className="text-sm text-red-700">{errorMessage}</p>
+                </div>
+              )}
 
               <Button
                 type="submit"
@@ -129,10 +162,19 @@ export default function Login() {
                           id="reset-email"
                           type="email"
                           value={resetEmail}
-                          onChange={(e) => setResetEmail(e.target.value)}
+                          onChange={(e) => {
+                            setResetEmail(e.target.value);
+                            setResetError("");
+                          }}
                           placeholder="ornek@email.com"
                         />
                       </div>
+                      {resetError && (
+                        <div className="p-3 bg-red-50 border border-red-200 rounded-lg flex items-start gap-2">
+                          <AlertCircle className="w-4 h-4 text-red-600 mt-0.5 shrink-0" />
+                          <p className="text-sm text-red-700">{resetError}</p>
+                        </div>
+                      )}
                       <Button
                         onClick={() => resetPasswordMutation.mutate({ email: resetEmail })}
                         disabled={!resetEmail || resetPasswordMutation.isPending}
@@ -162,7 +204,7 @@ export default function Login() {
                 Hesabınız yok mu?{" "}
                 <button
                   type="button"
-                  onClick={() => setLocation('/')}
+                  onClick={() => setLocation('/?kayit=1')}
                   className="text-indigo-600 hover:underline font-semibold"
                 >
                   Ücretsiz Kayıt Ol
