@@ -489,8 +489,8 @@ export async function scheduleNextStage(userId: number, currentStageId: number) 
     return;
   }
 
-  // Schedule next stage activation (configurable days from now, default 7)
-  const delayDays = await getPlatformSettingNumber('stage_transition_delay_days', 7);
+  // Schedule next stage activation - use age-group specific delay if set, else global
+  const delayDays = await getTransitionDelayForAgeGroup(currentStage.ageGroup, 7);
   const unlockedAt = new Date();
   unlockedAt.setDate(unlockedAt.getDate() + delayDays);
 
@@ -1526,4 +1526,110 @@ export async function getAllPlatformSettings(): Promise<Array<{ key: string; val
     .select()
     .from(platformSettings)
     .orderBy(platformSettings.key);
+}
+
+
+/**
+ * Instantly unlock a locked stage for a user (admin/mentor action)
+ * Returns the stage name for notification purposes
+ */
+export async function unlockStageNow(userId: number, userStageId: number): Promise<{ stageName: string; userEmail: string | null; userName: string | null } | null> {
+  const dbInstance = await getDb();
+  if (!dbInstance) return null;
+
+  // Get the userStage with user and stage info
+  const [us] = await dbInstance
+    .select({
+      id: userStages.id,
+      userId: userStages.userId,
+      stageId: userStages.stageId,
+      status: userStages.status,
+      stageName: stages.name,
+      userEmail: users.email,
+      userName: users.name,
+    })
+    .from(userStages)
+    .innerJoin(stages, eq(userStages.stageId, stages.id))
+    .innerJoin(users, eq(userStages.userId, users.id))
+    .where(and(eq(userStages.id, userStageId), eq(userStages.userId, userId)))
+    .limit(1);
+
+  if (!us || us.status !== 'locked') return null;
+
+  // Unlock immediately
+  await dbInstance
+    .update(userStages)
+    .set({ status: 'active', unlockedAt: new Date(), updatedAt: new Date() })
+    .where(eq(userStages.id, userStageId));
+
+  return {
+    stageName: us.stageName,
+    userEmail: us.userEmail,
+    userName: us.userName,
+  };
+}
+
+/**
+ * Get all locked stages for a specific user (for admin view)
+ */
+export async function getLockedStagesForUser(userId: number) {
+  const dbInstance = await getDb();
+  if (!dbInstance) return [];
+
+  return await dbInstance
+    .select({
+      id: userStages.id,
+      userId: userStages.userId,
+      stageId: userStages.stageId,
+      status: userStages.status,
+      unlockedAt: userStages.unlockedAt,
+      stageName: stages.name,
+      stageOrder: stages.order,
+      ageGroup: stages.ageGroup,
+    })
+    .from(userStages)
+    .innerJoin(stages, eq(userStages.stageId, stages.id))
+    .where(and(eq(userStages.userId, userId), eq(userStages.status, 'locked')))
+    .orderBy(stages.order);
+}
+
+/**
+ * Get all students with their locked stage counts (for admin overview)
+ */
+export async function getStudentsWithLockedStages() {
+  const dbInstance = await getDb();
+  if (!dbInstance) return [];
+
+  const allUsers = await getAllUsers();
+  const students = allUsers.filter(u => u.role === 'student' && u.status === 'active');
+
+  const result = [];
+  for (const student of students) {
+    const lockedStages = await getLockedStagesForUser(student.id);
+    if (lockedStages.length > 0) {
+      result.push({
+        userId: student.id,
+        userName: student.name,
+        userEmail: student.email,
+        ageGroup: student.ageGroup,
+        lockedStages,
+      });
+    }
+  }
+  return result;
+}
+
+/**
+ * Get the stage_transition_delay_days for a specific age group
+ * Falls back to global setting, then to defaultValue
+ */
+export async function getTransitionDelayForAgeGroup(ageGroup: string, defaultValue = 7): Promise<number> {
+  const key = `stage_transition_delay_days_${ageGroup.replace('-', '_')}`;
+  const ageGroupValue = await getPlatformSetting(key);
+  if (ageGroupValue !== null) {
+    const parsed = parseInt(ageGroupValue, 10);
+    if (!isNaN(parsed)) return parsed;
+  }
+  // Fall back to global setting
+  return await getPlatformSettingNumber('stage_transition_delay_days', defaultValue);
 }

@@ -925,3 +925,10 @@ Platform **minimum seviyede sağlıklı** çalışıyor. Tüm temel özellikler 
   - [x] `admin.getPlatformSettings` ve `admin.setPlatformSetting` tRPC prosedürleri eklendi
   - [x] Admin paneline "Platform Ayarları" sekmesi eklendi (PlatformSettings.tsx)
   - [x] Vitest testleri yazıldı ve geçti (platform-settings.test.ts)
+
+## 🔥 Yeni Görevler (2 Mart 2026 - Devam)
+- [x] Anlık etap açma: Admin/mentor için "Etabı Şimdi Aç" butonu (userStages.status locked -> active)
+- [x] Yaş grubuna göre farklı geçiş süreleri (14-17, 18-21, 22-24 için ayrı platformSettings anahtarları)
+- [x] Hatırlatma e-postası: Etap açılmadan X gün önce öğrenciye bildirim gönder (cron + emailService)
+- [x] Admin paneli Platform Ayarları UI'ını yaş grubu süreleri için genişlet
+- [x] Öğrenciler sekmesinde kilitli etaplar için "Şimdi Aç" butonu göster

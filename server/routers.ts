@@ -564,6 +564,47 @@ export const appRouter = router({
         await db.setPlatformSetting(input.key, input.value, input.description);
         return { success: true };
       }),
+
+    // Instant stage unlock
+    unlockStageNow: adminProcedure
+      .input(z.object({
+        userId: z.number(),
+        userStageId: z.number(),
+      }))
+      .mutation(async ({ input }) => {
+        const result = await db.unlockStageNow(input.userId, input.userStageId);
+        if (!result) {
+          throw new TRPCError({ code: 'NOT_FOUND', message: 'Kilitli etap bulunamadı veya zaten aktif' });
+        }
+        // Send email notification
+        if (result.userEmail && result.userName) {
+          try {
+            const { getNewStageActivatedEmailTemplate } = await import('./services/emailService');
+            const emailHtml = getNewStageActivatedEmailTemplate(result.userName, result.stageName);
+            const { sendEmail } = await import('./_core/resend-email');
+            await sendEmail({
+              to: result.userEmail,
+              subject: `🔓 Etabınız Açıldı: ${result.stageName}`,
+              html: emailHtml,
+            });
+          } catch (e) {
+            console.warn('[Admin] Email notification failed:', e);
+          }
+        }
+        return { success: true, stageName: result.stageName };
+      }),
+
+    // Get students with locked stages
+    getStudentsWithLockedStages: adminProcedure.query(async () => {
+      return await db.getStudentsWithLockedStages();
+    }),
+
+    // Get locked stages for a specific user
+    getLockedStagesForUser: adminProcedure
+      .input(z.object({ userId: z.number() }))
+      .query(async ({ input }) => {
+        return await db.getLockedStagesForUser(input.userId);
+      }),
   }),
 
   // Mentor procedures

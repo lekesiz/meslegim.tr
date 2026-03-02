@@ -246,3 +246,76 @@ export function getNewStageActivatedEmailTemplate(studentName: string, stageTitl
     </html>
   `;
 }
+
+/**
+ * Stage reminder email template
+ * Sent X days before a locked stage is scheduled to open
+ */
+export function getStageReminderEmailTemplate(
+  studentName: string,
+  stageTitle: string,
+  daysUntilOpen: number,
+  openDate: string
+): string {
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
+        .content { background: #f9fafb; padding: 30px; border-radius: 0 0 8px 8px; }
+        .countdown { background: #eef2ff; border: 2px solid #6366f1; border-radius: 8px; padding: 16px; text-align: center; margin: 20px 0; }
+        .countdown-number { font-size: 48px; font-weight: bold; color: #4f46e5; }
+        .countdown-label { font-size: 14px; color: #6366f1; margin-top: 4px; }
+        .button { display: inline-block; background: #6366f1; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 20px 0; }
+        .footer { text-align: center; margin-top: 30px; color: #666; font-size: 14px; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1>⏳ Yeni Etabınız Yakında Açılıyor!</h1>
+        </div>
+        <div class="content">
+          <p>Merhaba <strong>${studentName}</strong>,</p>
+          
+          <p><strong>${stageTitle}</strong> etabınız çok yakında açılacak. Hazır olun!</p>
+          
+          <div class="countdown">
+            <div class="countdown-number">${daysUntilOpen}</div>
+            <div class="countdown-label">GÜN KALDI</div>
+            <p style="margin: 8px 0 0; font-size: 14px; color: #4f46e5;">
+              Açılış tarihi: <strong>${openDate}</strong>
+            </p>
+          </div>
+          
+          <h3>📋 Hazırlık Önerileri</h3>
+          <ul>
+            <li>Önceki etap raporunuzu tekrar okuyun</li>
+            <li>Kariyer hedeflerinizi gözden geçirin</li>
+            <li>Mentorunuzla bir görüşme planlayın</li>
+            <li>15-20 dakika ayırabileceğiniz sakin bir ortam hazırlayın</li>
+          </ul>
+          
+          <p style="text-align: center;">
+            <a href="${process.env.VITE_FRONTEND_FORGE_API_URL || 'https://meslegim.tr'}/dashboard/student" class="button">
+              İlerlememizi Görüntüle
+            </a>
+          </p>
+          
+          <p><em>Bu e-posta, etabınızın açılmasına ${daysUntilOpen} gün kaldığı için otomatik olarak gönderilmiştir.</em></p>
+          
+          <p>Görüşmek üzere! 🚀</p>
+        </div>
+        <div class="footer">
+          <p>© 2026 Meslegim.tr - Tüm hakları saklıdır</p>
+          <p><a href="${process.env.VITE_FRONTEND_FORGE_API_URL || 'https://meslegim.tr'}">meslegim.tr</a></p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+}
