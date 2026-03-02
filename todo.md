@@ -882,3 +882,11 @@ Platform **minimum seviyede sağlıklı** çalışıyor. Tüm temel özellikler 
 - [x] Mentor dashboard → Çalışıyor
 - [x] Admin dashboard → Çalışıyor
 - [x] Şifremi Unuttum → Çalışıyor
+
+## 🎯 Etap 3 Soru Özelleştirmesi (02 Mart 2026)
+- [ ] Mevcut Etap 3 sorularını incele (stageId: 60003, 60006, 60009)
+- [ ] 14-17 yaş grubu için özel Etap 3 soruları yaz (lise, üniversite seçimi odaklı)
+- [ ] 18-21 yaş grubu için özel Etap 3 soruları yaz (üniversite, ilk kariyer adımları odaklı)
+- [ ] 22-24 yaş grubu için özel Etap 3 soruları yaz (iş hayatı, kariyer geçişi odaklı)
+- [ ] Mevcut genel sorularla değiştir ve veritabanını güncelle
+- [ ] Tarayıcıda test et
