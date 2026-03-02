@@ -218,3 +218,26 @@ export const platformSettings = mysqlTable("platform_settings", {
 
 export type PlatformSetting = typeof platformSettings.$inferSelect;
 export type InsertPlatformSetting = typeof platformSettings.$inferInsert;
+
+/**
+ * Stage unlock logs table - audit trail for manual stage unlocks
+ * Records who (admin/mentor) unlocked which student's stage and when
+ */
+export const stageUnlockLogs = mysqlTable("stage_unlock_logs", {
+  id: int("id").autoincrement().primaryKey(),
+  unlockedByUserId: int("unlockedByUserId").notNull(),   // admin or mentor
+  unlockedByRole: varchar("unlockedByRole", { length: 50 }).notNull(), // 'admin' | 'mentor'
+  studentId: int("studentId").notNull(),
+  stageId: int("stageId").notNull(),
+  stageName: varchar("stageName", { length: 255 }).notNull(),
+  studentName: varchar("studentName", { length: 255 }),
+  note: text("note"),  // optional reason / note from admin/mentor
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+  unlockedByIdx: index("unlock_by_idx").on(table.unlockedByUserId),
+  studentIdIdx: index("unlock_student_idx").on(table.studentId),
+  stageIdIdx: index("unlock_stage_idx").on(table.stageId),
+  createdAtIdx: index("unlock_created_at_idx").on(table.createdAt),
+}));
+export type StageUnlockLog = typeof stageUnlockLogs.$inferSelect;
+export type InsertStageUnlockLog = typeof stageUnlockLogs.$inferInsert;

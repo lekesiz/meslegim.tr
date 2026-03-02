@@ -1,6 +1,6 @@
-import { eq, and, or, desc } from "drizzle-orm";
+import { eq, and, or, desc, inArray } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, stages, questions, answers, userStages, reports, mentorNotes, messages, feedbacks, certificates, platformSettings } from "../drizzle/schema";
+import { InsertUser, users, stages, questions, answers, userStages, reports, mentorNotes, messages, feedbacks, certificates, platformSettings, stageUnlockLogs } from "../drizzle/schema";
 import { ENV } from './_core/env';
 import { sql } from 'drizzle-orm';
 
@@ -1533,7 +1533,66 @@ export async function getAllPlatformSettings(): Promise<Array<{ key: string; val
  * Instantly unlock a locked stage for a user (admin/mentor action)
  * Returns the stage name for notification purposes
  */
-export async function unlockStageNow(userId: number, userStageId: number): Promise<{ stageName: string; userEmail: string | null; userName: string | null } | null> {
+/**
+ * Log a manual stage unlock action (audit trail)
+ */
+export async function logStageUnlock(params: {
+  unlockedByUserId: number;
+  unlockedByRole: string;
+  studentId: number;
+  stageId: number;
+  stageName: string;
+  studentName?: string | null;
+  note?: string | null;
+}) {
+  const dbInstance = await getDb();
+  if (!dbInstance) return;
+  await dbInstance.insert(stageUnlockLogs).values({
+    unlockedByUserId: params.unlockedByUserId,
+    unlockedByRole: params.unlockedByRole,
+    studentId: params.studentId,
+    stageId: params.stageId,
+    stageName: params.stageName,
+    studentName: params.studentName ?? null,
+    note: params.note ?? null,
+  });
+}
+
+/**
+ * Get stage unlock audit logs (admin: all logs; mentor: only their students)
+ */
+export async function getStageUnlockLogs(options?: { mentorId?: number; limit?: number }) {
+  const dbInstance = await getDb();
+  if (!dbInstance) return [];
+
+  const limit = options?.limit ?? 100;
+
+  if (options?.mentorId) {
+    // Mentor: only logs for students assigned to this mentor
+    const mentorStudents = await dbInstance
+      .select({ id: users.id })
+      .from(users)
+      .where(and(eq(users.mentorId, options.mentorId), eq(users.role, 'student')));
+    const studentIds = mentorStudents.map(s => s.id);
+    if (studentIds.length === 0) return [];
+
+    return await dbInstance
+      .select()
+      .from(stageUnlockLogs)
+      .where(inArray(stageUnlockLogs.studentId, studentIds))
+      .orderBy(desc(stageUnlockLogs.createdAt))
+      .limit(limit);
+  }
+
+  // Admin: all logs
+  return await dbInstance
+    .select()
+    .from(stageUnlockLogs)
+    .orderBy(desc(stageUnlockLogs.createdAt))
+    .limit(limit);
+}
+
+export async function unlockStageNow(userId: number, userStageId: number): Promise<{ stageName: string; userEmail: string | null; userName: string | null; stageId: number } | null> {
   const dbInstance = await getDb();
   if (!dbInstance) return null;
 
@@ -1566,6 +1625,7 @@ export async function unlockStageNow(userId: number, userStageId: number): Promi
     stageName: us.stageName,
     userEmail: us.userEmail,
     userName: us.userName,
+    stageId: us.stageId,
   };
 }
 

@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { trpc } from '@/lib/trpc';
-import { Loader2, UserCheck, Users, FileText, CheckCircle, XCircle, ExternalLink, MessageSquare } from 'lucide-react';
+import { Loader2, UserCheck, Users, FileText, CheckCircle, XCircle, ExternalLink, MessageSquare, Unlock, History, ChevronDown, ChevronUp } from 'lucide-react';
 import { DashboardSkeleton } from '@/components/DashboardSkeleton';
 import { toast } from 'sonner';
 import { useLocation } from 'wouter';
@@ -17,6 +17,199 @@ import { ChatDialog } from '@/components/ChatDialog';
 import MentorStatsChart from '@/components/MentorStatsChart';
 import { MentorPerformanceTrends } from '@/components/MentorPerformanceTrends';
 import MentorFeedbackStats from '@/components/MentorFeedbackStats';
+
+// ─── Mentor Unlock Section ────────────────────────────────────────────────────────
+function MentorUnlockSection() {
+  const { data: studentsWithLocked, isLoading, refetch } = trpc.mentor.getMyStudentsWithLockedStages.useQuery();
+  const { data: unlockLogs, isLoading: logsLoading } = trpc.mentor.getMyUnlockLogs.useQuery();
+  const [expandedUser, setExpandedUser] = useState<number | null>(null);
+  const [unlocking, setUnlocking] = useState<number | null>(null);
+  const [noteInputs, setNoteInputs] = useState<Record<number, string>>({});
+  const [showLogs, setShowLogs] = useState(false);
+
+  const unlockMutation = trpc.mentor.unlockStudentStage.useMutation({
+    onSuccess: (data) => {
+      toast.success(`"${data.stageName}" etabı başarıyla açıldı! Öğrenciye bildirim e-postası gönderildi.`);
+      setUnlocking(null);
+      refetch();
+    },
+    onError: (error) => {
+      toast.error(`Hata: ${error.message}`);
+      setUnlocking(null);
+    },
+  });
+
+  const handleUnlock = (userId: number, userStageId: number, stageName: string) => {
+    if (!confirm(`"${stageName}" etabını şimdi açmak istediğinizden emin misiniz? Öğrenciye bildirim e-postası gönderilecek.`)) return;
+    setUnlocking(userStageId);
+    unlockMutation.mutate({
+      userId,
+      userStageId,
+      note: noteInputs[userStageId] || undefined,
+    });
+  };
+
+  return (
+    <div className="space-y-4">
+      {/* Students with locked stages */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Unlock className="h-5 w-5 text-primary" />
+            Kilitli Etap Açma
+          </CardTitle>
+          <CardDescription>
+            Öğrencilerinizin kilitli etaplarını bekleme süresini atlayıp anlık açabilirsiniz. Açma işlemi denetim log'una kaydedilir.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {isLoading ? (
+            <div className="flex items-center justify-center h-16">
+              <Loader2 className="h-5 w-5 animate-spin text-primary" />
+            </div>
+          ) : !studentsWithLocked || studentsWithLocked.length === 0 ? (
+            <div className="flex items-center gap-3 p-4 rounded-lg bg-muted/30 text-muted-foreground">
+              <CheckCircle className="h-5 w-5 shrink-0 text-green-500" />
+              <p className="text-sm">Şu anda kilitli etabı olan öğrencileriniz bulunmuyor.</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {studentsWithLocked.map((student: any) => (
+                <div key={student.userId} className="border rounded-lg overflow-hidden">
+                  <button
+                    className="w-full flex items-center justify-between p-3 hover:bg-muted/30 transition-colors text-left"
+                    onClick={() => setExpandedUser(expandedUser === student.userId ? null : student.userId)}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold text-sm">
+                        {student.userName?.charAt(0).toUpperCase() ?? '?'}
+                      </div>
+                      <div>
+                        <p className="font-medium text-sm">{student.userName}</p>
+                        <p className="text-xs text-muted-foreground">{student.userEmail} · {student.ageGroup} yaş</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="secondary">{student.lockedStages.length} kilitli etap</Badge>
+                      {expandedUser === student.userId ? (
+                        <ChevronUp className="h-4 w-4 text-muted-foreground" />
+                      ) : (
+                        <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                      )}
+                    </div>
+                  </button>
+
+                  {expandedUser === student.userId && (
+                    <div className="border-t bg-muted/10 p-3 space-y-3">
+                      {student.lockedStages.map((stage: any) => (
+                        <div key={stage.id} className="space-y-2 p-2 rounded bg-background border">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="text-sm font-medium">{stage.stageName}</p>
+                              <p className="text-xs text-muted-foreground">
+                                Etap {stage.stageOrder} · {stage.ageGroup} yaş grubu
+                                {stage.unlockedAt && (
+                                  <span className="ml-2 text-amber-600">
+                                    · Planl. açılış: {new Date(stage.unlockedAt).toLocaleDateString('tr-TR')}
+                                  </span>
+                                )}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex gap-2">
+                            <input
+                              type="text"
+                              placeholder="Not ekle (isteğe bağlı)"
+                              className="flex-1 text-xs px-2 py-1 rounded border bg-background"
+                              value={noteInputs[stage.id] ?? ''}
+                              onChange={(e) => setNoteInputs(prev => ({ ...prev, [stage.id]: e.target.value }))}
+                            />
+                            <Button
+                              size="sm"
+                              variant="default"
+                              onClick={() => handleUnlock(student.userId, stage.id, stage.stageName)}
+                              disabled={unlocking === stage.id}
+                              className="gap-1.5 shrink-0"
+                            >
+                              {unlocking === stage.id ? (
+                                <Loader2 className="h-3 w-3 animate-spin" />
+                              ) : (
+                                <Unlock className="h-3 w-3" />
+                              )}
+                              Şimdi Aç
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Audit Log */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <History className="h-5 w-5 text-primary" />
+            Açma Geçmişim
+          </CardTitle>
+          <CardDescription>Yaptığınız veya öğrencilerinize yapılan manuel etap açma işlemleri</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {logsLoading ? (
+            <div className="flex items-center justify-center h-12">
+              <Loader2 className="h-4 w-4 animate-spin text-primary" />
+            </div>
+          ) : !unlockLogs || unlockLogs.length === 0 ? (
+            <p className="text-sm text-muted-foreground">Henüz hiç manuel açma işlemi yapılmamış.</p>
+          ) : (
+            <div className="space-y-2">
+              <div className="rounded-md border overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b bg-muted/50">
+                      <th className="px-3 py-2 text-left font-medium">Tarih</th>
+                      <th className="px-3 py-2 text-left font-medium">Öğrenci</th>
+                      <th className="px-3 py-2 text-left font-medium">Etap</th>
+                      <th className="px-3 py-2 text-left font-medium">Açan</th>
+                      <th className="px-3 py-2 text-left font-medium">Not</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {(showLogs ? unlockLogs : unlockLogs.slice(0, 5)).map((log: any) => (
+                      <tr key={log.id} className="border-b last:border-0 hover:bg-muted/20">
+                        <td className="px-3 py-2 text-xs text-muted-foreground whitespace-nowrap">
+                          {new Date(log.createdAt).toLocaleString('tr-TR')}
+                        </td>
+                        <td className="px-3 py-2 text-sm">{log.studentName ?? `#${log.studentId}`}</td>
+                        <td className="px-3 py-2 text-sm font-medium">{log.stageName}</td>
+                        <td className="px-3 py-2">
+                          <Badge variant={log.unlockedByRole === 'admin' ? 'default' : 'secondary'} className="text-xs">
+                            {log.unlockedByRole}
+                          </Badge>
+                        </td>
+                        <td className="px-3 py-2 text-xs text-muted-foreground">{log.note ?? '-'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              {unlockLogs.length > 5 && (
+                <Button variant="ghost" size="sm" onClick={() => setShowLogs(!showLogs)} className="w-full">
+                  {showLogs ? 'Daralt' : `Tümünü Göster (${unlockLogs.length} kayıt)`}
+                </Button>
+              )}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
 
 export default function MentorDashboard() {
   const { user } = useAuth();
@@ -165,6 +358,9 @@ export default function MentorDashboard() {
             </TabsTrigger>
             <TabsTrigger value="feedback">
               Geri Bildirimler
+            </TabsTrigger>
+            <TabsTrigger value="unlock">
+              Etap Açma
             </TabsTrigger>
           </TabsList>
 
@@ -379,6 +575,11 @@ export default function MentorDashboard() {
           {/* Feedback Tab */}
           <TabsContent value="feedback">
             <MentorFeedbackStats />
+          </TabsContent>
+
+          {/* Stage Unlock Tab */}
+          <TabsContent value="unlock" className="space-y-4">
+            <MentorUnlockSection />
           </TabsContent>
         </Tabs>
       </div>

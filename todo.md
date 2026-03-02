@@ -932,3 +932,10 @@ Platform **minimum seviyede sağlıklı** çalışıyor. Tüm temel özellikler 
 - [x] Hatırlatma e-postası: Etap açılmadan X gün önce öğrenciye bildirim gönder (cron + emailService)
 - [x] Admin paneli Platform Ayarları UI'ını yaş grubu süreleri için genişlet
 - [x] Öğrenciler sekmesinde kilitli etaplar için "Şimdi Aç" butonu göster
+
+## 🔥 Yeni Görevler (2 Mart 2026 - Batch 2)
+- [x] Mentor için anlık etap açma yetkisi (mentorProcedure ile kendi öğrencilerini açabilsin)
+- [x] stageUnlockLogs tablosu: kim, hangi öğrenci, hangi etap, ne zaman açtı
+- [x] Admin/mentor panelinde denetim logu görüntüleme
+- [x] Platform Ayarları sekmesine "Test E-postası Gönder" butonu (hatırlatma şablonu önizlemesi)
+- [x] Mentor panelinde kilitli etaplar için "Şimdi Aç" butonu

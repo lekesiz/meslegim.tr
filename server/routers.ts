@@ -571,7 +571,7 @@ export const appRouter = router({
         userId: z.number(),
         userStageId: z.number(),
       }))
-      .mutation(async ({ input }) => {
+      .mutation(async ({ input, ctx }) => {
         const result = await db.unlockStageNow(input.userId, input.userStageId);
         if (!result) {
           throw new TRPCError({ code: 'NOT_FOUND', message: 'Kilitli etap bulunamadı veya zaten aktif' });
@@ -581,7 +581,6 @@ export const appRouter = router({
           try {
             const { getNewStageActivatedEmailTemplate } = await import('./services/emailService');
             const emailHtml = getNewStageActivatedEmailTemplate(result.userName, result.stageName);
-            const { sendEmail } = await import('./_core/resend-email');
             await sendEmail({
               to: result.userEmail,
               subject: `🔓 Etabınız Açıldı: ${result.stageName}`,
@@ -591,6 +590,16 @@ export const appRouter = router({
             console.warn('[Admin] Email notification failed:', e);
           }
         }
+        // Write audit log
+        await db.logStageUnlock({
+          unlockedByUserId: ctx.user.id,
+          unlockedByRole: ctx.user.role,
+          studentId: input.userId,
+          stageId: result.stageId,
+          stageName: result.stageName,
+          studentName: result.userName,
+        });
+
         return { success: true, stageName: result.stageName };
       }),
 
@@ -604,6 +613,40 @@ export const appRouter = router({
       .input(z.object({ userId: z.number() }))
       .query(async ({ input }) => {
         return await db.getLockedStagesForUser(input.userId);
+      }),
+
+    // Get stage unlock audit logs
+    getStageUnlockLogs: adminProcedure
+      .input(z.object({ limit: z.number().min(1).max(500).optional() }).optional())
+      .query(async ({ input }) => {
+        return await db.getStageUnlockLogs({ limit: input?.limit });
+      }),
+
+    // Send a test reminder email to admin themselves
+    sendTestReminderEmail: adminProcedure
+      .input(z.object({
+        toEmail: z.string().email(),
+        daysUntilOpen: z.number().min(1).max(30).default(2),
+      }))
+      .mutation(async ({ input }) => {
+        const { getStageReminderEmailTemplate } = await import('./services/emailService');
+        const openDate = new Date();
+        openDate.setDate(openDate.getDate() + input.daysUntilOpen);
+        const openDateStr = openDate.toLocaleDateString('tr-TR', {
+          day: 'numeric', month: 'long', year: 'numeric',
+        });
+        const html = getStageReminderEmailTemplate(
+          'Test Öğrenci',
+          'Etap 2: Kariyer Keşfi',
+          input.daysUntilOpen,
+          openDateStr
+        );
+        await sendEmail({
+          to: input.toEmail,
+          subject: `[TEST] ⏳ Etabınız ${input.daysUntilOpen} gün sonra açılıyor!`,
+          html,
+        });
+        return { success: true };
       }),
   }),
 
@@ -919,6 +962,90 @@ export const appRouter = router({
     
     getFeedbackStats: mentorProcedure.query(async ({ ctx }) => {
       return await db.getMentorFeedbackStats(ctx.user.id);
+    }),
+
+    // Get locked stages for mentor's own students
+    getMyStudentsWithLockedStages: mentorProcedure.query(async ({ ctx }) => {
+      if (hasRole(ctx.user.role, 'admin')) {
+        return await db.getStudentsWithLockedStages();
+      }
+      // Mentor: only their assigned students
+      const myStudents = await db.getStudentsByMentor(ctx.user.id);
+      const result = [];
+      for (const student of myStudents) {
+        const lockedStages = await db.getLockedStagesForUser(student.id);
+        if (lockedStages.length > 0) {
+          result.push({
+            userId: student.id,
+            userName: student.name,
+            userEmail: student.email,
+            ageGroup: student.ageGroup,
+            lockedStages,
+          });
+        }
+      }
+      return result;
+    }),
+
+    // Instantly unlock a locked stage for a student (mentor can only unlock own students)
+    unlockStudentStage: mentorProcedure
+      .input(z.object({
+        userId: z.number(),
+        userStageId: z.number(),
+        note: z.string().max(500).optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        // Verify ownership: mentor can only unlock their own students
+        if (!hasRole(ctx.user.role, 'admin')) {
+          const student = await db.getUserById(input.userId);
+          if (!student || student.mentorId !== ctx.user.id) {
+            throw new TRPCError({
+              code: 'FORBIDDEN',
+              message: 'Yalnızca kendi öğrencilerinizin etaplarını açabilirsiniz',
+            });
+          }
+        }
+
+        const result = await db.unlockStageNow(input.userId, input.userStageId);
+        if (!result) {
+          throw new TRPCError({ code: 'NOT_FOUND', message: 'Kilitli etap bulunamadı veya zaten aktif' });
+        }
+
+        // Write audit log
+        await db.logStageUnlock({
+          unlockedByUserId: ctx.user.id,
+          unlockedByRole: ctx.user.role,
+          studentId: input.userId,
+          stageId: result.stageId,
+          stageName: result.stageName,
+          studentName: result.userName,
+          note: input.note,
+        });
+
+        // Send email notification
+        if (result.userEmail && result.userName) {
+          try {
+            const { getNewStageActivatedEmailTemplate } = await import('./services/emailService');
+            const emailHtml = getNewStageActivatedEmailTemplate(result.userName, result.stageName);
+            await sendEmail({
+              to: result.userEmail,
+              subject: `🔓 Etabınız Açıldı: ${result.stageName}`,
+              html: emailHtml,
+            });
+          } catch (e) {
+            console.warn('[Mentor] Email notification failed:', e);
+          }
+        }
+
+        return { success: true, stageName: result.stageName };
+      }),
+
+    // Get stage unlock audit logs for mentor's students
+    getMyUnlockLogs: mentorProcedure.query(async ({ ctx }) => {
+      if (hasRole(ctx.user.role, 'admin')) {
+        return await db.getStageUnlockLogs();
+      }
+      return await db.getStageUnlockLogs({ mentorId: ctx.user.id });
     }),
   }),
 

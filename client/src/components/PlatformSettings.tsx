@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import {
-  Loader2, Save, Settings, Clock, Users, Unlock, AlertCircle, ChevronDown, ChevronUp, Bell
+  Loader2, Save, Settings, Clock, Users, Unlock, AlertCircle, ChevronDown, ChevronUp, Bell, History, Mail, ShieldCheck
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -208,6 +208,171 @@ function InstantUnlockSection() {
         </div>
       ))}
     </div>
+  );
+}
+
+// ─── Audit Log Component ──────────────────────────────────────────────────────
+function StageUnlockAuditLog() {
+  const { data: logs, isLoading } = trpc.admin.getStageUnlockLogs.useQuery({ limit: 50 });
+  const [expanded, setExpanded] = useState(false);
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <History className="h-5 w-5 text-primary" />
+          Etap Açılış Denetim Logu
+        </CardTitle>
+        <CardDescription>
+          Hangi admin/mentor, hangi öğrencinin etabını ne zaman manuel olarak açtığının kayıtları (son 50 kayıt)
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        {isLoading ? (
+          <div className="flex items-center justify-center h-16">
+            <Loader2 className="h-5 w-5 animate-spin text-primary" />
+          </div>
+        ) : !logs || logs.length === 0 ? (
+          <div className="flex items-center gap-3 p-4 rounded-lg bg-muted/30 text-muted-foreground">
+            <ShieldCheck className="h-5 w-5 shrink-0" />
+            <p className="text-sm">Henüz hiç manuel etap açma işlemi yapılmamış.</p>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm text-muted-foreground">{logs.length} kayıt bulundu</span>
+              <Button variant="ghost" size="sm" onClick={() => setExpanded(!expanded)}>
+                {expanded ? 'Daralt' : 'Tümünü Göster'}
+              </Button>
+            </div>
+            <div className="rounded-md border overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b bg-muted/50">
+                    <th className="px-3 py-2 text-left font-medium">Tarih</th>
+                    <th className="px-3 py-2 text-left font-medium">Açan</th>
+                    <th className="px-3 py-2 text-left font-medium">Öğrenci</th>
+                    <th className="px-3 py-2 text-left font-medium">Etap</th>
+                    <th className="px-3 py-2 text-left font-medium">Not</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(expanded ? logs : logs.slice(0, 10)).map((log) => (
+                    <tr key={log.id} className="border-b last:border-0 hover:bg-muted/20">
+                      <td className="px-3 py-2 text-xs text-muted-foreground whitespace-nowrap">
+                        {new Date(log.createdAt).toLocaleString('tr-TR')}
+                      </td>
+                      <td className="px-3 py-2">
+                        <div className="flex items-center gap-1.5">
+                          <Badge variant={log.unlockedByRole === 'admin' ? 'default' : 'secondary'} className="text-xs">
+                            {log.unlockedByRole}
+                          </Badge>
+                          <span className="text-xs text-muted-foreground">#{log.unlockedByUserId}</span>
+                        </div>
+                      </td>
+                      <td className="px-3 py-2 text-sm">{log.studentName ?? `#${log.studentId}`}</td>
+                      <td className="px-3 py-2 text-sm font-medium">{log.stageName}</td>
+                      <td className="px-3 py-2 text-xs text-muted-foreground">{log.note ?? '-'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            {!expanded && logs.length > 10 && (
+              <p className="text-xs text-muted-foreground text-center mt-2">
+                +{logs.length - 10} daha fazla kayıt var. "Tümünü Göster" butonuna tıklayın.
+              </p>
+            )}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+// ─── Test Reminder Email Component ────────────────────────────────────────────
+function TestReminderEmailCard({ adminEmail }: { adminEmail?: string }) {
+  const [toEmail, setToEmail] = useState(adminEmail ?? '');
+  const [daysUntilOpen, setDaysUntilOpen] = useState('2');
+  const [isSending, setIsSending] = useState(false);
+
+  const sendTestMutation = trpc.admin.sendTestReminderEmail.useMutation({
+    onSuccess: () => {
+      toast.success(`Test e-postası ${toEmail} adresine başarıyla gönderildi!`);
+      setIsSending(false);
+    },
+    onError: (error) => {
+      toast.error(`Gönderilemedi: ${error.message}`);
+      setIsSending(false);
+    },
+  });
+
+  const handleSend = () => {
+    if (!toEmail || !toEmail.includes('@')) {
+      toast.error('Geçerli bir e-posta adresi girin');
+      return;
+    }
+    const days = parseInt(daysUntilOpen, 10);
+    if (isNaN(days) || days < 1 || days > 30) {
+      toast.error('1–30 arasında geçerli bir gün sayısı girin');
+      return;
+    }
+    setIsSending(true);
+    sendTestMutation.mutate({ toEmail, daysUntilOpen: days });
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Mail className="h-5 w-5 text-primary" />
+          Hatırlatma E-postası Önizleme
+        </CardTitle>
+        <CardDescription>
+          Hatırlatma e-postası şablonunu test etmek için belirtilen adrese örnek bir e-posta gönderin.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="flex flex-col sm:flex-row gap-3 items-end">
+          <div className="space-y-1.5 flex-1">
+            <Label htmlFor="test-email">Alıcı E-posta Adresi</Label>
+            <Input
+              id="test-email"
+              type="email"
+              placeholder="admin@ornek.com"
+              value={toEmail}
+              onChange={(e) => setToEmail(e.target.value)}
+            />
+          </div>
+          <div className="space-y-1.5 w-32">
+            <Label htmlFor="test-days">Gün Sayısı</Label>
+            <Input
+              id="test-days"
+              type="number"
+              min={1}
+              max={30}
+              value={daysUntilOpen}
+              onChange={(e) => setDaysUntilOpen(e.target.value)}
+              placeholder="2"
+            />
+          </div>
+          <Button
+            onClick={handleSend}
+            disabled={isSending || !toEmail}
+            className="gap-2 mb-0"
+          >
+            {isSending ? (
+              <><Loader2 className="h-4 w-4 animate-spin" />Gönderiliyor...</>
+            ) : (
+              <><Mail className="h-4 w-4" />Test Gönder</>
+            )}
+          </Button>
+        </div>
+        <p className="text-xs text-muted-foreground mt-3">
+          Bu işlev gerçek bir öğrenciye e-posta göndermez; yalnızca belirtilen adrese örnek bir hatırlatma e-postası gönderir.
+        </p>
+      </CardContent>
+    </Card>
   );
 }
 
@@ -447,6 +612,12 @@ export function PlatformSettings() {
           <InstantUnlockSection />
         </CardContent>
       </Card>
+
+      {/* Audit Log */}
+      <StageUnlockAuditLog />
+
+      {/* Test Reminder Email */}
+      <TestReminderEmailCard adminEmail={undefined} />
 
       {/* All settings table */}
       {settings && settings.length > 0 && (
