@@ -213,8 +213,32 @@ function InstantUnlockSection() {
 
 // ─── Audit Log Component ──────────────────────────────────────────────────────
 function StageUnlockAuditLog() {
-  const { data: logs, isLoading } = trpc.admin.getStageUnlockLogs.useQuery({ limit: 50 });
+  // Filter state
+  const [filterStudentName, setFilterStudentName] = useState('');
+  const [filterRole, setFilterRole] = useState<'all' | 'admin' | 'mentor'>('all');
+  const [filterDateFrom, setFilterDateFrom] = useState('');
+  const [filterDateTo, setFilterDateTo] = useState('');
   const [expanded, setExpanded] = useState(false);
+
+  // Build query params
+  const queryParams = {
+    limit: 200,
+    role: filterRole !== 'all' ? filterRole as 'admin' | 'mentor' : undefined,
+    studentName: filterStudentName.trim() || undefined,
+    dateFrom: filterDateFrom ? new Date(filterDateFrom) : undefined,
+    dateTo: filterDateTo ? new Date(filterDateTo + 'T23:59:59') : undefined,
+  };
+
+  const { data: logs, isLoading, refetch } = trpc.admin.getStageUnlockLogs.useQuery(queryParams);
+
+  const hasActiveFilters = filterRole !== 'all' || filterStudentName.trim() || filterDateFrom || filterDateTo;
+
+  const handleClearFilters = () => {
+    setFilterStudentName('');
+    setFilterRole('all');
+    setFilterDateFrom('');
+    setFilterDateTo('');
+  };
 
   return (
     <Card>
@@ -224,10 +248,60 @@ function StageUnlockAuditLog() {
           Etap Açılış Denetim Logu
         </CardTitle>
         <CardDescription>
-          Hangi admin/mentor, hangi öğrencinin etabını ne zaman manuel olarak açtığının kayıtları (son 50 kayıt)
+          Hangi admin/mentor, hangi öğrencinin etabını ne zaman manuel olarak açtığının kayıtları
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-4">
+        {/* Filter Bar */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 p-3 rounded-lg bg-muted/30 border">
+          <div className="space-y-1">
+            <Label className="text-xs">Öğrenci Adı</Label>
+            <Input
+              placeholder="Öğrenci ara..."
+              value={filterStudentName}
+              onChange={e => setFilterStudentName(e.target.value)}
+              className="h-8 text-sm"
+            />
+          </div>
+          <div className="space-y-1">
+            <Label className="text-xs">Rol</Label>
+            <select
+              value={filterRole}
+              onChange={e => setFilterRole(e.target.value as 'all' | 'admin' | 'mentor')}
+              className="w-full h-8 text-sm rounded-md border border-input bg-background px-2"
+            >
+              <option value="all">Tümü</option>
+              <option value="admin">Admin</option>
+              <option value="mentor">Mentor</option>
+            </select>
+          </div>
+          <div className="space-y-1">
+            <Label className="text-xs">Başlangıç Tarihi</Label>
+            <Input
+              type="date"
+              value={filterDateFrom}
+              onChange={e => setFilterDateFrom(e.target.value)}
+              className="h-8 text-sm"
+            />
+          </div>
+          <div className="space-y-1">
+            <Label className="text-xs">Bitiş Tarihi</Label>
+            <div className="flex gap-1.5">
+              <Input
+                type="date"
+                value={filterDateTo}
+                onChange={e => setFilterDateTo(e.target.value)}
+                className="h-8 text-sm flex-1"
+              />
+              {hasActiveFilters && (
+                <Button variant="ghost" size="sm" onClick={handleClearFilters} className="h-8 px-2 text-xs shrink-0">
+                  Temizle
+                </Button>
+              )}
+            </div>
+          </div>
+        </div>
+
         {isLoading ? (
           <div className="flex items-center justify-center h-16">
             <Loader2 className="h-5 w-5 animate-spin text-primary" />
@@ -235,12 +309,19 @@ function StageUnlockAuditLog() {
         ) : !logs || logs.length === 0 ? (
           <div className="flex items-center gap-3 p-4 rounded-lg bg-muted/30 text-muted-foreground">
             <ShieldCheck className="h-5 w-5 shrink-0" />
-            <p className="text-sm">Henüz hiç manuel etap açma işlemi yapılmamış.</p>
+            <p className="text-sm">
+              {hasActiveFilters
+                ? 'Seçilen filtrelere uygun kayıt bulunamadı.'
+                : 'Henüz hiç manuel etap açma işlemi yapılmamış.'}
+            </p>
           </div>
         ) : (
           <div className="space-y-2">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-muted-foreground">{logs.length} kayıt bulundu</span>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-muted-foreground">
+                {logs.length} kayıt bulundu
+                {hasActiveFilters && <span className="ml-1 text-primary">(filtrelenmiş)</span>}
+              </span>
               <Button variant="ghost" size="sm" onClick={() => setExpanded(!expanded)}>
                 {expanded ? 'Daralt' : 'Tümünü Göster'}
               </Button>

@@ -8,6 +8,7 @@ import * as db from "./db";
 import { generateStageReportAsync } from './reportHelper';
 import { generatePDF } from './services/pdfGenerator';
 import { sendEmail, getRegistrationEmailTemplate, getApprovalEmailTemplate, getReportApprovedEmailTemplate, getReportRejectedEmailTemplate } from './_core/resend-email';
+import { notifyOwner } from './_core/notification';
 import bcrypt from 'bcryptjs';
 import { sdk } from './_core/sdk';
 import { hasRole, hasAnyRole } from './roleHelper';
@@ -617,9 +618,23 @@ export const appRouter = router({
 
     // Get stage unlock audit logs
     getStageUnlockLogs: adminProcedure
-      .input(z.object({ limit: z.number().min(1).max(500).optional() }).optional())
+      .input(z.object({
+        limit: z.number().min(1).max(500).optional(),
+        role: z.enum(['admin', 'mentor']).optional(),
+        studentName: z.string().optional(),
+        studentId: z.number().optional(),
+        dateFrom: z.date().optional(),
+        dateTo: z.date().optional(),
+      }).optional())
       .query(async ({ input }) => {
-        return await db.getStageUnlockLogs({ limit: input?.limit });
+        return await db.getStageUnlockLogs({
+          limit: input?.limit,
+          role: input?.role,
+          studentName: input?.studentName,
+          studentId: input?.studentId,
+          dateFrom: input?.dateFrom,
+          dateTo: input?.dateTo,
+        });
       }),
 
     // Send a test reminder email to admin themselves
@@ -738,8 +753,9 @@ export const appRouter = router({
         const stages = await db.getUserStages(student.id);
         const reports = await db.getReportsByUser(student.id);
         const progress = await db.calculateStudentProgress(student.id);
+        const unlockLogs = await db.getStageUnlockLogs({ studentId: input.studentId, limit: 50 });
         
-        return { student, stages, reports, progress };
+        return { student, stages, reports, progress, unlockLogs };
       }),
     
     initiateStudentStages: mentorProcedure
@@ -1022,7 +1038,7 @@ export const appRouter = router({
           note: input.note,
         });
 
-        // Send email notification
+        // Send email notification to student
         if (result.userEmail && result.userName) {
           try {
             const { getNewStageActivatedEmailTemplate } = await import('./services/emailService');
@@ -1035,6 +1051,19 @@ export const appRouter = router({
           } catch (e) {
             console.warn('[Mentor] Email notification failed:', e);
           }
+        }
+
+        // Notify admin about the manual unlock
+        try {
+          const mentorName = ctx.user.name ?? `Mentor #${ctx.user.id}`;
+          const studentName = result.userName ?? `Öğrenci #${input.userId}`;
+          await notifyOwner({
+            title: `🔓 Manuel Etap Açma: ${result.stageName}`,
+            content: `**${mentorName}** (Mentor), **${studentName}** adlı öğrencinin "${result.stageName}" etabını manuel olarak açtı.${input.note ? `\n\n**Not:** ${input.note}` : ''}`,
+          });
+        } catch (e) {
+          // Notification failure should not block the unlock operation
+          console.warn('[Mentor] Admin notification failed:', e);
         }
 
         return { success: true, stageName: result.stageName };
