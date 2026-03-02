@@ -134,7 +134,9 @@ export default function StageForm() {
   };
 
   const renderQuestion = (question: any) => {
-    const options = question.options ? JSON.parse(question.options) : [];
+    const options = question.options 
+      ? (Array.isArray(question.options) ? question.options : JSON.parse(question.options))
+      : [];
     const currentAnswer = String(answers[question.id] || '');
 
     switch (question.type) {

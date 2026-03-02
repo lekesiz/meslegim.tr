@@ -858,3 +858,27 @@ Platform **minimum seviyede sağlıklı** çalışıyor. Tüm temel özellikler 
 - [ ] Email subject'lerindeki yazım hatası: "Onaylan dı" → "Onaylandı" (2 yerde)
 - [ ] Tüm console.log debug loglarını temizle
 - [ ] Unit test coverage artır
+
+## 🛠️ A-Z Test ve Kritik Düzeltmeler (02 Mart 2026)
+
+### Düzeltilen Hatalar:
+- [x] Login sonrası otomatik yönlendirme çalışmıyordu → window.location.replace ile düzeltildi
+- [x] Email/password girişinde openId null → OAuth'a yönlendirme hatası → email:xxx prefix ile düzeltildi
+- [x] PDF oluşturma weasyprint AssertionError → Chromium headless ile yeniden yazıldı
+- [x] PDF İndir butonu sadece önceden oluşturulmuş dosyada görünüyordu → "PDF Oluştur & İndir" eklendi
+- [x] Admin Feedback Özeti'nde mentor adı "Bilinmeyen" → JOIN sorgusu düzeltildi
+- [x] Etap 2 ve 3 sorular boştu → 108 soru eklendi (her etap için 12 soru, 3 yaş grubu × 3 etap)
+- [x] StageForm.tsx JSON parse hatası (options alanı çift parse ediliyordu) → Array.isArray kontrolü eklendi
+
+### Test Sonuçları:
+- [x] Başvuru formu → Çalışıyor
+- [x] Login redirect → Çalışıyor (düzeltildi)
+- [x] Öğrenci dashboard → Çalışıyor
+- [x] Etap 2 form (12 soru) → Çalışıyor (düzeltildi)
+- [x] PDF oluşturma ve indirme → Çalışıyor (düzeltildi)
+- [x] Rapor görüntüleme → Çalışıyor
+- [x] Geri bildirim formu → Çalışıyor
+- [x] Mesajlaşma (öğrenci ↔ mentor) → Çalışıyor
+- [x] Mentor dashboard → Çalışıyor
+- [x] Admin dashboard → Çalışıyor
+- [x] Şifremi Unuttum → Çalışıyor
