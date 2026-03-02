@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import {
-  Loader2, Save, Settings, Clock, Users, Unlock, AlertCircle, ChevronDown, ChevronUp, Bell, History, Mail, ShieldCheck
+  Loader2, Save, Settings, Clock, Users, Unlock, AlertCircle, ChevronDown, ChevronUp, Bell, History, Mail, ShieldCheck, Download, Shield, ToggleLeft, ToggleRight
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -233,6 +233,33 @@ function StageUnlockAuditLog() {
 
   const hasActiveFilters = filterRole !== 'all' || filterStudentName.trim() || filterDateFrom || filterDateTo;
 
+  // CSV export
+  const csvQuery = trpc.admin.exportStageUnlockLogsCsv.useQuery(
+    {
+      role: filterRole !== 'all' ? filterRole as 'admin' | 'mentor' : undefined,
+      studentName: filterStudentName.trim() || undefined,
+      dateFrom: filterDateFrom ? new Date(filterDateFrom) : undefined,
+      dateTo: filterDateTo ? new Date(filterDateTo + 'T23:59:59') : undefined,
+    },
+    { enabled: false } // only fetch on demand
+  );
+
+  const handleDownloadCsv = async () => {
+    const result = await csvQuery.refetch();
+    if (!result.data?.csv) {
+      toast.error('CSV oluşturulamadı');
+      return;
+    }
+    const blob = new Blob([result.data.csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `etap-acma-logu-${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success('CSV indirildi');
+  };
+
   const handleClearFilters = () => {
     setFilterStudentName('');
     setFilterRole('all');
@@ -243,13 +270,31 @@ function StageUnlockAuditLog() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <History className="h-5 w-5 text-primary" />
-          Etap Açılış Denetim Logu
-        </CardTitle>
-        <CardDescription>
-          Hangi admin/mentor, hangi öğrencinin etabını ne zaman manuel olarak açtığının kayıtları
-        </CardDescription>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <CardTitle className="flex items-center gap-2">
+              <History className="h-5 w-5 text-primary" />
+              Etap Açılış Denetim Logu
+            </CardTitle>
+            <CardDescription className="mt-1">
+              Hangi admin/mentor, hangi öğrencinin etabını ne zaman manuel olarak açtığının kayıtları
+            </CardDescription>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleDownloadCsv}
+            disabled={csvQuery.isFetching}
+            className="shrink-0 gap-1.5"
+          >
+            {csvQuery.isFetching ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Download className="h-4 w-4" />
+            )}
+            CSV İndir
+          </Button>
+        </div>
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Filter Bar */}
@@ -452,6 +497,197 @@ function TestReminderEmailCard({ adminEmail }: { adminEmail?: string }) {
         <p className="text-xs text-muted-foreground mt-3">
           Bu işlev gerçek bir öğrenciye e-posta göndermez; yalnızca belirtilen adrese örnek bir hatırlatma e-postası gönderir.
         </p>
+      </CardContent>
+    </Card>
+  );
+}
+
+// ─── Notification Preferences Component ─────────────────────────────────────
+const NOTIF_PREFS = [
+  { key: 'notif_on_mentor_unlock', label: 'Mentor Etap Açma', desc: 'Bir mentor öğrencisinin etabını manuel açtığında bildirim al' },
+  { key: 'notif_on_admin_unlock', label: 'Admin Etap Açma', desc: 'Bir admin etap açtığında bildirim al' },
+  { key: 'notif_on_new_student', label: 'Yeni Öğrenci Kaydı', desc: 'Yeni bir öğrenci platforma kayd olduğunda bildirim al' },
+  { key: 'notif_on_report_submit', label: 'Rapor Gönderimi', desc: 'Bir öğrenci rapor gönderdiğinde bildirim al' },
+] as const;
+
+type NotifKey = typeof NOTIF_PREFS[number]['key'];
+
+function NotificationPrefsCard() {
+  const utils = trpc.useUtils();
+  const { data: prefs, isLoading } = trpc.admin.getNotificationPrefs.useQuery();
+
+  const setMutation = trpc.admin.setNotificationPref.useMutation({
+    onSuccess: () => {
+      utils.admin.getNotificationPrefs.invalidate();
+      toast.success('Bildirim tercihi güncellendi');
+    },
+    onError: (e) => toast.error('Hata: ' + e.message),
+  });
+
+  const handleToggle = (key: NotifKey, current: boolean) => {
+    setMutation.mutate({ key, enabled: !current });
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Bell className="h-5 w-5 text-primary" />
+          Bildirim Tercihleri
+        </CardTitle>
+        <CardDescription>
+          Hangi olaylarda Manus bildirimi alacağınızı seçin
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        {isLoading ? (
+          <div className="flex items-center justify-center h-16">
+            <Loader2 className="h-5 w-5 animate-spin text-primary" />
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {NOTIF_PREFS.map((pref) => {
+              const enabled = prefs?.[pref.key] !== false;
+              return (
+                <div key={pref.key} className="flex items-center justify-between p-3 rounded-lg border hover:bg-muted/20 transition-colors">
+                  <div>
+                    <p className="font-medium text-sm">{pref.label}</p>
+                    <p className="text-xs text-muted-foreground">{pref.desc}</p>
+                  </div>
+                  <button
+                    onClick={() => handleToggle(pref.key, enabled)}
+                    disabled={setMutation.isPending}
+                    className="flex items-center gap-1.5 text-sm font-medium transition-colors"
+                    aria-label={enabled ? 'Kapat' : 'Aç'}
+                  >
+                    {enabled ? (
+                      <><ToggleRight className="h-7 w-7 text-primary" /><span className="text-primary text-xs">Açık</span></>
+                    ) : (
+                      <><ToggleLeft className="h-7 w-7 text-muted-foreground" /><span className="text-muted-foreground text-xs">Kapalı</span></>
+                    )}
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+// ─── Mentor Unlock Quota Component ───────────────────────────────────────────
+function MentorUnlockQuotaCard() {
+  const utils = trpc.useUtils();
+  const { data: quota, isLoading } = trpc.admin.getMentorUnlockQuota.useQuery();
+
+  const [daily, setDaily] = useState<string>('');
+  const [weekly, setWeekly] = useState<string>('');
+  const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    if (quota) {
+      setDaily(String(quota.daily));
+      setWeekly(String(quota.weekly));
+    }
+  }, [quota]);
+
+  const setMutation = trpc.admin.setMentorUnlockQuota.useMutation({
+    onSuccess: () => {
+      utils.admin.getMentorUnlockQuota.invalidate();
+      toast.success('Kota ayarları kaydedildi');
+      setIsSaving(false);
+    },
+    onError: (e) => {
+      toast.error('Hata: ' + e.message);
+      setIsSaving(false);
+    },
+  });
+
+  const handleSave = () => {
+    const d = parseInt(daily, 10);
+    const w = parseInt(weekly, 10);
+    if (isNaN(d) || d < 0 || d > 100) {
+      toast.error('Günlük limit 0–100 arasında olmalıdır');
+      return;
+    }
+    if (isNaN(w) || w < 0 || w > 500) {
+      toast.error('Haftalık limit 0–500 arasında olmalıdır');
+      return;
+    }
+    setIsSaving(true);
+    setMutation.mutate({ daily: d, weekly: w });
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Shield className="h-5 w-5 text-primary" />
+          Mentor Etap Açma Kotası
+        </CardTitle>
+        <CardDescription>
+          Mentorların belirli bir süre içinde yapabileceği maksimum manuel etap açma sayısı (0 = sınırsız)
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        {isLoading ? (
+          <div className="flex items-center justify-center h-16">
+            <Loader2 className="h-5 w-5 animate-spin text-primary" />
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="daily-limit">Günlük Limit</Label>
+                <div className="flex items-center gap-2">
+                  <Input
+                    id="daily-limit"
+                    type="number"
+                    min="0"
+                    max="100"
+                    value={daily}
+                    onChange={e => setDaily(e.target.value)}
+                    className="w-28"
+                  />
+                  <span className="text-sm text-muted-foreground">açma/gün</span>
+                </div>
+                <p className="text-xs text-muted-foreground">0 = sınırsız</p>
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="weekly-limit">Haftalık Limit</Label>
+                <div className="flex items-center gap-2">
+                  <Input
+                    id="weekly-limit"
+                    type="number"
+                    min="0"
+                    max="500"
+                    value={weekly}
+                    onChange={e => setWeekly(e.target.value)}
+                    className="w-28"
+                  />
+                  <span className="text-sm text-muted-foreground">açma/hafta</span>
+                </div>
+                <p className="text-xs text-muted-foreground">0 = sınırsız</p>
+              </div>
+            </div>
+            <div className="bg-muted/40 rounded-lg p-3 text-xs text-muted-foreground">
+              <p>Adminler bu kotadan muaftir; yalnızca mentor rolündeki kullanıcılara uygulanır.</p>
+              <p className="mt-1">Günlük limit gece yarısında, haftalık limit her Pazar gece yarısında sıfırlanır.</p>
+            </div>
+            <Button
+              onClick={handleSave}
+              disabled={isSaving || (String(quota?.daily ?? 0) === daily && String(quota?.weekly ?? 0) === weekly)}
+              className="gap-2"
+            >
+              {isSaving ? (
+                <><Loader2 className="h-4 w-4 animate-spin" />Kaydediliyor...</>
+              ) : (
+                <><Save className="h-4 w-4" />Kaydet</>
+              )}
+            </Button>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
@@ -696,6 +932,12 @@ export function PlatformSettings() {
 
       {/* Audit Log */}
       <StageUnlockAuditLog />
+
+      {/* Notification Preferences */}
+      <NotificationPrefsCard />
+
+      {/* Mentor Unlock Quota */}
+      <MentorUnlockQuotaCard />
 
       {/* Test Reminder Email */}
       <TestReminderEmailCard adminEmail={undefined} />

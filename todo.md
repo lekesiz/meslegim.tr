@@ -944,3 +944,8 @@ Platform **minimum seviyede sağlıklı** çalışıyor. Tüm temel özellikler 
 - [x] Denetim logu filtreleme: tarih aralığı, rol (admin/mentor), öğrenci adı filtresi
 - [x] Mentor etap açma işleminde admin'e otomatik bildirim gönder
 - [x] Öğrenci profil sayfasında açma geçmişi bölümü ekle (StudentDetailView)
+
+## 🔥 Yeni Görevler (3 Mart 2026 - Batch 4)
+- [x] Denetim logu CSV dışa aktarma: filtrelenmiş log tablosunu CSV olarak indir
+- [x] Bildirim tercihleri: hangi olaylarda bildirim alınacağını Platform Ayarları'ndan yapılandır
+- [x] Mentor etap açma kotası: günlük/haftalık açma limiti tanımla ve uygula
