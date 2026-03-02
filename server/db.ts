@@ -1730,3 +1730,48 @@ export async function getTransitionDelayForAgeGroup(ageGroup: string, defaultVal
   // Fall back to global setting
   return await getPlatformSettingNumber('stage_transition_delay_days', defaultValue);
 }
+
+/**
+ * Count how many times a mentor has unlocked stages in a given time window.
+ * Used for quota enforcement.
+ */
+export async function getMentorUnlockCount(mentorId: number, since: Date): Promise<number> {
+  const db = await getDb();
+  if (!db) return 0;
+  const result = await db
+    .select({ count: sql<number>`COUNT(*)` })
+    .from(stageUnlockLogs)
+    .where(and(
+      eq(stageUnlockLogs.unlockedByUserId, mentorId),
+      gte(stageUnlockLogs.createdAt, since)
+    ));
+  return Number(result[0]?.count ?? 0);
+}
+
+/**
+ * Export stage unlock logs as CSV string.
+ * Accepts the same filter params as getStageUnlockLogs.
+ */
+export async function exportStageUnlockLogsCsv(params: {
+  role?: 'admin' | 'mentor';
+  studentName?: string;
+  studentId?: number;
+  dateFrom?: Date;
+  dateTo?: Date;
+  limit?: number;
+}): Promise<string> {
+  const logs = await getStageUnlockLogs({ ...params, limit: params.limit ?? 5000 });
+
+  const header = ['ID', 'Tarih', 'Açan Kullanıcı ID', 'Rol', 'Öğrenci', 'Etap', 'Not'].join(',');
+  const rows = logs.map(l => [
+    l.id,
+    new Date(l.createdAt).toLocaleString('tr-TR'),
+    l.unlockedByUserId,
+    l.unlockedByRole,
+    `"${(l.studentName ?? '').replace(/"/g, '""')}"`,
+    `"${l.stageName.replace(/"/g, '""')}"`,
+    `"${(l.note ?? '').replace(/"/g, '""')}"`,
+  ].join(','));
+
+  return [header, ...rows].join('\n');
+}

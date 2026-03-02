@@ -637,6 +637,72 @@ export const appRouter = router({
         });
       }),
 
+    // Export audit logs as CSV
+    exportStageUnlockLogsCsv: adminProcedure
+      .input(z.object({
+        role: z.enum(['admin', 'mentor']).optional(),
+        studentName: z.string().optional(),
+        studentId: z.number().optional(),
+        dateFrom: z.date().optional(),
+        dateTo: z.date().optional(),
+      }).optional())
+      .query(async ({ input }) => {
+        const csv = await db.exportStageUnlockLogsCsv({
+          role: input?.role,
+          studentName: input?.studentName,
+          studentId: input?.studentId,
+          dateFrom: input?.dateFrom,
+          dateTo: input?.dateTo,
+        });
+        return { csv };
+      }),
+
+    // Get notification preferences
+    getNotificationPrefs: adminProcedure.query(async () => {
+      const keys = [
+        'notif_on_mentor_unlock',
+        'notif_on_admin_unlock',
+        'notif_on_new_student',
+        'notif_on_report_submit',
+      ];
+      const prefs: Record<string, boolean> = {};
+      for (const key of keys) {
+        const val = await db.getPlatformSetting(key);
+        prefs[key] = val !== 'false'; // default true
+      }
+      return prefs;
+    }),
+
+    // Set notification preference
+    setNotificationPref: adminProcedure
+      .input(z.object({
+        key: z.enum(['notif_on_mentor_unlock', 'notif_on_admin_unlock', 'notif_on_new_student', 'notif_on_report_submit']),
+        enabled: z.boolean(),
+      }))
+      .mutation(async ({ input }) => {
+        await db.setPlatformSetting(input.key, String(input.enabled), `Bildirim tercihi: ${input.key}`);
+        return { success: true };
+      }),
+
+    // Get mentor unlock quota settings
+    getMentorUnlockQuota: adminProcedure.query(async () => {
+      const daily = await db.getPlatformSettingNumber('mentor_unlock_daily_limit', 0);
+      const weekly = await db.getPlatformSettingNumber('mentor_unlock_weekly_limit', 0);
+      return { daily, weekly };
+    }),
+
+    // Set mentor unlock quota
+    setMentorUnlockQuota: adminProcedure
+      .input(z.object({
+        daily: z.number().min(0).max(100),
+        weekly: z.number().min(0).max(500),
+      }))
+      .mutation(async ({ input }) => {
+        await db.setPlatformSetting('mentor_unlock_daily_limit', String(input.daily), 'Mentor günlük etap açma limiti (0 = sınırsız)');
+        await db.setPlatformSetting('mentor_unlock_weekly_limit', String(input.weekly), 'Mentor haftalık etap açma limiti (0 = sınırsız)');
+        return { success: true };
+      }),
+
     // Send a test reminder email to admin themselves
     sendTestReminderEmail: adminProcedure
       .input(z.object({
@@ -1020,6 +1086,35 @@ export const appRouter = router({
               message: 'Yalnızca kendi öğrencilerinizin etaplarını açabilirsiniz',
             });
           }
+
+          // Quota check (skip for admins)
+          const dailyLimit = await db.getPlatformSettingNumber('mentor_unlock_daily_limit', 0);
+          const weeklyLimit = await db.getPlatformSettingNumber('mentor_unlock_weekly_limit', 0);
+
+          if (dailyLimit > 0) {
+            const dayStart = new Date();
+            dayStart.setHours(0, 0, 0, 0);
+            const dailyCount = await db.getMentorUnlockCount(ctx.user.id, dayStart);
+            if (dailyCount >= dailyLimit) {
+              throw new TRPCError({
+                code: 'TOO_MANY_REQUESTS',
+                message: `Günlük etap açma limitine ulaştınız (${dailyLimit} açma/gün). Yarın tekrar deneyebilirsiniz.`,
+              });
+            }
+          }
+
+          if (weeklyLimit > 0) {
+            const weekStart = new Date();
+            weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+            weekStart.setHours(0, 0, 0, 0);
+            const weeklyCount = await db.getMentorUnlockCount(ctx.user.id, weekStart);
+            if (weeklyCount >= weeklyLimit) {
+              throw new TRPCError({
+                code: 'TOO_MANY_REQUESTS',
+                message: `Haftalık etap açma limitine ulaştınız (${weeklyLimit} açma/hafta). Gelecek hafta tekrar deneyebilirsiniz.`,
+              });
+            }
+          }
         }
 
         const result = await db.unlockStageNow(input.userId, input.userStageId);
@@ -1053,14 +1148,17 @@ export const appRouter = router({
           }
         }
 
-        // Notify admin about the manual unlock
+        // Notify admin about the manual unlock (respect notification preferences)
         try {
-          const mentorName = ctx.user.name ?? `Mentor #${ctx.user.id}`;
-          const studentName = result.userName ?? `Öğrenci #${input.userId}`;
-          await notifyOwner({
-            title: `🔓 Manuel Etap Açma: ${result.stageName}`,
-            content: `**${mentorName}** (Mentor), **${studentName}** adlı öğrencinin "${result.stageName}" etabını manuel olarak açtı.${input.note ? `\n\n**Not:** ${input.note}` : ''}`,
-          });
+          const notifEnabled = await db.getPlatformSetting('notif_on_mentor_unlock');
+          if (notifEnabled !== 'false') {
+            const mentorName = ctx.user.name ?? `Mentor #${ctx.user.id}`;
+            const studentName = result.userName ?? `Öğrenci #${input.userId}`;
+            await notifyOwner({
+              title: `🔓 Manuel Etap Açma: ${result.stageName}`,
+              content: `**${mentorName}** (Mentor), **${studentName}** adlı öğrencinin "${result.stageName}" etabını manuel olarak açtı.${input.note ? `\n\n**Not:** ${input.note}` : ''}`,
+            });
+          }
         } catch (e) {
           // Notification failure should not block the unlock operation
           console.warn('[Mentor] Admin notification failed:', e);
