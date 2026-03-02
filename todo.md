@@ -898,3 +898,12 @@ Platform **minimum seviyede sağlıklı** çalışıyor. Tüm temel özellikler 
 - [ ] Etap 2 sorularını 3 yaş grubuna özel yeniden yaz (14-17, 18-21, 22-24)
 - [ ] AI rapor prompt'unu incele ve kaliteyi test et
 - [ ] AI rapor prompt'unu yeni sorulara uygun şekilde güncelle
+
+
+## 🧪 Uçtan Uca Akış Testi (02.03.2026)
+
+- [ ] 14-17 yaş grubu test kullanıcısı oluştur ve başvuru akışını test et
+- [ ] Admin panelinden başvuruyu onayla ve mentor ata
+- [ ] 14-17 yaş öğrencisi olarak Etap 1 sorularını cevapla
+- [ ] AI rapor oluşturma kalitesini değerlendir
+- [ ] Mentor raporu onaylama akışını test et

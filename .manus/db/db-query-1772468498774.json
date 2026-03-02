@@ -1,0 +1,34 @@
+{
+  "query": "SELECT id, userId, stageId, status FROM user_stages WHERE userId = 1170022 ORDER BY id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute SELECT id, userId, stageId, status FROM user_stages WHERE userId = 1170022 ORDER BY id;",
+  "rows": [
+    {
+      "id": "270002",
+      "userId": "1170022",
+      "stageId": "60001",
+      "status": "completed"
+    },
+    {
+      "id": "270003",
+      "userId": "1170022",
+      "stageId": "60002",
+      "status": "locked"
+    },
+    {
+      "id": "270004",
+      "userId": "1170022",
+      "stageId": "60003",
+      "status": "locked"
+    },
+    {
+      "id": "270005",
+      "userId": "1170022",
+      "stageId": "60002",
+      "status": "locked"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuserId\tstageId\tstatus\n270002\t1170022\t60001\tcompleted\n270003\t1170022\t60002\tlocked\n270004\t1170022\t60003\tlocked\n270005\t1170022\t60002\tlocked\n",
+  "stderr": "",
+  "execution_time_ms": 1531
+}

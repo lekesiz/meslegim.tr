@@ -238,6 +238,24 @@ export const appRouter = router({
         }),
       }))
       .mutation(async ({ input }) => {
+        // If status is being changed to active, initialize user stages if not already done
+        if (input.data.status === 'active') {
+          const student = await db.getUserById(input.id);
+          if (student && student.ageGroup) {
+            const existingStages = await db.getUserStages(student.id);
+            if (existingStages.length === 0) {
+              const ageGroupStages = await db.getStagesByAgeGroup(student.ageGroup);
+              for (const stage of ageGroupStages) {
+                const isFirstStage = stage.order === 1;
+                await db.createUserStage({
+                  userId: student.id,
+                  stageId: stage.id,
+                  status: isFirstStage ? 'active' : 'locked',
+                });
+              }
+            }
+          }
+        }
         await db.updateUser(input.id, input.data);
         return { success: true };
       }),

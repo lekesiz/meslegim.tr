@@ -1,0 +1,50 @@
+{
+  "query": "SELECT id, name, email, status, ageGroup, createdAt FROM users ORDER BY createdAt DESC LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute SELECT id, name, email, status, ageGroup, createdAt FROM users ORDER BY createdAt DESC LIMIT 5;",
+  "rows": [
+    {
+      "id": "1140080",
+      "name": "Platform Admin",
+      "email": "admin@meslegim.tr",
+      "status": "active",
+      "ageGroup": "NULL",
+      "createdAt": "2026-03-02 12:09:49"
+    },
+    {
+      "id": "1140010",
+      "name": "Test Kullanıcı",
+      "email": "testuser2026@gmail.com",
+      "status": "pending",
+      "ageGroup": "18-21",
+      "createdAt": "2026-03-02 11:45:27"
+    },
+    {
+      "id": "930101",
+      "name": "Zeynep Arslan",
+      "email": "zeynep.arslan.beta@gmail.com",
+      "status": "active",
+      "ageGroup": "14-17",
+      "createdAt": "2026-02-28 16:24:39"
+    },
+    {
+      "id": "930102",
+      "name": "Emre Kaya",
+      "email": "emre.kaya.beta@gmail.com",
+      "status": "active",
+      "ageGroup": "18-21",
+      "createdAt": "2026-02-28 16:24:39"
+    },
+    {
+      "id": "930012",
+      "name": "Test Öğrenci 2 (18-21)",
+      "email": "test.ogrenci2@gmail.com",
+      "status": "active",
+      "ageGroup": "18-21",
+      "createdAt": "2026-02-26 11:00:40"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\tstatus\tageGroup\tcreatedAt\n1140080\tPlatform Admin\tadmin@meslegim.tr\tactive\tNULL\t2026-03-02 12:09:49\n1140010\tTest Kullanıcı\ttestuser2026@gmail.com\tpending\t18-21\t2026-03-02 11:45:27\n930101\tZeynep Arslan\tzeynep.arslan.beta@gmail.com\tactive\t14-17\t2026-02-28 16:24:39\n930102\tEmre Kaya\temre.kaya.beta@gmail.com\tactive\t18-21\t2026-02-28 16:24:39\n930012\tTest Öğrenci 2 (18-21)\ttest.ogrenci2@gmail.com\tactive\t18-21\t2026-02-26 11:00:40\n",
+  "stderr": "",
+  "execution_time_ms": 1509
+}
