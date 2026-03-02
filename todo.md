@@ -939,3 +939,8 @@ Platform **minimum seviyede sağlıklı** çalışıyor. Tüm temel özellikler 
 - [x] Admin/mentor panelinde denetim logu görüntüleme
 - [x] Platform Ayarları sekmesine "Test E-postası Gönder" butonu (hatırlatma şablonu önizlemesi)
 - [x] Mentor panelinde kilitli etaplar için "Şimdi Aç" butonu
+
+## 🔥 Yeni Görevler (2 Mart 2026 - Batch 3)
+- [x] Denetim logu filtreleme: tarih aralığı, rol (admin/mentor), öğrenci adı filtresi
+- [x] Mentor etap açma işleminde admin'e otomatik bildirim gönder
+- [x] Öğrenci profil sayfasında açma geçmişi bölümü ekle (StudentDetailView)

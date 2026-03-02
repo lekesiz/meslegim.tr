@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { trpc } from '@/lib/trpc';
-import { Loader2, ArrowLeft, FileText, CheckCircle, Clock, TrendingUp, StickyNote, Plus, Edit, Trash2, MessageCircle } from 'lucide-react';
+import { Loader2, ArrowLeft, FileText, CheckCircle, Clock, TrendingUp, StickyNote, Plus, Edit, Trash2, MessageCircle, Unlock, History } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -57,6 +57,7 @@ export default function StudentDetailView() {
   const stages = data?.stages;
   const reports = data?.reports;
   const progress = data?.progress;
+  const unlockLogs = data?.unlockLogs;
   
   // Mentor notes state
   const [noteDialogOpen, setNoteDialogOpen] = useState(false);
@@ -467,6 +468,54 @@ export default function StudentDetailView() {
         </Card>
       </div>
       
+      {/* Stage Unlock History */}
+      {unlockLogs && unlockLogs.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <History className="h-5 w-5 text-primary" />
+              Manuel Etap Açma Geçmişi
+            </CardTitle>
+            <CardDescription>
+              Bu öğrenci için yapılan tüm manuel etap açma işlemleri
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="rounded-md border overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b bg-muted/50">
+                    <th className="px-3 py-2 text-left font-medium">Tarih</th>
+                    <th className="px-3 py-2 text-left font-medium">Açan</th>
+                    <th className="px-3 py-2 text-left font-medium">Etap</th>
+                    <th className="px-3 py-2 text-left font-medium">Not</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {unlockLogs.map((log: any) => (
+                    <tr key={log.id} className="border-b last:border-0 hover:bg-muted/20">
+                      <td className="px-3 py-2 text-xs text-muted-foreground whitespace-nowrap">
+                        {new Date(log.createdAt).toLocaleString('tr-TR')}
+                      </td>
+                      <td className="px-3 py-2">
+                        <div className="flex items-center gap-1.5">
+                          <Badge variant={log.unlockedByRole === 'admin' ? 'default' : 'secondary'} className="text-xs">
+                            {log.unlockedByRole}
+                          </Badge>
+                          <span className="text-xs text-muted-foreground">#{log.unlockedByUserId}</span>
+                        </div>
+                      </td>
+                      <td className="px-3 py-2 text-sm font-medium">{log.stageName}</td>
+                      <td className="px-3 py-2 text-xs text-muted-foreground">{log.note ?? '-'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Chat Dialog */}
       {student && (
         <ChatDialog

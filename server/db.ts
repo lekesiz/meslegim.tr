@@ -1,4 +1,4 @@
-import { eq, and, or, desc, inArray } from "drizzle-orm";
+import { eq, and, or, desc, inArray, gte, lte } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { InsertUser, users, stages, questions, answers, userStages, reports, mentorNotes, messages, feedbacks, certificates, platformSettings, stageUnlockLogs } from "../drizzle/schema";
 import { ENV } from './_core/env';
@@ -1561,11 +1561,38 @@ export async function logStageUnlock(params: {
 /**
  * Get stage unlock audit logs (admin: all logs; mentor: only their students)
  */
-export async function getStageUnlockLogs(options?: { mentorId?: number; limit?: number }) {
+export async function getStageUnlockLogs(options?: {
+  mentorId?: number;
+  studentId?: number;
+  limit?: number;
+  role?: 'admin' | 'mentor';
+  studentName?: string;
+  dateFrom?: Date;
+  dateTo?: Date;
+}) {
   const dbInstance = await getDb();
   if (!dbInstance) return [];
 
   const limit = options?.limit ?? 100;
+
+  // Build base conditions
+  const conditions: ReturnType<typeof eq>[] = [];
+
+  if (options?.role) {
+    conditions.push(eq(stageUnlockLogs.unlockedByRole, options.role));
+  }
+
+  if (options?.studentId) {
+    conditions.push(eq(stageUnlockLogs.studentId, options.studentId));
+  }
+
+  if (options?.dateFrom) {
+    conditions.push(gte(stageUnlockLogs.createdAt, options.dateFrom));
+  }
+
+  if (options?.dateTo) {
+    conditions.push(lte(stageUnlockLogs.createdAt, options.dateTo));
+  }
 
   if (options?.mentorId) {
     // Mentor: only logs for students assigned to this mentor
@@ -1575,21 +1602,31 @@ export async function getStageUnlockLogs(options?: { mentorId?: number; limit?: 
       .where(and(eq(users.mentorId, options.mentorId), eq(users.role, 'student')));
     const studentIds = mentorStudents.map(s => s.id);
     if (studentIds.length === 0) return [];
-
-    return await dbInstance
-      .select()
-      .from(stageUnlockLogs)
-      .where(inArray(stageUnlockLogs.studentId, studentIds))
-      .orderBy(desc(stageUnlockLogs.createdAt))
-      .limit(limit);
+    conditions.push(inArray(stageUnlockLogs.studentId, studentIds));
   }
 
-  // Admin: all logs
-  return await dbInstance
+  let query = dbInstance
     .select()
     .from(stageUnlockLogs)
     .orderBy(desc(stageUnlockLogs.createdAt))
     .limit(limit);
+
+  if (conditions.length > 0) {
+    // @ts-ignore - drizzle where chaining
+    query = query.where(and(...conditions));
+  }
+
+  let results = await query;
+
+  // Client-side filter for studentName (partial match)
+  if (options?.studentName && options.studentName.trim()) {
+    const needle = options.studentName.trim().toLowerCase();
+    results = results.filter(r =>
+      r.studentName?.toLowerCase().includes(needle)
+    );
+  }
+
+  return results;
 }
 
 export async function unlockStageNow(userId: number, userStageId: number): Promise<{ stageName: string; userEmail: string | null; userName: string | null; stageId: number } | null> {
