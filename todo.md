@@ -890,3 +890,11 @@ Platform **minimum seviyede sağlıklı** çalışıyor. Tüm temel özellikler 
 - [ ] 22-24 yaş grubu için özel Etap 3 soruları yaz (iş hayatı, kariyer geçişi odaklı)
 - [ ] Mevcut genel sorularla değiştir ve veritabanını güncelle
 - [ ] Tarayıcıda test et
+
+
+## 🎯 Etap 1 ve 2 Yaş Grubuna Özel Sorular + AI Rapor Kalitesi (02 Mart 2026)
+
+- [ ] Etap 1 sorularını 3 yaş grubuna özel yeniden yaz (14-17, 18-21, 22-24)
+- [ ] Etap 2 sorularını 3 yaş grubuna özel yeniden yaz (14-17, 18-21, 22-24)
+- [ ] AI rapor prompt'unu incele ve kaliteyi test et
+- [ ] AI rapor prompt'unu yeni sorulara uygun şekilde güncelle

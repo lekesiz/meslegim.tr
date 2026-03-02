@@ -40,6 +40,7 @@ export async function generateStageReportAsync(userId: number, stageId: number) 
     const reportContent = await generateStageReport(
       user.name || user.email || 'Öğrenci',
       stage.name,
+      user.ageGroup || '18-21',
       formattedAnswers
     );
     console.log(`[ReportGen] LLM report generated, length: ${reportContent.length} chars`);
