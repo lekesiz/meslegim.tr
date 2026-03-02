@@ -1,6 +1,6 @@
 import { eq, and, or, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, stages, questions, answers, userStages, reports, mentorNotes, messages, feedbacks, certificates } from "../drizzle/schema";
+import { InsertUser, users, stages, questions, answers, userStages, reports, mentorNotes, messages, feedbacks, certificates, platformSettings } from "../drizzle/schema";
 import { ENV } from './_core/env';
 import { sql } from 'drizzle-orm';
 
@@ -489,9 +489,10 @@ export async function scheduleNextStage(userId: number, currentStageId: number) 
     return;
   }
 
-  // Schedule next stage activation (7 days from now)
+  // Schedule next stage activation (configurable days from now, default 7)
+  const delayDays = await getPlatformSettingNumber('stage_transition_delay_days', 7);
   const unlockedAt = new Date();
-  unlockedAt.setDate(unlockedAt.getDate() + 7);
+  unlockedAt.setDate(unlockedAt.getDate() + delayDays);
 
   await db.insert(userStages).values({
     userId,
@@ -1471,4 +1472,58 @@ export async function verifyCertificate(certificateNumber: string) {
   .limit(1);
 
   return result[0] || null;
+}
+
+// ============================================
+// Platform Settings Functions
+// ============================================
+
+export async function getPlatformSetting(key: string): Promise<string | null> {
+  const dbInstance = await getDb();
+  if (!dbInstance) return null;
+
+  const [setting] = await dbInstance
+    .select()
+    .from(platformSettings)
+    .where(eq(platformSettings.key, key))
+    .limit(1);
+
+  return setting?.value ?? null;
+}
+
+export async function getPlatformSettingNumber(key: string, defaultValue: number): Promise<number> {
+  const value = await getPlatformSetting(key);
+  if (value === null) return defaultValue;
+  const parsed = parseInt(value, 10);
+  return isNaN(parsed) ? defaultValue : parsed;
+}
+
+export async function setPlatformSetting(key: string, value: string, description?: string): Promise<void> {
+  const dbInstance = await getDb();
+  if (!dbInstance) throw new Error('Database not initialized');
+
+  const [existing] = await dbInstance
+    .select()
+    .from(platformSettings)
+    .where(eq(platformSettings.key, key))
+    .limit(1);
+
+  if (existing) {
+    await dbInstance
+      .update(platformSettings)
+      .set({ value, ...(description ? { description } : {}) })
+      .where(eq(platformSettings.key, key));
+  } else {
+    await dbInstance.insert(platformSettings).values({ key, value, description });
+  }
+}
+
+export async function getAllPlatformSettings(): Promise<Array<{ key: string; value: string; description: string | null; updatedAt: Date }>> {
+  const dbInstance = await getDb();
+  if (!dbInstance) return [];
+
+  return await dbInstance
+    .select()
+    .from(platformSettings)
+    .orderBy(platformSettings.key);
 }

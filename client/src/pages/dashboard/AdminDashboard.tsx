@@ -13,7 +13,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { trpc } from '@/lib/trpc';
-import { Loader2, Users, FileQuestion, Layers, Plus, TrendingUp, Zap, MessageSquare, Eye } from 'lucide-react';
+import { Loader2, Users, FileQuestion, Layers, Plus, TrendingUp, Zap, MessageSquare, Eye, Settings } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -26,6 +26,7 @@ import { EditMentorDialog } from '@/components/EditMentorDialog';
 import MentorComparisonReport from '@/components/MentorComparisonReport';
 import { AdminFeedbackSummary } from '@/components/AdminFeedbackSummary';
 import { UserManagement } from '@/components/UserManagement';
+import { PlatformSettings } from '@/components/PlatformSettings';
 
 export default function AdminDashboard() {
   const { user } = useAuth();
@@ -125,7 +126,7 @@ export default function AdminDashboard() {
 
         {/* Tabs */}
         <Tabs defaultValue="analytics" className="space-y-4">
-          <TabsList>
+          <TabsList className="flex flex-wrap h-auto gap-1 p-1">
             <TabsTrigger value="analytics">
               <TrendingUp className="h-4 w-4 mr-2" />
               İlerleme Analizi
@@ -161,6 +162,10 @@ export default function AdminDashboard() {
               <Users className="h-4 w-4 mr-2" />
               Kullanıcı Yönetimi
             </TabsTrigger>
+            <TabsTrigger value="platform-settings">
+              <Settings className="h-4 w-4 mr-2" />
+              Platform Ayarları
+            </TabsTrigger>
           </TabsList>
 
           {/* Analytics Tab */}
@@ -186,6 +191,11 @@ export default function AdminDashboard() {
           {/* User Management Tab */}
           <TabsContent value="user-management">
             <UserManagement />
+          </TabsContent>
+
+          {/* Platform Settings Tab */}
+          <TabsContent value="platform-settings">
+            <PlatformSettings />
           </TabsContent>
 
           {/* Students Tab */}

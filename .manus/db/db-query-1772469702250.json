@@ -1,0 +1,37 @@
+{
+  "query": "SELECT id, name, email, role, status, loginMethod, openId FROM users WHERE role = 'admin';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute SELECT id, name, email, role, status, loginMethod, openId FROM users WHERE role = 'admin';",
+  "rows": [
+    {
+      "id": "1",
+      "name": "Mikail Lekesiz",
+      "email": "mikail@netzinformatique.fr",
+      "role": "admin",
+      "status": "active",
+      "loginMethod": "google",
+      "openId": "89GkMn4sns9Yi5W6jBjiWy"
+    },
+    {
+      "id": "180024",
+      "name": "Test Admin",
+      "email": "admin@test.com",
+      "role": "admin",
+      "status": "active",
+      "loginMethod": "NULL",
+      "openId": "test_admin_1771500959513_3"
+    },
+    {
+      "id": "1140080",
+      "name": "Platform Admin",
+      "email": "admin@meslegim.tr",
+      "role": "admin",
+      "status": "active",
+      "loginMethod": "email",
+      "openId": "email:admin@meslegim.tr"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\trole\tstatus\tloginMethod\topenId\n1\tMikail Lekesiz\tmikail@netzinformatique.fr\tadmin\tactive\tgoogle\t89GkMn4sns9Yi5W6jBjiWy\n180024\tTest Admin\tadmin@test.com\tadmin\tactive\tNULL\ttest_admin_1771500959513_3\n1140080\tPlatform Admin\tadmin@meslegim.tr\tadmin\tactive\temail\temail:admin@meslegim.tr\n",
+  "stderr": "",
+  "execution_time_ms": 1586
+}

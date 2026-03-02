@@ -907,3 +907,21 @@ Platform **minimum seviyede sağlıklı** çalışıyor. Tüm temel özellikler 
 - [ ] 14-17 yaş öğrencisi olarak Etap 1 sorularını cevapla
 - [ ] AI rapor oluşturma kalitesini değerlendir
 - [ ] Mentor raporu onaylama akışını test et
+
+
+## ⚙️ Etap Geçiş Süresi Yapılandırma (02 Mart 2026)
+
+- [ ] Platform ayarları tablosu (settings) oluştur
+- [ ] Etap geçiş süresi backend procedure'ları ekle
+- [ ] Etap kilitleme mantığını settings tablosundan oku
+- [ ] Admin paneline Platform Ayarları sekmesi ekle
+
+## ✅ Tamamlanan Görevler (2 Mart 2026)
+- [x] Etap geçiş süresi admin panelinden yapılandırılabilir hale getirildi
+  - [x] `platformSettings` tablosu veritabanına eklendi (drizzle/schema.ts)
+  - [x] `getPlatformSetting`, `setPlatformSetting`, `getAllPlatformSettings` fonksiyonları db.ts'e eklendi
+  - [x] `scheduleNextStage` fonksiyonu sabit 7 gün yerine veritabanından okuyacak şekilde güncellendi
+  - [x] cronJobs.ts veritabanından gün sayısını okuyacak şekilde güncellendi
+  - [x] `admin.getPlatformSettings` ve `admin.setPlatformSetting` tRPC prosedürleri eklendi
+  - [x] Admin paneline "Platform Ayarları" sekmesi eklendi (PlatformSettings.tsx)
+  - [x] Vitest testleri yazıldı ve geçti (platform-settings.test.ts)

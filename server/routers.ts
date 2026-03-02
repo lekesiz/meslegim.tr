@@ -541,6 +541,29 @@ export const appRouter = router({
     getAllFeedbacksWithStats: adminProcedure.query(async () => {
       return await db.getAllFeedbacksWithStats();
     }),
+
+    // Platform Settings
+    getPlatformSettings: adminProcedure.query(async () => {
+      return await db.getAllPlatformSettings();
+    }),
+
+    getPlatformSetting: adminProcedure
+      .input(z.object({ key: z.string() }))
+      .query(async ({ input }) => {
+        const value = await db.getPlatformSetting(input.key);
+        return { key: input.key, value };
+      }),
+
+    setPlatformSetting: adminProcedure
+      .input(z.object({
+        key: z.string().min(1),
+        value: z.string(),
+        description: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        await db.setPlatformSetting(input.key, input.value, input.description);
+        return { success: true };
+      }),
   }),
 
   // Mentor procedures

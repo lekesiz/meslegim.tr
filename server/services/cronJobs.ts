@@ -1,12 +1,12 @@
 import cron from 'node-cron';
-import { getDb } from '../db';
+import { getDb, getPlatformSettingNumber } from '../db';
 import { userStages, stages, users } from '../../drizzle/schema';
-import { eq, and, lt, isNull } from 'drizzle-orm';
+import { eq, and, lt } from 'drizzle-orm';
 import { sendEmail } from '../_core/resend-email';
 import { getNewStageActivatedEmailTemplate } from './emailService';
 
 /**
- * Check and activate stages that should be unlocked (7 days after previous stage completion)
+ * Check and activate stages that should be unlocked based on configurable delay
  */
 export async function checkAndActivateStages() {
   const db = await getDb();
@@ -16,14 +16,18 @@ export async function checkAndActivateStages() {
   }
 
   try {
-    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    // Read configurable delay (default 7 days)
+    const delayDays = await getPlatformSettingNumber('stage_transition_delay_days', 7);
+    const cutoffDate = new Date(Date.now() - delayDays * 24 * 60 * 60 * 1000);
 
-    // Find all completed stages that were completed 7+ days ago
-    const completedStages = await db
+    console.log(`[Cron] Stage transition delay: ${delayDays} days. Cutoff: ${cutoffDate.toISOString()}`);
+
+    // Find locked stages whose unlockedAt has passed
+    const stagesToActivate = await db
       .select({
         userId: userStages.userId,
         stageId: userStages.stageId,
-        completedAt: userStages.completedAt,
+        unlockedAt: userStages.unlockedAt,
         userEmail: users.email,
         userName: users.name,
         ageGroup: users.ageGroup,
@@ -32,78 +36,57 @@ export async function checkAndActivateStages() {
       .innerJoin(users, eq(userStages.userId, users.id))
       .where(
         and(
-          eq(userStages.status, 'completed'),
-          lt(userStages.completedAt, sevenDaysAgo)
+          eq(userStages.status, 'locked'),
+          lt(userStages.unlockedAt, new Date())
         )
       );
 
-    for (const completed of completedStages) {
-      // Find the next stage for this user's age group
-      const currentStage = await db
-        .select()
-        .from(stages)
-        .where(eq(stages.id, completed.stageId))
-        .limit(1);
-
-      if (currentStage.length === 0) continue;
-
-      const nextStageOrder = currentStage[0].order + 1;
-
-      // Find next stage in same age group
-      const nextStage = await db
-        .select()
-        .from(stages)
+    for (const stage of stagesToActivate) {
+      // Activate the stage
+      await db
+        .update(userStages)
+        .set({
+          status: 'active',
+          unlockedAt: new Date(),
+          updatedAt: new Date(),
+        })
         .where(
           and(
-            eq(stages.ageGroup, completed.ageGroup!),
-            eq(stages.order, nextStageOrder)
+            eq(userStages.userId, stage.userId),
+            eq(userStages.stageId, stage.stageId)
           )
-        )
-        .limit(1);
+        );
 
-      if (nextStage.length === 0) continue; // No more stages
-
-      // Check if user already has this stage
-      const existingUserStage = await db
+      // Get stage name for email
+      const stageData = await db
         .select()
-        .from(userStages)
-        .where(
-          and(
-            eq(userStages.userId, completed.userId),
-            eq(userStages.stageId, nextStage[0].id)
-          )
-        )
+        .from(stages)
+        .where(eq(stages.id, stage.stageId))
         .limit(1);
 
-      if (existingUserStage.length > 0) continue; // Already exists
+      const stageName = stageData[0]?.name || 'Yeni Etap';
 
-      // Create and activate the next stage
-      await db.insert(userStages).values({
-        userId: completed.userId,
-        stageId: nextStage[0].id,
-        status: 'active',
-        unlockedAt: new Date(),
-      });
-
-      console.log(
-        `[Cron] Activated stage ${nextStage[0].name} for user ${completed.userId}`
-      );
+      console.log(`[Cron] Activated stage ${stageName} for user ${stage.userId}`);
 
       // Send email notification
-      if (completed.userEmail && completed.userName) {
-        const emailHtml = getNewStageActivatedEmailTemplate(
-          completed.userName,
-          nextStage[0].name
-        );
-        await sendEmail({
-          to: completed.userEmail,
-          subject: `🔓 Yeni Etap Açıldı: ${nextStage[0].name}`,
-          html: emailHtml,
-        });
+      if (stage.userEmail && stage.userName) {
+        try {
+          const emailHtml = getNewStageActivatedEmailTemplate(
+            stage.userName,
+            stageName
+          );
+          await sendEmail({
+            to: stage.userEmail,
+            subject: `🔓 Yeni Etap Açıldı: ${stageName}`,
+            html: emailHtml,
+          });
+        } catch (emailErr) {
+          console.warn(`[Cron] Email send failed for user ${stage.userId}:`, emailErr);
+        }
       }
     }
 
-    console.log(`[Cron] Checked and activated stages: ${completedStages.length} processed`);
+    console.log(`[Cron] Stage activation check complete: ${stagesToActivate.length} stages activated`);
   } catch (error) {
     console.error('[Cron] Error in checkAndActivateStages:', error);
   }
@@ -122,7 +105,7 @@ export function initializeCronJobs() {
 
   console.log('[Cron] Cron jobs initialized');
 
-  // Run once on startup for testing
+  // Run once on startup
   setTimeout(() => {
     console.log('[Cron] Running initial stage activation check...');
     checkAndActivateStages();
