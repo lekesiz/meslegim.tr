@@ -949,3 +949,20 @@ Platform **minimum seviyede sağlıklı** çalışıyor. Tüm temel özellikler 
 - [x] Denetim logu CSV dışa aktarma: filtrelenmiş log tablosunu CSV olarak indir
 - [x] Bildirim tercihleri: hangi olaylarda bildirim alınacağını Platform Ayarları'ndan yapılandır
 - [x] Mentor etap açma kotası: günlük/haftalık açma limiti tanımla ve uygula
+
+## 🔥 Final Hazırlık Görevleri (29 Mart 2026)
+- [ ] Profil düzenleme prosedürü ve sayfası (ad, telefon, yaş grubu)
+- [ ] Şifre değiştirme (mevcut şifre ile)
+- [ ] E-posta doğrulama sistemi (emailVerified alanı + token + doğrulama e-postası)
+- [ ] In-app bildirim sistemi (notifications tablosu + bell icon)
+- [ ] AI analiz motoru prompt'larını Türkçe'ye çevir ve iyileştir
+- [ ] RIASEC/Big Five test yapısını reflektif-web'den uyarla
+- [ ] PDF rapor indirme iyileştirmesi
+- [ ] SEO meta tagları güncelle (title, description, OG tags)
+- [ ] Performance optimizasyonu (lazy loading, code splitting)
+- [ ] Erişilebilirlik (a11y) iyileştirmeleri
+- [ ] Error handling ve kullanıcı dostu hata mesajları
+- [ ] Mobil responsive kontrol ve düzeltmeler
+- [ ] Google Fonts entegrasyonu
+- [ ] reportGenerator.ts Fransızca prompt'ları temizle
+- [ ] Pazar araştırması ve strateji raporu

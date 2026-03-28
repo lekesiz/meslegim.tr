@@ -23,6 +23,8 @@ import ResetPassword from "./pages/ResetPassword";
 import VerifyCertificate from "./pages/VerifyCertificate";
 import GizlilikPolitikasi from "./pages/GizlilikPolitikasi";
 import KullanimSartlari from "./pages/KullanimSartlari";
+import Profile from "./pages/Profile";
+import VerifyEmail from "./pages/VerifyEmail";
 
 function Router() {
   return (
@@ -33,6 +35,8 @@ function Router() {
       <Route path="/verify-certificate/:id" component={VerifyCertificate} />
       <Route path="/gizlilik-politikasi" component={GizlilikPolitikasi} />
       <Route path="/kullanim-sartlari" component={KullanimSartlari} />
+      <Route path="/profile" component={Profile} />
+      <Route path="/verify-email/:token" component={VerifyEmail} />
       
       {/* Dashboard - role-based routing */}
       <Route path="/dashboard" component={Dashboard} />

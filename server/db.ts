@@ -1,6 +1,6 @@
 import { eq, and, or, desc, inArray, gte, lte } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, stages, questions, answers, userStages, reports, mentorNotes, messages, feedbacks, certificates, platformSettings, stageUnlockLogs } from "../drizzle/schema";
+import { InsertUser, users, stages, questions, answers, userStages, reports, mentorNotes, messages, feedbacks, certificates, platformSettings, stageUnlockLogs, notifications } from "../drizzle/schema";
 import { ENV } from './_core/env';
 import { sql } from 'drizzle-orm';
 
@@ -1774,4 +1774,106 @@ export async function exportStageUnlockLogsCsv(params: {
   ].join(','));
 
   return [header, ...rows].join('\n');
+}
+
+
+// ============ PROFILE MANAGEMENT ============
+
+export async function updateUserProfile(userId: number, data: {
+  name?: string;
+  phone?: string;
+  bio?: string;
+  profileImage?: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(users).set(data).where(eq(users.id, userId));
+  return await getUserById(userId);
+}
+
+export async function changeUserPassword(userId: number, newHashedPassword: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(users).set({ password: newHashedPassword }).where(eq(users.id, userId));
+}
+
+// ============ EMAIL VERIFICATION ============
+
+export async function setEmailVerificationToken(userId: number, token: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(users).set({ emailVerificationToken: token }).where(eq(users.id, userId));
+}
+
+export async function verifyEmailByToken(token: string): Promise<boolean> {
+  const db = await getDb();
+  if (!db) return false;
+  
+  const result = await db.select().from(users).where(eq(users.emailVerificationToken, token)).limit(1);
+  if (result.length === 0) return false;
+  
+  await db.update(users).set({ 
+    emailVerified: true, 
+    emailVerificationToken: null 
+  }).where(eq(users.id, result[0].id));
+  
+  return true;
+}
+
+export async function getUserByVerificationToken(token: string) {
+  const db = await getDb();
+  if (!db) return null;
+  const result = await db.select().from(users).where(eq(users.emailVerificationToken, token)).limit(1);
+  return result[0] || null;
+}
+
+// ============ IN-APP NOTIFICATIONS ============
+
+export async function createNotification(data: {
+  userId: number;
+  title: string;
+  message: string;
+  type?: string;
+  link?: string;
+}) {
+  const db = await getDb();
+  if (!db) return;
+  await db.insert(notifications).values({
+    userId: data.userId,
+    title: data.title,
+    message: data.message,
+    type: data.type || 'info',
+    link: data.link || null,
+  });
+}
+
+export async function getUserNotifications(userId: number, limit = 50) {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(notifications)
+    .where(eq(notifications.userId, userId))
+    .orderBy(desc(notifications.createdAt))
+    .limit(limit);
+}
+
+export async function getUnreadNotificationCount(userId: number): Promise<number> {
+  const db = await getDb();
+  if (!db) return 0;
+  const result = await db.select({ count: sql<number>`count(*)` }).from(notifications)
+    .where(and(eq(notifications.userId, userId), eq(notifications.isRead, false)));
+  return result[0]?.count || 0;
+}
+
+export async function markNotificationAsRead(notificationId: number, userId: number) {
+  const db = await getDb();
+  if (!db) return;
+  await db.update(notifications).set({ isRead: true })
+    .where(and(eq(notifications.id, notificationId), eq(notifications.userId, userId)));
+}
+
+export async function markAllNotificationsAsRead(userId: number) {
+  const db = await getDb();
+  if (!db) return;
+  await db.update(notifications).set({ isRead: true })
+    .where(eq(notifications.userId, userId));
 }

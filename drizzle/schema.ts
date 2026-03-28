@@ -17,6 +17,10 @@ export const users = mysqlTable("users", {
   status: mysqlEnum("status", ["pending", "active", "inactive"]).default("pending").notNull(),
   ageGroup: mysqlEnum("ageGroup", ["14-17", "18-21", "22-24"]),
   mentorId: int("mentorId"),
+  emailVerified: boolean("emailVerified").default(false).notNull(),
+  emailVerificationToken: varchar("emailVerificationToken", { length: 255 }),
+  profileImage: text("profileImage"),
+  bio: text("bio"),
   kvkkConsent: boolean("kvkkConsent").default(false).notNull(),
   kvkkConsentDate: timestamp("kvkkConsentDate"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
@@ -241,3 +245,24 @@ export const stageUnlockLogs = mysqlTable("stage_unlock_logs", {
 }));
 export type StageUnlockLog = typeof stageUnlockLogs.$inferSelect;
 export type InsertStageUnlockLog = typeof stageUnlockLogs.$inferInsert;
+
+
+/**
+ * In-app notifications table
+ */
+export const notifications = mysqlTable("notifications", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  title: varchar("title", { length: 255 }).notNull(),
+  message: text("message").notNull(),
+  type: varchar("type", { length: 50 }).default("info").notNull(), // info, success, warning, error
+  link: text("link"), // optional link to navigate to
+  isRead: boolean("isRead").default(false).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+  userIdIdx: index("notif_user_id_idx").on(table.userId),
+  isReadIdx: index("notif_is_read_idx").on(table.isRead),
+  createdAtIdx: index("notif_created_at_idx").on(table.createdAt),
+}));
+export type Notification = typeof notifications.$inferSelect;
+export type InsertNotification = typeof notifications.$inferInsert;

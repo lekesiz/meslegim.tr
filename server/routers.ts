@@ -219,6 +219,115 @@ export const appRouter = router({
       }),
   }),
 
+  // Profile management
+  profile: router({
+    get: protectedProcedure.query(async ({ ctx }) => {
+      const user = await db.getUserById(ctx.user.id);
+      if (!user) throw new TRPCError({ code: 'NOT_FOUND', message: 'Kullanıcı bulunamadı' });
+      return {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        bio: user.bio,
+        profileImage: user.profileImage,
+        ageGroup: user.ageGroup,
+        role: user.role,
+        emailVerified: user.emailVerified,
+        createdAt: user.createdAt,
+      };
+    }),
+    update: protectedProcedure
+      .input(z.object({
+        name: z.string().min(1).optional(),
+        phone: z.string().min(10).optional(),
+        bio: z.string().max(500).optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const updated = await db.updateUserProfile(ctx.user.id, input);
+        return { success: true, user: updated };
+      }),
+    changePassword: protectedProcedure
+      .input(z.object({
+        currentPassword: z.string().min(1),
+        newPassword: z.string().min(6),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const user = await db.getUserById(ctx.user.id);
+        if (!user || !user.password) {
+          throw new TRPCError({ code: 'BAD_REQUEST', message: 'Şifre değiştirme bu hesap için kullanılamaz' });
+        }
+        const valid = await bcrypt.compare(input.currentPassword, user.password);
+        if (!valid) {
+          throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Mevcut şifreniz yanlış' });
+        }
+        const hashed = await bcrypt.hash(input.newPassword, 10);
+        await db.changeUserPassword(ctx.user.id, hashed);
+        return { success: true, message: 'Şifreniz başarıyla güncellendi' };
+      }),
+    sendVerificationEmail: protectedProcedure
+      .mutation(async ({ ctx }) => {
+        const user = await db.getUserById(ctx.user.id);
+        if (!user || !user.email) throw new TRPCError({ code: 'BAD_REQUEST', message: 'E-posta adresi bulunamadı' });
+        if (user.emailVerified) throw new TRPCError({ code: 'BAD_REQUEST', message: 'E-posta zaten doğrulanmış' });
+        
+        const token = `ev_${Date.now()}_${Math.random().toString(36).substr(2, 16)}`;
+        await db.setEmailVerificationToken(ctx.user.id, token);
+        
+        const verifyUrl = `${process.env.VITE_APP_URL || 'http://localhost:3000'}/verify-email/${token}`;
+        await sendEmail({
+          to: user.email,
+          subject: 'Meslegim.tr - E-posta Doğrulama',
+          html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+              <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 20px; text-align: center;">
+                <h1 style="color: white; margin: 0;">Meslegim.tr</h1>
+                <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0 0;">E-posta Doğrulama</p>
+              </div>
+              <div style="padding: 40px 20px; background: white;">
+                <p style="color: #666;">Merhaba ${user.name},</p>
+                <p style="color: #666;">E-posta adresinizi doğrulamak için aşağıdaki butona tıklayın:</p>
+                <div style="text-align: center; margin: 30px 0;">
+                  <a href="${verifyUrl}" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 40px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: bold;">E-postamı Doğrula</a>
+                </div>
+              </div>
+            </div>
+          `,
+        });
+        return { success: true, message: 'Doğrulama e-postası gönderildi' };
+      }),
+    verifyEmail: publicProcedure
+      .input(z.object({ token: z.string() }))
+      .mutation(async ({ input }) => {
+        const verified = await db.verifyEmailByToken(input.token);
+        if (!verified) throw new TRPCError({ code: 'BAD_REQUEST', message: 'Geçersiz veya süresi dolmuş doğrulama linki' });
+        return { success: true, message: 'E-posta adresiniz başarıyla doğrulandı' };
+      }),
+  }),
+
+  // In-app notifications
+  notifications: router({
+    list: protectedProcedure
+      .input(z.object({ limit: z.number().min(1).max(100).optional() }).optional())
+      .query(async ({ ctx, input }) => {
+        return await db.getUserNotifications(ctx.user.id, input?.limit || 50);
+      }),
+    unreadCount: protectedProcedure.query(async ({ ctx }) => {
+      return await db.getUnreadNotificationCount(ctx.user.id);
+    }),
+    markAsRead: protectedProcedure
+      .input(z.object({ notificationId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        await db.markNotificationAsRead(input.notificationId, ctx.user.id);
+        return { success: true };
+      }),
+    markAllAsRead: protectedProcedure
+      .mutation(async ({ ctx }) => {
+        await db.markAllNotificationsAsRead(ctx.user.id);
+        return { success: true };
+      }),
+  }),
+
   // Admin procedures
   admin: router({
     getUsers: adminProcedure.query(async () => {
