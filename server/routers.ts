@@ -152,7 +152,7 @@ export const appRouter = router({
         try {
           const session = await sdk.verifySession(input.token);
           if (!session || !session.openId) {
-            throw new Error('Invalid session');
+            throw new Error('Geçersiz oturum');
           }
           userOpenId = session.openId;
         } catch (error) {
@@ -1004,7 +1004,7 @@ export const appRouter = router({
         // Get report details
         const report = await db.getReportById(input.reportId);
         if (!report) {
-          throw new TRPCError({ code: 'NOT_FOUND', message: 'Report not found' });
+          throw new TRPCError({ code: 'NOT_FOUND', message: 'Rapor bulunamadı' });
         }
         
         // Approve or reject the report
