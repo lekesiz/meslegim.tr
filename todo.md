@@ -973,3 +973,17 @@ Platform **minimum seviyede sağlıklı** çalışıyor. Tüm temel özellikler 
 - [x] Uçtan uca test senaryoları (5 senaryo) oluştur ve test et
 - [x] Analytics entegrasyonu (Umami + özel event tracking)
 - [ ] Pilot kullanıcı geri bildirim formu (NPS + açık uçlu soru)
+
+
+## 📋 Pilot Geri Bildirim Formu (29 Mart 2026)
+- [x] pilot_feedbacks veritabanı tablosu oluşturuldu (schema.ts + migration)
+- [x] createPilotFeedback, getAllPilotFeedbacks, getPilotFeedbackStats db helper'ları eklendi
+- [x] pilotFeedback tRPC router oluşturuldu (submit - public, getAll/getStats - admin only)
+- [x] PilotFeedback.tsx sayfası oluşturuldu (NPS 0-10 + açık uçlu sorular + başarı ekranı)
+- [x] /geri-bildirim route'u App.tsx'e eklendi
+- [x] PilotFeedbackPanel.tsx admin bileşeni oluşturuldu (NPS istatistikleri + feedback listesi)
+- [x] Admin dashboard'a "Pilot Geri Bildirim" sekmesi eklendi
+- [x] StudentDashboard'a geri bildirim banner'ı eklendi
+- [x] Analytics event tracking entegre edildi (feedbackSubmit)
+- [x] 11 vitest testi yazıldı ve geçti (submit, getAll, getStats - yetki kontrolleri dahil)
+- [x] Toplam 78/78 test geçiyor, TypeScript 0 hata
