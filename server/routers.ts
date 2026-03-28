@@ -710,6 +710,18 @@ export const appRouter = router({
           studentName: result.userName,
         });
 
+        // Create in-app notification for student
+        try {
+          await db.createNotification({
+            userId: input.userId,
+            title: '🔓 Yeni Etabınız Açıldı!',
+            message: `"${result.stageName}" etabı admin tarafından açıldı. Hemen başlayabilirsiniz!`,
+            type: 'stage_unlocked',
+          });
+        } catch (notifErr) {
+          console.error('Failed to create unlock notification:', notifErr);
+        }
+
         return { success: true, stageName: result.stageName };
       }),
 
@@ -1035,6 +1047,22 @@ export const appRouter = router({
           }
         }
         
+        // Create in-app notification for student
+        if (report.userId) {
+          try {
+            await db.createNotification({
+              userId: report.userId,
+              title: input.approved ? '✅ Raporunuz Onaylandı!' : '⚠️ Raporunuz İnceleme Bekliyor',
+              message: input.approved 
+                ? `"${stage?.name || 'Etap'}" raporunuz mentorünüz tarafından onaylandı. PDF olarak indirebilirsiniz.`
+                : `"${stage?.name || 'Etap'}" raporunuz için geri bildirim verildi: ${input.feedback || 'Lütfen tekrar inceleyin.'}`,
+              type: input.approved ? 'report_approved' : 'report_rejected',
+            });
+          } catch (notifErr) {
+            console.error('Failed to create notification:', notifErr);
+          }
+        }
+        
         return { success: true };
       }),
     
@@ -1273,9 +1301,19 @@ export const appRouter = router({
           console.warn('[Mentor] Admin notification failed:', e);
         }
 
+         // Create in-app notification for student
+        try {
+          await db.createNotification({
+            userId: input.userId,
+            title: '🔓 Yeni Etabınız Açıldı!',
+            message: `"${result.stageName}" etabı mentorünüz tarafından açıldı. Hemen başlayabilirsiniz!`,
+            type: 'stage_unlocked',
+          });
+        } catch (notifErr) {
+          console.error('Failed to create unlock notification:', notifErr);
+        }
         return { success: true, stageName: result.stageName };
       }),
-
     // Get stage unlock audit logs for mentor's students
     getMyUnlockLogs: mentorProcedure.query(async ({ ctx }) => {
       if (hasRole(ctx.user.role, 'admin')) {
@@ -1402,6 +1440,27 @@ export const appRouter = router({
               console.error('Failed to send mentor notification:', err);
             });
           }
+        }
+        
+        // Create in-app notification for student
+        try {
+          await db.createNotification({
+            userId,
+            title: '🎉 Etap Tamamlandı!',
+            message: `${stage?.name || 'Etap'} başarıyla tamamlandı. Raporunuz hazırlanıyor...`,
+            type: 'stage_completed',
+          });
+          // Notify mentor in-app
+          if (student && student.mentorId) {
+            await db.createNotification({
+              userId: student.mentorId,
+              title: '📚 Öğrenci Etap Tamamladı',
+              message: `${student.name} "${stage?.name || 'Etap'}" etabını tamamladı. Raporu incelemeyi unutmayın.`,
+              type: 'student_progress',
+            });
+          }
+        } catch (notifErr) {
+          console.error('Failed to create notification:', notifErr);
         }
         
         return { success: true, message: 'Etap başarıyla tamamlandı!' };
