@@ -1,17 +1,8 @@
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 
-// Email configuration
-// For production, use environment variables for SMTP credentials
-// These should be set via webdev_request_secrets
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || 'smtp.gmail.com',
-  port: parseInt(process.env.SMTP_PORT || '587'),
-  secure: false, // true for 465, false for other ports
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-});
+// Resend API configuration
+const resend = new Resend(process.env.RESEND_API_KEY);
+const FROM_EMAIL = process.env.EMAIL_FROM || 'Meslegim.tr <bilgi@meslegim.tr>';
 
 export interface EmailOptions {
   to: string;
@@ -21,62 +12,24 @@ export interface EmailOptions {
 
 export async function sendEmail(options: EmailOptions): Promise<boolean> {
   try {
-    const info = await transporter.sendMail({
-      from: `"Meslegim.tr" <${process.env.SMTP_USER}>`,
-      to: options.to,
+    const { data, error } = await resend.emails.send({
+      from: FROM_EMAIL,
+      to: [options.to],
       subject: options.subject,
       html: options.html,
     });
 
-    console.log('Email sent:', info.messageId);
+    if (error) {
+      console.error('[Email] Resend error:', error);
+      return false;
+    }
+
+    console.log(`[Email] Sent to ${options.to}: ${options.subject} (id: ${data?.id})`);
     return true;
   } catch (error) {
-    console.error('Error sending email:', error);
+    console.error('[Email] Failed to send:', error);
     return false;
   }
-}
-
-// Email templates
-export function getRegistrationEmailTemplate(name: string, email: string): string {
-  return `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="utf-8">
-      <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-        .header { background: #3b82f6; color: white; padding: 20px; text-align: center; }
-        .content { padding: 20px; background: #f9fafb; }
-        .footer { padding: 20px; text-align: center; font-size: 12px; color: #666; }
-      </style>
-    </head>
-    <body>
-      <div class="container">
-        <div class="header">
-          <h1>Meslegim.tr'ye Hoş Geldiniz!</h1>
-        </div>
-        <div class="content">
-          <p>Merhaba <strong>${name}</strong>,</p>
-          <p>Meslegim.tr kariyer değerlendirme platformuna başvurunuz alındı.</p>
-          <p>Mentor onayından sonra e-posta ile bilgilendirileceksiniz ve kariyer değerlendirme süreciniz başlayacak.</p>
-          <p><strong>Süreç nasıl işliyor?</strong></p>
-          <ul>
-            <li>✅ Başvurunuz mentorlarımız tarafından incelenecek</li>
-            <li>📧 Onay sonrası e-posta ile bilgilendirileceksiniz</li>
-            <li>📝 3 aşamalı değerlendirme sürecine başlayacaksınız</li>
-            <li>📊 Her aşama sonunda ara değerlendirme raporu alacaksınız</li>
-            <li>🎯 Süreç sonunda kapsamlı kariyer rehberliği raporu hazırlanacak</li>
-          </ul>
-          <p>Herhangi bir sorunuz olursa bizimle iletişime geçebilirsiniz.</p>
-        </div>
-        <div class="footer">
-          <p>© 2026 Meslegim.tr - Kariyer Değerlendirme Platformu</p>
-        </div>
-      </div>
-    </body>
-    </html>
-  `;
 }
 
 export function getApprovalEmailTemplate(name: string, email: string): string {
@@ -97,7 +50,7 @@ export function getApprovalEmailTemplate(name: string, email: string): string {
     <body>
       <div class="container">
         <div class="header">
-          <h1>🎉 Başvurunuz Onaylandı!</h1>
+          <h1>Başvurunuz Onaylandı!</h1>
         </div>
         <div class="content">
           <p>Merhaba <strong>${name}</strong>,</p>
@@ -106,10 +59,10 @@ export function getApprovalEmailTemplate(name: string, email: string): string {
           <p><strong>İlk adım:</strong> 1. Etap - Meslek Seçimi Yetkinlik Değerlendirmesi</p>
           <p>Bu etapta temel yetkinlikleriniz, ilgi alanlarınız ve kariyer hedefleriniz değerlendirilecek.</p>
           <a href="${process.env.VITE_OAUTH_PORTAL_URL}" class="button">Platforma Giriş Yap</a>
-          <p><strong>Önemli:</strong> Her etap tamamlandıktan sonra 7 gün içinde bir sonraki etap otomatik olarak aktif hale gelecektir.</p>
+          <p><strong>Önemli:</strong> Her etap tamamlandıktan sonra belirlenen süre içinde bir sonraki etap otomatik olarak aktif hale gelecektir.</p>
         </div>
         <div class="footer">
-          <p>© 2026 Meslegim.tr - Kariyer Değerlendirme Platformu</p>
+          <p>&copy; 2026 Meslegim.tr - Kariyer Değerlendirme Platformu</p>
         </div>
       </div>
     </body>
@@ -135,7 +88,7 @@ export function getStageActivationEmailTemplate(name: string, stageName: string)
     <body>
       <div class="container">
         <div class="header">
-          <h1>📝 Yeni Etap Aktif!</h1>
+          <h1>Yeni Etap Aktif!</h1>
         </div>
         <div class="content">
           <p>Merhaba <strong>${name}</strong>,</p>
@@ -146,7 +99,7 @@ export function getStageActivationEmailTemplate(name: string, stageName: string)
           <p><strong>Hatırlatma:</strong> Her etap tamamlandıktan sonra ara değerlendirme raporu hazırlanacak ve mentor onayına sunulacaktır.</p>
         </div>
         <div class="footer">
-          <p>© 2026 Meslegim.tr - Kariyer Değerlendirme Platformu</p>
+          <p>&copy; 2026 Meslegim.tr - Kariyer Değerlendirme Platformu</p>
         </div>
       </div>
     </body>
@@ -172,7 +125,7 @@ export function getReportReadyEmailTemplate(name: string, stageName: string): st
     <body>
       <div class="container">
         <div class="header">
-          <h1>📊 Raporunuz Hazır!</h1>
+          <h1>Raporunuz Hazır!</h1>
         </div>
         <div class="content">
           <p>Merhaba <strong>${name}</strong>,</p>
@@ -187,7 +140,7 @@ export function getReportReadyEmailTemplate(name: string, stageName: string): st
           </ul>
         </div>
         <div class="footer">
-          <p>© 2026 Meslegim.tr - Kariyer Değerlendirme Platformu</p>
+          <p>&copy; 2026 Meslegim.tr - Kariyer Değerlendirme Platformu</p>
         </div>
       </div>
     </body>
