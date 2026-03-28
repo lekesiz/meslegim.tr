@@ -966,3 +966,10 @@ Platform **minimum seviyede sağlıklı** çalışıyor. Tüm temel özellikler 
 - [x] Google Fonts entegrasyonu
 - [x] reportGenerator.ts Fransızca prompt'ları temizle
 - [x] Pazar araştırması ve strateji raporu
+
+## 🔥 Yayınlama ve Son Adımlar (29 Mart 2026)
+- [x] Resend domain doğrulaması ve e-posta production modu
+- [ ] Site yayınlama ve domain bağlama
+- [ ] Uçtan uca test senaryoları (5 senaryo) oluştur ve test et
+- [ ] Analytics entegrasyonu (Plausible/GA)
+- [ ] Pilot kullanıcı geri bildirim formu (NPS + açık uçlu soru)
