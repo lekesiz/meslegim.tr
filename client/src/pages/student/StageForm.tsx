@@ -12,6 +12,7 @@ import { Progress } from '@/components/ui/progress';
 import { trpc } from '@/lib/trpc';
 import { Loader2, Save, Send } from 'lucide-react';
 import { toast } from 'sonner';
+import { analytics } from '@/lib/analytics';
 
 type Answer = {
   [questionId: number]: string;
@@ -54,6 +55,7 @@ export default function StageForm() {
   });
   const submitStageMutation = trpc.student.submitStage.useMutation({
     onSuccess: () => {
+      analytics.stageComplete(Number(stageId), activeStage?.stageName || '');
       toast.success('Etap başarıyla tamamlandı! Raporunuz hazırlanıyor.');
       setLocation('/dashboard/student');
     },

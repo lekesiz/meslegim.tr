@@ -22,6 +22,7 @@ import {
   Clock,
   Award
 } from "lucide-react";
+import { analytics } from "@/lib/analytics";
 
 export default function Home() {
   const [showForm, setShowForm] = useState(() => {
@@ -42,6 +43,7 @@ export default function Home() {
 
   const registerMutation = trpc.auth.register.useMutation({
     onSuccess: () => {
+      analytics.register(formData.ageGroup);
       setFormSuccess("Başvurunuz alındı! Mentor onayından sonra e-posta ile bilgilendirileceksiniz.");
       setFormError("");
       setTimeout(() => {
@@ -200,6 +202,7 @@ export default function Home() {
                   onCheckedChange={(checked) =>
                     setFormData({ ...formData, kvkkConsent: checked === true })
                   }
+                  className="mt-1 shrink-0"
                 />
                 <div className="flex-1">
                   <Label

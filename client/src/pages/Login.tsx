@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useLocation } from "wouter";
 import { Briefcase, ArrowLeft, AlertCircle, CheckCircle } from "lucide-react";
+import { analytics } from "@/lib/analytics";
 
 export default function Login() {
   const [, setLocation] = useLocation();
@@ -36,6 +37,7 @@ export default function Login() {
   const loginMutation = trpc.auth.login.useMutation({
     onSuccess: () => {
       setErrorMessage("");
+      analytics.login('user');
       // Hard redirect so auth state is fully refreshed
       window.location.replace('/dashboard');
     },

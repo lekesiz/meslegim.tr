@@ -8,6 +8,7 @@ import { useEffect } from 'react';
 import { toast } from 'sonner';
 import FeedbackForm from '@/components/FeedbackForm';
 import { Streamdown } from 'streamdown';
+import { analytics } from '@/lib/analytics';
 
 export default function ReportView() {
   const [, params] = useRoute('/dashboard/student/reports/:id');
@@ -23,6 +24,7 @@ export default function ReportView() {
   const generatePDFMutation = trpc.student.generateReportPDF.useMutation({
     onSuccess: (data) => {
       if (data.pdfUrl) {
+        analytics.reportDownloadPDF(reportId);
         window.open(data.pdfUrl, '_blank');
         toast.success('PDF başarıyla oluşturuldu ve indiriliyor!');
       }

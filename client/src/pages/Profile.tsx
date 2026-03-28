@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { ArrowLeft, User, Lock, Mail, CheckCircle, AlertCircle, Shield } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { analytics } from "@/lib/analytics";
 
 export default function Profile() {
   const { user } = useAuth();
@@ -56,6 +57,7 @@ function ProfileInfoCard() {
 
   const updateMutation = trpc.profile.update.useMutation({
     onSuccess: () => {
+      analytics.profileUpdate();
       toast.success("Profil bilgileriniz güncellendi");
       utils.profile.get.invalidate();
       utils.auth.me.invalidate();
@@ -120,6 +122,7 @@ function ChangePasswordCard() {
 
   const changeMutation = trpc.profile.changePassword.useMutation({
     onSuccess: () => {
+      analytics.passwordChange();
       toast.success("Şifreniz başarıyla güncellendi");
       setCurrentPassword("");
       setNewPassword("");
