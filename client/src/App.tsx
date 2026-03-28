@@ -29,6 +29,7 @@ const GizlilikPolitikasi = lazy(() => import("./pages/GizlilikPolitikasi"));
 const KullanimSartlari = lazy(() => import("./pages/KullanimSartlari"));
 const Profile = lazy(() => import("./pages/Profile"));
 const VerifyEmail = lazy(() => import("./pages/VerifyEmail"));
+const PilotFeedback = lazy(() => import("./pages/PilotFeedback"));
 
 function PageLoader() {
   return (
@@ -53,6 +54,7 @@ function Router() {
         <Route path="/kullanim-sartlari" component={KullanimSartlari} />
         <Route path="/profile" component={Profile} />
         <Route path="/verify-email/:token" component={VerifyEmail} />
+        <Route path="/geri-bildirim" component={PilotFeedback} />
         
         {/* Dashboard - role-based routing */}
         <Route path="/dashboard" component={Dashboard} />

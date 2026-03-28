@@ -1,6 +1,6 @@
 import { eq, and, or, desc, inArray, gte, lte } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, stages, questions, answers, userStages, reports, mentorNotes, messages, feedbacks, certificates, platformSettings, stageUnlockLogs, notifications } from "../drizzle/schema";
+import { InsertUser, users, stages, questions, answers, userStages, reports, mentorNotes, messages, feedbacks, certificates, platformSettings, stageUnlockLogs, notifications, pilotFeedbacks } from "../drizzle/schema";
 import { ENV } from './_core/env';
 import { sql } from 'drizzle-orm';
 
@@ -1876,4 +1876,58 @@ export async function markAllNotificationsAsRead(userId: number) {
   if (!db) return;
   await db.update(notifications).set({ isRead: true })
     .where(eq(notifications.userId, userId));
+}
+
+
+// ========== Pilot Feedback ==========
+export async function createPilotFeedback(data: {
+  userId?: number;
+  npsScore: number;
+  whatWorkedWell?: string;
+  whatNeedsImprovement?: string;
+  wouldRecommend?: boolean;
+  additionalComments?: string;
+  userAgent?: string;
+}) {
+  const db = await getDb();
+  if (!db) return null;
+  const [result] = await db.insert(pilotFeedbacks).values(data);
+  return result.insertId;
+}
+
+export async function getAllPilotFeedbacks() {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select({
+    id: pilotFeedbacks.id,
+    userId: pilotFeedbacks.userId,
+    userName: users.name,
+    userEmail: users.email,
+    npsScore: pilotFeedbacks.npsScore,
+    whatWorkedWell: pilotFeedbacks.whatWorkedWell,
+    whatNeedsImprovement: pilotFeedbacks.whatNeedsImprovement,
+    wouldRecommend: pilotFeedbacks.wouldRecommend,
+    additionalComments: pilotFeedbacks.additionalComments,
+    createdAt: pilotFeedbacks.createdAt,
+  })
+    .from(pilotFeedbacks)
+    .leftJoin(users, eq(pilotFeedbacks.userId, users.id))
+    .orderBy(desc(pilotFeedbacks.createdAt));
+}
+
+export async function getPilotFeedbackStats() {
+  const db = await getDb();
+  if (!db) return { total: 0, avgNps: 0, promoters: 0, passives: 0, detractors: 0, npsScore: 0 };
+  
+  const allFeedbacks = await db.select({ npsScore: pilotFeedbacks.npsScore }).from(pilotFeedbacks);
+  const total = allFeedbacks.length;
+  if (total === 0) return { total: 0, avgNps: 0, promoters: 0, passives: 0, detractors: 0, npsScore: 0 };
+  
+  const avgNps = allFeedbacks.reduce((sum, f) => sum + f.npsScore, 0) / total;
+  const promoters = allFeedbacks.filter(f => f.npsScore >= 9).length;
+  const passives = allFeedbacks.filter(f => f.npsScore >= 7 && f.npsScore <= 8).length;
+  const detractors = allFeedbacks.filter(f => f.npsScore <= 6).length;
+  const npsScore = Math.round(((promoters - detractors) / total) * 100);
+  
+  return { total, avgNps: Math.round(avgNps * 10) / 10, promoters, passives, detractors, npsScore };
 }

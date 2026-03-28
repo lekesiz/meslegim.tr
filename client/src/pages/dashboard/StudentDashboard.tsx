@@ -5,7 +5,7 @@ import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { trpc } from "@/lib/trpc";
-import { Loader2, FileText, Clock, CheckCircle2, Lock, Award, MessageCircle, User } from "lucide-react";
+import { Loader2, FileText, Clock, CheckCircle2, Lock, Award, MessageCircle, User, MessageSquareHeart } from "lucide-react";
 import { ChatDialog } from "@/components/ChatDialog";
 import { useState } from "react";
 import { DashboardSkeleton } from "@/components/DashboardSkeleton";
@@ -321,6 +321,25 @@ export default function StudentDashboard() {
             </CardContent>
           </Card>
         )}
+        {/* Pilot Geri Bildirim Banner */}
+        <Card className="bg-gradient-to-r from-purple-50 to-blue-50 border-purple-200">
+          <CardContent className="py-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <MessageSquareHeart className="h-5 w-5 text-purple-600" />
+              <div>
+                <p className="font-medium text-purple-900">Deneyiminizi paylaşın!</p>
+                <p className="text-sm text-purple-700">Platformu geliştirmemize yardımcı olun</p>
+              </div>
+            </div>
+            <Button
+              variant="outline"
+              className="border-purple-300 text-purple-700 hover:bg-purple-100"
+              onClick={() => setLocation("/geri-bildirim")}
+            >
+              Geri Bildirim Ver
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     </DashboardLayout>
   );

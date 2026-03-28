@@ -268,3 +268,26 @@ export const notifications = mysqlTable("notifications", {
 }));
 export type Notification = typeof notifications.$inferSelect;
 export type InsertNotification = typeof notifications.$inferInsert;
+
+
+/**
+ * Pilot kullanıcı geri bildirim tablosu
+ * NPS skoru + açık uçlu sorular
+ */
+export const pilotFeedbacks = mysqlTable("pilot_feedbacks", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId"),
+  npsScore: int("npsScore").notNull(), // 0-10 NPS skoru
+  whatWorkedWell: text("whatWorkedWell"), // Ne iyi çalıştı?
+  whatNeedsImprovement: text("whatNeedsImprovement"), // Ne iyileştirilmeli?
+  wouldRecommend: boolean("wouldRecommend"), // Arkadaşına önerir misin?
+  additionalComments: text("additionalComments"), // Ek yorumlar
+  userAgent: text("userAgent"), // Tarayıcı bilgisi
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+  userIdIdx: index("pf_user_id_idx").on(table.userId),
+  npsScoreIdx: index("pf_nps_score_idx").on(table.npsScore),
+  createdAtIdx: index("pf_created_at_idx").on(table.createdAt),
+}));
+export type PilotFeedback = typeof pilotFeedbacks.$inferSelect;
+export type InsertPilotFeedback = typeof pilotFeedbacks.$inferInsert;

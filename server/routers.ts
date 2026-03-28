@@ -1640,6 +1640,42 @@ export const appRouter = router({
       return performFullAnalysis(allAnswers);
     }),
   }),
+
+  // ========== Pilot Feedback Router ==========
+  pilotFeedback: router({
+    submit: publicProcedure
+      .input(z.object({
+        npsScore: z.number().min(0).max(10),
+        whatWorkedWell: z.string().optional(),
+        whatNeedsImprovement: z.string().optional(),
+        wouldRecommend: z.boolean().optional(),
+        additionalComments: z.string().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const userId = ctx.user?.id;
+        const userAgent = ctx.req?.headers?.['user-agent'] || undefined;
+        const id = await db.createPilotFeedback({
+          userId,
+          npsScore: input.npsScore,
+          whatWorkedWell: input.whatWorkedWell || undefined,
+          whatNeedsImprovement: input.whatNeedsImprovement || undefined,
+          wouldRecommend: input.wouldRecommend,
+          additionalComments: input.additionalComments || undefined,
+          userAgent,
+        });
+        return { success: true, id };
+      }),
+
+    // Admin: tüm geri bildirimleri listele
+    getAll: adminProcedure.query(async () => {
+      return db.getAllPilotFeedbacks();
+    }),
+
+    // Admin: NPS istatistikleri
+    getStats: adminProcedure.query(async () => {
+      return db.getPilotFeedbackStats();
+    }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;
