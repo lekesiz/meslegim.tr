@@ -969,7 +969,7 @@ Platform **minimum seviyede sağlıklı** çalışıyor. Tüm temel özellikler 
 
 ## 🔥 Yayınlama ve Son Adımlar (29 Mart 2026)
 - [x] Resend domain doğrulaması ve e-posta production modu
-- [ ] Site yayınlama ve domain bağlama
-- [ ] Uçtan uca test senaryoları (5 senaryo) oluştur ve test et
-- [ ] Analytics entegrasyonu (Plausible/GA)
+- [x] Site yayınlama ve domain bağlama (domain'ler zaten bağlı: meslegim.tr, www.meslegim.tr)
+- [x] Uçtan uca test senaryoları (5 senaryo) oluştur ve test et
+- [x] Analytics entegrasyonu (Umami + özel event tracking)
 - [ ] Pilot kullanıcı geri bildirim formu (NPS + açık uçlu soru)
