@@ -1,6 +1,7 @@
 import { generateStageReport } from './_core/reportGeneration';
 import { convertMarkdownToPDF } from './_core/pdfExport';
 import * as db from './db';
+import { performFullAnalysis } from './services/riasecAnalyzer';
 
 export async function generateStageReportAsync(userId: number, stageId: number) {
   console.log(`[ReportGen] Starting report generation for user ${userId}, stage ${stageId}`);
@@ -35,13 +36,36 @@ export async function generateStageReportAsync(userId: number, stageId: number) 
     });
     console.log(`[ReportGen] Formatted ${formattedAnswers.length} answers for LLM`);
 
-    // Generate report content
+    // Perform RIASEC analysis
+    console.log(`[ReportGen] Performing RIASEC analysis...`);
+    const riasecAnalysis = performFullAnalysis(formattedAnswers);
+    console.log(`[ReportGen] RIASEC top 3: ${riasecAnalysis.riasecTop3.join(', ')}`);
+
+    // Build RIASEC context for LLM
+    const riasecContext = `\n\n## RIASEC Analiz Sonuçları (Otomatik Hesaplanmış)
+R (Gerçekçi): ${riasecAnalysis.riasec.R}/100
+I (Araştırmacı): ${riasecAnalysis.riasec.I}/100
+A (Sanatsal): ${riasecAnalysis.riasec.A}/100
+S (Sosyal): ${riasecAnalysis.riasec.S}/100
+E (Girişimci): ${riasecAnalysis.riasec.E}/100
+C (Geleneksel): ${riasecAnalysis.riasec.C}/100
+
+En güçlü boyutlar: ${riasecAnalysis.strengthAreas.join(', ')}
+Gelişim alanları: ${riasecAnalysis.developmentAreas.join(', ')}
+Önerilen kariyer alanları: ${riasecAnalysis.careerSuggestions.join(', ')}
+
+Lütfen bu RIASEC skorlarını da raporda değerlendir ve kariyer önerilerini buna göre destekle.`;
+
+    // Generate report content with RIASEC context
     console.log(`[ReportGen] Calling LLM to generate report...`);
     const reportContent = await generateStageReport(
       user.name || user.email || 'Öğrenci',
       stage.name,
       user.ageGroup || '18-21',
-      formattedAnswers
+      formattedAnswers.map((a, i) => ({
+        ...a,
+        answer: a.answer + (i === formattedAnswers.length - 1 ? riasecContext : ''),
+      }))
     );
     console.log(`[ReportGen] LLM report generated, length: ${reportContent.length} chars`);
 

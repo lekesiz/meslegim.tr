@@ -1,0 +1,50 @@
+{
+  "query": "SELECT id, stageId, text, type, `options`, `order` FROM questions WHERE stageId = 60001 ORDER BY `order` LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute SELECT id, stageId, text, type, `options`, `order` FROM questions WHERE stageId = 60001 ORDER BY `order` LIMIT 5;",
+  "rows": [
+    {
+      "id": "150042",
+      "stageId": "60001",
+      "text": "Okulda en çok hangi dersleri seviyorsun? (En fazla 3 seçin)",
+      "type": "multiple_choice",
+      "options": "[\"Matematik\", \"Fizik\", \"Kimya\", \"Biyoloji\", \"Tarih / Coğrafya\", \"Türkçe / Edebiyat\", \"İngilizce / Yabancı Dil\", \"Bilişim / Teknoloji\", \"Beden Eğitimi / Spor\", \"Müzik / Görsel Sanatlar\"]",
+      "order": "1"
+    },
+    {
+      "id": "150043",
+      "stageId": "60001",
+      "text": "Boş zamanlarında en çok ne yapmaktan keyif alırsın? (En fazla 3 seçin)",
+      "type": "multiple_choice",
+      "options": "[\"Resim çizmek / el sanatları yapmak\", \"Müzik aleti çalmak veya şarkı söylemek\", \"Spor yapmak / antrenman\", \"Bilgisayar / kodlama / oyun geliştirme\", \"Kitap okumak / hikaye yazmak\", \"Arkadaşlarıma yardım etmek / sorunlarını dinlemek\", \"Doğada vakit geçirmek / hayvanlarla ilgilenmek\", \"Matematik / bulmaca çözmek\", \"Video / fotoğraf çekmek / içerik üretmek\", \"Sosyal medya / topluluk yönetimi\"]",
+      "order": "2"
+    },
+    {
+      "id": "150044",
+      "stageId": "60001",
+      "text": "Sınıfta ya da grup çalışmalarında genellikle hangi rolü üstlenirsin?",
+      "type": "multiple_choice",
+      "options": "[\"Lider: Grubu organize eder, kararları ben alırım\", \"Fikir üretici: Yaratıcı çözümler öneririm\", \"Araştırmacı: Bilgi toplar, analiz yaparım\", \"Uygulayıcı: Planlananı titizlikle hayata geçiririm\", \"Arabulucu: Grup içi uyumu sağlarım\", \"Takipçi: Grubun kararlarına uyarım\"]",
+      "order": "3"
+    },
+    {
+      "id": "150045",
+      "stageId": "60001",
+      "text": "Gelecekte çalışmak istediğin ortam hangisine daha yakın?",
+      "type": "multiple_choice",
+      "options": "[\"Ofis ortamı (masa başı, bilgisayar)\", \"Saha / dışarıda aktif çalışma\", \"Hastane / klinik / sağlık ortamı\", \"Okul / eğitim ortamı\", \"Atölye / laboratuvar / üretim alanı\", \"Sahne / stüdyo / yaratıcı ortam\", \"Uzaktan / evden çalışma\", \"Henüz bilmiyorum\"]",
+      "order": "4"
+    },
+    {
+      "id": "150046",
+      "stageId": "60001",
+      "text": "Ailen senden hangi mesleği yapmanı bekliyor?",
+      "type": "multiple_choice",
+      "options": "[\"Doktor / Mühendis / Avukat (klasik prestijli meslekler)\", \"Öğretmen / Akademisyen\", \"İş insanı / Girişimci\", \"Sanatçı / Sporcu / Yaratıcı alan\", \"Devlet memuru / Kamu görevlisi\", \"Ailemin beklentisi yok, kendi kararımı veriyorum\", \"Aile baskısı var ama farklı bir şey istiyorum\"]",
+      "order": "5"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tstageId\ttext\ttype\toptions\torder\n150042\t60001\tOkulda en çok hangi dersleri seviyorsun? (En fazla 3 seçin)\tmultiple_choice\t[\"Matematik\", \"Fizik\", \"Kimya\", \"Biyoloji\", \"Tarih / Coğrafya\", \"Türkçe / Edebiyat\", \"İngilizce / Yabancı Dil\", \"Bilişim / Teknoloji\", \"Beden Eğitimi / Spor\", \"Müzik / Görsel Sanatlar\"]\t1\n150043\t60001\tBoş zamanlarında en çok ne yapmaktan keyif alırsın? (En fazla 3 seçin)\tmultiple_choice\t[\"Resim çizmek / el sanatları yapmak\", \"Müzik aleti çalmak veya şarkı söylemek\", \"Spor yapmak / antrenman\", \"Bilgisayar / kodlama / oyun geliştirme\", \"Kitap okumak / hikaye yazmak\", \"Arkadaşlarıma yardım etmek / sorunlarını dinlemek\", \"Doğada vakit geçirmek / hayvanlarla ilgilenmek\", \"Matematik / bulmaca çözmek\", \"Video / fotoğraf çekmek / içerik üretmek\", \"Sosyal medya / topluluk yönetimi\"]\t2\n150044\t60001\tSınıfta ya da grup çalışmalarında genellikle hangi rolü üstlenirsin?\tmultiple_choice\t[\"Lider: Grubu organize eder, kararları ben alırım\", \"Fikir üretici: Yaratıcı çözümler öneririm\", \"Araştırmacı: Bilgi toplar, analiz yaparım\", \"Uygulayıcı: Planlananı titizlikle hayata geçiririm\", \"Arabulucu: Grup içi uyumu sağlarım\", \"Takipçi: Grubun kararlarına uyarım\"]\t3\n150045\t60001\tGelecekte çalışmak istediğin ortam hangisine daha yakın?\tmultiple_choice\t[\"Ofis ortamı (masa başı, bilgisayar)\", \"Saha / dışarıda aktif çalışma\", \"Hastane / klinik / sağlık ortamı\", \"Okul / eğitim ortamı\", \"Atölye / laboratuvar / üretim alanı\", \"Sahne / stüdyo / yaratıcı ortam\", \"Uzaktan / evden çalışma\", \"Henüz bilmiyorum\"]\t4\n150046\t60001\tAilen senden hangi mesleği yapmanı bekliyor?\tmultiple_choice\t[\"Doktor / Mühendis / Avukat (klasik prestijli meslekler)\", \"Öğretmen / Akademisyen\", \"İş insanı / Girişimci\", \"Sanatçı / Sporcu / Yaratıcı alan\", \"Devlet memuru / Kamu görevlisi\", \"Ailemin beklentisi yok, kendi kararımı veriyorum\", \"Aile baskısı var ama farklı bir şey istiyorum\"]\t5\n",
+  "stderr": "",
+  "execution_time_ms": 58
+}

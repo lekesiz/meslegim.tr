@@ -61,6 +61,8 @@ export const questions = mysqlTable("questions", {
   text: text("text").notNull(),
   type: mysqlEnum("type", ["multiple_choice", "likert", "ranking", "text"]).notNull(),
   options: json("options"), // JSON array of options for multiple_choice, likert, ranking
+  category: varchar("category", { length: 50 }), // RIASEC, Big Five, Values, Skills, etc.
+  metadata: json("metadata"), // Scoring weights, dimension mappings, etc.
   required: boolean("required").default(true).notNull(),
   order: int("order").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),

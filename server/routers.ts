@@ -1548,6 +1548,38 @@ export const appRouter = router({
 
       return certificate;
     }),
+
+    getMyRIASECProfile: studentProcedure.query(async ({ ctx }) => {
+      const userId = ctx.user.id;
+      
+      // Get all completed stages for this user
+      const allStages = await db.getAllUserStages();
+      const completedStages = allStages.filter(s => s.userId === userId && s.status === 'completed');
+      
+      if (completedStages.length === 0) {
+        return null;
+      }
+      
+      // Collect all answers from completed stages
+      const allAnswers: Array<{ question: string; answer: string }> = [];
+      for (const us of completedStages) {
+        const stageAnswers = await db.getAnswersByUserAndStage(userId, us.stageId);
+        const stageQuestions = await db.getQuestionsByStage(us.stageId);
+        for (const q of stageQuestions) {
+          const ans = stageAnswers.find(a => a.questionId === q.id);
+          if (ans) {
+            allAnswers.push({ question: q.text, answer: ans.answer || '' });
+          }
+        }
+      }
+      
+      if (allAnswers.length === 0) {
+        return null;
+      }
+      
+      const { performFullAnalysis } = await import('./services/riasecAnalyzer');
+      return performFullAnalysis(allAnswers);
+    }),
   }),
 });
 
