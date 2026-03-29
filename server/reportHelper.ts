@@ -3,6 +3,7 @@ import { convertMarkdownToPDF } from './_core/pdfExport';
 import * as db from './db';
 import { performFullAnalysis } from './services/riasecAnalyzer';
 import { performValuesAnalysis, getValuesContext } from './services/valuesAnalyzer';
+import { performRiskAnalysis, getRiskContext } from './services/riskAnalyzer';
 
 /**
  * Etap adından değerler testi olup olmadığını belirle
@@ -10,6 +11,14 @@ import { performValuesAnalysis, getValuesContext } from './services/valuesAnalyz
 function isValuesStage(stageName: string): boolean {
   const lower = (stageName || '').toLowerCase();
   return lower.includes('değer') || lower.includes('kariyer değerleri') || lower.includes('values');
+}
+
+/**
+ * Etap adından risk analizi olup olmadığını belirle
+ */
+function isRiskStage(stageName: string): boolean {
+  const lower = (stageName || '').toLowerCase();
+  return lower.includes('risk') || lower.includes('kariyer risk');
 }
 
 export async function generateStageReportAsync(userId: number, stageId: number) {
@@ -48,7 +57,13 @@ export async function generateStageReportAsync(userId: number, stageId: number) 
     let analysisContext = '';
 
     // Determine analysis type based on stage name
-    if (isValuesStage(stage.name)) {
+    if (isRiskStage(stage.name)) {
+      // Kariyer Risk Analizi
+      console.log(`[ReportGen] Performing Risk analysis (Kariyer Risk Analizi)...`);
+      const riskAnalysis = performRiskAnalysis(formattedAnswers);
+      console.log(`[ReportGen] Risk type: ${riskAnalysis.riskType}, score: ${riskAnalysis.overallScore}/100`);
+      analysisContext = getRiskContext(riskAnalysis);
+    } else if (isValuesStage(stage.name)) {
       // Kariyer Değerleri Envanteri analizi
       console.log(`[ReportGen] Performing Values analysis (Kariyer Değerleri Envanteri)...`);
       const valuesAnalysis = performValuesAnalysis(formattedAnswers);
