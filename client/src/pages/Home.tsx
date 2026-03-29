@@ -267,6 +267,9 @@ export default function Home() {
           </div>
           <div className="flex items-center gap-4">
             <Button variant="ghost" asChild>
+              <a href="/fiyatlandirma">Fiyatlandırma</a>
+            </Button>
+            <Button variant="ghost" asChild>
               <a href="/login">Giriş Yap</a>
             </Button>
             <Button onClick={() => setShowForm(true)}>

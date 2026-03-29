@@ -1,0 +1,1 @@
+ALTER TABLE `scheduled_reminders` MODIFY COLUMN `type` enum('stage_incomplete','stage_upcoming','weekly_digest','stage_reminder') NOT NULL;

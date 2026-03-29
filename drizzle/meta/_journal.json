@@ -120,6 +120,34 @@
       "when": 1774811221524,
       "tag": "0016_salty_marvel_zombies",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "5",
+      "when": 1774813098136,
+      "tag": "0017_complex_hulk",
+      "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "5",
+      "when": 1774814883646,
+      "tag": "0018_friendly_warlock",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "5",
+      "when": 1774815746015,
+      "tag": "0019_woozy_eddie_brock",
+      "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "5",
+      "when": 1774816994988,
+      "tag": "0020_unusual_colonel_america",
+      "breakpoints": true
     }
   ]
 }

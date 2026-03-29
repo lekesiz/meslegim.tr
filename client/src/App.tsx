@@ -31,6 +31,10 @@ const Profile = lazy(() => import("./pages/Profile"));
 const VerifyEmail = lazy(() => import("./pages/VerifyEmail"));
 const PilotFeedback = lazy(() => import("./pages/PilotFeedback"));
 const CareerProfile = lazy(() => import("./pages/student/CareerProfile"));
+const Achievements = lazy(() => import("./pages/student/Achievements"));
+const NotificationSettings = lazy(() => import("./pages/student/NotificationSettings"));
+const Pricing = lazy(() => import("./pages/Pricing"));
+const PaymentHistory = lazy(() => import("./pages/student/PaymentHistory"));
 
 function PageLoader() {
   return (
@@ -56,6 +60,7 @@ function Router() {
         <Route path="/profile" component={Profile} />
         <Route path="/verify-email/:token" component={VerifyEmail} />
         <Route path="/geri-bildirim" component={PilotFeedback} />
+        <Route path="/fiyatlandirma" component={Pricing} />
         
         {/* Dashboard - role-based routing */}
         <Route path="/dashboard" component={Dashboard} />
@@ -68,6 +73,9 @@ function Router() {
         <Route path="/dashboard/student/reports" component={MyReports} />
         <Route path="/dashboard/student/reports/:id" component={StudentReportView} />
         <Route path="/dashboard/student/career-profile" component={CareerProfile} />
+        <Route path="/dashboard/student/achievements" component={Achievements} />
+        <Route path="/dashboard/student/notification-settings" component={NotificationSettings} />
+        <Route path="/dashboard/student/payment-history" component={PaymentHistory} />
         <Route path="/dashboard/student/stage/:stageId" component={StudentStageForm} />
         <Route path="/dashboard/student/:id" component={StudentDetailView} />
         <Route path="/reports/:id" component={ReportView} />

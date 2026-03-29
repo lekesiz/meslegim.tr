@@ -1,6 +1,6 @@
 import { eq, and, or, desc, inArray, gte, lte } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, stages, questions, answers, userStages, reports, mentorNotes, messages, feedbacks, certificates, platformSettings, stageUnlockLogs, notifications, pilotFeedbacks } from "../drizzle/schema";
+import { InsertUser, users, stages, questions, answers, userStages, reports, mentorNotes, messages, feedbacks, certificates, platformSettings, stageUnlockLogs, notifications, pilotFeedbacks, purchases } from "../drizzle/schema";
 import { ENV } from './_core/env';
 import { sql } from 'drizzle-orm';
 
@@ -1970,4 +1970,56 @@ export async function getPilotFeedbackStats() {
   const npsScore = Math.round(((promoters - detractors) / total) * 100);
   
   return { total, avgNps: Math.round(avgNps * 10) / 10, promoters, passives, detractors, npsScore };
+}
+
+
+// ==================== PURCHASES ====================
+
+export async function createPurchase(data: {
+  userId: number;
+  productId: string;
+  stripeSessionId: string;
+  amountInCents: number;
+  currency?: string;
+  metadata?: string;
+}) {
+  const db = await getDb();
+  if (!db) return null;
+  const result = await db.insert(purchases).values({
+    userId: data.userId,
+    productId: data.productId,
+    stripeSessionId: data.stripeSessionId,
+    amountInCents: data.amountInCents,
+    currency: data.currency || 'try',
+    status: 'pending',
+    metadata: data.metadata,
+  });
+  return result[0].insertId;
+}
+
+export async function getUserPurchases(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(purchases).where(eq(purchases.userId, userId)).orderBy(sql`${purchases.createdAt} DESC`);
+}
+
+export async function getUserCompletedPurchases(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(purchases)
+    .where(and(eq(purchases.userId, userId), eq(purchases.status, 'completed')))
+    .orderBy(sql`${purchases.createdAt} DESC`);
+}
+
+export async function hasUserPurchasedProduct(userId: number, productId: string): Promise<boolean> {
+  const db = await getDb();
+  if (!db) return false;
+  const result = await db.select().from(purchases)
+    .where(and(
+      eq(purchases.userId, userId),
+      eq(purchases.productId, productId),
+      eq(purchases.status, 'completed')
+    ))
+    .limit(1);
+  return result.length > 0;
 }

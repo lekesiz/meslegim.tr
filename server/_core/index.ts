@@ -8,6 +8,7 @@ import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 import { initializeCronJobs } from "../services/cronJobs";
+import { registerStripeWebhook } from "../stripeWebhook";
 import helmet from "helmet";
 import cors from "cors";
 import { rateLimit } from "express-rate-limit";
@@ -55,9 +56,10 @@ async function startServer() {
           defaultSrc: ["'self'"],
           styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
           fontSrc: ["'self'", "https://fonts.gstatic.com"],
-          scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://manus-analytics.com"], // unsafe-eval needed for Vite HMR in dev
+          scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://manus-analytics.com", "https://js.stripe.com"], // unsafe-eval needed for Vite HMR in dev
+          frameSrc: ["'self'", "https://js.stripe.com", "https://hooks.stripe.com"],
           imgSrc: ["'self'", "data:", "https:"],
-          connectSrc: ["'self'", "https:", "https://manus-analytics.com"],
+          connectSrc: ["'self'", "https:", "https://manus-analytics.com", "https://api.stripe.com"],
         },
       },
       crossOriginEmbedderPolicy: false, // Needed for some external resources
@@ -101,6 +103,9 @@ async function startServer() {
     });
     app.use("/api/oauth", authLimiter);
   }
+
+  // Stripe webhook MUST be registered BEFORE body parsers (needs raw body)
+  registerStripeWebhook(app);
 
   // Configure body parser with larger size limit for file uploads
   app.use(express.json({ limit: "50mb" }));
