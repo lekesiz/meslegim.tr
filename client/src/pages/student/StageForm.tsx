@@ -155,24 +155,41 @@ export default function StageForm() {
       case 'multiple_choice':
         return (
           <div className="space-y-3">
-            {options.map((option: string, index: number) => (
-              <label
-                key={index}
-                htmlFor={`${question.id}-${index}`}
-                className="flex items-center space-x-3 p-3 rounded-lg border border-border hover:bg-accent cursor-pointer transition-colors"
-              >
-                <input
-                  type="radio"
-                  id={`${question.id}-${index}`}
-                  name={`question-${question.id}`}
-                  value={String(option)}
-                  checked={currentAnswer === String(option)}
-                  onChange={(e) => handleAnswerChange(question.id, e.target.value)}
-                  className="w-4 h-4 text-primary border-gray-300 focus:ring-2 focus:ring-primary"
-                />
-                <span className="text-sm font-medium">{option}</span>
-              </label>
-            ))}
+            {options.map((option: string, index: number) => {
+              const isSelected = currentAnswer === String(option);
+              const optionLetter = String.fromCharCode(65 + index); // A, B, C
+              return (
+                <label
+                  key={index}
+                  htmlFor={`${question.id}-${index}`}
+                  className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 ${
+                    isSelected
+                      ? 'border-primary bg-primary/5 shadow-md ring-1 ring-primary/20'
+                      : 'border-border hover:border-primary/40 hover:bg-accent/50'
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    id={`${question.id}-${index}`}
+                    name={`question-${question.id}`}
+                    value={String(option)}
+                    checked={isSelected}
+                    onChange={(e) => handleAnswerChange(question.id, e.target.value)}
+                    className="sr-only"
+                  />
+                  <span className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-colors ${
+                    isSelected
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-muted text-muted-foreground'
+                  }`}>
+                    {optionLetter}
+                  </span>
+                  <span className={`text-sm font-medium ${
+                    isSelected ? 'text-foreground' : 'text-muted-foreground'
+                  }`}>{option}</span>
+                </label>
+              );
+            })}
           </div>
         );
 
