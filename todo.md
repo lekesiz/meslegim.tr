@@ -1047,3 +1047,14 @@ Platform **minimum seviyede sağlıklı** çalışıyor. Tüm temel özellikler 
 - [x] PDF indirme desteği (LLM rapor + PDF export)
 - [x] Vitest testleri yaz (10 yeni test - 106/106 toplam)
 - [x] Checkpoint kaydet ve GitHub'a push yap
+
+
+## 🏆 Profesyonel Sertifika Tasarımı (29 Mart 2026)
+- [x] Mevcut sertifika sistemini incele (generateCertificate, certificates tablosu)
+- [x] Profesyonel PDF sertifika şablonu tasarla (PDFKit + altın çerçeve + dekoratif köşeler)
+- [x] Sertifika tasarımı: altın çerçeve, logo, imza alanı, QR doğrulama - TÜMÜ EKLENDİ
+- [x] Backend sertifika oluşturma mantığını güncelle (tamamlanan etaplar + RIASEC profili)
+- [x] Frontend sertifika görüntüleme ve indirme sayfası (altın gradient kart)
+- [x] Sertifika doğrulama sayfası güncelle (altın tema, badge, detaylı bilgi)
+- [x] Vitest testleri yaz (8 yeni test - 114/114 toplam)
+- [x] Checkpoint kaydet ve GitHub'a push yap
