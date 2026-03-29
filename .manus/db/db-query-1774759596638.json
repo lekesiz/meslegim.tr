@@ -1,0 +1,64 @@
+{
+  "query": "SELECT id, name, ageGroup, `order` FROM stages ORDER BY `order` LIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute SELECT id, name, ageGroup, `order` FROM stages ORDER BY `order` LIMIT 20;",
+  "rows": [
+    {
+      "id": "60004",
+      "name": "Etap 1: Kariyer Hazırlık ve Yetkinlik Değerlendirmesi",
+      "ageGroup": "18-21",
+      "order": "1"
+    },
+    {
+      "id": "60001",
+      "name": "Etap 1: Meslek Seçimi Yetkinlik Değerlendirmesi",
+      "ageGroup": "14-17",
+      "order": "1"
+    },
+    {
+      "id": "60007",
+      "name": "Etap 1: Kariyer Geçiş ve Yetkinlik Değerlendirmesi",
+      "ageGroup": "22-24",
+      "order": "1"
+    },
+    {
+      "id": "60005",
+      "name": "Etap 2: Profesyonel Yetenek ve Eğilim Analizi",
+      "ageGroup": "18-21",
+      "order": "2"
+    },
+    {
+      "id": "60002",
+      "name": "Etap 2: Yetenek Keşfi ve Mesleki Eğilim Analizi",
+      "ageGroup": "14-17",
+      "order": "2"
+    },
+    {
+      "id": "60008",
+      "name": "Etap 2: Profesyonel Gelişim ve Liderlik Analizi",
+      "ageGroup": "22-24",
+      "order": "2"
+    },
+    {
+      "id": "60006",
+      "name": "Etap 3: Kariyer Stratejisi ve Eylem Planı",
+      "ageGroup": "18-21",
+      "order": "3"
+    },
+    {
+      "id": "60003",
+      "name": "Etap 3: Gerçeklik Kontrolü ve Eylem Planı",
+      "ageGroup": "14-17",
+      "order": "3"
+    },
+    {
+      "id": "60009",
+      "name": "Etap 3: Kariyer Optimizasyonu ve Uzun Vadeli Planlama",
+      "ageGroup": "22-24",
+      "order": "3"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tageGroup\torder\n60004\tEtap 1: Kariyer Hazırlık ve Yetkinlik Değerlendirmesi\t18-21\t1\n60001\tEtap 1: Meslek Seçimi Yetkinlik Değerlendirmesi\t14-17\t1\n60007\tEtap 1: Kariyer Geçiş ve Yetkinlik Değerlendirmesi\t22-24\t1\n60005\tEtap 2: Profesyonel Yetenek ve Eğilim Analizi\t18-21\t2\n60002\tEtap 2: Yetenek Keşfi ve Mesleki Eğilim Analizi\t14-17\t2\n60008\tEtap 2: Profesyonel Gelişim ve Liderlik Analizi\t22-24\t2\n60006\tEtap 3: Kariyer Stratejisi ve Eylem Planı\t18-21\t3\n60003\tEtap 3: Gerçeklik Kontrolü ve Eylem Planı\t14-17\t3\n60009\tEtap 3: Kariyer Optimizasyonu ve Uzun Vadeli Planlama\t22-24\t3\n",
+  "stderr": "",
+  "execution_time_ms": 64
+}

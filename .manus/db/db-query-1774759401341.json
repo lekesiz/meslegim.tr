@@ -1,0 +1,25 @@
+{
+  "query": "SELECT id, email, password FROM users WHERE email IN ('admin@test.com', 'student@test.com', 'mentor@test.com') LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute SELECT id, email, password FROM users WHERE email IN ('admin@test.com', 'student@test.com', 'mentor@test.com') LIMIT 5;",
+  "rows": [
+    {
+      "id": "180024",
+      "email": "admin@test.com",
+      "password": "$2b$10$5kC87Qj4dTHSmujDGPfHfeSp7JjAS0Pl/uwz3kguuLpMmUxQlrg3e"
+    },
+    {
+      "id": "180023",
+      "email": "mentor@test.com",
+      "password": "$2b$10$g3bWxQqQwqn9dQmG5d4DPeqldc.3ee7ObTuXyT2ypWKmvGuZlqOZW"
+    },
+    {
+      "id": "180022",
+      "email": "student@test.com",
+      "password": "$2b$10$Eyr9XVGAeARCtT.rWLrUDOhX5494PNJR..utSVuvL4V5QxPrG9rzi"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\temail\tpassword\n180024\tadmin@test.com\t$2b$10$5kC87Qj4dTHSmujDGPfHfeSp7JjAS0Pl/uwz3kguuLpMmUxQlrg3e\n180023\tmentor@test.com\t$2b$10$g3bWxQqQwqn9dQmG5d4DPeqldc.3ee7ObTuXyT2ypWKmvGuZlqOZW\n180022\tstudent@test.com\t$2b$10$Eyr9XVGAeARCtT.rWLrUDOhX5494PNJR..utSVuvL4V5QxPrG9rzi\n",
+  "stderr": "",
+  "execution_time_ms": 185
+}

@@ -1,0 +1,26 @@
+{
+  "query": "SELECT us.id, us.userId, us.stageId, us.status, us.unlockedAt, us.completedAt FROM user_stages us WHERE us.userId = 180022 ORDER BY us.id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute SELECT us.id, us.userId, us.stageId, us.status, us.unlockedAt, us.completedAt FROM user_stages us WHERE us.userId = 180022 ORDER BY us.id;",
+  "rows": [
+    {
+      "id": "1",
+      "userId": "180022",
+      "stageId": "30001",
+      "status": "completed",
+      "unlockedAt": "NULL",
+      "completedAt": "2026-02-19 11:58:32"
+    },
+    {
+      "id": "2",
+      "userId": "180022",
+      "stageId": "30002",
+      "status": "active",
+      "unlockedAt": "2026-03-02 16:38:50",
+      "completedAt": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuserId\tstageId\tstatus\tunlockedAt\tcompletedAt\n1\t180022\t30001\tcompleted\tNULL\t2026-02-19 11:58:32\n2\t180022\t30002\tactive\t2026-03-02 16:38:50\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 57
+}

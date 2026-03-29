@@ -1,0 +1,170 @@
+{
+  "query": "SELECT id, name, email, role, status, ageGroup FROM users ORDER BY id LIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute SELECT id, name, email, role, status, ageGroup FROM users ORDER BY id LIMIT 20;",
+  "rows": [
+    {
+      "id": "1",
+      "name": "Mikail Lekesiz",
+      "email": "mikail@netzinformatique.fr",
+      "role": "admin",
+      "status": "active",
+      "ageGroup": "NULL"
+    },
+    {
+      "id": "150002",
+      "name": "Mehmet Demir (Edited)",
+      "email": "mehmet.demir@test.com",
+      "role": "student",
+      "status": "active",
+      "ageGroup": "14-17"
+    },
+    {
+      "id": "180022",
+      "name": "Test Öğrenci",
+      "email": "student@test.com",
+      "role": "student",
+      "status": "active",
+      "ageGroup": "14-17"
+    },
+    {
+      "id": "180023",
+      "name": "Test Mentor",
+      "email": "mentor@test.com",
+      "role": "mentor",
+      "status": "active",
+      "ageGroup": "NULL"
+    },
+    {
+      "id": "180024",
+      "name": "Test Admin",
+      "email": "admin@test.com",
+      "role": "admin",
+      "status": "active",
+      "ageGroup": "NULL"
+    },
+    {
+      "id": "180160",
+      "name": "Ahmet Yılmaz",
+      "email": "ahmet@test.com",
+      "role": "student",
+      "status": "active",
+      "ageGroup": "18-21"
+    },
+    {
+      "id": "240003",
+      "name": "Mikail Lekesiz",
+      "email": "mikaillekesiz@gmail.com",
+      "role": "admin,mentor",
+      "status": "active",
+      "ageGroup": "22-24"
+    },
+    {
+      "id": "330003",
+      "name": "Test Kullanıcı Final",
+      "email": "test.final@meslegim.tr",
+      "role": "student",
+      "status": "active",
+      "ageGroup": "14-17"
+    },
+    {
+      "id": "330016",
+      "name": "Yusuf özcan",
+      "email": "yusuf.ozcan69@gmail.com",
+      "role": "student",
+      "status": "active",
+      "ageGroup": "22-24"
+    },
+    {
+      "id": "450001",
+      "name": "Mikail Lekesiz",
+      "email": "mikail@lekesiz.org",
+      "role": "student",
+      "status": "active",
+      "ageGroup": "22-24"
+    },
+    {
+      "id": "570040",
+      "name": "Hilal Lekesiz",
+      "email": "hilallekesizkilic@gmail.com",
+      "role": "mentor",
+      "status": "active",
+      "ageGroup": "NULL"
+    },
+    {
+      "id": "630089",
+      "name": "Test Öğrenci Dört",
+      "email": "test.ogrenci4@test.com",
+      "role": "student",
+      "status": "active",
+      "ageGroup": "14-17"
+    },
+    {
+      "id": "660002",
+      "name": "Test Network Debug",
+      "email": "test.network@test.com",
+      "role": "student",
+      "status": "active",
+      "ageGroup": "18-21"
+    },
+    {
+      "id": "780066",
+      "name": "Test Öğrenci",
+      "email": "test@student.com",
+      "role": "student",
+      "status": "active",
+      "ageGroup": "18-21"
+    },
+    {
+      "id": "930011",
+      "name": "Test Öğrenci 1 (14-17)",
+      "email": "test.ogrenci1@gmail.com",
+      "role": "student",
+      "status": "active",
+      "ageGroup": "14-17"
+    },
+    {
+      "id": "930012",
+      "name": "Test Öğrenci 2 (18-21)",
+      "email": "test.ogrenci2@gmail.com",
+      "role": "student",
+      "status": "active",
+      "ageGroup": "18-21"
+    },
+    {
+      "id": "930013",
+      "name": "Test Öğrenci 3 (22-24)",
+      "email": "test.ogrenci3@gmail.com",
+      "role": "student",
+      "status": "active",
+      "ageGroup": "22-24"
+    },
+    {
+      "id": "930014",
+      "name": "Test Mentor",
+      "email": "test.mentor@gmail.com",
+      "role": "mentor",
+      "status": "active",
+      "ageGroup": "NULL"
+    },
+    {
+      "id": "930101",
+      "name": "Zeynep Arslan",
+      "email": "zeynep.arslan.beta@gmail.com",
+      "role": "student",
+      "status": "active",
+      "ageGroup": "14-17"
+    },
+    {
+      "id": "930102",
+      "name": "Emre Kaya",
+      "email": "emre.kaya.beta@gmail.com",
+      "role": "student",
+      "status": "active",
+      "ageGroup": "18-21"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\trole\tstatus\tageGroup\n1\tMikail Lekesiz\tmikail@netzinformatique.fr\tadmin\tactive\tNULL\n150002\tMehmet Demir (Edited)\tmehmet.demir@test.com\tstudent\tactive\t14-17\n180022\tTest Öğrenci\tstudent@test.com\tstudent\tactive\t14-17\n180023\tTest Mentor\tmentor@test.com\tmentor\tactive\tNULL\n180024\tTest Admin\tadmin@test.com\tadmin\tactive\tNULL\n180160\tAhmet Yılmaz\tahmet@test.com\tstudent\tactive\t18-21\n240003\tMikail Lekesiz\tmikaillekesiz@gmail.com\tadmin,mentor\tactive\t22-24\n330003\tTest Kullanıcı Final\ttest.final@meslegim.tr\tstudent\tactive\t14-17\n330016\tYusuf özcan\tyusuf.ozcan69@gmail.com\tstudent\tactive\t22-24\n450001\tMikail Lekesiz\tmikail@lekesiz.org\tstudent\tactive\t22-24\n570040\tHilal Lekesiz\thilallekesizkilic@gmail.com\tmentor\tactive\tNULL\n630089\tTest Öğrenci Dört\ttest.ogrenci4@test.com\tstudent\tactive\t14-17\n660002\tTest Network Debug\ttest.network@test.com\tstudent\tactive\t18-21\n780066\tTest Öğrenci\ttest@student.com\tstudent\tactive\t18-21\n930011\tTest Öğrenci 1 (14-17)\ttest.ogrenci1@gmail.com\tstudent\tactive\t14-17\n930012\tTest Öğrenci 2 (18-21)\ttest.ogrenci2@gmail.com\tstudent\tactive\t18-21\n930013\tTest Öğrenci 3 (22-24)\ttest.ogrenci3@gmail.com\tstudent\tactive\t22-24\n930014\tTest Mentor\ttest.mentor@gmail.com\tmentor\tactive\tNULL\n930101\tZeynep Arslan\tzeynep.arslan.beta@gmail.com\tstudent\tactive\t14-17\n930102\tEmre Kaya\temre.kaya.beta@gmail.com\tstudent\tactive\t18-21\n",
+  "stderr": "",
+  "execution_time_ms": 217
+}

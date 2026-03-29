@@ -1,0 +1,66 @@
+{
+  "query": "SELECT r.id, r.userId, r.stageId, r.status, r.content IS NOT NULL as has_content FROM reports r ORDER BY r.id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute SELECT r.id, r.userId, r.stageId, r.status, r.content IS NOT NULL as has_content FROM reports r ORDER BY r.id;",
+  "rows": [
+    {
+      "id": "1",
+      "userId": "180022",
+      "stageId": "30001",
+      "status": "approved",
+      "has_content": "0"
+    },
+    {
+      "id": "30001",
+      "userId": "240003",
+      "stageId": "60007",
+      "status": "approved",
+      "has_content": "1"
+    },
+    {
+      "id": "60001",
+      "userId": "930012",
+      "stageId": "60004",
+      "status": "approved",
+      "has_content": "1"
+    },
+    {
+      "id": "90001",
+      "userId": "930013",
+      "stageId": "60007",
+      "status": "approved",
+      "has_content": "1"
+    },
+    {
+      "id": "90002",
+      "userId": "450001",
+      "stageId": "60007",
+      "status": "pending",
+      "has_content": "1"
+    },
+    {
+      "id": "120001",
+      "userId": "930101",
+      "stageId": "60001",
+      "status": "approved",
+      "has_content": "1"
+    },
+    {
+      "id": "120002",
+      "userId": "930102",
+      "stageId": "60004",
+      "status": "approved",
+      "has_content": "1"
+    },
+    {
+      "id": "150001",
+      "userId": "1170022",
+      "stageId": "60001",
+      "status": "approved",
+      "has_content": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuserId\tstageId\tstatus\thas_content\n1\t180022\t30001\tapproved\t0\n30001\t240003\t60007\tapproved\t1\n60001\t930012\t60004\tapproved\t1\n90001\t930013\t60007\tapproved\t1\n90002\t450001\t60007\tpending\t1\n120001\t930101\t60001\tapproved\t1\n120002\t930102\t60004\tapproved\t1\n150001\t1170022\t60001\tapproved\t1\n",
+  "stderr": "",
+  "execution_time_ms": 57
+}

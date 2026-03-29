@@ -1,0 +1,22 @@
+{
+  "query": "SELECT id, name FROM stages WHERE id IN (30001, 60001, 60004, 60007) ORDER BY id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute SELECT id, name FROM stages WHERE id IN (30001, 60001, 60004, 60007) ORDER BY id;",
+  "rows": [
+    {
+      "id": "60001",
+      "name": "Etap 1: Meslek Seçimi Yetkinlik Değerlendirmesi"
+    },
+    {
+      "id": "60004",
+      "name": "Etap 1: Kariyer Hazırlık ve Yetkinlik Değerlendirmesi"
+    },
+    {
+      "id": "60007",
+      "name": "Etap 1: Kariyer Geçiş ve Yetkinlik Değerlendirmesi"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\n60001\tEtap 1: Meslek Seçimi Yetkinlik Değerlendirmesi\n60004\tEtap 1: Kariyer Hazırlık ve Yetkinlik Değerlendirmesi\n60007\tEtap 1: Kariyer Geçiş ve Yetkinlik Değerlendirmesi\n",
+  "stderr": "",
+  "execution_time_ms": 65
+}
