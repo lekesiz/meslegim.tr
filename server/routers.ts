@@ -6,12 +6,28 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import * as db from "./db";
 import { generateStageReportAsync } from './reportHelper';
+import Stripe from 'stripe';
+import { PRODUCTS, PACKAGE_ACCESS, type ProductId, formatPrice, getPackages } from './products';
+import { checkAndAwardBadges, getUserBadgesWithStatus, getUserTotalXP, getLeaderboard, markBadgesNotified, getUnnotifiedBadges } from './services/badgeEngine';
 import { generatePDF } from './services/pdfGenerator';
 import { sendEmail, getRegistrationEmailTemplate, getApprovalEmailTemplate, getReportApprovedEmailTemplate, getReportRejectedEmailTemplate } from './_core/resend-email';
 import { notifyOwner } from './_core/notification';
 import bcrypt from 'bcryptjs';
 import { sdk } from './_core/sdk';
 import { hasRole, hasAnyRole } from './roleHelper';
+
+// Production'da gerçek domain'i kullan, development'ta localhost
+function getBaseUrl(req?: { headers: { origin?: string; host?: string } }): string {
+  // 1. Request origin varsa onu kullan
+  if (req?.headers?.origin) return req.headers.origin;
+  // 2. Host header'ından oluştur
+  if (req?.headers?.host) {
+    const protocol = req.headers.host.includes('localhost') ? 'http' : 'https';
+    return `${protocol}://${req.headers.host}`;
+  }
+  // 3. Fallback: production'da meslegim.tr, development'ta localhost
+  return process.env.NODE_ENV === 'production' ? 'https://meslegim.tr' : 'http://localhost:3000';
+}
 
 // Role-based procedures
 const studentProcedure = protectedProcedure.use(({ ctx, next }) => {
@@ -111,7 +127,7 @@ export const appRouter = router({
         });
         
         // Send password reset email
-        const resetUrl = `${process.env.VITE_APP_URL || 'http://localhost:3000'}/reset-password/${resetToken}`;
+        const resetUrl = `${getBaseUrl()}/reset-password/${resetToken}`;
         await sendEmail({
           to: user.email || '',
           subject: 'Meslegim.tr - Şifre Sıfırlama',
@@ -274,7 +290,7 @@ export const appRouter = router({
         const token = `ev_${Date.now()}_${Math.random().toString(36).substr(2, 16)}`;
         await db.setEmailVerificationToken(ctx.user.id, token);
         
-        const verifyUrl = `${process.env.VITE_APP_URL || 'http://localhost:3000'}/verify-email/${token}`;
+        const verifyUrl = `${getBaseUrl()}/verify-email/${token}`;
         await sendEmail({
           to: user.email,
           subject: 'Meslegim.tr - E-posta Doğrulama',
@@ -325,6 +341,59 @@ export const appRouter = router({
       .mutation(async ({ ctx }) => {
         await db.markAllNotificationsAsRead(ctx.user.id);
         return { success: true };
+      }),
+
+    // Push subscription management
+    subscribePush: protectedProcedure
+      .input(z.object({
+        endpoint: z.string(),
+        keys: z.object({
+          p256dh: z.string(),
+          auth: z.string(),
+        }),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { savePushSubscription } = await import('./services/notificationService');
+        await savePushSubscription(ctx.user.id, input);
+        return { success: true };
+      }),
+
+    unsubscribePush: protectedProcedure
+      .input(z.object({ endpoint: z.string() }))
+      .mutation(async ({ ctx, input }) => {
+        const { removePushSubscription } = await import('./services/notificationService');
+        await removePushSubscription(ctx.user.id, input.endpoint);
+        return { success: true };
+      }),
+
+    // Email preferences
+    getEmailPreferences: protectedProcedure
+      .query(async ({ ctx }) => {
+        const { getEmailPreferences } = await import('./services/notificationService');
+        return await getEmailPreferences(ctx.user.id);
+      }),
+
+    updateEmailPreferences: protectedProcedure
+      .input(z.object({
+        stageActivation: z.boolean().optional(),
+        reportReady: z.boolean().optional(),
+        badgeEarned: z.boolean().optional(),
+        certificateReady: z.boolean().optional(),
+        stageReminder: z.boolean().optional(),
+        weeklyDigest: z.boolean().optional(),
+        marketingEmails: z.boolean().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { updateEmailPreferences } = await import('./services/notificationService');
+        return await updateEmailPreferences(ctx.user.id, input);
+      }),
+
+    // Get push subscription status
+    getPushStatus: protectedProcedure
+      .query(async ({ ctx }) => {
+        const { getUserPushSubscriptions } = await import('./services/notificationService');
+        const subs = await getUserPushSubscriptions(ctx.user.id);
+        return { subscribed: subs.length > 0, count: subs.length };
       }),
   }),
 
@@ -572,7 +641,7 @@ export const appRouter = router({
             const student = await db.getUserById(studentId);
             if (student?.email && student?.name) {
               try {
-                const loginUrl = `${process.env.VITE_FRONTEND_URL || 'http://localhost:3000'}/login`;
+                const loginUrl = `${getBaseUrl()}/login`;
                 await sendEmail({
                   to: student.email,
                   subject: '🎉 Başvurunuz Onaylandı - Meslegim.tr',
@@ -901,7 +970,7 @@ export const appRouter = router({
         // Send activation email
         if (student.email && student.name) {
           try {
-            const loginUrl = `${process.env.VITE_FRONTEND_URL || 'http://localhost:3000'}/login`;
+            const loginUrl = `${getBaseUrl()}/login`;
             await sendEmail({
               to: student.email,
               subject: '🎉 Başvurunuz Onaylandı - Meslegim.tr',
@@ -1029,7 +1098,7 @@ export const appRouter = router({
         // Send email (approval or rejection)
         if (student?.email && student?.name && stage?.name) {
           try {
-            const reportUrl = `${process.env.VITE_FRONTEND_URL || 'http://localhost:3000'}/reports/${report.id}`;
+            const reportUrl = `${getBaseUrl()}/reports/${report.id}`;
             const subject = input.approved 
               ? '✅ Raporunuz Onaylandı - Meslegim.tr'
               : '⚠️ Raporunuz İnceleme Bekliyor - Meslegim.tr';
@@ -1428,7 +1497,7 @@ export const appRouter = router({
                     <p style="margin: 10px 0 0 0;"><strong>Tamamlanma Tarihi:</strong> ${new Date().toLocaleDateString('tr-TR')}</p>
                   </div>
                   <p>Öğrencinin ilerlemesini kontrol etmek ve raporu onaylamak için lütfen platforma giriş yapın.</p>
-                  <a href="${process.env.VITE_APP_URL || 'http://localhost:3000'}/dashboard/mentor" style="display: inline-block; background-color: #4F46E5; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin-top: 20px;">
+                  <a href="${getBaseUrl()}/dashboard/mentor" style="display: inline-block; background-color: #4F46E5; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin-top: 20px;">
                     Mentor Paneline Git
                   </a>
                   <p style="color: #6B7280; font-size: 14px; margin-top: 30px;">
@@ -1592,7 +1661,7 @@ export const appRouter = router({
       // Send certificate ready email
       if (ctx.user.email && ctx.user.name) {
         try {
-          const certificateUrl = `${process.env.VITE_FRONTEND_URL || 'http://localhost:3000'}/dashboard`;
+          const certificateUrl = `${getBaseUrl()}/dashboard`;
           const { getCertificateReadyEmailTemplate } = await import('./_core/resend-email');
           await sendEmail({
             to: ctx.user.email,
@@ -1769,6 +1838,39 @@ export const appRouter = router({
   }),
 
   // ========== Pilot Feedback Router ==========
+  badge: router({
+    // Kullanıcının tüm rozetlerini getir (kazanılan + kilitli)
+    getMyBadges: protectedProcedure.query(async ({ ctx }) => {
+      const allBadges = await getUserBadgesWithStatus(ctx.user.id);
+      const totalXP = await getUserTotalXP(ctx.user.id);
+      return { badges: allBadges, totalXP };
+    }),
+
+    // Yeni rozet kontrolü yap ve kazanılan rozetleri döndür
+    checkNewBadges: protectedProcedure.mutation(async ({ ctx }) => {
+      const result = await checkAndAwardBadges(ctx.user.id);
+      return result;
+    }),
+
+    // Bildirilmemiş rozetleri getir (toast notification için)
+    getUnnotified: protectedProcedure.query(async ({ ctx }) => {
+      return getUnnotifiedBadges(ctx.user.id);
+    }),
+
+    // Rozetleri bildirildi olarak işaretle
+    markNotified: protectedProcedure.mutation(async ({ ctx }) => {
+      await markBadgesNotified(ctx.user.id);
+      return { success: true };
+    }),
+
+    // Liderlik tablosu
+    getLeaderboard: publicProcedure
+      .input(z.object({ limit: z.number().min(1).max(50).default(10) }).optional())
+      .query(async ({ input }) => {
+        return getLeaderboard(input?.limit ?? 10);
+      }),
+  }),
+
   pilotFeedback: router({
     submit: publicProcedure
       .input(z.object({
@@ -1802,6 +1904,107 @@ export const appRouter = router({
     getStats: adminProcedure.query(async () => {
       return db.getPilotFeedbackStats();
     }),
+  }),
+
+  // ==================== STRIPE PAYMENT ====================
+  payment: router({
+    // Ürünleri ve paketleri listele
+    getProducts: publicProcedure.query(() => {
+      return {
+        packages: getPackages(),
+        singleProducts: [
+          PRODUCTS.ai_career_report,
+          PRODUCTS.single_stage_unlock,
+        ],
+      };
+    }),
+
+    // Kullanıcının mevcut paket bilgisini getir
+    getMyAccess: protectedProcedure.query(async ({ ctx }) => {
+      const userId = ctx.user.id;
+      const userRecord = await db.getUserById(userId);
+      const pkg = userRecord?.purchasedPackage || 'free';
+      const access = PACKAGE_ACCESS[pkg] || PACKAGE_ACCESS.free;
+      const completedPurchases = await db.getUserCompletedPurchases(userId);
+      const hasAiReport = completedPurchases.some((p: any) => p.productId === 'ai_career_report') || access.aiReport;
+      
+      return {
+        currentPackage: pkg,
+        access: { ...access, aiReport: hasAiReport },
+        purchases: completedPurchases,
+      };
+    }),
+
+    // Stripe Checkout Session oluştur
+    createCheckoutSession: protectedProcedure
+      .input(z.object({
+        productId: z.enum(['basic_package', 'professional_package', 'enterprise_package', 'ai_career_report', 'single_stage_unlock']),
+        metadata: z.record(z.string(), z.string()).optional(), // ek bilgi (ör. stageId)
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+        if (!stripeSecretKey) {
+          throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Ödeme sistemi yapılandırılmamış' });
+        }
+
+        const stripe = new Stripe(stripeSecretKey, { apiVersion: '2025-03-31.basil' as any });
+        const product = PRODUCTS[input.productId as ProductId];
+        if (!product) {
+          throw new TRPCError({ code: 'BAD_REQUEST', message: 'Geçersiz ürün' });
+        }
+
+        const userId = ctx.user.id;
+        const baseUrl = getBaseUrl(ctx.req);
+
+        // Stripe Checkout Session oluştur
+        const session = await stripe.checkout.sessions.create({
+          payment_method_types: ['card'],
+          line_items: [{
+            price_data: {
+              currency: product.currency,
+              product_data: {
+                name: product.name,
+                description: product.description,
+              },
+              unit_amount: product.priceInCents,
+            },
+            quantity: 1,
+          }],
+          mode: 'payment',
+          success_url: `${baseUrl}/dashboard/student?payment=success&product=${input.productId}`,
+          cancel_url: `${baseUrl}/fiyatlandirma?payment=cancelled`,
+          metadata: {
+            user_id: userId.toString(),
+            product_id: input.productId,
+            ...input.metadata,
+          },
+          customer_email: ctx.user.email || undefined,
+        });
+
+        // Purchase kaydı oluştur
+        await db.createPurchase({
+          userId,
+          productId: input.productId,
+          stripeSessionId: session.id,
+          amountInCents: product.priceInCents,
+          currency: product.currency,
+          metadata: input.metadata ? JSON.stringify(input.metadata) : undefined,
+        });
+
+        return { sessionId: session.id, url: session.url };
+      }),
+
+    // Ödeme geçmişi
+    getMyPurchases: protectedProcedure.query(async ({ ctx }) => {
+      return db.getUserPurchases(ctx.user.id);
+    }),
+
+    // Belirli bir ürün satın alınmış mı kontrol et
+    hasProduct: protectedProcedure
+      .input(z.object({ productId: z.string() }))
+      .query(async ({ ctx, input }) => {
+        return db.hasUserPurchasedProduct(ctx.user.id, input.productId);
+      }),
   }),
 });
 

@@ -1058,3 +1058,73 @@ Platform **minimum seviyede sağlıklı** çalışıyor. Tüm temel özellikler 
 - [x] Sertifika doğrulama sayfası güncelle (altın tema, badge, detaylı bilgi)
 - [x] Vitest testleri yaz (8 yeni test - 114/114 toplam)
 - [x] Checkpoint kaydet ve GitHub'a push yap
+
+
+## 🎮 Gamification - Rozet/Başarı Sistemi (29 Mart 2026)
+- [x] Rozet sistemi tasarımı (17 rozet, 5 kategori, 5 nadirlik seviyesi)
+- [x] Veritabanı şeması (badges, userBadges tabloları)
+- [x] Rozet kontrol motoru (badgeEngine.ts - 17 rozet kontrolü)
+- [x] tRPC endpoint'leri (getMyBadges, checkNewBadges, getLeaderboard, markNotified, getUnnotified)
+- [x] db helper fonksiyonları (awardBadge, getUserBadgesWithStatus, getUserTotalXP, getLeaderboard)
+- [x] Rozet görselleri (emoji ikonlar - her rozet için özel)
+- [x] Başarılarım sayfası (Achievements.tsx - XP bar, seviye, liderlik tablosu)
+- [x] Dashboard sidebar'a Başarılarım linki ekle
+- [x] DashboardLayout sidebar'a Başarılarım linki ekle
+- [x] Rozet kazanım bildirimi (unnotified badges + toast)
+- [x] Vitest testleri yaz (18 yeni test, toplam 132/132 geçiyor)
+- [ ] Checkpoint kaydet ve GitHub'a push yap
+
+
+## 🔧 SEO Düzeltmesi (29 Mart 2026)
+- [x] Meta description 160 karakter altına düşür (122 karakter)
+
+## ✅ Resend Domain Doğrulaması (29 Mart 2026)
+- [x] Resend domain doğrulaması tamamlandı - e-posta gönderimi aktif
+
+## 🔔 Özel Bildirim Sistemi (29 Mart 2026)
+- [ ] Web sitesine özel bildirim sistemi ekle
+
+## 💳 Stripe Ödeme Entegrasyonu (29 Mart 2026)
+- [ ] Stripe ödeme özelliği ekle (ürün satın alma / abonelik)
+
+
+## 📧 E-posta Bildirim Sistemi (29 Mart 2026)
+- [x] Olay bazlı e-posta şablonları oluştur (notificationService.ts - birleşik servis)
+- [x] E-posta gönderim servisi (Resend entegrasyonu - mevcut şablonlar kullanılıyor)
+- [x] Kullanıcı e-posta tercihleri (emailPreferences tablosu + NotificationSettings sayfası)
+- [x] E-posta şablon tasarımı (mevcut profesyonel HTML şablonlar)
+
+## 🏅 Rozet Kazanım Bildirimleri (29 Mart 2026)
+- [x] Rozet kazanımında otomatik in-app bildirim oluştur (badgeEngine.ts entegrasyonu)
+- [x] Rozet kazanımında e-posta bildirimi gönder (notificationService.notify)
+- [x] Rozet kazanımında push bildirim gönder (notificationService.notify)
+
+## 🔔 Push Bildirimleri (29 Mart 2026)
+- [x] Service Worker kaydı (sw.js - client/public/sw.js)
+- [x] Push subscription yönetimi (notifications.subscribePush endpoint)
+- [x] Push bildirim gönderim servisi (web-push + notificationService)
+- [x] Kullanıcı push izin yönetimi (usePushNotifications hook + NotificationSettings)
+- [x] Push bildirim tetikleyicileri (notificationService.notify - tüm olaylar)
+
+## ⏰ Zamanlı Hatırlatma Bildirimleri (29 Mart 2026)
+- [x] Etap tamamlama hatırlatması (reminderService.ts - 3/7/14 gün)
+- [x] scheduledReminders tablosu ve migration
+- [x] Hatırlatma servisi (checkAndSendReminders fonksiyonu)
+- [x] Hatırlatma e-postası + push + in-app bildirim
+
+## 💳 Stripe Ödeme Entegrasyonu (29 Mart 2026)
+- [x] Ürün/fiyat tanımları (products.ts) - Temel/Profesyonel/Kurumsal paketler
+- [x] Veritabanı şeması - stripe_customer_id, purchases tablosu
+- [x] Stripe checkout session backend endpoint'leri
+- [x] Webhook handler (/api/stripe/webhook)
+- [x] Freemium erişim kontrolü (ilk etap ücretsiz, sonrası ücretli)
+- [x] Tek seferlik ödeme - kapsamlı AI kariyer raporu
+- [x] Fiyatlandırma sayfası (Pricing.tsx)
+- [x] Ödeme geçmişi sayfası (PaymentHistory.tsx)
+- [x] Dashboard'a premium badge ve erişim kontrolü
+- [x] Vitest testleri yaz (18 yeni test, toplam 132/132 geçiyor)
+- [ ] Checkpoint kaydet ve GitHub'a push yap
+
+
+## 🐛 Bug Fix - Şifre Sıfırlama Linki (29 Mart 2026)
+- [x] Şifre sıfırlama e-postasındaki link localhost:3000 yerine gerçek domain'i kullanmalı (getBaseUrl helper + 7 referans düzeltildi)

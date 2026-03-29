@@ -23,6 +23,8 @@ export const users = mysqlTable("users", {
   bio: text("bio"),
   kvkkConsent: boolean("kvkkConsent").default(false).notNull(),
   kvkkConsentDate: timestamp("kvkkConsentDate"),
+  stripeCustomerId: varchar("stripeCustomerId", { length: 255 }),
+  purchasedPackage: varchar("purchasedPackage", { length: 50 }),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
@@ -291,3 +293,125 @@ export const pilotFeedbacks = mysqlTable("pilot_feedbacks", {
 }));
 export type PilotFeedback = typeof pilotFeedbacks.$inferSelect;
 export type InsertPilotFeedback = typeof pilotFeedbacks.$inferInsert;
+
+
+/**
+ * Badges (rozetler) tablosu - platform genelinde tanımlı rozetler
+ */
+export const badges = mysqlTable("badges", {
+  id: int("id").autoincrement().primaryKey(),
+  slug: varchar("slug", { length: 100 }).unique().notNull(), // unique identifier e.g. "first-stage"
+  name: varchar("name", { length: 255 }).notNull(), // display name e.g. "İlk Adım"
+  description: text("description"), // e.g. "İlk etabınızı tamamladınız!"
+  icon: varchar("icon", { length: 50 }).notNull(), // lucide icon name e.g. "rocket"
+  color: varchar("color", { length: 50 }).notNull(), // tailwind color e.g. "amber"
+  category: mysqlEnum("category", ["milestone", "speed", "mastery", "social", "special"]).notNull(),
+  rarity: mysqlEnum("rarity", ["common", "rare", "epic", "legendary"]).default("common").notNull(),
+  xpReward: int("xpReward").default(10).notNull(), // XP points awarded
+  sortOrder: int("sortOrder").default(0).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+  slugIdx: index("badge_slug_idx").on(table.slug),
+  categoryIdx: index("badge_category_idx").on(table.category),
+}));
+export type Badge = typeof badges.$inferSelect;
+export type InsertBadge = typeof badges.$inferInsert;
+
+/**
+ * User badges (kullanıcı rozetleri) - hangi kullanıcı hangi rozeti kazandı
+ */
+export const userBadges = mysqlTable("user_badges", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  badgeId: int("badgeId").notNull(),
+  earnedAt: timestamp("earnedAt").defaultNow().notNull(),
+  notified: boolean("notified").default(false).notNull(), // kullanıcıya bildirildi mi
+}, (table) => ({
+  userIdIdx: index("ub_user_id_idx").on(table.userId),
+  badgeIdIdx: index("ub_badge_id_idx").on(table.badgeId),
+  userBadgeIdx: index("ub_user_badge_idx").on(table.userId, table.badgeId),
+}));
+export type UserBadge = typeof userBadges.$inferSelect;
+export type InsertUserBadge = typeof userBadges.$inferInsert;
+
+
+/**
+ * Push notification subscriptions - tarayıcı push bildirim abonelikleri
+ */
+export const pushSubscriptions = mysqlTable("push_subscriptions", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  endpoint: text("endpoint").notNull(),
+  p256dh: text("p256dh").notNull(), // public key
+  auth: text("auth").notNull(), // auth secret
+  userAgent: text("userAgent"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+  userIdIdx: index("ps_user_id_idx").on(table.userId),
+}));
+export type PushSubscription = typeof pushSubscriptions.$inferSelect;
+export type InsertPushSubscription = typeof pushSubscriptions.$inferInsert;
+
+/**
+ * Email preferences - kullanıcı e-posta tercihleri
+ */
+export const emailPreferences = mysqlTable("email_preferences", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().unique(),
+  stageActivation: boolean("stageActivation").default(true).notNull(), // etap açılma
+  reportReady: boolean("reportReady").default(true).notNull(), // rapor hazır
+  badgeEarned: boolean("badgeEarned").default(true).notNull(), // rozet kazanım
+  certificateReady: boolean("certificateReady").default(true).notNull(), // sertifika hazır
+  stageReminder: boolean("stageReminder").default(true).notNull(), // etap hatırlatma
+  weeklyDigest: boolean("weeklyDigest").default(false).notNull(), // haftalık özet
+  marketingEmails: boolean("marketingEmails").default(false).notNull(), // pazarlama
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  userIdIdx: index("ep_user_id_idx").on(table.userId),
+}));
+export type EmailPreference = typeof emailPreferences.$inferSelect;
+export type InsertEmailPreference = typeof emailPreferences.$inferInsert;
+
+/**
+ * Scheduled reminders - zamanlı hatırlatma bildirimleri
+ */
+export const scheduledReminders = mysqlTable("scheduled_reminders", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  type: mysqlEnum("type", ["stage_incomplete", "stage_upcoming", "weekly_digest", "stage_reminder"]).notNull(),
+  scheduledFor: timestamp("scheduledFor").notNull(),
+  sent: boolean("sent").default(false).notNull(),
+  relatedId: int("relatedId"), // stageId, etc.
+  metadata: text("metadata"), // JSON string for extra data
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+  userIdIdx: index("sr_user_id_idx").on(table.userId),
+  scheduledForIdx: index("sr_scheduled_for_idx").on(table.scheduledFor),
+  sentIdx: index("sr_sent_idx").on(table.sent),
+}));
+export type ScheduledReminder = typeof scheduledReminders.$inferSelect;
+export type InsertScheduledReminder = typeof scheduledReminders.$inferInsert;
+
+
+/**
+ * Purchases - Stripe ödeme kayıtları
+ */
+export const purchases = mysqlTable("purchases", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  productId: varchar("productId", { length: 50 }).notNull(), // products.ts'deki ProductId
+  stripeSessionId: varchar("stripeSessionId", { length: 255 }),
+  stripePaymentIntentId: varchar("stripePaymentIntentId", { length: 255 }),
+  status: mysqlEnum("status", ["pending", "completed", "failed", "refunded"]).default("pending").notNull(),
+  amountInCents: int("amountInCents").notNull(),
+  currency: varchar("currency", { length: 10 }).default("try").notNull(),
+  metadata: text("metadata"), // JSON string for extra data (e.g., stageId for single_stage_unlock)
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  completedAt: timestamp("completedAt"),
+}, (table) => ({
+  userIdIdx: index("p_user_id_idx").on(table.userId),
+  stripeSessionIdx: index("p_stripe_session_idx").on(table.stripeSessionId),
+  statusIdx: index("p_status_idx").on(table.status),
+}));
+export type Purchase = typeof purchases.$inferSelect;
+export type InsertPurchase = typeof purchases.$inferInsert;
