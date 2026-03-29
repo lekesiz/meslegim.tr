@@ -5,7 +5,7 @@ import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { trpc } from "@/lib/trpc";
-import { Loader2, FileText, Clock, CheckCircle2, Lock, Award, MessageCircle, User, MessageSquareHeart } from "lucide-react";
+import { Loader2, FileText, Clock, CheckCircle2, Lock, Award, MessageCircle, User, MessageSquareHeart, BarChart3 } from "lucide-react";
 import { ChatDialog } from "@/components/ChatDialog";
 import { useState } from "react";
 import { DashboardSkeleton } from "@/components/DashboardSkeleton";
@@ -234,6 +234,41 @@ export default function StudentDashboard() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Kariyer Profili Özeti */}
+        {completedStages >= 2 && (
+          <Card className="border-emerald-200 bg-gradient-to-br from-emerald-50/80 to-teal-50/50">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <BarChart3 className="h-5 w-5 text-emerald-600" />
+                  <CardTitle className="text-lg">Kariyer Profili Özeti</CardTitle>
+                </div>
+                <Badge variant="outline" className="border-emerald-300 text-emerald-700">
+                  {completedStages} etap tamamlandı
+                </Badge>
+              </div>
+              <CardDescription>
+                Tüm etap sonuçlarınızı birleştiren kapsamlı kariyer profili analizi
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <p className="text-sm text-muted-foreground">
+                RIASEC, Big Five Kişilik, Kariyer Değerleri ve Risk Analizi sonuçlarınızı birleştirerek
+                bütünsel bir kariyer profili oluşturulur. AI-Proof kariyer önerileri de dahil edilir.
+              </p>
+              <div className="flex gap-3">
+                <Button
+                  className="bg-emerald-600 hover:bg-emerald-700"
+                  onClick={() => setLocation('/dashboard/student/career-profile')}
+                >
+                  <BarChart3 className="h-4 w-4 mr-2" />
+                  Profilimi Gör
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Reports */}
         {reports && reports.length > 0 && (

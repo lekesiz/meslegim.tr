@@ -1,0 +1,1 @@
+ALTER TABLE `reports` MODIFY COLUMN `type` enum('stage','final','comprehensive') NOT NULL;

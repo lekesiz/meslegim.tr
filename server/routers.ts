@@ -1639,6 +1639,133 @@ export const appRouter = router({
       const { performFullAnalysis } = await import('./services/riasecAnalyzer');
       return performFullAnalysis(allAnswers);
     }),
+
+    getCareerProfileSummary: studentProcedure.query(async ({ ctx }) => {
+      const userId = ctx.user.id;
+      
+      // Get all completed stages for this user
+      const allUserStages = await db.getAllUserStages();
+      const completedStages = allUserStages.filter(s => s.userId === userId && s.status === 'completed');
+      
+      if (completedStages.length === 0) {
+        return null;
+      }
+      
+      // Get stage details and collect answers per stage
+      const allStages = await db.getAllStages();
+      const stageAnswersList: Array<{ stageId: number; stageName: string; answers: Array<{ question: string; answer: string }> }> = [];
+      
+      for (const us of completedStages) {
+        const stage = allStages.find(s => s.id === us.stageId);
+        if (!stage) continue;
+        
+        const stageQuestions = await db.getQuestionsByStage(us.stageId);
+        const stageAnswers = await db.getAnswersByUserAndStage(userId, us.stageId);
+        
+        const answers = stageQuestions.map(q => {
+          const ans = stageAnswers.find(a => a.questionId === q.id);
+          return { question: q.text, answer: ans?.answer || '' };
+        }).filter(a => a.answer);
+        
+        if (answers.length > 0) {
+          stageAnswersList.push({ stageId: us.stageId, stageName: stage.name, answers });
+        }
+      }
+      
+      if (stageAnswersList.length === 0) {
+        return null;
+      }
+      
+      const { generateProfileSummary } = await import('./services/profileSummaryAnalyzer');
+      return generateProfileSummary(stageAnswersList);
+    }),
+
+    generateCareerProfileReport: studentProcedure.mutation(async ({ ctx }) => {
+      const userId = ctx.user.id;
+      const user = await db.getUserById(userId);
+      if (!user) throw new TRPCError({ code: 'NOT_FOUND', message: 'Kullanıcı bulunamadı' });
+      
+      // Get all completed stages
+      const allUserStages = await db.getAllUserStages();
+      const completedStages = allUserStages.filter(s => s.userId === userId && s.status === 'completed');
+      
+      if (completedStages.length < 2) {
+        throw new TRPCError({ code: 'BAD_REQUEST', message: 'Kapsamlı rapor için en az 2 etabı tamamlamanız gerekiyor' });
+      }
+      
+      // Collect all stage answers
+      const allStages = await db.getAllStages();
+      const stageAnswersList: Array<{ stageId: number; stageName: string; answers: Array<{ question: string; answer: string }> }> = [];
+      
+      for (const us of completedStages) {
+        const stage = allStages.find(s => s.id === us.stageId);
+        if (!stage) continue;
+        const stageQuestions = await db.getQuestionsByStage(us.stageId);
+        const stageAnswers = await db.getAnswersByUserAndStage(userId, us.stageId);
+        const answers = stageQuestions.map(q => {
+          const ans = stageAnswers.find(a => a.questionId === q.id);
+          return { question: q.text, answer: ans?.answer || '' };
+        }).filter(a => a.answer);
+        if (answers.length > 0) {
+          stageAnswersList.push({ stageId: us.stageId, stageName: stage.name, answers });
+        }
+      }
+      
+      // Generate profile summary
+      const { generateProfileSummary, getProfileSummaryContext } = await import('./services/profileSummaryAnalyzer');
+      const profileSummary = generateProfileSummary(stageAnswersList);
+      const profileContext = getProfileSummaryContext(profileSummary);
+      
+      // Generate comprehensive report via LLM
+      const { generateCareerReport } = await import('./_core/reportGeneration');
+      const reportContent = await generateCareerReport({
+        studentName: user.name || user.email || 'Öğrenci',
+        studentEmail: user.email || '',
+        ageGroup: user.ageGroup || '18-21',
+        stageAnswers: stageAnswersList.map(s => ({
+          stageName: s.stageName,
+          questions: s.answers.map((a, i) => ({
+            ...a,
+            answer: a.answer + (i === s.answers.length - 1 ? profileContext : ''),
+          })),
+        })),
+      });
+      
+      // Generate PDF
+      let fileUrl: string | undefined;
+      try {
+        const { convertMarkdownToPDF } = await import('./_core/pdfExport');
+        const fileName = `career-profile-${userId}-${Date.now()}`;
+        const result = await convertMarkdownToPDF(reportContent, fileName);
+        fileUrl = result.fileUrl;
+      } catch (pdfError) {
+        console.error('PDF generation failed for career profile:', pdfError);
+      }
+      
+      // Save as report with type 'comprehensive'
+      await db.createReport({
+        userId,
+        stageId: completedStages[completedStages.length - 1].stageId,
+        type: 'comprehensive',
+        content: reportContent,
+        summary: `${user.name || 'Öğrenci'} - Kapsamlı Kariyer Profili Özeti (${completedStages.length} etap)`,
+        status: 'pending',
+        fileUrl: fileUrl || null,
+        fileKey: null,
+      });
+      
+      // Create notification
+      try {
+        await db.createNotification({
+          userId,
+          title: '📊 Kariyer Profili Raporunuz Hazır!',
+          message: 'Kapsamlı kariyer profili özet raporunuz oluşturuldu. Raporlarım sayfasından inceleyebilirsiniz.',
+          type: 'report_ready',
+        });
+      } catch (e) { console.error('Notification failed:', e); }
+      
+      return { success: true, content: reportContent, fileUrl };
+    }),
   }),
 
   // ========== Pilot Feedback Router ==========

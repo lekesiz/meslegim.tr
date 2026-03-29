@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/sidebar";
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { LayoutDashboard, LogOut, PanelLeft, Users, FileText, CheckCircle, User, Settings } from "lucide-react";
+import { LayoutDashboard, LogOut, PanelLeft, Users, FileText, CheckCircle, User, Settings, BarChart3 } from "lucide-react";
 import NotificationBell from "./NotificationBell";
 import { DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { CSSProperties, useEffect, useRef, useState } from "react";
@@ -42,6 +42,7 @@ const getMenuItems = (role: string) => {
   
   const studentItems = [
     { icon: LayoutDashboard, label: "Panel", path: "/dashboard/student" },
+    { icon: BarChart3, label: "Kariyer Profilim", path: "/dashboard/student/career-profile" },
     { icon: FileText, label: "Raporlarım", path: "/dashboard/student/reports" },
   ];
   

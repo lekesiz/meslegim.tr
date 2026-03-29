@@ -30,6 +30,7 @@ const KullanimSartlari = lazy(() => import("./pages/KullanimSartlari"));
 const Profile = lazy(() => import("./pages/Profile"));
 const VerifyEmail = lazy(() => import("./pages/VerifyEmail"));
 const PilotFeedback = lazy(() => import("./pages/PilotFeedback"));
+const CareerProfile = lazy(() => import("./pages/student/CareerProfile"));
 
 function PageLoader() {
   return (
@@ -66,6 +67,7 @@ function Router() {
         <Route path="/dashboard/student" component={StudentDashboard} />
         <Route path="/dashboard/student/reports" component={MyReports} />
         <Route path="/dashboard/student/reports/:id" component={StudentReportView} />
+        <Route path="/dashboard/student/career-profile" component={CareerProfile} />
         <Route path="/dashboard/student/stage/:stageId" component={StudentStageForm} />
         <Route path="/dashboard/student/:id" component={StudentDetailView} />
         <Route path="/reports/:id" component={ReportView} />

@@ -115,7 +115,7 @@ export const reports = mysqlTable("reports", {
   id: int("id").autoincrement().primaryKey(),
   userId: int("userId").notNull(),
   stageId: int("stageId"), // NULL for final report
-  type: mysqlEnum("type", ["stage", "final"]).notNull(),
+  type: mysqlEnum("type", ["stage", "final", "comprehensive"]).notNull(),
   content: text("content"), // AI-generated report content (markdown)
   summary: text("summary"), // Short summary of the report
   fileUrl: varchar("fileUrl", { length: 500 }),
