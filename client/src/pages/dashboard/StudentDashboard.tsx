@@ -87,46 +87,64 @@ export default function StudentDashboard() {
 
         {/* Certificate Section */}
         {(isEligible || certificate) && (
-          <Card className="border-primary/50 bg-gradient-to-br from-primary/5 to-transparent">
+          <Card className="border-amber-300/60 bg-gradient-to-br from-amber-50 via-yellow-50/30 to-orange-50/20 dark:from-amber-950/30 dark:via-yellow-950/10 dark:to-transparent shadow-lg">
             <CardHeader>
-              <div className="flex items-center gap-2">
-                <Award className="h-5 w-5 text-primary" />
-                <CardTitle>Tebrikler! Sertifika Kazandınız 🎉</CardTitle>
+              <div className="flex items-center gap-3">
+                <div className="flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br from-amber-400 to-yellow-500 shadow-md">
+                  <Award className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <CardTitle className="text-lg">Tebrikler! Başarı Sertifikası Kazandınız</CardTitle>
+                  <CardDescription>
+                    Tüm etapları başarıyla tamamladınız. Sertifikanızı oluşturup indirebilirsiniz.
+                  </CardDescription>
+                </div>
               </div>
-              <CardDescription>
-                Tüm etapları başarıyla tamamladınız
-              </CardDescription>
             </CardHeader>
             <CardContent>
               {certificate ? (
                 <div className="space-y-4">
-                  <div className="flex items-center justify-between p-4 bg-background rounded-lg border">
-                    <div>
-                      <p className="font-medium">Sertifika Numarası</p>
-                      <p className="text-sm text-muted-foreground font-mono">{certificate.certificateNumber}</p>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Düzenlenme: {new Date(certificate.issueDate).toLocaleDateString('tr-TR')}
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-5 bg-white/80 dark:bg-background/80 rounded-xl border border-amber-200/50 shadow-sm">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                        <p className="text-sm font-semibold text-green-700 dark:text-green-400">Sertifika Hazır</p>
+                      </div>
+                      <p className="font-mono text-sm text-muted-foreground">{certificate.certificateNumber}</p>
+                      <p className="text-xs text-muted-foreground">
+                        Düzenleme: {new Date(certificate.issueDate).toLocaleDateString('tr-TR', { year: 'numeric', month: 'long', day: 'numeric' })}
                       </p>
                     </div>
-                    {certificate.pdfUrl && (
-                      <Button asChild>
-                        <a href={certificate.pdfUrl} target="_blank" rel="noopener noreferrer">
-                          <Award className="h-4 w-4 mr-2" />
-                          Sertifikayı İndir
+                    <div className="flex gap-2">
+                      {certificate.pdfUrl && (
+                        <Button asChild className="bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white shadow-md">
+                          <a href={certificate.pdfUrl} target="_blank" rel="noopener noreferrer">
+                            <Award className="h-4 w-4 mr-2" />
+                            Sertifikayı İndir
+                          </a>
+                        </Button>
+                      )}
+                      <Button variant="outline" size="sm" asChild className="border-amber-300">
+                        <a href={`/verify-certificate/${certificate.certificateNumber}`} target="_blank">
+                          QR Doğrulama
                         </a>
                       </Button>
-                    )}
+                    </div>
                   </div>
                 </div>
               ) : (
-                <Button 
-                  onClick={() => generateCertificate.mutate()}
-                  disabled={generateCertificate.isPending}
-                  size="lg"
-                >
-                  <Award className="h-4 w-4 mr-2" />
-                  {generateCertificate.isPending ? "Oluşturuluyor..." : "Sertifikamı Oluştur"}
-                </Button>
+                <div className="flex flex-col items-center gap-3 py-2">
+                  <p className="text-sm text-muted-foreground text-center">Profesyonel sertifikanızı oluşturun. Altın çerçeveli, QR doğrulamalı ve RIASEC profilinizi içerir.</p>
+                  <Button 
+                    onClick={() => generateCertificate.mutate()}
+                    disabled={generateCertificate.isPending}
+                    size="lg"
+                    className="bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white shadow-md"
+                  >
+                    <Award className="h-5 w-5 mr-2" />
+                    {generateCertificate.isPending ? "Oluşturuluyor..." : "Sertifikamı Oluştur"}
+                  </Button>
+                </div>
               )}
             </CardContent>
           </Card>

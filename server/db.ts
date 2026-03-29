@@ -1324,6 +1324,44 @@ export async function createCertificate(studentId: number) {
   // Generate certificate number
   const certificateNumber = await generateCertificateNumber(studentId);
 
+  // Get completed stages info for certificate
+  let completedStageNames: string[] = [];
+  let riasecProfile = '';
+  try {
+    const allUserStages = await dbInstance
+      .select({ stageId: userStages.stageId, status: userStages.status })
+      .from(userStages)
+      .where(eq(userStages.userId, studentId));
+    const completedStageIds = allUserStages
+      .filter(s => s.status === 'completed')
+      .map(s => s.stageId);
+    if (completedStageIds.length > 0) {
+      const stageRows = await dbInstance
+        .select({ id: stages.id, name: stages.name })
+        .from(stages);
+      completedStageNames = stageRows
+        .filter(s => completedStageIds.includes(s.id))
+        .map(s => s.name);
+    }
+    // Get RIASEC profile
+    const { performFullAnalysis } = await import('./services/riasecAnalyzer');
+    const stageAnswers = await dbInstance
+      .select()
+      .from(answers)
+      .innerJoin(questions, eq(answers.questionId, questions.id))
+      .where(eq(answers.userId, studentId));
+    if (stageAnswers.length > 0) {
+      const answerTexts = stageAnswers.map(sa => ({
+        question: sa.questions.text,
+        answer: sa.answers.answer || '',
+      }));
+      const analysis = performFullAnalysis(answerTexts);
+      riasecProfile = analysis.riasecTop3.join('');
+    }
+  } catch (err) {
+    console.error('Failed to get stage/RIASEC info for certificate:', err);
+  }
+
   // Generate PDF
   const { generateCertificatePDF } = await import("./pdfCertificate");
   const { url: pdfUrl } = await generateCertificatePDF({
@@ -1331,6 +1369,8 @@ export async function createCertificate(studentId: number) {
     certificateNumber,
     completionDate: new Date(),
     ageGroup: student[0].ageGroup || "18-21",
+    completedStages: completedStageNames,
+    riasecProfile: riasecProfile || undefined,
   });
 
   // Create certificate
