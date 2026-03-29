@@ -2,6 +2,15 @@ import { generateStageReport } from './_core/reportGeneration';
 import { convertMarkdownToPDF } from './_core/pdfExport';
 import * as db from './db';
 import { performFullAnalysis } from './services/riasecAnalyzer';
+import { performValuesAnalysis, getValuesContext } from './services/valuesAnalyzer';
+
+/**
+ * Etap adından değerler testi olup olmadığını belirle
+ */
+function isValuesStage(stageName: string): boolean {
+  const lower = (stageName || '').toLowerCase();
+  return lower.includes('değer') || lower.includes('kariyer değerleri') || lower.includes('values');
+}
 
 export async function generateStageReportAsync(userId: number, stageId: number) {
   console.log(`[ReportGen] Starting report generation for user ${userId}, stage ${stageId}`);
@@ -36,13 +45,22 @@ export async function generateStageReportAsync(userId: number, stageId: number) 
     });
     console.log(`[ReportGen] Formatted ${formattedAnswers.length} answers for LLM`);
 
-    // Perform RIASEC analysis
-    console.log(`[ReportGen] Performing RIASEC analysis...`);
-    const riasecAnalysis = performFullAnalysis(formattedAnswers);
-    console.log(`[ReportGen] RIASEC top 3: ${riasecAnalysis.riasecTop3.join(', ')}`);
+    let analysisContext = '';
 
-    // Build RIASEC context for LLM
-    const riasecContext = `\n\n## RIASEC Analiz Sonuçları (Otomatik Hesaplanmış)
+    // Determine analysis type based on stage name
+    if (isValuesStage(stage.name)) {
+      // Kariyer Değerleri Envanteri analizi
+      console.log(`[ReportGen] Performing Values analysis (Kariyer Değerleri Envanteri)...`);
+      const valuesAnalysis = performValuesAnalysis(formattedAnswers);
+      console.log(`[ReportGen] Values top 3: ${valuesAnalysis.topValues.map(v => v.name).join(', ')}`);
+      analysisContext = getValuesContext(valuesAnalysis);
+    } else {
+      // Standart RIASEC analizi
+      console.log(`[ReportGen] Performing RIASEC analysis...`);
+      const riasecAnalysis = performFullAnalysis(formattedAnswers);
+      console.log(`[ReportGen] RIASEC top 3: ${riasecAnalysis.riasecTop3.join(', ')}`);
+
+      analysisContext = `\n\n## RIASEC Analiz Sonuçları (Otomatik Hesaplanmış)
 R (Gerçekçi): ${riasecAnalysis.riasec.R}/100
 I (Araştırmacı): ${riasecAnalysis.riasec.I}/100
 A (Sanatsal): ${riasecAnalysis.riasec.A}/100
@@ -50,13 +68,22 @@ S (Sosyal): ${riasecAnalysis.riasec.S}/100
 E (Girişimci): ${riasecAnalysis.riasec.E}/100
 C (Geleneksel): ${riasecAnalysis.riasec.C}/100
 
+## Big Five Kişilik Profili
+Deneyime Açıklık: ${riasecAnalysis.bigFive.openness}/100
+Sorumluluk: ${riasecAnalysis.bigFive.conscientiousness}/100
+Dışa Dönüklük: ${riasecAnalysis.bigFive.extraversion}/100
+Uyumluluk: ${riasecAnalysis.bigFive.agreeableness}/100
+Duygusal Denge: ${riasecAnalysis.bigFive.emotionalStability}/100
+
 En güçlü boyutlar: ${riasecAnalysis.strengthAreas.join(', ')}
 Gelişim alanları: ${riasecAnalysis.developmentAreas.join(', ')}
 Önerilen kariyer alanları: ${riasecAnalysis.careerSuggestions.join(', ')}
+Kişilik Özeti: ${riasecAnalysis.personalityInsights}
 
-Lütfen bu RIASEC skorlarını da raporda değerlendir ve kariyer önerilerini buna göre destekle.`;
+Lütfen bu RIASEC ve Big Five skorlarını raporda değerlendir ve kariyer önerilerini buna göre destekle.`;
+    }
 
-    // Generate report content with RIASEC context
+    // Generate report content with analysis context
     console.log(`[ReportGen] Calling LLM to generate report...`);
     const reportContent = await generateStageReport(
       user.name || user.email || 'Öğrenci',
@@ -64,7 +91,7 @@ Lütfen bu RIASEC skorlarını da raporda değerlendir ve kariyer önerilerini b
       user.ageGroup || '18-21',
       formattedAnswers.map((a, i) => ({
         ...a,
-        answer: a.answer + (i === formattedAnswers.length - 1 ? riasecContext : ''),
+        answer: a.answer + (i === formattedAnswers.length - 1 ? analysisContext : ''),
       }))
     );
     console.log(`[ReportGen] LLM report generated, length: ${reportContent.length} chars`);

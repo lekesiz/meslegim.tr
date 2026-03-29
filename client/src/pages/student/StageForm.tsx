@@ -177,19 +177,29 @@ export default function StageForm() {
         );
 
       case 'likert':
+        const likertLabels: Record<string, string> = {
+          '1': 'Kesinlikle\nKatılmıyorum',
+          '2': 'Katılmıyorum',
+          '3': 'Kararsızım',
+          '4': 'Katılıyorum',
+          '5': 'Kesinlikle\nKatılıyorum',
+        };
+        const likertColors: Record<string, string> = {
+          '1': 'border-red-300 bg-red-50 text-red-700 peer-checked:border-red-500 peer-checked:bg-red-100 peer-checked:ring-2 peer-checked:ring-red-500',
+          '2': 'border-orange-300 bg-orange-50 text-orange-700 peer-checked:border-orange-500 peer-checked:bg-orange-100 peer-checked:ring-2 peer-checked:ring-orange-500',
+          '3': 'border-gray-300 bg-gray-50 text-gray-700 peer-checked:border-gray-500 peer-checked:bg-gray-100 peer-checked:ring-2 peer-checked:ring-gray-500',
+          '4': 'border-green-300 bg-green-50 text-green-700 peer-checked:border-green-500 peer-checked:bg-green-100 peer-checked:ring-2 peer-checked:ring-green-500',
+          '5': 'border-emerald-300 bg-emerald-50 text-emerald-700 peer-checked:border-emerald-500 peer-checked:bg-emerald-100 peer-checked:ring-2 peer-checked:ring-emerald-500',
+        };
         const likertOptions = options.length > 0 ? options : ['1', '2', '3', '4', '5'];
         return (
-          <div className="space-y-2">
-            <div className="flex justify-between text-sm text-muted-foreground">
-              <span>Kesinlikle Katılmıyorum</span>
-              <span>Kesinlikle Katılıyorum</span>
-            </div>
-            <div className="flex justify-between">
+          <div className="space-y-3">
+            <div className="grid grid-cols-5 gap-2">
               {likertOptions.map((option: string) => (
                 <label
                   key={option}
                   htmlFor={`${question.id}-${option}`}
-                  className="flex flex-col items-center space-y-2 cursor-pointer"
+                  className="flex flex-col items-center cursor-pointer group"
                 >
                   <input
                     type="radio"
@@ -198,9 +208,12 @@ export default function StageForm() {
                     value={String(option)}
                     checked={currentAnswer === String(option)}
                     onChange={(e) => handleAnswerChange(question.id, e.target.value)}
-                    className="w-4 h-4 text-primary border-gray-300 focus:ring-2 focus:ring-primary"
+                    className="sr-only peer"
                   />
-                  <span className="text-xs font-medium">{option}</span>
+                  <div className={`w-full py-3 px-1 rounded-lg border-2 text-center transition-all ${likertColors[option] || 'border-gray-300 bg-gray-50'}`}>
+                    <div className="text-lg font-bold">{option}</div>
+                    <div className="text-[10px] leading-tight mt-1 whitespace-pre-line">{likertLabels[option] || option}</div>
+                  </div>
                 </label>
               ))}
             </div>

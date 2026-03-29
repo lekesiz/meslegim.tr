@@ -1,0 +1,31 @@
+{
+  "query": "SELECT s.id, s.name, s.ageGroup, s.`order`, COUNT(q.id) as questionCount FROM stages s LEFT JOIN questions q ON q.stageId = s.id WHERE s.`order` = 4 GROUP BY s.id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute SELECT s.id, s.name, s.ageGroup, s.`order`, COUNT(q.id) as questionCount FROM stages s LEFT JOIN questions q ON q.stageId = s.id WHERE s.`order` = 4 GROUP BY s.id;",
+  "rows": [
+    {
+      "id": "90002",
+      "name": "Etap 4: Kariyer Değerleri Envanteri",
+      "ageGroup": "18-21",
+      "order": "4",
+      "questionCount": "30"
+    },
+    {
+      "id": "90003",
+      "name": "Etap 4: Kariyer Değerleri Envanteri",
+      "ageGroup": "22-24",
+      "order": "4",
+      "questionCount": "30"
+    },
+    {
+      "id": "90001",
+      "name": "Etap 4: Kariyer Değerleri Envanteri",
+      "ageGroup": "14-17",
+      "order": "4",
+      "questionCount": "30"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tageGroup\torder\tquestionCount\n90002\tEtap 4: Kariyer Değerleri Envanteri\t18-21\t4\t30\n90003\tEtap 4: Kariyer Değerleri Envanteri\t22-24\t4\t30\n90001\tEtap 4: Kariyer Değerleri Envanteri\t14-17\t4\t30\n",
+  "stderr": "",
+  "execution_time_ms": 184
+}
