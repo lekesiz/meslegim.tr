@@ -1,0 +1,50 @@
+{
+  "query": "SELECT us.userId, us.stageId, us.status, us.createdAt, us.updatedAt, s.name as stageName FROM user_stages us JOIN stages s ON us.stageId = s.id WHERE us.userId = (SELECT id FROM users WHERE email = 'student@test.com') ORDER BY us.stageId;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute SELECT us.userId, us.stageId, us.status, us.createdAt, us.updatedAt, s.name as stageName FROM user_stages us JOIN stages s ON us.stageId = s.id WHERE us.userId = (SELECT id FROM users WHERE email = 'student@test.com') ORDER BY us.stageId;",
+  "rows": [
+    {
+      "userId": "180022",
+      "stageId": "60001",
+      "status": "completed",
+      "createdAt": "2026-02-19 11:37:36",
+      "updatedAt": "2026-03-29 04:47:12",
+      "stageName": "Etap 1: Meslek Seçimi Yetkinlik Değerlendirmesi"
+    },
+    {
+      "userId": "180022",
+      "stageId": "60002",
+      "status": "completed",
+      "createdAt": "2026-02-19 11:58:33",
+      "updatedAt": "2026-03-29 19:57:06",
+      "stageName": "Etap 2: Yetenek Keşfi ve Mesleki Eğilim Analizi"
+    },
+    {
+      "userId": "180022",
+      "stageId": "60003",
+      "status": "locked",
+      "createdAt": "2026-03-29 19:57:06",
+      "updatedAt": "2026-03-29 19:57:06",
+      "stageName": "Etap 3: Gerçeklik Kontrolü ve Eylem Planı"
+    },
+    {
+      "userId": "180022",
+      "stageId": "90001",
+      "status": "completed",
+      "createdAt": "2026-03-29 18:20:49",
+      "updatedAt": "2026-03-29 20:00:13",
+      "stageName": "Etap 4: Kariyer Değerleri Envanteri"
+    },
+    {
+      "userId": "180022",
+      "stageId": "90004",
+      "status": "locked",
+      "createdAt": "2026-03-29 20:00:13",
+      "updatedAt": "2026-03-29 20:00:13",
+      "stageName": "Etap 5: Kariyer Risk Analizi"
+    }
+  ],
+  "messages": [],
+  "stdout": "userId\tstageId\tstatus\tcreatedAt\tupdatedAt\tstageName\n180022\t60001\tcompleted\t2026-02-19 11:37:36\t2026-03-29 04:47:12\tEtap 1: Meslek Seçimi Yetkinlik Değerlendirmesi\n180022\t60002\tcompleted\t2026-02-19 11:58:33\t2026-03-29 19:57:06\tEtap 2: Yetenek Keşfi ve Mesleki Eğilim Analizi\n180022\t60003\tlocked\t2026-03-29 19:57:06\t2026-03-29 19:57:06\tEtap 3: Gerçeklik Kontrolü ve Eylem Planı\n180022\t90001\tcompleted\t2026-03-29 18:20:49\t2026-03-29 20:00:13\tEtap 4: Kariyer Değerleri Envanteri\n180022\t90004\tlocked\t2026-03-29 20:00:13\t2026-03-29 20:00:13\tEtap 5: Kariyer Risk Analizi\n",
+  "stderr": "",
+  "execution_time_ms": 65
+}

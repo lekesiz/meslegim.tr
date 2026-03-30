@@ -1,0 +1,80 @@
+{
+  "query": "SELECT id, stageId, text, type, options FROM questions WHERE type = 'multiple_choice' LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute SELECT id, stageId, text, type, options FROM questions WHERE type = 'multiple_choice' LIMIT 10;",
+  "rows": [
+    {
+      "id": "90001",
+      "stageId": "4",
+      "text": "Şu anki eğitim durumunuz nedir?",
+      "type": "multiple_choice",
+      "options": "[\"Üniversite öğrencisiyim\", \"Yeni mezun oldum\", \"Çalışıyorum ve okuyorum\", \"Ara verdim\"]"
+    },
+    {
+      "id": "90002",
+      "stageId": "4",
+      "text": "Hangi alanlarda kendinizi geliştirmek istiyorsunuz?",
+      "type": "multiple_choice",
+      "options": "[\"Teknik beceriler\", \"İletişim becerileri\", \"Liderlik\", \"Yabancı dil\", \"Proje yönetimi\"]"
+    },
+    {
+      "id": "90004",
+      "stageId": "4",
+      "text": "Hangi sektörlerde çalışmak istersiniz?",
+      "type": "multiple_choice",
+      "options": "[\"Teknoloji\", \"Finans\", \"Sağlık\", \"Eğitim\", \"Mühendislik\", \"Sanat/Tasarım\", \"Diğer\"]"
+    },
+    {
+      "id": "90005",
+      "stageId": "4",
+      "text": "İş deneyiminiz var mı?",
+      "type": "multiple_choice",
+      "options": "[\"Evet, tam zamanlı\", \"Evet, part-time\", \"Staj yaptım\", \"Hayır\"]"
+    },
+    {
+      "id": "90008",
+      "stageId": "4",
+      "text": "Hangi teknik becerilere sahipsiniz?",
+      "type": "multiple_choice",
+      "options": "[\"Programlama\", \"Veri analizi\", \"Grafik tasarım\", \"Dijital pazarlama\", \"Proje yönetimi\", \"Diğer\"]"
+    },
+    {
+      "id": "90009",
+      "stageId": "4",
+      "text": "Yabancı dil seviyeniz nedir?",
+      "type": "multiple_choice",
+      "options": "[\"İleri seviye\", \"Orta seviye\", \"Başlangıç seviyesi\", \"Bilmiyorum\"]"
+    },
+    {
+      "id": "90010",
+      "stageId": "4",
+      "text": "Liderlik deneyiminiz var mı?",
+      "type": "multiple_choice",
+      "options": "[\"Evet, çok\", \"Biraz var\", \"Hayır ama öğrenmek isterim\", \"İlgimi çekmiyor\"]"
+    },
+    {
+      "id": "90011",
+      "stageId": "4",
+      "text": "İdeal iş ortamınız nasıl olmalı?",
+      "type": "multiple_choice",
+      "options": "[\"Ofis\", \"Uzaktan\", \"Hibrit\", \"Saha\", \"Farketmez\"]"
+    },
+    {
+      "id": "90013",
+      "stageId": "4",
+      "text": "Ne kadar sürede kariyer hedefinize ulaşmayı planlıyorsunuz?",
+      "type": "multiple_choice",
+      "options": "[\"1-2 yıl\", \"3-5 yıl\", \"5-10 yıl\", \"Belirsiz\"]"
+    },
+    {
+      "id": "90016",
+      "stageId": "4",
+      "text": "En çok hangi alanda desteğe ihtiyacınız var?",
+      "type": "multiple_choice",
+      "options": "[\"CV hazırlama\", \"Mülakat teknikleri\", \"Networking\", \"Kişisel marka\", \"Teknik beceriler\"]"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tstageId\ttext\ttype\toptions\n90001\t4\tŞu anki eğitim durumunuz nedir?\tmultiple_choice\t[\"Üniversite öğrencisiyim\", \"Yeni mezun oldum\", \"Çalışıyorum ve okuyorum\", \"Ara verdim\"]\n90002\t4\tHangi alanlarda kendinizi geliştirmek istiyorsunuz?\tmultiple_choice\t[\"Teknik beceriler\", \"İletişim becerileri\", \"Liderlik\", \"Yabancı dil\", \"Proje yönetimi\"]\n90004\t4\tHangi sektörlerde çalışmak istersiniz?\tmultiple_choice\t[\"Teknoloji\", \"Finans\", \"Sağlık\", \"Eğitim\", \"Mühendislik\", \"Sanat/Tasarım\", \"Diğer\"]\n90005\t4\tİş deneyiminiz var mı?\tmultiple_choice\t[\"Evet, tam zamanlı\", \"Evet, part-time\", \"Staj yaptım\", \"Hayır\"]\n90008\t4\tHangi teknik becerilere sahipsiniz?\tmultiple_choice\t[\"Programlama\", \"Veri analizi\", \"Grafik tasarım\", \"Dijital pazarlama\", \"Proje yönetimi\", \"Diğer\"]\n90009\t4\tYabancı dil seviyeniz nedir?\tmultiple_choice\t[\"İleri seviye\", \"Orta seviye\", \"Başlangıç seviyesi\", \"Bilmiyorum\"]\n90010\t4\tLiderlik deneyiminiz var mı?\tmultiple_choice\t[\"Evet, çok\", \"Biraz var\", \"Hayır ama öğrenmek isterim\", \"İlgimi çekmiyor\"]\n90011\t4\tİdeal iş ortamınız nasıl olmalı?\tmultiple_choice\t[\"Ofis\", \"Uzaktan\", \"Hibrit\", \"Saha\", \"Farketmez\"]\n90013\t4\tNe kadar sürede kariyer hedefinize ulaşmayı planlıyorsunuz?\tmultiple_choice\t[\"1-2 yıl\", \"3-5 yıl\", \"5-10 yıl\", \"Belirsiz\"]\n90016\t4\tEn çok hangi alanda desteğe ihtiyacınız var?\tmultiple_choice\t[\"CV hazırlama\", \"Mülakat teknikleri\", \"Networking\", \"Kişisel marka\", \"Teknik beceriler\"]\n",
+  "stderr": "",
+  "execution_time_ms": 55
+}

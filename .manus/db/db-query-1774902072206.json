@@ -1,0 +1,59 @@
+{
+  "query": "SELECT ub.userId, ub.badgeId, b.slug, b.name, ub.earnedAt FROM user_badges ub JOIN badges b ON ub.badgeId = b.id WHERE ub.userId = (SELECT id FROM users WHERE email = 'student@test.com');",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute SELECT ub.userId, ub.badgeId, b.slug, b.name, ub.earnedAt FROM user_badges ub JOIN badges b ON ub.badgeId = b.id WHERE ub.userId = (SELECT id FROM users WHERE email = 'student@test.com');",
+  "rows": [
+    {
+      "userId": "180022",
+      "badgeId": "1",
+      "slug": "first-stage",
+      "name": "İlk Adım",
+      "earnedAt": "2026-03-30 20:11:45"
+    },
+    {
+      "userId": "180022",
+      "badgeId": "2",
+      "slug": "three-stages",
+      "name": "Kararlı Yolcu",
+      "earnedAt": "2026-03-30 20:11:45"
+    },
+    {
+      "userId": "180022",
+      "badgeId": "4",
+      "slug": "first-report",
+      "name": "İlk Rapor",
+      "earnedAt": "2026-03-30 20:11:45"
+    },
+    {
+      "userId": "180022",
+      "badgeId": "5",
+      "slug": "profile-complete",
+      "name": "Profil Uzmanı",
+      "earnedAt": "2026-03-30 20:11:45"
+    },
+    {
+      "userId": "180022",
+      "badgeId": "12",
+      "slug": "values-master",
+      "name": "Değerler Kaşifi",
+      "earnedAt": "2026-03-30 20:11:45"
+    },
+    {
+      "userId": "180022",
+      "badgeId": "16",
+      "slug": "mentor-approved",
+      "name": "Mentor Onaylı",
+      "earnedAt": "2026-03-30 20:11:45"
+    },
+    {
+      "userId": "180022",
+      "badgeId": "17",
+      "slug": "pioneer",
+      "name": "Öncü",
+      "earnedAt": "2026-03-30 20:11:45"
+    }
+  ],
+  "messages": [],
+  "stdout": "userId\tbadgeId\tslug\tname\tearnedAt\n180022\t1\tfirst-stage\tİlk Adım\t2026-03-30 20:11:45\n180022\t2\tthree-stages\tKararlı Yolcu\t2026-03-30 20:11:45\n180022\t4\tfirst-report\tİlk Rapor\t2026-03-30 20:11:45\n180022\t5\tprofile-complete\tProfil Uzmanı\t2026-03-30 20:11:45\n180022\t12\tvalues-master\tDeğerler Kaşifi\t2026-03-30 20:11:45\n180022\t16\tmentor-approved\tMentor Onaylı\t2026-03-30 20:11:45\n180022\t17\tpioneer\tÖncü\t2026-03-30 20:11:45\n",
+  "stderr": "",
+  "execution_time_ms": 64
+}

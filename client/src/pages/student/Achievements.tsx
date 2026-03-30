@@ -166,11 +166,12 @@ function BadgeCard({
 }
 
 export default function Achievements() {
+  const utils = trpc.useUtils();
   const { data, isLoading } = trpc.badge.getMyBadges.useQuery();
   const checkMutation = trpc.badge.checkNewBadges.useMutation({
     onSuccess: () => {
       // Refetch badges after check
-      void trpc.useUtils().badge.getMyBadges.invalidate();
+      void utils.badge.getMyBadges.invalidate();
     },
   });
 

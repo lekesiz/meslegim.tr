@@ -1,0 +1,80 @@
+{
+  "query": "SELECT id, stageId, text, type, options FROM questions WHERE id >= 200000 AND type = 'multiple_choice' LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute SELECT id, stageId, text, type, options FROM questions WHERE id >= 200000 AND type = 'multiple_choice' LIMIT 10;",
+  "rows": [
+    {
+      "id": "210001",
+      "stageId": "60001",
+      "text": "Okulda en çok hangi dersleri seviyorsun? (En fazla 3 seçin)",
+      "type": "multiple_choice",
+      "options": "[\"Matematik\", \"Fizik\", \"Kimya\", \"Biyoloji\", \"Tarih / Coğrafya\", \"Türkçe / Edebiyat\", \"İngilizce / Yabancı Dil\", \"Bilişim / Teknoloji\", \"Beden Eğitimi / Spor\", \"Müzik / Görsel Sanatlar\", \"Felsefe / Psikoloji\"]"
+    },
+    {
+      "id": "210002",
+      "stageId": "60001",
+      "text": "Boş zamanlarında en çok ne yapmaktan keyif alırsın? (En fazla 3 seçin)",
+      "type": "multiple_choice",
+      "options": "[\"Resim çizmek / el sanatları yapmak\", \"Müzik aleti çalmak veya şarkı söylemek\", \"Spor yapmak / antrenman\", \"Bilgisayar / kodlama / oyun geliştirme\", \"Kitap okumak / hikaye yazmak\", \"Arkadaşlarıma yardım etmek / sorunlarını dinlemek\", \"Doğada vakit geçirmek / hayvanlarla ilgilenmek\", \"Matematik / bulmaca çözmek\", \"Video / fotoğraf çekmek / içerik üretmek\", \"Sosyal medya / topluluk yönetimi\", \"Bilimsel deneyler yapmak / araştırmak\"]"
+    },
+    {
+      "id": "210003",
+      "stageId": "60001",
+      "text": "Sınıfta ya da grup çalışmalarında genellikle hangi rolü üstlenirsin?",
+      "type": "multiple_choice",
+      "options": "[\"Lider: Grubu organize eder, kararları ben alırım\", \"Fikir üretici: Yaratıcı çözümler öneririm\", \"Araştırmacı: Bilgi toplar, analiz yaparım\", \"Uygulayıcı: Planlananı titizlikle hayata geçiririm\", \"Arabulucu: Grup içi uyumu sağlarım\", \"Sunucu: Sonuçları en iyi ben anlatırım\"]"
+    },
+    {
+      "id": "210005",
+      "stageId": "60001",
+      "text": "Gelecekte çalışmak istediğin ortam hangisine daha yakın?",
+      "type": "multiple_choice",
+      "options": "[\"Ofis ortamı (masa başı, bilgisayar)\", \"Saha / dışarıda aktif çalışma\", \"Hastane / klinik / sağlık ortamı\", \"Okul / eğitim ortamı\", \"Atölye / laboratuvar / üretim alanı\", \"Sahne / stüdyo / yaratıcı ortam\", \"Uzaktan / evden çalışma\", \"Henüz bilmiyorum\"]"
+    },
+    {
+      "id": "210006",
+      "stageId": "60001",
+      "text": "Ailen senden hangi mesleği yapmanı bekliyor?",
+      "type": "multiple_choice",
+      "options": "[\"Doktor / Mühendis / Avukat (klasik prestijli meslekler)\", \"Öğretmen / Akademisyen\", \"İş insanı / Girişimci\", \"Sanatçı / Sporcu / Yaratıcı alan\", \"Devlet memuru / Kamu görevlisi\", \"Ailemin beklentisi yok, kendi kararımı veriyorum\", \"Aile baskısı var ama farklı bir şey istiyorum\"]"
+    },
+    {
+      "id": "210008",
+      "stageId": "60001",
+      "text": "Hangi üniversite bölümlerini düşünüyorsun? (Birden fazla seçebilirsin)",
+      "type": "multiple_choice",
+      "options": "[\"Tıp / Diş Hekimliği / Eczacılık\", \"Mühendislik (Bilgisayar, Makine, Elektrik vb.)\", \"Hukuk\", \"İşletme / Ekonomi / Finans\", \"Öğretmenlik / Eğitim Bilimleri\", \"Psikoloji / Sosyoloji / Sosyal Bilimler\", \"Güzel Sanatlar / Tasarım / Mimarlık\", \"İletişim / Medya / Gazetecilik\", \"Spor Bilimleri\", \"Sağlık Bilimleri (Hemşirelik, Fizyoterapi vb.)\", \"Henüz karar vermedim\"]"
+    },
+    {
+      "id": "210009",
+      "stageId": "60001",
+      "text": "Bir meslek seçerken sana en önemli gelen faktör nedir?",
+      "type": "multiple_choice",
+      "options": "[\"Yüksek maaş ve maddi güvence\", \"Topluma faydalı olmak\", \"Yaratıcılık ve özgürlük\", \"Prestij ve toplumsal saygınlık\", \"İş güvencesi ve stabilite\", \"Sürekli yeni şeyler öğrenmek\", \"Esnek çalışma saatleri\", \"İnsanlarla iletişim halinde olmak\"]"
+    },
+    {
+      "id": "210010",
+      "stageId": "60001",
+      "text": "Zorlu bir matematik problemi veya bulmacayla karşılaştığında ne yaparsın?",
+      "type": "multiple_choice",
+      "options": "[\"Hemen vazgeçerim, canımı sıkar\", \"Biraz denerim, olmazsa bırakırım\", \"Sabırla çözmeye çalışırım\", \"Çözmeden bırakmam, çok zorlanırsam yardım isterim\", \"Heyecanlanırım, zor problemleri severim\"]"
+    },
+    {
+      "id": "210011",
+      "stageId": "60001",
+      "text": "Okul dışında herhangi bir kursa, kulübe veya etkinliğe katılıyor musun?",
+      "type": "multiple_choice",
+      "options": "[\"Evet, spor kulübü / takım\", \"Evet, müzik / sanat kursu\", \"Evet, dil kursu\", \"Evet, kodlama / robotik / bilim kulübü\", \"Evet, gönüllü çalışma / sosyal sorumluluk\", \"Evet, dershane / özel ders\", \"Hayır, katılmıyorum ama katılmak istiyorum\", \"Hayır, zamanım yok\"]"
+    },
+    {
+      "id": "210013",
+      "stageId": "60001",
+      "text": "Hayatta seni en çok motive eden şey nedir?",
+      "type": "multiple_choice",
+      "options": "[\"Ailemi gururlandırmak\", \"Maddi bağımsızlık kazanmak\", \"Topluma faydalı olmak\", \"Hayallerimi gerçekleştirmek\", \"Yeni şeyler öğrenmek ve keşfetmek\", \"Tanınmak ve başarılı olmak\", \"Özgür ve bağımsız yaşamak\"]"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tstageId\ttext\ttype\toptions\n210001\t60001\tOkulda en çok hangi dersleri seviyorsun? (En fazla 3 seçin)\tmultiple_choice\t[\"Matematik\", \"Fizik\", \"Kimya\", \"Biyoloji\", \"Tarih / Coğrafya\", \"Türkçe / Edebiyat\", \"İngilizce / Yabancı Dil\", \"Bilişim / Teknoloji\", \"Beden Eğitimi / Spor\", \"Müzik / Görsel Sanatlar\", \"Felsefe / Psikoloji\"]\n210002\t60001\tBoş zamanlarında en çok ne yapmaktan keyif alırsın? (En fazla 3 seçin)\tmultiple_choice\t[\"Resim çizmek / el sanatları yapmak\", \"Müzik aleti çalmak veya şarkı söylemek\", \"Spor yapmak / antrenman\", \"Bilgisayar / kodlama / oyun geliştirme\", \"Kitap okumak / hikaye yazmak\", \"Arkadaşlarıma yardım etmek / sorunlarını dinlemek\", \"Doğada vakit geçirmek / hayvanlarla ilgilenmek\", \"Matematik / bulmaca çözmek\", \"Video / fotoğraf çekmek / içerik üretmek\", \"Sosyal medya / topluluk yönetimi\", \"Bilimsel deneyler yapmak / araştırmak\"]\n210003\t60001\tSınıfta ya da grup çalışmalarında genellikle hangi rolü üstlenirsin?\tmultiple_choice\t[\"Lider: Grubu organize eder, kararları ben alırım\", \"Fikir üretici: Yaratıcı çözümler öneririm\", \"Araştırmacı: Bilgi toplar, analiz yaparım\", \"Uygulayıcı: Planlananı titizlikle hayata geçiririm\", \"Arabulucu: Grup içi uyumu sağlarım\", \"Sunucu: Sonuçları en iyi ben anlatırım\"]\n210005\t60001\tGelecekte çalışmak istediğin ortam hangisine daha yakın?\tmultiple_choice\t[\"Ofis ortamı (masa başı, bilgisayar)\", \"Saha / dışarıda aktif çalışma\", \"Hastane / klinik / sağlık ortamı\", \"Okul / eğitim ortamı\", \"Atölye / laboratuvar / üretim alanı\", \"Sahne / stüdyo / yaratıcı ortam\", \"Uzaktan / evden çalışma\", \"Henüz bilmiyorum\"]\n210006\t60001\tAilen senden hangi mesleği yapmanı bekliyor?\tmultiple_choice\t[\"Doktor / Mühendis / Avukat (klasik prestijli meslekler)\", \"Öğretmen / Akademisyen\", \"İş insanı / Girişimci\", \"Sanatçı / Sporcu / Yaratıcı alan\", \"Devlet memuru / Kamu görevlisi\", \"Ailemin beklentisi yok, kendi kararımı veriyorum\", \"Aile baskısı var ama farklı bir şey istiyorum\"]\n210008\t60001\tHangi üniversite bölümlerini düşünüyorsun? (Birden fazla seçebilirsin)\tmultiple_choice\t[\"Tıp / Diş Hekimliği / Eczacılık\", \"Mühendislik (Bilgisayar, Makine, Elektrik vb.)\", \"Hukuk\", \"İşletme / Ekonomi / Finans\", \"Öğretmenlik / Eğitim Bilimleri\", \"Psikoloji / Sosyoloji / Sosyal Bilimler\", \"Güzel Sanatlar / Tasarım / Mimarlık\", \"İletişim / Medya / Gazetecilik\", \"Spor Bilimleri\", \"Sağlık Bilimleri (Hemşirelik, Fizyoterapi vb.)\", \"Henüz karar vermedim\"]\n210009\t60001\tBir meslek seçerken sana en önemli gelen faktör nedir?\tmultiple_choice\t[\"Yüksek maaş ve maddi güvence\", \"Topluma faydalı olmak\", \"Yaratıcılık ve özgürlük\", \"Prestij ve toplumsal saygınlık\", \"İş güvencesi ve stabilite\", \"Sürekli yeni şeyler öğrenmek\", \"Esnek çalışma saatleri\", \"İnsanlarla iletişim halinde olmak\"]\n210010\t60001\tZorlu bir matematik problemi veya bulmacayla karşılaştığında ne yaparsın?\tmultiple_choice\t[\"Hemen vazgeçerim, canımı sıkar\", \"Biraz denerim, olmazsa bırakırım\", \"Sabırla çözmeye çalışırım\", \"Çözmeden bırakmam, çok zorlanırsam yardım isterim\", \"Heyecanlanırım, zor problemleri severim\"]\n210011\t60001\tOkul dışında herhangi bir kursa, kulübe veya etkinliğe katılıyor musun?\tmultiple_choice\t[\"Evet, spor kulübü / takım\", \"Evet, müzik / sanat kursu\", \"Evet, dil kursu\", \"Evet, kodlama / robotik / bilim kulübü\", \"Evet, gönüllü çalışma / sosyal sorumluluk\", \"Evet, dershane / özel ders\", \"Hayır, katılmıyorum ama katılmak istiyorum\", \"Hayır, zamanım yok\"]\n210013\t60001\tHayatta seni en çok motive eden şey nedir?\tmultiple_choice\t[\"Ailemi gururlandırmak\", \"Maddi bağımsızlık kazanmak\", \"Topluma faydalı olmak\", \"Hayallerimi gerçekleştirmek\", \"Yeni şeyler öğrenmek ve keşfetmek\", \"Tanınmak ve başarılı olmak\", \"Özgür ve bağımsız yaşamak\"]\n",
+  "stderr": "",
+  "execution_time_ms": 63
+}

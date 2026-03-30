@@ -511,7 +511,7 @@ export const appRouter = router({
         .filter(us => us.status === 'completed' && us.completedAt && us.unlockedAt)
         .map(us => ({
           stageId: us.stageId,
-          days: Math.floor((new Date(us.completedAt!).getTime() - new Date(us.unlockedAt!).getTime()) / (1000 * 60 * 60 * 24)),
+          days: Math.max(0, Math.floor((new Date(us.completedAt!).getTime() - new Date(us.unlockedAt!).getTime()) / (1000 * 60 * 60 * 24))),
         }));
       
       const avgCompletionByStage = stages.map(stage => {
@@ -1648,6 +1648,13 @@ export const appRouter = router({
           }
         } catch (notifErr) {
           console.error('Failed to create notification:', notifErr);
+        }
+        
+        // Auto-check badges after stage completion
+        try {
+          await checkAndAwardBadges(userId);
+        } catch (badgeErr) {
+          console.error('Badge check failed:', badgeErr);
         }
         
         return { success: true, message: 'Etap başarıyla tamamlandı!' };

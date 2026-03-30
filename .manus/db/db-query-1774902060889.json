@@ -1,0 +1,118 @@
+{
+  "query": "SELECT id, slug, name, category FROM badges ORDER BY sortOrder;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute SELECT id, slug, name, category FROM badges ORDER BY sortOrder;",
+  "rows": [
+    {
+      "id": "1",
+      "slug": "first-stage",
+      "name": "İlk Adım",
+      "category": "milestone"
+    },
+    {
+      "id": "2",
+      "slug": "three-stages",
+      "name": "Kararlı Yolcu",
+      "category": "milestone"
+    },
+    {
+      "id": "3",
+      "slug": "all-stages",
+      "name": "Tam Tamamlama",
+      "category": "milestone"
+    },
+    {
+      "id": "4",
+      "slug": "first-report",
+      "name": "İlk Rapor",
+      "category": "milestone"
+    },
+    {
+      "id": "5",
+      "slug": "profile-complete",
+      "name": "Profil Uzmanı",
+      "category": "milestone"
+    },
+    {
+      "id": "6",
+      "slug": "certificate-earned",
+      "name": "Sertifika Sahibi",
+      "category": "milestone"
+    },
+    {
+      "id": "7",
+      "slug": "speed-stage",
+      "name": "Hız Kurşunu",
+      "category": "speed"
+    },
+    {
+      "id": "8",
+      "slug": "daily-streak-3",
+      "name": "3 Gün Serisi",
+      "category": "speed"
+    },
+    {
+      "id": "9",
+      "slug": "daily-streak-7",
+      "name": "Haftalık Seri",
+      "category": "speed"
+    },
+    {
+      "id": "10",
+      "slug": "early-bird",
+      "name": "Erken Kuş",
+      "category": "speed"
+    },
+    {
+      "id": "11",
+      "slug": "riasec-master",
+      "name": "RIASEC Uzmanı",
+      "category": "mastery"
+    },
+    {
+      "id": "12",
+      "slug": "values-master",
+      "name": "Değerler Kaşifi",
+      "category": "mastery"
+    },
+    {
+      "id": "13",
+      "slug": "risk-master",
+      "name": "Risk Analizcisi",
+      "category": "mastery"
+    },
+    {
+      "id": "14",
+      "slug": "personality-master",
+      "name": "Kişilik Uzmanı",
+      "category": "mastery"
+    },
+    {
+      "id": "15",
+      "slug": "feedback-giver",
+      "name": "Geri Bildirimci",
+      "category": "social"
+    },
+    {
+      "id": "16",
+      "slug": "mentor-approved",
+      "name": "Mentor Onaylı",
+      "category": "social"
+    },
+    {
+      "id": "17",
+      "slug": "pioneer",
+      "name": "Öncü",
+      "category": "special"
+    },
+    {
+      "id": "18",
+      "slug": "explorer",
+      "name": "Kaşif",
+      "category": "special"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tslug\tname\tcategory\n1\tfirst-stage\tİlk Adım\tmilestone\n2\tthree-stages\tKararlı Yolcu\tmilestone\n3\tall-stages\tTam Tamamlama\tmilestone\n4\tfirst-report\tİlk Rapor\tmilestone\n5\tprofile-complete\tProfil Uzmanı\tmilestone\n6\tcertificate-earned\tSertifika Sahibi\tmilestone\n7\tspeed-stage\tHız Kurşunu\tspeed\n8\tdaily-streak-3\t3 Gün Serisi\tspeed\n9\tdaily-streak-7\tHaftalık Seri\tspeed\n10\tearly-bird\tErken Kuş\tspeed\n11\triasec-master\tRIASEC Uzmanı\tmastery\n12\tvalues-master\tDeğerler Kaşifi\tmastery\n13\trisk-master\tRisk Analizcisi\tmastery\n14\tpersonality-master\tKişilik Uzmanı\tmastery\n15\tfeedback-giver\tGeri Bildirimci\tsocial\n16\tmentor-approved\tMentor Onaylı\tsocial\n17\tpioneer\tÖncü\tspecial\n18\texplorer\tKaşif\tspecial\n",
+  "stderr": "",
+  "execution_time_ms": 56
+}
