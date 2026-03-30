@@ -25,6 +25,7 @@ export const users = mysqlTable("users", {
   kvkkConsentDate: timestamp("kvkkConsentDate"),
   stripeCustomerId: varchar("stripeCustomerId", { length: 255 }),
   purchasedPackage: varchar("purchasedPackage", { length: 50 }),
+  schoolId: int("schoolId"), // Okul ilişkisi
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
@@ -415,3 +416,119 @@ export const purchases = mysqlTable("purchases", {
 }));
 export type Purchase = typeof purchases.$inferSelect;
 export type InsertPurchase = typeof purchases.$inferInsert;
+
+
+/**
+ * Schools - Okul yönetimi
+ */
+export const schools = mysqlTable("schools", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  code: varchar("code", { length: 50 }).unique(), // Okul kodu (kısa tanımlayıcı)
+  address: text("address"),
+  city: varchar("city", { length: 100 }),
+  district: varchar("district", { length: 100 }),
+  phone: varchar("phone", { length: 20 }),
+  email: varchar("email", { length: 320 }),
+  website: varchar("website", { length: 500 }),
+  logo: text("logo"), // S3 URL
+  type: mysqlEnum("type", ["public", "private", "university", "vocational", "other"]).default("public").notNull(),
+  status: mysqlEnum("status", ["active", "inactive", "pending"]).default("active").notNull(),
+  maxStudents: int("maxStudents").default(500),
+  maxMentors: int("maxMentors").default(50),
+  subscriptionPlan: varchar("subscriptionPlan", { length: 50 }), // Okul abonelik paketi
+  subscriptionExpiresAt: timestamp("subscriptionExpiresAt"),
+  metadata: text("metadata"), // JSON - ek bilgiler
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  codeIdx: index("school_code_idx").on(table.code),
+  cityIdx: index("school_city_idx").on(table.city),
+  statusIdx: index("school_status_idx").on(table.status),
+}));
+export type School = typeof schools.$inferSelect;
+export type InsertSchool = typeof schools.$inferInsert;
+
+/**
+ * School-Mentor ilişki tablosu (many-to-many: bir mentor birden fazla okula atanabilir)
+ */
+export const schoolMentors = mysqlTable("school_mentors", {
+  id: int("id").autoincrement().primaryKey(),
+  schoolId: int("schoolId").notNull(),
+  mentorId: int("mentorId").notNull(),
+  isPrimary: boolean("isPrimary").default(false).notNull(), // Ana mentor mu?
+  assignedAt: timestamp("assignedAt").defaultNow().notNull(),
+  assignedBy: int("assignedBy"), // Kim atadı
+}, (table) => ({
+  schoolIdIdx: index("sm_school_id_idx").on(table.schoolId),
+  mentorIdIdx: index("sm_mentor_id_idx").on(table.mentorId),
+  uniquePair: index("sm_unique_pair_idx").on(table.schoolId, table.mentorId),
+}));
+export type SchoolMentor = typeof schoolMentors.$inferSelect;
+
+/**
+ * Promotion Codes - İndirim kodları
+ */
+export const promotionCodes = mysqlTable("promotion_codes", {
+  id: int("id").autoincrement().primaryKey(),
+  code: varchar("code", { length: 50 }).unique().notNull(),
+  description: text("description"),
+  discountType: mysqlEnum("discountType", ["percentage", "fixed_amount"]).notNull(),
+  discountValue: int("discountValue").notNull(), // Yüzde veya kuruş cinsinden sabit tutar
+  currency: varchar("currency", { length: 10 }).default("try"),
+  minPurchaseAmount: int("minPurchaseAmount").default(0), // Minimum alışveriş tutarı (kuruş)
+  maxUses: int("maxUses"), // null = sınırsız
+  currentUses: int("currentUses").default(0).notNull(),
+  maxUsesPerUser: int("maxUsesPerUser").default(1), // Kullanıcı başına max kullanım
+  applicableProducts: text("applicableProducts"), // JSON array of product IDs, null = tümü
+  applicableSchools: text("applicableSchools"), // JSON array of school IDs, null = tümü
+  isActive: boolean("isActive").default(true).notNull(),
+  startsAt: timestamp("startsAt"),
+  expiresAt: timestamp("expiresAt"),
+  createdBy: int("createdBy"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  codeIdx: index("promo_code_idx").on(table.code),
+  activeIdx: index("promo_active_idx").on(table.isActive),
+}));
+export type PromotionCode = typeof promotionCodes.$inferSelect;
+export type InsertPromotionCode = typeof promotionCodes.$inferInsert;
+
+/**
+ * Promotion Code Usages - Kod kullanım geçmişi
+ */
+export const promotionCodeUsages = mysqlTable("promotion_code_usages", {
+  id: int("id").autoincrement().primaryKey(),
+  promotionCodeId: int("promotionCodeId").notNull(),
+  userId: int("userId").notNull(),
+  purchaseId: int("purchaseId"),
+  discountApplied: int("discountApplied").notNull(), // Uygulanan indirim (kuruş)
+  usedAt: timestamp("usedAt").defaultNow().notNull(),
+}, (table) => ({
+  promoIdIdx: index("pcu_promo_id_idx").on(table.promotionCodeId),
+  userIdIdx: index("pcu_user_id_idx").on(table.userId),
+}));
+export type PromotionCodeUsage = typeof promotionCodeUsages.$inferSelect;
+
+/**
+ * Activity Logs - Sistem aktivite kaydı (audit trail)
+ */
+export const activityLogs = mysqlTable("activity_logs", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId"), // null = sistem aksiyonu
+  action: varchar("action", { length: 100 }).notNull(), // e.g., "user.login", "stage.complete", "payment.success"
+  entityType: varchar("entityType", { length: 50 }), // e.g., "user", "stage", "report", "payment"
+  entityId: int("entityId"), // İlgili kayıt ID'si
+  details: text("details"), // JSON - ek detaylar
+  ipAddress: varchar("ipAddress", { length: 45 }),
+  userAgent: text("userAgent"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+  userIdIdx: index("al_user_id_idx").on(table.userId),
+  actionIdx: index("al_action_idx").on(table.action),
+  entityIdx: index("al_entity_idx").on(table.entityType, table.entityId),
+  createdAtIdx: index("al_created_at_idx").on(table.createdAt),
+}));
+export type ActivityLog = typeof activityLogs.$inferSelect;
+export type InsertActivityLog = typeof activityLogs.$inferInsert;

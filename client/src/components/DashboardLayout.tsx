@@ -28,6 +28,8 @@ import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
 import { Button } from "./ui/button";
+import { ThemeToggle } from "./ThemeToggle";
+import { GlobalSearch } from "./GlobalSearch";
 
 const getMenuItems = (role: string) => {
   const adminItems = [
@@ -286,7 +288,11 @@ function DashboardLayoutContent({
                 </div>
               </div>
             </div>
-            <NotificationBell />
+            <div className="flex items-center gap-2">
+              <GlobalSearch />
+              <ThemeToggle />
+              <NotificationBell />
+            </div>
           </div>
         )}
         <main className="flex-1 p-4">{children}</main>

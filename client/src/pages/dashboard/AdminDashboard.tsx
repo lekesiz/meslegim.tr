@@ -29,6 +29,9 @@ import { UserManagement } from '@/components/UserManagement';
 import { PlatformSettings } from '@/components/PlatformSettings';
 import { PilotFeedbackPanel } from '@/components/admin/PilotFeedbackPanel';
 import { PaymentManagement } from '@/components/admin/PaymentManagement';
+import { SchoolManagement } from '@/components/admin/SchoolManagement';
+import { PromotionCodeManagement } from '@/components/admin/PromotionCodeManagement';
+import { ActivityLogViewer } from '@/components/admin/ActivityLogViewer';
 
 export default function AdminDashboard() {
   const { user } = useAuth();
@@ -168,6 +171,18 @@ export default function AdminDashboard() {
               <CreditCard className="h-4 w-4 mr-2" />
               Ödeme Yönetimi
             </TabsTrigger>
+            <TabsTrigger value="schools">
+              <Layers className="h-4 w-4 mr-2" />
+              Okul Yönetimi
+            </TabsTrigger>
+            <TabsTrigger value="promotions">
+              <Zap className="h-4 w-4 mr-2" />
+              Promosyon Kodları
+            </TabsTrigger>
+            <TabsTrigger value="activity-logs">
+              <Eye className="h-4 w-4 mr-2" />
+              Aktivite Logları
+            </TabsTrigger>
             <TabsTrigger value="pilot-feedback">
               <MessageSquare className="h-4 w-4 mr-2" />
               Pilot Geri Bildirim
@@ -206,6 +221,21 @@ export default function AdminDashboard() {
           {/* Payments Tab */}
           <TabsContent value="payments">
             <PaymentManagement />
+          </TabsContent>
+
+          {/* Schools Tab */}
+          <TabsContent value="schools">
+            <SchoolManagement />
+          </TabsContent>
+
+          {/* Promotions Tab */}
+          <TabsContent value="promotions">
+            <PromotionCodeManagement />
+          </TabsContent>
+
+          {/* Activity Logs Tab */}
+          <TabsContent value="activity-logs">
+            <ActivityLogViewer />
           </TabsContent>
 
           {/* Pilot Feedback Tab */}

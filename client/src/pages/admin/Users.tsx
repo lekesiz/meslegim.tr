@@ -66,16 +66,16 @@ export default function AdminUsers() {
       mentor: "bg-blue-100 text-blue-800",
       student: "bg-green-100 text-green-800",
     };
-    return colors[role as keyof typeof colors] || "bg-gray-100 text-gray-800";
+    return colors[role as keyof typeof colors] || "bg-muted text-foreground";
   };
 
   const getStatusBadge = (status: string) => {
     const colors = {
       active: "bg-green-100 text-green-800",
       pending: "bg-yellow-100 text-yellow-800",
-      inactive: "bg-gray-100 text-gray-800",
+      inactive: "bg-muted text-foreground",
     };
-    return colors[status as keyof typeof colors] || "bg-gray-100 text-gray-800";
+    return colors[status as keyof typeof colors] || "bg-muted text-foreground";
   };
 
   return (
@@ -83,7 +83,7 @@ export default function AdminUsers() {
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold">Gestion des utilisateurs</h1>
-          <p className="text-gray-600">Gérer tous les utilisateurs de la plateforme</p>
+          <p className="text-muted-foreground">Gérer tous les utilisateurs de la plateforme</p>
         </div>
 
         <Card>

@@ -5,6 +5,7 @@ import { Loader2 } from 'lucide-react';
 import AdminDashboard from './dashboard/AdminDashboard';
 import MentorDashboard from './dashboard/MentorDashboard';
 import StudentDashboard from './dashboard/StudentDashboard';
+import SchoolAdminDashboard from './dashboard/SchoolAdminDashboard';
 
 /**
  * Dashboard Router - Role-based dashboard routing
@@ -34,13 +35,19 @@ export default function Dashboard() {
 
   // Check roles - support multi-role (e.g., "admin,mentor")
   const roles = user.role.split(',').map(r => r.trim());
+  const hasSuperAdmin = roles.includes('super_admin');
   const hasAdmin = roles.includes('admin');
+  const hasSchoolAdmin = roles.includes('school_admin');
   const hasMentor = roles.includes('mentor');
   const hasStudent = roles.includes('student');
 
-  // Priority: Admin > Mentor > Student
-  if (hasAdmin) {
+  // Priority: Super Admin > Admin > School Admin > Mentor > Student
+  if (hasSuperAdmin || hasAdmin) {
     return <AdminDashboard />;
+  }
+
+  if (hasSchoolAdmin) {
+    return <SchoolAdminDashboard />;
   }
 
   if (hasMentor) {

@@ -109,7 +109,7 @@ export default function VerifyCertificate() {
             </div>
 
             {/* Student info */}
-            <div className="bg-gray-50/80 border border-gray-200/50 rounded-xl p-4 space-y-3">
+            <div className="bg-muted/50/80 border border-border/50 rounded-xl p-4 space-y-3">
               <div className="flex items-start gap-3">
                 <User className="h-4 w-4 text-muted-foreground mt-0.5" />
                 <div>

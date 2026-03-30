@@ -47,7 +47,7 @@ export default function MentorDashboard() {
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold">Tableau de bord Mentor</h1>
-          <p className="text-gray-600">Gérez vos étudiants et leurs progressions</p>
+          <p className="text-muted-foreground">Gérez vos étudiants et leurs progressions</p>
         </div>
 
         <div className="grid gap-4 md:grid-cols-3">
@@ -105,8 +105,8 @@ export default function MentorDashboard() {
                   >
                     <div>
                       <p className="font-medium">{student.name}</p>
-                      <p className="text-sm text-gray-600">{student.email}</p>
-                      <p className="text-xs text-gray-500">
+                      <p className="text-sm text-muted-foreground">{student.email}</p>
+                      <p className="text-xs text-muted-foreground">
                         Groupe d'âge: {student.ageGroup}
                       </p>
                     </div>
@@ -132,7 +132,7 @@ export default function MentorDashboard() {
             <CardTitle>Activité récente</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-gray-600">Aucune activité récente</p>
+            <p className="text-sm text-muted-foreground">Aucune activité récente</p>
           </CardContent>
         </Card>
       </div>

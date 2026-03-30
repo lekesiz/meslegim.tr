@@ -23,6 +23,8 @@ import {
   Award
 } from "lucide-react";
 import { analytics } from "@/lib/analytics";
+import { SEO } from "@/components/SEO";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export default function Home() {
   const [showForm, setShowForm] = useState(() => {
@@ -90,14 +92,14 @@ export default function Home() {
 
   if (showForm) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
         <Toaster position="top-center" richColors />
-        <div className="max-w-2xl w-full bg-white rounded-2xl shadow-2xl p-8">
+        <div className="max-w-2xl w-full bg-card rounded-2xl shadow-2xl p-8">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            <h1 className="text-3xl font-bold text-foreground mb-2">
               Başvuru Formu
             </h1>
-            <p className="text-gray-600">
+            <p className="text-muted-foreground">
               Lütfen bilgilerinizi eksiksiz doldurunuz
             </p>
           </div>
@@ -194,7 +196,7 @@ export default function Home() {
               </Select>
             </div>
 
-            <div className="bg-gray-50 p-4 rounded-lg">
+            <div className="bg-muted/50 p-4 rounded-lg">
               <div className="flex items-start space-x-3">
                 <Checkbox
                   id="kvkk"
@@ -207,7 +209,7 @@ export default function Home() {
                 <div className="flex-1">
                   <Label
                     htmlFor="kvkk"
-                    className="text-sm text-gray-700 cursor-pointer"
+                    className="text-sm text-foreground/80 cursor-pointer"
                   >
                     <span className="font-semibold">KVKK Aydınlatma Metni:</span>{" "}
                     Kişisel verilerimin, 6698 sayılı Kişisel Verilerin Korunması
@@ -253,9 +255,14 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800">
+      <SEO
+        title="Ana Sayfa"
+        description="Meslegim.tr - Kariyer değerlendirme platformu. Kişisel yeteneklerini keşfet, kariyer yolunu belirle. Yapay zeka destekli kariyer analizi ve profesyonel rehberlik."
+        keywords="kariyer değerlendirme, meslek seçimi, yetenek testi, kariyer rehberliği, meslek testi, üniversite tercih"
+      />
       {/* Navbar */}
-      <nav aria-label="Ana navigasyon" className="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50">
+      <nav aria-label="Ana navigasyon" className="bg-card/80 backdrop-blur-md border-b border-border sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <img 
@@ -263,7 +270,7 @@ export default function Home() {
               alt="Meslegim.tr Logo" 
               className="h-10 w-10"
             />
-            <span className="text-2xl font-bold text-gray-900">Meslegim.tr</span>
+            <span className="text-2xl font-bold text-foreground">Meslegim.tr</span>
           </div>
           <div className="flex items-center gap-4">
             <Button variant="ghost" asChild>
@@ -275,6 +282,7 @@ export default function Home() {
             <Button onClick={() => setShowForm(true)}>
               Ücretsiz Başla
             </Button>
+            <ThemeToggle />
           </div>
         </div>
       </nav>
@@ -282,17 +290,17 @@ export default function Home() {
       {/* Hero Section */}
       <section aria-label="Giriş" className="container mx-auto px-4 py-20">
         <div className="max-w-4xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-700 px-4 py-2 rounded-full text-sm font-medium mb-6">
+          <div className="inline-flex items-center gap-2 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-4 py-2 rounded-full text-sm font-medium mb-6">
             <Sparkles className="h-4 w-4" />
             AI Destekli Kariyer Değerlendirme
           </div>
           
-          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+          <h1 className="text-5xl md:text-6xl font-bold text-foreground mb-6">
             Geleceğin Mesleğini
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600"> Keşfet</span>
           </h1>
           
-          <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+          <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
             14-24 yaş arası gençler için özel olarak tasarlanmış, 
             AI destekli kariyer değerlendirme platformu ile yeteneklerini keşfet, 
             doğru mesleği bul.
@@ -319,17 +327,17 @@ export default function Home() {
 
           {/* Stats */}
           <div className="grid grid-cols-3 gap-6 max-w-2xl mx-auto">
-            <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 shadow-lg">
+            <div className="bg-card/80 backdrop-blur-sm rounded-xl p-4 shadow-lg">
               <div className="text-3xl font-bold text-blue-600 mb-1">9</div>
-              <div className="text-sm text-gray-600">Aşamalı Değerlendirme</div>
+              <div className="text-sm text-muted-foreground">Aşamalı Değerlendirme</div>
             </div>
-            <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 shadow-lg">
+            <div className="bg-card/80 backdrop-blur-sm rounded-xl p-4 shadow-lg">
               <div className="text-3xl font-bold text-indigo-600 mb-1">7</div>
-              <div className="text-sm text-gray-600">Günlük Aktivasyon</div>
+              <div className="text-sm text-muted-foreground">Günlük Aktivasyon</div>
             </div>
-            <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 shadow-lg">
+            <div className="bg-card/80 backdrop-blur-sm rounded-xl p-4 shadow-lg">
               <div className="text-3xl font-bold text-purple-600 mb-1">AI</div>
-              <div className="text-sm text-gray-600">Destekli Raporlama</div>
+              <div className="text-sm text-muted-foreground">Destekli Raporlama</div>
             </div>
           </div>
         </div>
@@ -338,49 +346,49 @@ export default function Home() {
       {/* Features Section */}
       <section className="container mx-auto px-4 py-16">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
             Neden Meslegim.tr?
           </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Bilimsel yöntemler ve yapay zeka desteğiyle kariyer yolculuğunda sana rehberlik ediyoruz
           </p>
         </div>
 
         <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-          <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow">
-            <div className="bg-blue-100 w-14 h-14 rounded-xl flex items-center justify-center mb-6">
+          <div className="bg-card rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow">
+            <div className="bg-blue-100 dark:bg-blue-900/30 w-14 h-14 rounded-xl flex items-center justify-center mb-6">
               <Target className="h-7 w-7 text-blue-600" />
             </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-3">
+            <h3 className="text-xl font-bold text-foreground mb-3">
               Kişiselleştirilmiş Değerlendirme
             </h3>
-            <p className="text-gray-600">
+            <p className="text-muted-foreground">
               Yaş grubuna özel hazırlanmış sorularla yeteneklerini, ilgi alanlarını 
               ve kişilik özelliklerini kapsamlı şekilde değerlendiriyoruz.
             </p>
           </div>
 
-          <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow">
-            <div className="bg-indigo-100 w-14 h-14 rounded-xl flex items-center justify-center mb-6">
+          <div className="bg-card rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow">
+            <div className="bg-indigo-100 dark:bg-indigo-900/30 w-14 h-14 rounded-xl flex items-center justify-center mb-6">
               <Brain className="h-7 w-7 text-indigo-600" />
             </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-3">
+            <h3 className="text-xl font-bold text-foreground mb-3">
               AI Destekli Raporlama
             </h3>
-            <p className="text-gray-600">
+            <p className="text-muted-foreground">
               Yapay zeka teknolojisi ile cevaplarını analiz ediyor, 
               sana özel kariyer önerileri ve gelişim planı hazırlıyoruz.
             </p>
           </div>
 
-          <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow">
-            <div className="bg-purple-100 w-14 h-14 rounded-xl flex items-center justify-center mb-6">
+          <div className="bg-card rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow">
+            <div className="bg-purple-100 dark:bg-purple-900/30 w-14 h-14 rounded-xl flex items-center justify-center mb-6">
               <Users className="h-7 w-7 text-purple-600" />
             </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-3">
+            <h3 className="text-xl font-bold text-foreground mb-3">
               Uzman Mentor Desteği
             </h3>
-            <p className="text-gray-600">
+            <p className="text-muted-foreground">
               Deneyimli kariyer mentorları raporlarını inceliyor, 
               onaylıyor ve gerektiğinde ek önerilerle destekliyor.
             </p>
@@ -391,54 +399,54 @@ export default function Home() {
       {/* How It Works Section */}
       <section className="container mx-auto px-4 py-16">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
             Nasıl Çalışır?
           </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Üç basit adımda kariyer yolculuğuna başla
           </p>
         </div>
 
         <div className="max-w-4xl mx-auto space-y-8">
-          <div className="flex gap-6 items-start bg-white rounded-2xl p-8 shadow-lg">
+          <div className="flex gap-6 items-start bg-card rounded-2xl p-8 shadow-lg">
             <div className="bg-blue-600 text-white w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg flex-shrink-0">
               1
             </div>
             <div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">
+              <h3 className="text-xl font-bold text-foreground mb-2">
                 Kayıt Ol ve Onay Bekle
               </h3>
-              <p className="text-gray-600">
+              <p className="text-muted-foreground">
                 Ücretsiz kayıt ol, mentor onayından sonra e-posta ile bilgilendirileceksin. 
                 Onay süreci genellikle 24 saat içinde tamamlanır.
               </p>
             </div>
           </div>
 
-          <div className="flex gap-6 items-start bg-white rounded-2xl p-8 shadow-lg">
+          <div className="flex gap-6 items-start bg-card rounded-2xl p-8 shadow-lg">
             <div className="bg-indigo-600 text-white w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg flex-shrink-0">
               2
             </div>
             <div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">
+              <h3 className="text-xl font-bold text-foreground mb-2">
                 Değerlendirme Etaplarını Tamamla
               </h3>
-              <p className="text-gray-600">
+              <p className="text-muted-foreground">
                 9 aşamalı değerlendirme sürecinde her 7 günde bir yeni etap aktif olur. 
                 Her etapta yeteneklerini, ilgi alanlarını ve hedeflerini keşfedeceksin.
               </p>
             </div>
           </div>
 
-          <div className="flex gap-6 items-start bg-white rounded-2xl p-8 shadow-lg">
+          <div className="flex gap-6 items-start bg-card rounded-2xl p-8 shadow-lg">
             <div className="bg-purple-600 text-white w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg flex-shrink-0">
               3
             </div>
             <div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">
+              <h3 className="text-xl font-bold text-foreground mb-2">
                 Raporunu Al ve Geleceğini Planla
               </h3>
-              <p className="text-gray-600">
+              <p className="text-muted-foreground">
                 AI tarafından hazırlanan ve mentor onaylı raporunu indir. 
                 Kariyer önerileri, gelişim planı ve meslek tavsiyeleri ile geleceğini şekillendir.
               </p>
@@ -460,7 +468,7 @@ export default function Home() {
           <Button
             onClick={() => setShowForm(true)}
             size="lg"
-            className="bg-white text-blue-600 hover:bg-gray-100 text-lg px-8 py-6"
+            className="bg-card text-blue-600 hover:bg-muted text-lg px-8 py-6"
           >
             Hemen Başla - Ücretsiz
             <ArrowRight className="ml-2 h-5 w-5" />
@@ -469,8 +477,8 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer aria-label="Site altı" className="container mx-auto px-4 py-8 border-t border-gray-200">
-        <div className="text-center text-gray-600 text-sm space-y-3">
+      <footer aria-label="Site altı" className="container mx-auto px-4 py-8 border-t border-border">
+        <div className="text-center text-muted-foreground text-sm space-y-3">
           <div className="flex items-center justify-center gap-6 flex-wrap">
             <a href="/gizlilik-politikasi" className="hover:text-indigo-600 transition-colors">
               Gizlilik Politikası

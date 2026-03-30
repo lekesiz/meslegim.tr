@@ -303,14 +303,14 @@ export default function StageForm() {
         const likertColors: Record<string, string> = {
           '1': 'border-red-300 bg-red-50 text-red-700',
           '2': 'border-orange-300 bg-orange-50 text-orange-700',
-          '3': 'border-gray-300 bg-gray-50 text-gray-700',
+          '3': 'border-gray-300 bg-muted/50 text-foreground/80',
           '4': 'border-green-300 bg-green-50 text-green-700',
           '5': 'border-emerald-300 bg-emerald-50 text-emerald-700',
         };
         const selectedLikertColors: Record<string, string> = {
           '1': 'border-red-500 bg-red-100 ring-2 ring-red-500 text-red-800',
           '2': 'border-orange-500 bg-orange-100 ring-2 ring-orange-500 text-orange-800',
-          '3': 'border-gray-500 bg-gray-100 ring-2 ring-gray-500 text-gray-800',
+          '3': 'border-gray-500 bg-muted ring-2 ring-gray-500 text-foreground',
           '4': 'border-green-500 bg-green-100 ring-2 ring-green-500 text-green-800',
           '5': 'border-emerald-500 bg-emerald-100 ring-2 ring-emerald-500 text-emerald-800',
         };
@@ -343,7 +343,7 @@ export default function StageForm() {
                     <div className={`w-full py-3 px-1 rounded-lg border-2 text-center transition-all ${
                       isSelected 
                         ? (selectedLikertColors[optionKey] || 'border-primary bg-primary/10 ring-2 ring-primary')
-                        : (likertColors[optionKey] || 'border-gray-300 bg-gray-50')
+                        : (likertColors[optionKey] || 'border-gray-300 bg-muted/50')
                     }`}>
                       <div className="text-lg font-bold">{optionKey}</div>
                       <div className="text-[10px] leading-tight mt-1 whitespace-pre-line">

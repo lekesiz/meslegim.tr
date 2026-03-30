@@ -43,7 +43,7 @@ export function PilotFeedbackPanel() {
           <CardContent className="pt-6 text-center">
             <p className="text-sm text-muted-foreground">NPS Skoru</p>
             <p className={`text-3xl font-bold ${
-              (stats?.npsScore || 0) > 0 ? "text-green-600" : (stats?.npsScore || 0) < 0 ? "text-red-600" : "text-gray-600"
+              (stats?.npsScore || 0) > 0 ? "text-green-600" : (stats?.npsScore || 0) < 0 ? "text-red-600" : "text-muted-foreground"
             }`}>
               {stats?.npsScore || 0}
             </p>

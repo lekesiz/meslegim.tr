@@ -13,7 +13,7 @@ import { sendEmail, getRegistrationEmailTemplate, getApprovalEmailTemplate, getR
 import { notifyOwner } from './_core/notification';
 import bcrypt from 'bcryptjs';
 import { sdk } from './_core/sdk';
-import { hasRole, hasAnyRole } from './roleHelper';
+import { hasRole, hasAnyRole, isSuperAdmin, isAdminLevel, isSchoolAdminLevel, hasRoleLevel, getHighestRole, addRole, removeRole } from './roleHelper';
 
 // Production'da gerçek domain'i kullan, development'ta localhost
 function getBaseUrl(req?: { headers: { origin?: string; host?: string } }): string {
@@ -2057,7 +2057,8 @@ export const appRouter = router({
     createCheckoutSession: protectedProcedure
       .input(z.object({
         productId: z.enum(['basic_package', 'professional_package', 'enterprise_package', 'ai_career_report', 'single_stage_unlock']),
-        metadata: z.record(z.string(), z.string()).optional(), // ek bilgi (ör. stageId)
+        promotionCode: z.string().optional(),
+        metadata: z.record(z.string(), z.string()).optional(),
       }))
       .mutation(async ({ input, ctx }) => {
         const { getStripe } = await import('./stripeWebhook');
@@ -2073,6 +2074,32 @@ export const appRouter = router({
         const userId = ctx.user.id;
         const baseUrl = getBaseUrl(ctx.req);
 
+        // Promotion kodu varsa doğrula ve indirim hesapla
+        let finalAmountInCents = product.priceInCents;
+        let promoCodeId: number | undefined;
+        let promoDiscount = 0;
+        if (input.promotionCode) {
+          const validation = await db.validatePromotionCode(
+            input.promotionCode,
+            userId,
+            input.productId,
+            ctx.user.schoolId || undefined
+          );
+          if (validation.valid && validation.code) {
+            promoCodeId = validation.code.id;
+            const dType = validation.code.discountType;
+            const dValue = validation.code.discountValue;
+            if (dType === 'percentage') {
+              promoDiscount = Math.round(finalAmountInCents * dValue / 100);
+            } else {
+              promoDiscount = dValue * 100; // TL to kuruş
+            }
+            finalAmountInCents = Math.max(50, finalAmountInCents - promoDiscount); // Min 0.50 TL
+          } else {
+            throw new TRPCError({ code: 'BAD_REQUEST', message: validation.error || 'Geçersiz promosyon kodu' });
+          }
+        }
+
         // Stripe Checkout Session oluştur
         const session = await stripe.checkout.sessions.create({
           payment_method_types: ['card'],
@@ -2081,32 +2108,47 @@ export const appRouter = router({
               currency: product.currency,
               product_data: {
                 name: product.name,
-                description: product.description,
+                description: promoDiscount > 0
+                  ? `${product.description} (Promosyon indirimi: -${(promoDiscount / 100).toFixed(2)} TL)`
+                  : product.description,
               },
-              unit_amount: product.priceInCents,
+              unit_amount: finalAmountInCents,
             },
             quantity: 1,
           }],
           mode: 'payment',
-          allow_promotion_codes: true,
+          allow_promotion_codes: !input.promotionCode, // Kendi kodumuz varsa Stripe'in kodlarını kapat
           success_url: `${baseUrl}/dashboard/student?payment=success&product=${input.productId}`,
           cancel_url: `${baseUrl}/fiyatlandirma?payment=cancelled`,
           metadata: {
             user_id: userId.toString(),
             product_id: input.productId,
+            promotion_code_id: promoCodeId?.toString() || '',
+            original_amount: product.priceInCents.toString(),
+            discount_amount: promoDiscount.toString(),
             ...input.metadata,
           },
           customer_email: ctx.user.email || undefined,
         });
+
+        // Promotion kodu kullanımını kaydet
+        if (promoCodeId) {
+          await db.usePromotionCode(promoCodeId, userId);
+        }
 
         // Purchase kaydı oluştur
         await db.createPurchase({
           userId,
           productId: input.productId,
           stripeSessionId: session.id,
-          amountInCents: product.priceInCents,
+          amountInCents: finalAmountInCents,
           currency: product.currency,
-          metadata: input.metadata ? JSON.stringify(input.metadata) : undefined,
+          metadata: JSON.stringify({
+            ...(input.metadata || {}),
+            promotionCodeId: promoCodeId,
+            originalAmount: product.priceInCents,
+            discountAmount: promoDiscount,
+          }),
         });
 
         return { sessionId: session.id, url: session.url };
@@ -2123,6 +2165,362 @@ export const appRouter = router({
       .query(async ({ ctx, input }) => {
         return db.hasUserPurchasedProduct(ctx.user.id, input.productId);
       }),
+  }),
+
+  // ==========================================
+  // SCHOOL MANAGEMENT ROUTER
+  // ==========================================
+  school: router({
+    // Tüm okulları listele (admin+ seviye)
+    getAll: protectedProcedure
+      .input(z.object({
+        city: z.string().optional(),
+        status: z.string().optional(),
+        type: z.string().optional(),
+        search: z.string().optional(),
+      }).optional())
+      .query(async ({ ctx, input }) => {
+        if (!isSchoolAdminLevel(ctx.user.role)) throw new TRPCError({ code: 'FORBIDDEN', message: 'Yetkiniz yok' });
+        // School admin sadece kendi okulunu görür
+        if (hasRole(ctx.user.role, 'school_admin') && !isAdminLevel(ctx.user.role)) {
+          if (!ctx.user.schoolId) return [];
+          const school = await db.getSchoolById(ctx.user.schoolId);
+          return school ? [school] : [];
+        }
+        return db.getAllSchools(input || undefined);
+      }),
+
+    // Okul detayı
+    getById: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ ctx, input }) => {
+        if (!isSchoolAdminLevel(ctx.user.role)) throw new TRPCError({ code: 'FORBIDDEN' });
+        // School admin sadece kendi okulunu görebilir
+        if (hasRole(ctx.user.role, 'school_admin') && !isAdminLevel(ctx.user.role)) {
+          if (ctx.user.schoolId !== input.id) throw new TRPCError({ code: 'FORBIDDEN', message: 'Bu okula erişim yetkiniz yok' });
+        }
+        const school = await db.getSchoolById(input.id);
+        if (!school) throw new TRPCError({ code: 'NOT_FOUND', message: 'Okul bulunamadı' });
+        const stats = await db.getSchoolStats(input.id);
+        const mentors = await db.getSchoolMentors(input.id);
+        return { ...school, stats, mentors };
+      }),
+
+    // Okul oluştur (admin+ seviye)
+    create: protectedProcedure
+      .input(z.object({
+        name: z.string().min(2),
+        code: z.string().optional(),
+        address: z.string().optional(),
+        city: z.string().optional(),
+        district: z.string().optional(),
+        phone: z.string().optional(),
+        email: z.string().email().optional(),
+        website: z.string().optional(),
+        type: z.string().optional(),
+        maxStudents: z.number().optional(),
+        maxMentors: z.number().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (!isAdminLevel(ctx.user.role)) throw new TRPCError({ code: 'FORBIDDEN' });
+        const id = await db.createSchool(input);
+        await db.logActivity({ userId: ctx.user.id, action: 'school.create', entityType: 'school', entityId: id || undefined, details: { name: input.name } });
+        return { id };
+      }),
+
+    // Okul güncelle
+    update: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        name: z.string().optional(),
+        address: z.string().optional(),
+        city: z.string().optional(),
+        district: z.string().optional(),
+        phone: z.string().optional(),
+        email: z.string().optional(),
+        website: z.string().optional(),
+        type: z.string().optional(),
+        status: z.string().optional(),
+        maxStudents: z.number().optional(),
+        maxMentors: z.number().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (!isSchoolAdminLevel(ctx.user.role)) throw new TRPCError({ code: 'FORBIDDEN' });
+        if (hasRole(ctx.user.role, 'school_admin') && !isAdminLevel(ctx.user.role)) {
+          if (ctx.user.schoolId !== input.id) throw new TRPCError({ code: 'FORBIDDEN' });
+        }
+        const { id, ...data } = input;
+        await db.updateSchool(id, data);
+        await db.logActivity({ userId: ctx.user.id, action: 'school.update', entityType: 'school', entityId: id });
+        return { success: true };
+      }),
+
+    // Okul sil (sadece admin+)
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        if (!isAdminLevel(ctx.user.role)) throw new TRPCError({ code: 'FORBIDDEN' });
+        await db.deleteSchool(input.id);
+        await db.logActivity({ userId: ctx.user.id, action: 'school.delete', entityType: 'school', entityId: input.id });
+        return { success: true };
+      }),
+
+    // Okula mentor ata
+    assignMentor: protectedProcedure
+      .input(z.object({ schoolId: z.number(), mentorId: z.number(), isPrimary: z.boolean().optional() }))
+      .mutation(async ({ ctx, input }) => {
+        if (!isSchoolAdminLevel(ctx.user.role)) throw new TRPCError({ code: 'FORBIDDEN' });
+        await db.assignMentorToSchool(input.schoolId, input.mentorId, ctx.user.id, input.isPrimary);
+        await db.logActivity({ userId: ctx.user.id, action: 'school.assignMentor', entityType: 'school', entityId: input.schoolId, details: { mentorId: input.mentorId } });
+        return { success: true };
+      }),
+
+    // Okuldan mentor çıkar
+    removeMentor: protectedProcedure
+      .input(z.object({ schoolId: z.number(), mentorId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        if (!isSchoolAdminLevel(ctx.user.role)) throw new TRPCError({ code: 'FORBIDDEN' });
+        await db.removeMentorFromSchool(input.schoolId, input.mentorId);
+        await db.logActivity({ userId: ctx.user.id, action: 'school.removeMentor', entityType: 'school', entityId: input.schoolId, details: { mentorId: input.mentorId } });
+        return { success: true };
+      }),
+
+    // Okul mentorlarını getir
+    getMentors: protectedProcedure
+      .input(z.object({ schoolId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        if (!isSchoolAdminLevel(ctx.user.role)) throw new TRPCError({ code: 'FORBIDDEN' });
+        return db.getSchoolMentors(input.schoolId);
+      }),
+
+    // Okul öğrencilerini getir
+    getStudents: protectedProcedure
+      .input(z.object({
+        schoolId: z.number(),
+        status: z.string().optional(),
+        search: z.string().optional(),
+      }))
+      .query(async ({ ctx, input }) => {
+        if (!isSchoolAdminLevel(ctx.user.role)) throw new TRPCError({ code: 'FORBIDDEN' });
+        return db.getUsersBySchool(input.schoolId, { role: 'student', status: input.status, search: input.search });
+      }),
+
+    // Okul istatistikleri
+    getStats: protectedProcedure
+      .input(z.object({ schoolId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        if (!isSchoolAdminLevel(ctx.user.role)) throw new TRPCError({ code: 'FORBIDDEN' });
+        return db.getSchoolStats(input.schoolId);
+      }),
+  }),
+
+  // ==========================================
+  // SUPER ADMIN ROUTER
+  // ==========================================
+  superAdmin: router({
+    // Sistem genel bakış istatistikleri
+    getSystemStats: protectedProcedure.query(async ({ ctx }) => {
+      if (!isAdminLevel(ctx.user.role)) throw new TRPCError({ code: 'FORBIDDEN' });
+      const allUsers = await db.getAdvancedUserList({ limit: 10000 });
+      const allSchools = await db.getAllSchools();
+      const activityStats = await db.getActivityLogStats();
+      
+      const usersByRole = {
+        super_admin: allUsers.users.filter((u: any) => u.role.includes('super_admin')).length,
+        admin: allUsers.users.filter((u: any) => u.role.includes('admin') && !u.role.includes('super_admin')).length,
+        school_admin: allUsers.users.filter((u: any) => u.role.includes('school_admin')).length,
+        mentor: allUsers.users.filter((u: any) => u.role.includes('mentor')).length,
+        student: allUsers.users.filter((u: any) => u.role.includes('student')).length,
+      };
+      const usersByStatus = {
+        active: allUsers.users.filter(u => u.status === 'active').length,
+        pending: allUsers.users.filter(u => u.status === 'pending').length,
+        inactive: allUsers.users.filter(u => u.status === 'inactive').length,
+      };
+      return {
+        totalUsers: allUsers.total,
+        usersByRole,
+        usersByStatus,
+        totalSchools: allSchools.length,
+        activeSchools: allSchools.filter((s: any) => s.status === 'active').length,
+        activityStats,
+      };
+    }),
+
+    // Gelişmiş kullanıcı listesi (filtreleme, arama, sıralama)
+    getUsers: protectedProcedure
+      .input(z.object({
+        role: z.string().optional(),
+        status: z.string().optional(),
+        schoolId: z.number().optional(),
+        mentorId: z.number().optional(),
+        ageGroup: z.string().optional(),
+        search: z.string().optional(),
+        limit: z.number().optional(),
+        offset: z.number().optional(),
+      }).optional())
+      .query(async ({ ctx, input }) => {
+        if (!isAdminLevel(ctx.user.role)) throw new TRPCError({ code: 'FORBIDDEN' });
+        return db.getAdvancedUserList(input || undefined);
+      }),
+
+    // Kullanıcı rolü değiştir
+    changeUserRole: protectedProcedure
+      .input(z.object({ userId: z.number(), newRole: z.string() }))
+      .mutation(async ({ ctx, input }) => {
+        if (!isAdminLevel(ctx.user.role)) throw new TRPCError({ code: 'FORBIDDEN' });
+        // Super admin sadece başka bir super admin tarafından atanabilir
+        if (input.newRole.includes('super_admin') && !isSuperAdmin(ctx.user.role)) {
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'Süper admin atamak için süper admin olmalısınız' });
+        }
+        await db.updateUser(input.userId, { role: input.newRole });
+        await db.logActivity({ userId: ctx.user.id, action: 'user.changeRole', entityType: 'user', entityId: input.userId, details: { newRole: input.newRole } });
+        return { success: true };
+      }),
+
+    // Kullanıcıyı okula ata
+    assignUserToSchool: protectedProcedure
+      .input(z.object({ userId: z.number(), schoolId: z.number().nullable() }))
+      .mutation(async ({ ctx, input }) => {
+        if (!isAdminLevel(ctx.user.role)) throw new TRPCError({ code: 'FORBIDDEN' });
+        await db.updateUser(input.userId, { schoolId: input.schoolId } as any);
+        await db.logActivity({ userId: ctx.user.id, action: 'user.assignSchool', entityType: 'user', entityId: input.userId, details: { schoolId: input.schoolId } });
+        return { success: true };
+      }),
+
+    // Aktivite logları
+    getActivityLogs: protectedProcedure
+      .input(z.object({
+        userId: z.number().optional(),
+        action: z.string().optional(),
+        entityType: z.string().optional(),
+        limit: z.number().optional(),
+        offset: z.number().optional(),
+      }).optional())
+      .query(async ({ ctx, input }) => {
+        if (!isAdminLevel(ctx.user.role)) throw new TRPCError({ code: 'FORBIDDEN' });
+        return db.getActivityLogs(input || undefined);
+      }),
+
+    // Aktivite log istatistikleri
+    getActivityStats: protectedProcedure.query(async ({ ctx }) => {
+      if (!isAdminLevel(ctx.user.role)) throw new TRPCError({ code: 'FORBIDDEN' });
+      return db.getActivityLogStats();
+    }),
+
+    // Mentor performans detayları
+    getMentorPerformance: protectedProcedure
+      .input(z.object({ mentorId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        if (!isAdminLevel(ctx.user.role)) throw new TRPCError({ code: 'FORBIDDEN' });
+        return db.getMentorPerformanceStats(input.mentorId);
+      }),
+  }),
+
+  // ==========================================
+  // PROMOTION CODE ROUTER
+  // ==========================================
+  promotionCode: router({
+    // Tüm kodları listele (admin+)
+    getAll: protectedProcedure.query(async ({ ctx }) => {
+      if (!isAdminLevel(ctx.user.role)) throw new TRPCError({ code: 'FORBIDDEN' });
+      return db.getAllPromotionCodes();
+    }),
+
+    // Kod oluştur
+    create: protectedProcedure
+      .input(z.object({
+        code: z.string().min(3).max(50),
+        description: z.string().optional(),
+        discountType: z.enum(['percentage', 'fixed_amount']),
+        discountValue: z.number().min(1),
+        minPurchaseAmount: z.number().optional(),
+        maxUses: z.number().optional(),
+        maxUsesPerUser: z.number().optional(),
+        applicableProducts: z.array(z.string()).optional(),
+        applicableSchools: z.array(z.number()).optional(),
+        startsAt: z.date().optional(),
+        expiresAt: z.date().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (!isAdminLevel(ctx.user.role)) throw new TRPCError({ code: 'FORBIDDEN' });
+        const id = await db.createPromotionCode({ ...input, createdBy: ctx.user.id });
+        await db.logActivity({ userId: ctx.user.id, action: 'promo.create', entityType: 'promotionCode', entityId: id || undefined, details: { code: input.code } });
+        return { id };
+      }),
+
+    // Kod güncelle
+    update: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        description: z.string().optional(),
+        isActive: z.boolean().optional(),
+        maxUses: z.number().optional(),
+        expiresAt: z.date().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (!isAdminLevel(ctx.user.role)) throw new TRPCError({ code: 'FORBIDDEN' });
+        const { id, ...data } = input;
+        await db.updatePromotionCode(id, data);
+        await db.logActivity({ userId: ctx.user.id, action: 'promo.update', entityType: 'promotionCode', entityId: id });
+        return { success: true };
+      }),
+
+    // Kod sil
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        if (!isAdminLevel(ctx.user.role)) throw new TRPCError({ code: 'FORBIDDEN' });
+        await db.deletePromotionCode(input.id);
+        await db.logActivity({ userId: ctx.user.id, action: 'promo.delete', entityType: 'promotionCode', entityId: input.id });
+        return { success: true };
+      }),
+
+    // Kodu doğrula (public - checkout sırasında kullanılır)
+    validate: protectedProcedure
+      .input(z.object({ code: z.string(), productId: z.string().optional() }))
+      .query(async ({ ctx, input }) => {
+        return db.validatePromotionCode(input.code, ctx.user.id, input.productId, ctx.user.schoolId || undefined);
+      }),
+  }),
+
+  // ==========================================
+  // SCHOOL ADMIN ROUTER (okul yöneticisi için)
+  // ==========================================
+  schoolAdmin: router({
+    // Kendi okul bilgilerini getir
+    getMySchool: protectedProcedure.query(async ({ ctx }) => {
+      if (!isSchoolAdminLevel(ctx.user.role)) throw new TRPCError({ code: 'FORBIDDEN' });
+      if (!ctx.user.schoolId) throw new TRPCError({ code: 'NOT_FOUND', message: 'Bir okula atanmamışsınız' });
+      const school = await db.getSchoolById(ctx.user.schoolId);
+      if (!school) throw new TRPCError({ code: 'NOT_FOUND' });
+      const stats = await db.getSchoolStats(ctx.user.schoolId);
+      const mentors = await db.getSchoolMentors(ctx.user.schoolId);
+      return { ...school, stats, mentors };
+    }),
+
+    // Kendi okulundaki öğrencileri getir
+    getMyStudents: protectedProcedure
+      .input(z.object({ status: z.string().optional(), search: z.string().optional() }).optional())
+      .query(async ({ ctx, input }) => {
+        if (!isSchoolAdminLevel(ctx.user.role)) throw new TRPCError({ code: 'FORBIDDEN' });
+        if (!ctx.user.schoolId) return [];
+        return db.getUsersBySchool(ctx.user.schoolId, { role: 'student', ...input });
+      }),
+
+    // Kendi okulundaki mentorları getir
+    getMyMentors: protectedProcedure.query(async ({ ctx }) => {
+      if (!isSchoolAdminLevel(ctx.user.role)) throw new TRPCError({ code: 'FORBIDDEN' });
+      if (!ctx.user.schoolId) return [];
+      return db.getSchoolMentors(ctx.user.schoolId);
+    }),
+
+    // Kendi okulunun istatistiklerini getir
+    getMyStats: protectedProcedure.query(async ({ ctx }) => {
+      if (!isSchoolAdminLevel(ctx.user.role)) throw new TRPCError({ code: 'FORBIDDEN' });
+      if (!ctx.user.schoolId) return { studentCount: 0, mentorCount: 0, activeStudents: 0, completedStages: 0 };
+      return db.getSchoolStats(ctx.user.schoolId);
+    }),
   }),
 });
 

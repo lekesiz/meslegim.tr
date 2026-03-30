@@ -4,7 +4,7 @@ export function DashboardSkeleton() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
       {/* Header Skeleton */}
-      <div className="bg-white shadow-sm border-b">
+      <div className="bg-card shadow-sm border-b">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <Skeleton className="h-8 w-32" />
@@ -21,7 +21,7 @@ export function DashboardSkeleton() {
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="bg-white rounded-lg shadow-sm p-6">
+            <div key={i} className="bg-card rounded-lg shadow-sm p-6">
               <Skeleton className="h-4 w-24 mb-2" />
               <Skeleton className="h-8 w-16 mb-1" />
               <Skeleton className="h-3 w-32" />
@@ -30,7 +30,7 @@ export function DashboardSkeleton() {
         </div>
 
         {/* Main Content */}
-        <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="bg-card rounded-lg shadow-sm p-6">
           <Skeleton className="h-6 w-48 mb-4" />
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (
@@ -76,7 +76,7 @@ export function TableSkeleton({ rows = 5 }: { rows?: number }) {
 
 export function CardSkeleton() {
   return (
-    <div className="bg-white rounded-lg shadow-sm p-6">
+    <div className="bg-card rounded-lg shadow-sm p-6">
       <Skeleton className="h-6 w-48 mb-4" />
       <Skeleton className="h-4 w-full mb-2" />
       <Skeleton className="h-4 w-3/4 mb-4" />

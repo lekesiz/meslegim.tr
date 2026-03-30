@@ -34,6 +34,7 @@ const CareerProfile = lazy(() => import("./pages/student/CareerProfile"));
 const Achievements = lazy(() => import("./pages/student/Achievements"));
 const NotificationSettings = lazy(() => import("./pages/student/NotificationSettings"));
 const Pricing = lazy(() => import("./pages/Pricing"));
+const SchoolAdminDashboard = lazy(() => import("./pages/dashboard/SchoolAdminDashboard"));
 const PaymentHistory = lazy(() => import("./pages/student/PaymentHistory"));
 
 function PageLoader() {
@@ -67,6 +68,7 @@ function Router() {
         
         {/* Legacy routes for backward compatibility */}
         <Route path="/dashboard/admin" component={AdminDashboard} />
+        <Route path="/dashboard/school-admin" component={SchoolAdminDashboard} />
         <Route path="/dashboard/mentor" component={MentorDashboard} />
         <Route path="/dashboard/mentor/reports" component={MentorReportApproval} />
         <Route path="/dashboard/student" component={StudentDashboard} />
@@ -90,7 +92,7 @@ function Router() {
 function App() {
   return (
     <ErrorBoundary>
-      <ThemeProvider defaultTheme="light">
+      <ThemeProvider defaultTheme="light" switchable={true}>
         <AuthProvider>
           <TooltipProvider>
             <Toaster />

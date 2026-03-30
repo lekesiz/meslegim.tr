@@ -1,6 +1,6 @@
 import { eq, and, or, desc, inArray, gte, lte } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, stages, questions, answers, userStages, reports, mentorNotes, messages, feedbacks, certificates, platformSettings, stageUnlockLogs, notifications, pilotFeedbacks, purchases } from "../drizzle/schema";
+import { InsertUser, users, stages, questions, answers, userStages, reports, mentorNotes, messages, feedbacks, certificates, platformSettings, stageUnlockLogs, notifications, pilotFeedbacks, purchases, schools, schoolMentors, promotionCodes, promotionCodeUsages, activityLogs } from "../drizzle/schema";
 import { ENV } from './_core/env';
 import { sql } from 'drizzle-orm';
 
@@ -2048,4 +2048,383 @@ export async function hasUserPurchasedProduct(userId: number, productId: string)
     ))
     .limit(1);
   return result.length > 0;
+}
+
+
+// ==========================================
+// SCHOOL MANAGEMENT HELPERS
+// ==========================================
+
+export async function createSchool(data: { name: string; code?: string; address?: string; city?: string; district?: string; phone?: string; email?: string; website?: string; type?: string; maxStudents?: number; maxMentors?: number }) {
+  const db = await getDb();
+  if (!db) return null;
+  const result = await db.insert(schools).values({
+    name: data.name,
+    code: data.code || `SCH${Date.now().toString(36).toUpperCase()}`,
+    address: data.address,
+    city: data.city,
+    district: data.district,
+    phone: data.phone,
+    email: data.email,
+    website: data.website,
+    type: (data.type as any) || 'public',
+    maxStudents: data.maxStudents || 500,
+    maxMentors: data.maxMentors || 50,
+  });
+  return result[0].insertId;
+}
+
+export async function getSchoolById(id: number) {
+  const db = await getDb();
+  if (!db) return null;
+  const result = await db.select().from(schools).where(eq(schools.id, id));
+  return result[0] || null;
+}
+
+export async function getAllSchools(filters?: { city?: string; status?: string; type?: string; search?: string }) {
+  const db = await getDb();
+  if (!db) return [];
+  const conditions = [];
+  if (filters?.status) conditions.push(eq(schools.status, filters.status as any));
+  if (filters?.type) conditions.push(eq(schools.type, filters.type as any));
+  if (filters?.city) conditions.push(eq(schools.city, filters.city));
+  
+  let query = db.select().from(schools);
+  if (conditions.length > 0) {
+    query = query.where(and(...conditions)) as any;
+  }
+  const result = await (query as any).orderBy(desc(schools.createdAt));
+  
+  if (filters?.search) {
+    return result.filter((s: any) => 
+      s.name.toLowerCase().includes(filters.search!.toLowerCase()) ||
+      (s.code && s.code.toLowerCase().includes(filters.search!.toLowerCase())) ||
+      (s.city && s.city.toLowerCase().includes(filters.search!.toLowerCase()))
+    );
+  }
+  return result;
+}
+
+export async function updateSchool(id: number, data: Partial<{ name: string; code: string; address: string; city: string; district: string; phone: string; email: string; website: string; type: string; status: string; maxStudents: number; maxMentors: number; logo: string; subscriptionPlan: string }>) {
+  const db = await getDb();
+  if (!db) return;
+  await db.update(schools).set(data as any).where(eq(schools.id, id));
+}
+
+export async function deleteSchool(id: number) {
+  const db = await getDb();
+  if (!db) return;
+  // Önce okul-mentor ilişkilerini sil
+  await db.delete(schoolMentors).where(eq(schoolMentors.schoolId, id));
+  // Okula bağlı kullanıcıların schoolId'sini null yap
+  await db.update(users).set({ schoolId: null } as any).where(eq(users.schoolId as any, id));
+  // Okulu sil
+  await db.delete(schools).where(eq(schools.id, id));
+}
+
+export async function getSchoolStats(schoolId: number) {
+  const db = await getDb();
+  if (!db) return { studentCount: 0, mentorCount: 0, activeStudents: 0, completedStages: 0 };
+  
+  const studentResult = await db.select().from(users).where(and(eq(users.schoolId as any, schoolId), sql`${users.role} LIKE '%student%'`));
+  const mentorResult = await db.select().from(schoolMentors).where(eq(schoolMentors.schoolId, schoolId));
+  const activeStudents = studentResult.filter(s => s.status === 'active').length;
+  
+  return {
+    studentCount: studentResult.length,
+    mentorCount: mentorResult.length,
+    activeStudents,
+    completedStages: 0, // Hesaplanacak
+  };
+}
+
+// ==========================================
+// SCHOOL-MENTOR RELATIONSHIP HELPERS
+// ==========================================
+
+export async function assignMentorToSchool(schoolId: number, mentorId: number, assignedBy?: number, isPrimary?: boolean) {
+  const db = await getDb();
+  if (!db) return;
+  // Zaten atanmış mı kontrol et
+  const existing = await db.select().from(schoolMentors).where(and(eq(schoolMentors.schoolId, schoolId), eq(schoolMentors.mentorId, mentorId)));
+  if (existing.length > 0) return;
+  await db.insert(schoolMentors).values({ schoolId, mentorId, assignedBy, isPrimary: isPrimary || false });
+}
+
+export async function removeMentorFromSchool(schoolId: number, mentorId: number) {
+  const db = await getDb();
+  if (!db) return;
+  await db.delete(schoolMentors).where(and(eq(schoolMentors.schoolId, schoolId), eq(schoolMentors.mentorId, mentorId)));
+}
+
+export async function getSchoolMentors(schoolId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  const result = await db.select({
+    id: schoolMentors.id,
+    mentorId: schoolMentors.mentorId,
+    isPrimary: schoolMentors.isPrimary,
+    assignedAt: schoolMentors.assignedAt,
+    mentorName: users.name,
+    mentorEmail: users.email,
+  }).from(schoolMentors)
+    .innerJoin(users, eq(schoolMentors.mentorId, users.id))
+    .where(eq(schoolMentors.schoolId, schoolId));
+  return result;
+}
+
+export async function getMentorSchools(mentorId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  const result = await db.select({
+    id: schoolMentors.id,
+    schoolId: schoolMentors.schoolId,
+    isPrimary: schoolMentors.isPrimary,
+    schoolName: schools.name,
+    schoolCity: schools.city,
+  }).from(schoolMentors)
+    .innerJoin(schools, eq(schoolMentors.schoolId, schools.id))
+    .where(eq(schoolMentors.mentorId, mentorId));
+  return result;
+}
+
+// ==========================================
+// PROMOTION CODE HELPERS
+// ==========================================
+
+export async function createPromotionCode(data: {
+  code: string; description?: string; discountType: string; discountValue: number;
+  minPurchaseAmount?: number; maxUses?: number; maxUsesPerUser?: number;
+  applicableProducts?: string[]; applicableSchools?: number[];
+  startsAt?: Date; expiresAt?: Date; createdBy?: number;
+}) {
+  const db = await getDb();
+  if (!db) return null;
+  const result = await db.insert(promotionCodes).values({
+    code: data.code.toUpperCase(),
+    description: data.description,
+    discountType: data.discountType as any,
+    discountValue: data.discountValue,
+    minPurchaseAmount: data.minPurchaseAmount || 0,
+    maxUses: data.maxUses,
+    maxUsesPerUser: data.maxUsesPerUser || 1,
+    applicableProducts: data.applicableProducts ? JSON.stringify(data.applicableProducts) : null,
+    applicableSchools: data.applicableSchools ? JSON.stringify(data.applicableSchools) : null,
+    startsAt: data.startsAt,
+    expiresAt: data.expiresAt,
+    createdBy: data.createdBy,
+  });
+  return result[0].insertId;
+}
+
+export async function getPromotionCodeByCode(code: string) {
+  const db = await getDb();
+  if (!db) return null;
+  const result = await db.select().from(promotionCodes).where(eq(promotionCodes.code, code.toUpperCase()));
+  return result[0] || null;
+}
+
+export async function getAllPromotionCodes() {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(promotionCodes).orderBy(desc(promotionCodes.createdAt));
+}
+
+export async function validatePromotionCode(code: string, userId: number, productId?: string, schoolId?: number): Promise<{ valid: boolean; error?: string; discount?: { type: string; value: number }; code?: { id: number; discountType: string; discountValue: number } }> {
+  const promo = await getPromotionCodeByCode(code);
+  if (!promo) return { valid: false, error: 'Geçersiz promosyon kodu' };
+  if (!promo.isActive) return { valid: false, error: 'Bu promosyon kodu artık aktif değil' };
+  
+  const now = new Date();
+  if (promo.startsAt && now < promo.startsAt) return { valid: false, error: 'Bu promosyon kodu henüz başlamamış' };
+  if (promo.expiresAt && now > promo.expiresAt) return { valid: false, error: 'Bu promosyon kodunun süresi dolmuş' };
+  if (promo.maxUses && promo.currentUses >= promo.maxUses) return { valid: false, error: 'Bu promosyon kodu kullanım limitine ulaşmış' };
+  
+  // Kullanıcı başına kullanım kontrolü
+  const db = await getDb();
+  if (db) {
+    const userUsages = await db.select().from(promotionCodeUsages).where(and(eq(promotionCodeUsages.promotionCodeId, promo.id), eq(promotionCodeUsages.userId, userId)));
+    if (promo.maxUsesPerUser && userUsages.length >= promo.maxUsesPerUser) {
+      return { valid: false, error: 'Bu promosyon kodunu daha fazla kullanamazsınız' };
+    }
+  }
+  
+  // Ürün kontrolü
+  if (promo.applicableProducts && productId) {
+    const products = JSON.parse(promo.applicableProducts);
+    if (!products.includes(productId)) return { valid: false, error: 'Bu promosyon kodu bu ürün için geçerli değil' };
+  }
+  
+  // Okul kontrolü
+  if (promo.applicableSchools && schoolId) {
+    const schoolIds = JSON.parse(promo.applicableSchools);
+    if (!schoolIds.includes(schoolId)) return { valid: false, error: 'Bu promosyon kodu okulunuz için geçerli değil' };
+  }
+  
+  return { valid: true, discount: { type: promo.discountType, value: promo.discountValue }, code: { id: promo.id, discountType: promo.discountType, discountValue: promo.discountValue } };
+}
+
+export async function usePromotionCode(promotionCodeId: number, userId: number, purchaseId?: number, discountApplied?: number) {
+  const db = await getDb();
+  if (!db) return;
+  await db.insert(promotionCodeUsages).values({ promotionCodeId, userId, purchaseId, discountApplied: discountApplied || 0 });
+  await db.update(promotionCodes).set({ currentUses: sql`${promotionCodes.currentUses} + 1` }).where(eq(promotionCodes.id, promotionCodeId));
+}
+
+export async function updatePromotionCode(id: number, data: Partial<{ description: string; isActive: boolean; maxUses: number; expiresAt: Date }>) {
+  const db = await getDb();
+  if (!db) return;
+  await db.update(promotionCodes).set(data as any).where(eq(promotionCodes.id, id));
+}
+
+export async function deletePromotionCode(id: number) {
+  const db = await getDb();
+  if (!db) return;
+  await db.delete(promotionCodeUsages).where(eq(promotionCodeUsages.promotionCodeId, id));
+  await db.delete(promotionCodes).where(eq(promotionCodes.id, id));
+}
+
+// ==========================================
+// ACTIVITY LOG HELPERS
+// ==========================================
+
+export async function logActivity(data: { userId?: number; action: string; entityType?: string; entityId?: number; details?: any; ipAddress?: string; userAgent?: string }) {
+  const db = await getDb();
+  if (!db) return;
+  try {
+    await db.insert(activityLogs).values({
+      userId: data.userId,
+      action: data.action,
+      entityType: data.entityType,
+      entityId: data.entityId,
+      details: data.details ? JSON.stringify(data.details) : null,
+      ipAddress: data.ipAddress,
+      userAgent: data.userAgent,
+    });
+  } catch (e) {
+    // Activity log hatası ana işlemi engellememeli
+    console.warn('[ActivityLog] Failed to log:', e);
+  }
+}
+
+export async function getActivityLogs(filters?: { userId?: number; action?: string; entityType?: string; limit?: number; offset?: number }) {
+  const db = await getDb();
+  if (!db) return [];
+  const conditions = [];
+  if (filters?.userId) conditions.push(eq(activityLogs.userId as any, filters.userId));
+  if (filters?.action) conditions.push(eq(activityLogs.action, filters.action));
+  if (filters?.entityType) conditions.push(eq(activityLogs.entityType as any, filters.entityType));
+  
+  let query = db.select().from(activityLogs);
+  if (conditions.length > 0) {
+    query = query.where(and(...conditions)) as any;
+  }
+  return (query as any).orderBy(desc(activityLogs.createdAt)).limit(filters?.limit || 100).offset(filters?.offset || 0);
+}
+
+export async function getActivityLogStats() {
+  const db = await getDb();
+  if (!db) return { total: 0, today: 0, thisWeek: 0 };
+  
+  const now = new Date();
+  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const weekStart = new Date(todayStart);
+  weekStart.setDate(weekStart.getDate() - 7);
+  
+  const allLogs = await db.select().from(activityLogs);
+  const todayLogs = allLogs.filter(l => l.createdAt >= todayStart);
+  const weekLogs = allLogs.filter(l => l.createdAt >= weekStart);
+  
+  return { total: allLogs.length, today: todayLogs.length, thisWeek: weekLogs.length };
+}
+
+// ==========================================
+// ENHANCED USER MANAGEMENT HELPERS
+// ==========================================
+
+export async function getUsersBySchool(schoolId: number, filters?: { role?: string; status?: string; search?: string }) {
+  const db = await getDb();
+  if (!db) return [];
+  const conditions = [eq(users.schoolId as any, schoolId)];
+  if (filters?.status) conditions.push(eq(users.status, filters.status as any));
+  
+  let result = await db.select().from(users).where(and(...conditions)).orderBy(desc(users.createdAt));
+  
+  if (filters?.role) {
+    result = result.filter(u => u.role.includes(filters.role!));
+  }
+  if (filters?.search) {
+    result = result.filter(u => 
+      (u.name && u.name.toLowerCase().includes(filters.search!.toLowerCase())) ||
+      (u.email && u.email.toLowerCase().includes(filters.search!.toLowerCase()))
+    );
+  }
+  return result;
+}
+
+export async function getAdvancedUserList(filters?: { role?: string; status?: string; schoolId?: number; mentorId?: number; ageGroup?: string; search?: string; sortBy?: string; sortOrder?: string; limit?: number; offset?: number }) {
+  const db = await getDb();
+  if (!db) return { users: [], total: 0 };
+  
+  const conditions = [];
+  if (filters?.status) conditions.push(eq(users.status, filters.status as any));
+  if (filters?.schoolId) conditions.push(eq(users.schoolId as any, filters.schoolId));
+  if (filters?.mentorId) conditions.push(eq(users.mentorId as any, filters.mentorId));
+  if (filters?.ageGroup) conditions.push(eq(users.ageGroup as any, filters.ageGroup));
+  
+  let result = await db.select().from(users).where(conditions.length > 0 ? and(...conditions) : undefined).orderBy(desc(users.createdAt));
+  
+  // Role filtresi (varchar alanında LIKE kontrolü)
+  if (filters?.role) {
+    result = result.filter(u => u.role.includes(filters.role!));
+  }
+  // Arama filtresi
+  if (filters?.search) {
+    const s = filters.search.toLowerCase();
+    result = result.filter(u => 
+      (u.name && u.name.toLowerCase().includes(s)) ||
+      (u.email && u.email.toLowerCase().includes(s)) ||
+      (u.phone && u.phone.includes(s))
+    );
+  }
+  
+  const total = result.length;
+  const offset = filters?.offset || 0;
+  const limit = filters?.limit || 50;
+  const paged = result.slice(offset, offset + limit);
+  
+  return { users: paged, total };
+}
+
+export async function getMentorPerformanceStats(mentorId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const mentorStudents = await db.select().from(users).where(eq(users.mentorId as any, mentorId));
+  const studentIds = mentorStudents.map(s => s.id);
+  
+  if (studentIds.length === 0) {
+    return { totalStudents: 0, activeStudents: 0, completedStudents: 0, avgCompletionRate: 0, pendingReports: 0, approvedReports: 0 };
+  }
+  
+  const studentStages = await db.select().from(userStages).where(inArray(userStages.userId, studentIds));
+  const studentReports = await db.select().from(reports).where(inArray(reports.userId, studentIds));
+  
+  const activeStudents = mentorStudents.filter(s => s.status === 'active').length;
+  const completedStages = studentStages.filter(s => s.status === 'completed').length;
+  const totalStages = studentStages.length;
+  const pendingReports = studentReports.filter(r => r.status === 'pending').length;
+  const approvedReports = studentReports.filter(r => r.status === 'approved').length;
+  
+  return {
+    totalStudents: mentorStudents.length,
+    activeStudents,
+    completedStudents: mentorStudents.filter(s => {
+      const stages = studentStages.filter(st => st.userId === s.id);
+      return stages.length > 0 && stages.every(st => st.status === 'completed');
+    }).length,
+    avgCompletionRate: totalStages > 0 ? Math.round((completedStages / totalStages) * 100) : 0,
+    pendingReports,
+    approvedReports,
+  };
 }
