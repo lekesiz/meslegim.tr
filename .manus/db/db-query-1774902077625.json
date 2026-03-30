@@ -1,0 +1,52 @@
+{
+  "query": "SELECT ub.userId, ub.badgeId, ub.notified, ub.earnedAt FROM user_badges ub WHERE ub.userId = (SELECT id FROM users WHERE email = 'student@test.com');",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute SELECT ub.userId, ub.badgeId, ub.notified, ub.earnedAt FROM user_badges ub WHERE ub.userId = (SELECT id FROM users WHERE email = 'student@test.com');",
+  "rows": [
+    {
+      "userId": "180022",
+      "badgeId": "1",
+      "notified": "0",
+      "earnedAt": "2026-03-30 20:11:45"
+    },
+    {
+      "userId": "180022",
+      "badgeId": "2",
+      "notified": "0",
+      "earnedAt": "2026-03-30 20:11:45"
+    },
+    {
+      "userId": "180022",
+      "badgeId": "4",
+      "notified": "0",
+      "earnedAt": "2026-03-30 20:11:45"
+    },
+    {
+      "userId": "180022",
+      "badgeId": "5",
+      "notified": "0",
+      "earnedAt": "2026-03-30 20:11:45"
+    },
+    {
+      "userId": "180022",
+      "badgeId": "12",
+      "notified": "0",
+      "earnedAt": "2026-03-30 20:11:45"
+    },
+    {
+      "userId": "180022",
+      "badgeId": "16",
+      "notified": "0",
+      "earnedAt": "2026-03-30 20:11:45"
+    },
+    {
+      "userId": "180022",
+      "badgeId": "17",
+      "notified": "0",
+      "earnedAt": "2026-03-30 20:11:45"
+    }
+  ],
+  "messages": [],
+  "stdout": "userId\tbadgeId\tnotified\tearnedAt\n180022\t1\t0\t2026-03-30 20:11:45\n180022\t2\t0\t2026-03-30 20:11:45\n180022\t4\t0\t2026-03-30 20:11:45\n180022\t5\t0\t2026-03-30 20:11:45\n180022\t12\t0\t2026-03-30 20:11:45\n180022\t16\t0\t2026-03-30 20:11:45\n180022\t17\t0\t2026-03-30 20:11:45\n",
+  "stderr": "",
+  "execution_time_ms": 84
+}

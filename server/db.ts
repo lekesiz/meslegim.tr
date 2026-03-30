@@ -817,9 +817,9 @@ export async function getMentorStats(mentorId: number) {
   if (reportsWithApproval.length > 0) {
     const totalDays = reportsWithApproval.reduce((sum, report) => {
       if (!report.approvedAt) return sum;
-      const days = Math.floor(
+      const days = Math.max(0, Math.floor(
         (new Date(report.approvedAt).getTime() - new Date(report.createdAt).getTime()) / (1000 * 60 * 60 * 24)
-      );
+      ));
       return sum + days;
     }, 0);
     avgResponseTime = Math.round(totalDays / reportsWithApproval.length);
@@ -895,9 +895,9 @@ export async function getMentorPerformanceTrends(mentorId: number) {
     
     const totalDays = monthReports.reduce((sum, report) => {
       if (!report.approvedAt) return sum;
-      const days = Math.floor(
+      const days = Math.max(0, Math.floor(
         (new Date(report.approvedAt).getTime() - new Date(report.createdAt).getTime()) / (1000 * 60 * 60 * 24)
-      );
+      ));
       return sum + days;
     }, 0);
     

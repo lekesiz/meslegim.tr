@@ -1,0 +1,42 @@
+{
+  "query": "SELECT id, userId, stageId, type, status, createdAt FROM reports WHERE userId = (SELECT id FROM users WHERE email = 'student@test.com') ORDER BY stageId, createdAt;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute SELECT id, userId, stageId, type, status, createdAt FROM reports WHERE userId = (SELECT id FROM users WHERE email = 'student@test.com') ORDER BY stageId, createdAt;",
+  "rows": [
+    {
+      "id": "1",
+      "userId": "180022",
+      "stageId": "60001",
+      "type": "stage",
+      "status": "approved",
+      "createdAt": "2026-02-19 11:58:59"
+    },
+    {
+      "id": "180001",
+      "userId": "180022",
+      "stageId": "60002",
+      "type": "stage",
+      "status": "approved",
+      "createdAt": "2026-03-29 19:57:16"
+    },
+    {
+      "id": "180002",
+      "userId": "180022",
+      "stageId": "90001",
+      "type": "stage",
+      "status": "approved",
+      "createdAt": "2026-03-29 20:00:20"
+    },
+    {
+      "id": "180003",
+      "userId": "180022",
+      "stageId": "90001",
+      "type": "comprehensive",
+      "status": "approved",
+      "createdAt": "2026-03-29 20:01:36"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuserId\tstageId\ttype\tstatus\tcreatedAt\n1\t180022\t60001\tstage\tapproved\t2026-02-19 11:58:59\n180001\t180022\t60002\tstage\tapproved\t2026-03-29 19:57:16\n180002\t180022\t90001\tstage\tapproved\t2026-03-29 20:00:20\n180003\t180022\t90001\tcomprehensive\tapproved\t2026-03-29 20:01:36\n",
+  "stderr": "",
+  "execution_time_ms": 68
+}

@@ -68,6 +68,20 @@ export default function MyReports() {
     }
   };
 
+  // Deduplicate reports: if same stageId has both 'stage' and 'comprehensive', show only 'comprehensive'
+  const deduplicatedReports = reports ? reports.reduce((acc: any[], report: any) => {
+    const existingIdx = acc.findIndex((r: any) => r.stageId === report.stageId && r.stageId !== null);
+    if (existingIdx >= 0) {
+      // Prefer comprehensive over stage type
+      if (report.type === 'comprehensive') {
+        acc[existingIdx] = report;
+      }
+    } else {
+      acc.push(report);
+    }
+    return acc;
+  }, []) : [];
+
   return (
     <DashboardLayout>
       <div className="space-y-6">
@@ -78,7 +92,7 @@ export default function MyReports() {
           </p>
         </div>
 
-        {!reports || reports.length === 0 ? (
+        {deduplicatedReports.length === 0 ? (
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-12">
               <FileText className="w-16 h-16 text-muted-foreground mb-4" />
@@ -90,7 +104,7 @@ export default function MyReports() {
           </Card>
         ) : (
           <div className="space-y-4">
-            {reports.map((report: any) => (
+            {deduplicatedReports.map((report: any) => (
               <Card key={report.id} className={`hover:shadow-md transition-shadow ${report.status === 'rejected' ? 'border-red-200' : ''}`}>
                 <CardHeader>
                   <div className="flex items-start justify-between">
@@ -114,19 +128,19 @@ export default function MyReports() {
                 <CardContent className="space-y-4">
                   {/* Mentor Feedback for rejected reports */}
                   {report.status === 'rejected' && report.mentorFeedback && (
-                    <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                      <div className="flex items-center gap-2 text-red-700 mb-2">
+                    <div className="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-lg p-4">
+                      <div className="flex items-center gap-2 text-red-700 dark:text-red-400 mb-2">
                         <AlertCircle className="w-4 h-4" />
                         <span className="font-semibold text-sm">Mentor Geri Bildirimi</span>
                       </div>
-                      <p className="text-sm text-red-800">{report.mentorFeedback}</p>
+                      <p className="text-sm text-red-800 dark:text-red-300">{report.mentorFeedback}</p>
                     </div>
                   )}
 
                   {/* Pending status info */}
                   {report.status === 'pending' && (
-                    <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
-                      <p className="text-sm text-amber-800">
+                    <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg p-3">
+                      <p className="text-sm text-amber-800 dark:text-amber-300">
                         Raporunuz mentorunuz tarafından inceleniyor. Onaylandığında e-posta ile bildirim alacaksınız.
                       </p>
                     </div>
