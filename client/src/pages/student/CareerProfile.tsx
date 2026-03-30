@@ -273,14 +273,14 @@ export default function CareerProfile() {
                 </div>
                 <div className="space-y-3">
                   {values.topValues.map((v: any, i: number) => (
-                    <div key={v.key} className="flex items-start gap-3 p-3 rounded-lg bg-green-50/50 border border-green-100">
-                      <div className="flex-shrink-0 w-7 h-7 rounded-full bg-green-100 flex items-center justify-center text-sm font-bold text-green-700">
+                    <div key={v.key} className="flex items-start gap-3 p-3 rounded-lg bg-green-50/50 dark:bg-green-950/30 border border-green-100 dark:border-green-800">
+                      <div className="flex-shrink-0 w-7 h-7 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center text-sm font-bold text-green-700 dark:text-green-300">
                         {i + 1}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between">
                           <p className="font-medium text-sm">{v.name}</p>
-                          <Badge variant="outline" className="text-xs border-green-200 text-green-700">{v.score}/100</Badge>
+                          <Badge variant="outline" className="text-xs border-green-200 dark:border-green-700 text-green-700 dark:text-green-400">{v.score}/100</Badge>
                         </div>
                         <p className="text-xs text-muted-foreground mt-1">{v.description}</p>
                       </div>

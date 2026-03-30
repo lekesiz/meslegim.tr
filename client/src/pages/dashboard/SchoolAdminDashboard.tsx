@@ -159,7 +159,7 @@ export default function SchoolAdminDashboard() {
                 </div>
               </CardHeader>
               <CardContent>
-                <Table>
+                <div className="overflow-x-auto"><Table>
                   <TableHeader>
                     <TableRow>
                       <TableHead>Ad Soyad</TableHead>
@@ -204,7 +204,7 @@ export default function SchoolAdminDashboard() {
                       </TableRow>
                     )}
                   </TableBody>
-                </Table>
+                </Table></div>
               </CardContent>
             </Card>
           </TabsContent>
@@ -230,7 +230,7 @@ export default function SchoolAdminDashboard() {
                 </div>
               </CardHeader>
               <CardContent>
-                <Table>
+                <div className="overflow-x-auto"><Table>
                   <TableHeader>
                     <TableRow>
                       <TableHead>Ad Soyad</TableHead>
@@ -259,7 +259,7 @@ export default function SchoolAdminDashboard() {
                       </TableRow>
                     )}
                   </TableBody>
-                </Table>
+                </Table></div>
               </CardContent>
             </Card>
           </TabsContent>

@@ -168,8 +168,8 @@ export default function MentorReportApproval() {
 
                   {/* Reject Feedback Section */}
                   {selectedReport === report.id && isRejectMode && (
-                    <div className="space-y-3 pt-4 border-t border-red-200 bg-red-50/50 rounded-lg p-4">
-                      <div className="flex items-center gap-2 text-red-700">
+                    <div className="space-y-3 pt-4 border-t border-red-200 dark:border-red-800 bg-red-50/50 dark:bg-red-950/30 rounded-lg p-4">
+                      <div className="flex items-center gap-2 text-red-700 dark:text-red-400">
                         <AlertCircle className="w-4 h-4" />
                         <span className="font-semibold text-sm">Reddetme Gerekçesi</span>
                         <Badge variant="destructive" className="text-xs">Zorunlu</Badge>
@@ -180,7 +180,7 @@ export default function MentorReportApproval() {
                         placeholder="Öğrenciye reddedilme gerekçesini ve nasıl iyileştirebileceğini açıklayın..."
                         className="min-h-[100px] border-red-200 focus:border-red-400"
                       />
-                      <p className="text-xs text-red-600">
+                      <p className="text-xs text-red-600 dark:text-red-400">
                         Bu geri bildirim öğrenciye iletilecektir. Öğrenci etabı yeniden tamamlayabilecektir.
                       </p>
                     </div>

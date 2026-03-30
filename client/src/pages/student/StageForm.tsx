@@ -321,7 +321,7 @@ export default function StageForm() {
         const likertOptions = options.length > 0 ? options : ['1', '2', '3', '4', '5'];
         return (
           <div className="space-y-3">
-            <div className="grid grid-cols-5 gap-2">
+            <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
               {likertOptions.map((option: string, idx: number) => {
                 const optionKey = String(idx + 1);
                 const isSelected = currentAnswer === String(option);

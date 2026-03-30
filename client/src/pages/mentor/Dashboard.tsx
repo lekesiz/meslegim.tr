@@ -16,11 +16,11 @@ export default function MentorDashboard() {
 
   const activateStudentMutation = trpc.mentor.activateStudent.useMutation({
     onSuccess: () => {
-      toast.success("Étudiant activé avec succès");
+      toast.success("Öğrenci başarıyla aktifleştirildi");
       refetchPending();
     },
     onError: () => {
-      toast.error("Erreur lors de l'activation");
+      toast.error("Aktifleştirme sırasında bir hata oluştu");
     },
   });
 
@@ -46,46 +46,46 @@ export default function MentorDashboard() {
     <DashboardLayout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold">Tableau de bord Mentor</h1>
-          <p className="text-muted-foreground">Gérez vos étudiants et leurs progressions</p>
+          <h1 className="text-3xl font-bold">Mentor Paneli</h1>
+          <p className="text-muted-foreground">Öğrencilerinizi ve ilerlemelerini yönetin</p>
         </div>
 
         <div className="grid gap-4 md:grid-cols-3">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">En attente</CardTitle>
+              <CardTitle className="text-sm font-medium">Onay Bekleyen</CardTitle>
               <Clock className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.pending}</div>
               <p className="text-xs text-muted-foreground">
-                Étudiants à approuver
+                Onaylanacak öğrenci
               </p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Mes étudiants</CardTitle>
+              <CardTitle className="text-sm font-medium">Öğrencilerim</CardTitle>
               <GraduationCap className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.active}</div>
               <p className="text-xs text-muted-foreground">
-                Étudiants actifs
+                Aktif öğrenci
               </p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Rapports</CardTitle>
+              <CardTitle className="text-sm font-medium">Raporlar</CardTitle>
               <FileText className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.reports}</div>
               <p className="text-xs text-muted-foreground">
-                À approuver
+                Onaylanacak rapor
               </p>
             </CardContent>
           </Card>
@@ -94,7 +94,7 @@ export default function MentorDashboard() {
         {pendingStudents && pendingStudents.length > 0 && (
           <Card>
             <CardHeader>
-              <CardTitle>Étudiants en attente d'approbation</CardTitle>
+              <CardTitle>Onay Bekleyen Öğrenciler</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -107,7 +107,7 @@ export default function MentorDashboard() {
                       <p className="font-medium">{student.name}</p>
                       <p className="text-sm text-muted-foreground">{student.email}</p>
                       <p className="text-xs text-muted-foreground">
-                        Groupe d'âge: {student.ageGroup}
+                        Yaş Grubu: {student.ageGroup}
                       </p>
                     </div>
                     <Button
@@ -117,7 +117,7 @@ export default function MentorDashboard() {
                       {activateStudentMutation.isPending ? (
                         <Loader2 className="w-4 h-4 animate-spin" />
                       ) : (
-                        "Activer"
+                        "Aktifleştir"
                       )}
                     </Button>
                   </div>
@@ -129,10 +129,10 @@ export default function MentorDashboard() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Activité récente</CardTitle>
+            <CardTitle>Son Aktiviteler</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-muted-foreground">Aucune activité récente</p>
+            <p className="text-sm text-muted-foreground">Henüz kayıtlı aktivite bulunmuyor.</p>
           </CardContent>
         </Card>
       </div>

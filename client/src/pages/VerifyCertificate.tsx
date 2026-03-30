@@ -15,7 +15,7 @@ export default function VerifyCertificate() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-yellow-50/30 to-orange-50/20 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-yellow-50/30 to-orange-50/20 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
         <Card className="w-full max-w-md border-amber-200/50 shadow-xl">
           <CardContent className="pt-10 pb-10 flex flex-col items-center gap-4">
             <div className="w-16 h-16 rounded-full bg-gradient-to-br from-amber-400 to-yellow-500 flex items-center justify-center shadow-lg">
@@ -45,12 +45,12 @@ export default function VerifyCertificate() {
               </div>
             </div>
 
-            <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
+            <div className="bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-800 rounded-xl p-4 mb-6">
               <div className="flex items-center gap-2 mb-1">
                 <Hash className="h-4 w-4 text-red-400" />
                 <p className="text-xs font-medium text-red-500">Aranan Sertifika No</p>
               </div>
-              <p className="font-mono text-sm text-red-800">{certificateNumber}</p>
+              <p className="font-mono text-sm text-red-800 dark:text-red-300">{certificateNumber}</p>
             </div>
 
             <p className="text-sm text-muted-foreground text-center mb-4">
@@ -71,7 +71,7 @@ export default function VerifyCertificate() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-yellow-50/30 to-orange-50/20 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-yellow-50/30 to-orange-50/20 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
       <Card className="w-full max-w-lg border-amber-200/50 shadow-2xl overflow-hidden">
         {/* Gold header bar */}
         <div className="h-2 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500" />
@@ -83,12 +83,12 @@ export default function VerifyCertificate() {
               <div className="w-20 h-20 rounded-full bg-gradient-to-br from-amber-400 to-yellow-500 flex items-center justify-center shadow-xl">
                 <Award className="h-10 w-10 text-white" />
               </div>
-              <div className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-green-500 flex items-center justify-center border-3 border-white shadow-md">
+              <div className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-green-500 flex items-center justify-center border-3 border-white dark:border-gray-800 shadow-md">
                 <CheckCircle className="h-5 w-5 text-white" />
               </div>
             </div>
             <div className="text-center">
-              <h2 className="text-xl font-bold text-green-700">Sertifika Dogrulandı</h2>
+              <h2 className="text-xl font-bold text-green-700 dark:text-green-400">Sertifika Dogrulandı</h2>
               <p className="text-sm text-muted-foreground mt-1">
                 Bu sertifika Meslegim.tr platformu tarafından verilmistir ve gecerlidir.
               </p>
