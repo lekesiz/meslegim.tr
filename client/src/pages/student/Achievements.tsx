@@ -32,11 +32,11 @@ const rarityLabels: Record<string, string> = {
 };
 
 const rarityColors: Record<string, string> = {
-  common: "bg-zinc-100 text-zinc-700 border-zinc-300",
-  uncommon: "bg-green-50 text-green-700 border-green-300",
-  rare: "bg-blue-50 text-blue-700 border-blue-300",
-  epic: "bg-purple-50 text-purple-700 border-purple-300",
-  legendary: "bg-amber-50 text-amber-700 border-amber-300",
+  common: "bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border-zinc-300 dark:border-zinc-600",
+  uncommon: "bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-400 border-green-300 dark:border-green-700",
+  rare: "bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-400 border-blue-300 dark:border-blue-700",
+  epic: "bg-purple-50 dark:bg-purple-950/30 text-purple-700 dark:text-purple-400 border-purple-300 dark:border-purple-700",
+  legendary: "bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 border-amber-300 dark:border-amber-700",
 };
 
 function XPBar({ totalXP, maxXP = 1000 }: { totalXP: number; maxXP?: number }) {
@@ -104,8 +104,8 @@ function BadgeCard({
       className={cn(
         "relative group rounded-xl border-2 p-4 transition-all duration-300 cursor-pointer",
         badge.earned
-          ? "bg-card border-indigo-200 shadow-md hover:shadow-lg hover:-translate-y-1"
-          : "bg-zinc-50 border-zinc-200 opacity-60 grayscale hover:opacity-80"
+          ? "bg-card border-indigo-200 dark:border-indigo-800 shadow-md hover:shadow-lg hover:-translate-y-1"
+          : "bg-zinc-50 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-700 opacity-60 grayscale hover:opacity-80"
       )}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -139,12 +139,12 @@ function BadgeCard({
         </div>
 
         {/* Name */}
-        <h3 className={cn("font-semibold text-sm", badge.earned ? "text-zinc-900" : "text-zinc-500")}>
+        <h3 className={cn("font-semibold text-sm", badge.earned ? "text-foreground" : "text-muted-foreground")}>
           {badge.name}
         </h3>
 
         {/* Description */}
-        <p className="text-xs text-zinc-500 line-clamp-2">{badge.description}</p>
+        <p className="text-xs text-muted-foreground line-clamp-2">{badge.description}</p>
 
         {/* XP */}
         <div className="flex items-center gap-1">
@@ -177,10 +177,10 @@ export default function Achievements() {
   if (isLoading) {
     return (
       <div className="space-y-6 p-6">
-        <div className="h-32 bg-zinc-100 rounded-xl animate-pulse" />
+        <div className="h-32 bg-muted rounded-xl animate-pulse" />
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className="h-48 bg-zinc-100 rounded-xl animate-pulse" />
+            <div key={i} className="h-48 bg-muted rounded-xl animate-pulse" />
           ))}
         </div>
       </div>
@@ -200,11 +200,11 @@ export default function Achievements() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-zinc-900 flex items-center gap-2">
+          <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
             <Award className="h-7 w-7 text-indigo-600" />
             Başarılarım
           </h1>
-          <p className="text-zinc-500 mt-1">
+          <p className="text-muted-foreground mt-1">
             {earnedCount}/{totalCount} rozet kazanıldı
           </p>
         </div>
@@ -220,11 +220,11 @@ export default function Achievements() {
 
       {/* New badges notification */}
       {checkMutation.data && checkMutation.data.newBadges.length > 0 && (
-        <Card className="bg-gradient-to-r from-yellow-50 to-amber-50 border-yellow-200">
+        <Card className="bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-yellow-950/20 dark:to-amber-950/20 border-yellow-200 dark:border-yellow-800">
           <CardContent className="p-4">
             <div className="flex items-center gap-2 mb-2">
               <Sparkles className="h-5 w-5 text-yellow-600" />
-              <span className="font-semibold text-yellow-800">
+              <span className="font-semibold text-yellow-800 dark:text-yellow-300">
                 Tebrikler! {checkMutation.data.newBadges.length} yeni rozet kazandınız!
               </span>
             </div>
@@ -246,8 +246,8 @@ export default function Achievements() {
       <Card>
         <CardContent className="p-4">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-zinc-700">Genel İlerleme</span>
-            <span className="text-sm text-zinc-500">
+            <span className="text-sm font-medium text-foreground">Genel İlerleme</span>
+            <span className="text-sm text-muted-foreground">
               {earnedCount}/{totalCount} ({Math.round((earnedCount / totalCount) * 100)}%)
             </span>
           </div>
@@ -283,7 +283,7 @@ export default function Achievements() {
         {categories.map((cat) => (
           <TabsContent key={cat} value={cat} className="mt-4">
             <div className="mb-4">
-              <h2 className="text-lg font-semibold text-zinc-800 flex items-center gap-2">
+              <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
                 {categoryIcons[cat]}
                 {categoryLabels[cat] || cat}
               </h2>
@@ -300,7 +300,7 @@ export default function Achievements() {
       </Tabs>
 
       {/* Leaderboard teaser */}
-      <Card className="bg-gradient-to-r from-zinc-50 to-zinc-100 border-zinc-200">
+      <Card className="bg-gradient-to-r from-zinc-50 to-zinc-100 dark:from-zinc-900 dark:to-zinc-800 border-zinc-200 dark:border-zinc-700">
         <CardHeader className="pb-2">
           <CardTitle className="text-lg flex items-center gap-2">
             <Crown className="h-5 w-5 text-amber-500" />
@@ -322,14 +322,14 @@ function LeaderboardMini() {
     return (
       <div className="space-y-2">
         {Array.from({ length: 3 }).map((_, i) => (
-          <div key={i} className="h-10 bg-zinc-200 rounded animate-pulse" />
+          <div key={i} className="h-10 bg-muted rounded animate-pulse" />
         ))}
       </div>
     );
   }
 
   if (!data || data.length === 0) {
-    return <p className="text-sm text-zinc-500">Henüz liderlik tablosunda kimse yok. İlk sen ol!</p>;
+    return <p className="text-sm text-muted-foreground">Henüz liderlik tablosunda kimse yok. İlk sen ol!</p>;
   }
 
   const medals = ["🥇", "🥈", "🥉"];
@@ -341,14 +341,14 @@ function LeaderboardMini() {
           key={entry.userId}
           className={cn(
             "flex items-center justify-between p-3 rounded-lg",
-            idx === 0 ? "bg-amber-50 border border-amber-200" : "bg-card border border-zinc-100"
+            idx === 0 ? "bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800" : "bg-card border border-zinc-100 dark:border-zinc-700"
           )}
         >
           <div className="flex items-center gap-3">
             <span className="text-lg w-8 text-center">
               {idx < 3 ? medals[idx] : `${idx + 1}.`}
             </span>
-            <span className="font-medium text-zinc-800">{entry.userName || "Anonim"}</span>
+            <span className="font-medium text-foreground">{entry.userName || "Anonim"}</span>
           </div>
           <div className="flex items-center gap-2">
             <Badge variant="secondary" className="text-xs">

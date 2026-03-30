@@ -1,0 +1,9 @@
+{
+  "query": "SELECT q.id, q.stageId, s.name, q.text FROM questions q JOIN stages s ON q.stageId = s.id WHERE q.stageId BETWEEN 4 AND 9 ORDER BY q.stageId, q.`order` LIMIT 20",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute SELECT q.id, q.stageId, s.name, q.text FROM questions q JOIN stages s ON q.stageId = s.id WHERE q.stageId BETWEEN 4 AND 9 ORDER BY q.stageId, q.`order` LIMIT 20",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 56
+}

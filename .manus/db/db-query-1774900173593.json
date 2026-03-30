@@ -1,0 +1,190 @@
+{
+  "query": "SELECT q.id, q.stageId, q.text, q.type FROM questions q WHERE q.stageId IN (90001, 90002, 90003, 90004, 90005, 90006) ORDER BY q.stageId, q.`order` LIMIT 30",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute SELECT q.id, q.stageId, q.text, q.type FROM questions q WHERE q.stageId IN (90001, 90002, 90003, 90004, 90005, 90006) ORDER BY q.stageId, q.`order` LIMIT 30",
+  "rows": [
+    {
+      "id": "180001",
+      "stageId": "90001",
+      "text": "İleride iyi para kazanmak benim için çok önemli.",
+      "type": "likert"
+    },
+    {
+      "id": "180002",
+      "stageId": "90001",
+      "text": "Meslek seçerken maaşın yüksek olması en önemli kriterlerden biridir.",
+      "type": "likert"
+    },
+    {
+      "id": "180003",
+      "stageId": "90001",
+      "text": "Ailemi maddi olarak destekleyebilecek bir iş istiyorum.",
+      "type": "likert"
+    },
+    {
+      "id": "180004",
+      "stageId": "90001",
+      "text": "Hobilerimi ve arkadaşlarımla vakit geçirmeyi işimden daha çok önemsiyorum.",
+      "type": "likert"
+    },
+    {
+      "id": "180005",
+      "stageId": "90001",
+      "text": "Çok çalışmak yerine dengeli bir yaşam sürmek istiyorum.",
+      "type": "likert"
+    },
+    {
+      "id": "180006",
+      "stageId": "90001",
+      "text": "Hafta sonları ve tatillerde kesinlikle çalışmak istemem.",
+      "type": "likert"
+    },
+    {
+      "id": "180007",
+      "stageId": "90001",
+      "text": "Sürekli yeni şeyler öğrenmek beni mutlu eder.",
+      "type": "likert"
+    },
+    {
+      "id": "180008",
+      "stageId": "90001",
+      "text": "Kendimi geliştirmek için kurslara ve eğitimlere katılmak isterim.",
+      "type": "likert"
+    },
+    {
+      "id": "180009",
+      "stageId": "90001",
+      "text": "Bir meslek seçerken ne kadar gelişim fırsatı sunduğuna bakarım.",
+      "type": "likert"
+    },
+    {
+      "id": "180010",
+      "stageId": "90001",
+      "text": "İnsanlara yardım etmek benim için çok tatmin edici.",
+      "type": "likert"
+    },
+    {
+      "id": "180011",
+      "stageId": "90001",
+      "text": "Topluma faydalı bir iş yapmak istiyorum.",
+      "type": "likert"
+    },
+    {
+      "id": "180012",
+      "stageId": "90001",
+      "text": "Çevreye ve doğaya duyarlı bir meslek tercih ederim.",
+      "type": "likert"
+    },
+    {
+      "id": "180013",
+      "stageId": "90001",
+      "text": "Yeni fikirler üretmek ve yaratıcı projeler yapmak beni heyecanlandırır.",
+      "type": "likert"
+    },
+    {
+      "id": "180014",
+      "stageId": "90001",
+      "text": "Rutin ve tekrarlayan işlerden sıkılırım.",
+      "type": "likert"
+    },
+    {
+      "id": "180015",
+      "stageId": "90001",
+      "text": "Sanatsal veya tasarım odaklı bir meslek ilgimi çeker.",
+      "type": "likert"
+    },
+    {
+      "id": "180016",
+      "stageId": "90001",
+      "text": "Bir grubun başında olmak ve yönlendirmek hoşuma gider.",
+      "type": "likert"
+    },
+    {
+      "id": "180017",
+      "stageId": "90001",
+      "text": "Kararları ben almak istiyorum, başkalarının kararlarına uymak zor geliyor.",
+      "type": "likert"
+    },
+    {
+      "id": "180018",
+      "stageId": "90001",
+      "text": "İleride kendi ekibimi yönetmek istiyorum.",
+      "type": "likert"
+    },
+    {
+      "id": "180019",
+      "stageId": "90001",
+      "text": "Kendi başıma çalışmayı tercih ederim.",
+      "type": "likert"
+    },
+    {
+      "id": "180020",
+      "stageId": "90001",
+      "text": "Esnek çalışma saatleri benim için çok önemli.",
+      "type": "likert"
+    },
+    {
+      "id": "180021",
+      "stageId": "90001",
+      "text": "İleride kendi işimi kurmak istiyorum.",
+      "type": "likert"
+    },
+    {
+      "id": "180022",
+      "stageId": "90001",
+      "text": "Saygın ve prestijli bir meslek sahibi olmak istiyorum.",
+      "type": "likert"
+    },
+    {
+      "id": "180023",
+      "stageId": "90001",
+      "text": "İnsanların mesleğime hayranlık duyması benim için önemli.",
+      "type": "likert"
+    },
+    {
+      "id": "180024",
+      "stageId": "90001",
+      "text": "Toplumda tanınan bir pozisyonda olmak istiyorum.",
+      "type": "likert"
+    },
+    {
+      "id": "180025",
+      "stageId": "90001",
+      "text": "İşten çıkarılma korkusu yaşamak istemem.",
+      "type": "likert"
+    },
+    {
+      "id": "180026",
+      "stageId": "90001",
+      "text": "Devlet memurluğu gibi güvenceli bir iş tercih ederim.",
+      "type": "likert"
+    },
+    {
+      "id": "180027",
+      "stageId": "90001",
+      "text": "Düzenli ve öngörülebilir bir gelir benim için çok önemli.",
+      "type": "likert"
+    },
+    {
+      "id": "180028",
+      "stageId": "90001",
+      "text": "Ekip arkadaşlarımla birlikte çalışmak beni motive eder.",
+      "type": "likert"
+    },
+    {
+      "id": "180029",
+      "stageId": "90001",
+      "text": "İş yerinde sosyal ilişkiler kurmak benim için önemli.",
+      "type": "likert"
+    },
+    {
+      "id": "180030",
+      "stageId": "90001",
+      "text": "Ortak bir hedefe doğru birlikte çalışmak beni mutlu eder.",
+      "type": "likert"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tstageId\ttext\ttype\n180001\t90001\tİleride iyi para kazanmak benim için çok önemli.\tlikert\n180002\t90001\tMeslek seçerken maaşın yüksek olması en önemli kriterlerden biridir.\tlikert\n180003\t90001\tAilemi maddi olarak destekleyebilecek bir iş istiyorum.\tlikert\n180004\t90001\tHobilerimi ve arkadaşlarımla vakit geçirmeyi işimden daha çok önemsiyorum.\tlikert\n180005\t90001\tÇok çalışmak yerine dengeli bir yaşam sürmek istiyorum.\tlikert\n180006\t90001\tHafta sonları ve tatillerde kesinlikle çalışmak istemem.\tlikert\n180007\t90001\tSürekli yeni şeyler öğrenmek beni mutlu eder.\tlikert\n180008\t90001\tKendimi geliştirmek için kurslara ve eğitimlere katılmak isterim.\tlikert\n180009\t90001\tBir meslek seçerken ne kadar gelişim fırsatı sunduğuna bakarım.\tlikert\n180010\t90001\tİnsanlara yardım etmek benim için çok tatmin edici.\tlikert\n180011\t90001\tTopluma faydalı bir iş yapmak istiyorum.\tlikert\n180012\t90001\tÇevreye ve doğaya duyarlı bir meslek tercih ederim.\tlikert\n180013\t90001\tYeni fikirler üretmek ve yaratıcı projeler yapmak beni heyecanlandırır.\tlikert\n180014\t90001\tRutin ve tekrarlayan işlerden sıkılırım.\tlikert\n180015\t90001\tSanatsal veya tasarım odaklı bir meslek ilgimi çeker.\tlikert\n180016\t90001\tBir grubun başında olmak ve yönlendirmek hoşuma gider.\tlikert\n180017\t90001\tKararları ben almak istiyorum, başkalarının kararlarına uymak zor geliyor.\tlikert\n180018\t90001\tİleride kendi ekibimi yönetmek istiyorum.\tlikert\n180019\t90001\tKendi başıma çalışmayı tercih ederim.\tlikert\n180020\t90001\tEsnek çalışma saatleri benim için çok önemli.\tlikert\n180021\t90001\tİleride kendi işimi kurmak istiyorum.\tlikert\n180022\t90001\tSaygın ve prestijli bir meslek sahibi olmak istiyorum.\tlikert\n180023\t90001\tİnsanların mesleğime hayranlık duyması benim için önemli.\tlikert\n180024\t90001\tToplumda tanınan bir pozisyonda olmak istiyorum.\tlikert\n180025\t90001\tİşten çıkarılma korkusu yaşamak istemem.\tlikert\n180026\t90001\tDevlet memurluğu gibi güvenceli bir iş tercih ederim.\tlikert\n180027\t90001\tDüzenli ve öngörülebilir bir gelir benim için çok önemli.\tlikert\n180028\t90001\tEkip arkadaşlarımla birlikte çalışmak beni motive eder.\tlikert\n180029\t90001\tİş yerinde sosyal ilişkiler kurmak benim için önemli.\tlikert\n180030\t90001\tOrtak bir hedefe doğru birlikte çalışmak beni mutlu eder.\tlikert\n",
+  "stderr": "",
+  "execution_time_ms": 54
+}

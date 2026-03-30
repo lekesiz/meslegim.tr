@@ -70,7 +70,7 @@ export default function FeedbackForm({ mentorId, mentorName, reportId, onSuccess
                   className={`h-8 w-8 ${
                     star <= (hoveredRating || rating)
                       ? 'fill-yellow-400 text-yellow-400'
-                      : 'text-gray-300'
+                      : 'text-gray-300 dark:text-gray-600'
                   }`}
                 />
               </button>

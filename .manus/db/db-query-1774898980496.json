@@ -1,0 +1,82 @@
+{
+  "query": "SELECT q.id, q.`order`, LEFT(q.text, 100) as questionPreview, q.type FROM questions q WHERE q.stageId = 60001 ORDER BY q.`order`;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute SELECT q.id, q.`order`, LEFT(q.text, 100) as questionPreview, q.type FROM questions q WHERE q.stageId = 60001 ORDER BY q.`order`;",
+  "rows": [
+    {
+      "id": "150042",
+      "order": "1",
+      "questionPreview": "Okulda en çok hangi dersleri seviyorsun? (En fazla 3 seçin)",
+      "type": "multiple_choice"
+    },
+    {
+      "id": "150043",
+      "order": "2",
+      "questionPreview": "Boş zamanlarında en çok ne yapmaktan keyif alırsın? (En fazla 3 seçin)",
+      "type": "multiple_choice"
+    },
+    {
+      "id": "150044",
+      "order": "3",
+      "questionPreview": "Sınıfta ya da grup çalışmalarında genellikle hangi rolü üstlenirsin?",
+      "type": "multiple_choice"
+    },
+    {
+      "id": "150045",
+      "order": "4",
+      "questionPreview": "Gelecekte çalışmak istediğin ortam hangisine daha yakın?",
+      "type": "multiple_choice"
+    },
+    {
+      "id": "150046",
+      "order": "5",
+      "questionPreview": "Ailen senden hangi mesleği yapmanı bekliyor?",
+      "type": "multiple_choice"
+    },
+    {
+      "id": "150047",
+      "order": "6",
+      "questionPreview": "Üniversite sınavına (YKS) ne kadar hazırlıklı hissediyorsun?",
+      "type": "likert"
+    },
+    {
+      "id": "150048",
+      "order": "7",
+      "questionPreview": "Hangi üniversite bölümlerini düşünüyorsun? (Birden fazla seçebilirsin)",
+      "type": "multiple_choice"
+    },
+    {
+      "id": "150049",
+      "order": "8",
+      "questionPreview": "Bir meslek seçerken sana en önemli gelen faktör nedir?",
+      "type": "multiple_choice"
+    },
+    {
+      "id": "150050",
+      "order": "9",
+      "questionPreview": "Zorlu bir matematik problemi veya bulmacayla karşılaştığında ne yaparsın?",
+      "type": "multiple_choice"
+    },
+    {
+      "id": "150051",
+      "order": "10",
+      "questionPreview": "Okul dışında herhangi bir kursa, kulübe veya etkinliğe katılıyor musun?",
+      "type": "multiple_choice"
+    },
+    {
+      "id": "150052",
+      "order": "11",
+      "questionPreview": "Hayatta seni en çok motive eden şey nedir?",
+      "type": "multiple_choice"
+    },
+    {
+      "id": "150053",
+      "order": "12",
+      "questionPreview": "Eğer bir gün kendi işini kursaydın, ne tür bir iş kurardın? Kısaca açıkla.",
+      "type": "text"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\torder\tquestionPreview\ttype\n150042\t1\tOkulda en çok hangi dersleri seviyorsun? (En fazla 3 seçin)\tmultiple_choice\n150043\t2\tBoş zamanlarında en çok ne yapmaktan keyif alırsın? (En fazla 3 seçin)\tmultiple_choice\n150044\t3\tSınıfta ya da grup çalışmalarında genellikle hangi rolü üstlenirsin?\tmultiple_choice\n150045\t4\tGelecekte çalışmak istediğin ortam hangisine daha yakın?\tmultiple_choice\n150046\t5\tAilen senden hangi mesleği yapmanı bekliyor?\tmultiple_choice\n150047\t6\tÜniversite sınavına (YKS) ne kadar hazırlıklı hissediyorsun?\tlikert\n150048\t7\tHangi üniversite bölümlerini düşünüyorsun? (Birden fazla seçebilirsin)\tmultiple_choice\n150049\t8\tBir meslek seçerken sana en önemli gelen faktör nedir?\tmultiple_choice\n150050\t9\tZorlu bir matematik problemi veya bulmacayla karşılaştığında ne yaparsın?\tmultiple_choice\n150051\t10\tOkul dışında herhangi bir kursa, kulübe veya etkinliğe katılıyor musun?\tmultiple_choice\n150052\t11\tHayatta seni en çok motive eden şey nedir?\tmultiple_choice\n150053\t12\tEğer bir gün kendi işini kursaydın, ne tür bir iş kurardın? Kısaca açıkla.\ttext\n",
+  "stderr": "",
+  "execution_time_ms": 58
+}

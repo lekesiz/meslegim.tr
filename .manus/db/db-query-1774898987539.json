@@ -1,0 +1,190 @@
+{
+  "query": "SELECT q.stageId, s.ageGroup, s.name as stageName, q.id, q.`order`, LEFT(q.text, 80) as qText, q.type FROM questions q JOIN stages s ON s.id = q.stageId WHERE q.stageId IN (60001,60002,60003,60004,60005,60006,60007,60008,60009) ORDER BY s.ageGroup, q.stageId, q.`order` LIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute SELECT q.stageId, s.ageGroup, s.name as stageName, q.id, q.`order`, LEFT(q.text, 80) as qText, q.type FROM questions q JOIN stages s ON s.id = q.stageId WHERE q.stageId IN (60001,60002,60003,60004,60005,60006,60007,60008,60009) ORDER BY s.ageGroup, q.stageId, q.`order` LIMIT 20;",
+  "rows": [
+    {
+      "stageId": "60001",
+      "ageGroup": "14-17",
+      "stageName": "Etap 1: Meslek Seçimi Yetkinlik Değerlendirmesi",
+      "id": "150042",
+      "order": "1",
+      "qText": "Okulda en çok hangi dersleri seviyorsun? (En fazla 3 seçin)",
+      "type": "multiple_choice"
+    },
+    {
+      "stageId": "60001",
+      "ageGroup": "14-17",
+      "stageName": "Etap 1: Meslek Seçimi Yetkinlik Değerlendirmesi",
+      "id": "150043",
+      "order": "2",
+      "qText": "Boş zamanlarında en çok ne yapmaktan keyif alırsın? (En fazla 3 seçin)",
+      "type": "multiple_choice"
+    },
+    {
+      "stageId": "60001",
+      "ageGroup": "14-17",
+      "stageName": "Etap 1: Meslek Seçimi Yetkinlik Değerlendirmesi",
+      "id": "150044",
+      "order": "3",
+      "qText": "Sınıfta ya da grup çalışmalarında genellikle hangi rolü üstlenirsin?",
+      "type": "multiple_choice"
+    },
+    {
+      "stageId": "60001",
+      "ageGroup": "14-17",
+      "stageName": "Etap 1: Meslek Seçimi Yetkinlik Değerlendirmesi",
+      "id": "150045",
+      "order": "4",
+      "qText": "Gelecekte çalışmak istediğin ortam hangisine daha yakın?",
+      "type": "multiple_choice"
+    },
+    {
+      "stageId": "60001",
+      "ageGroup": "14-17",
+      "stageName": "Etap 1: Meslek Seçimi Yetkinlik Değerlendirmesi",
+      "id": "150046",
+      "order": "5",
+      "qText": "Ailen senden hangi mesleği yapmanı bekliyor?",
+      "type": "multiple_choice"
+    },
+    {
+      "stageId": "60001",
+      "ageGroup": "14-17",
+      "stageName": "Etap 1: Meslek Seçimi Yetkinlik Değerlendirmesi",
+      "id": "150047",
+      "order": "6",
+      "qText": "Üniversite sınavına (YKS) ne kadar hazırlıklı hissediyorsun?",
+      "type": "likert"
+    },
+    {
+      "stageId": "60001",
+      "ageGroup": "14-17",
+      "stageName": "Etap 1: Meslek Seçimi Yetkinlik Değerlendirmesi",
+      "id": "150048",
+      "order": "7",
+      "qText": "Hangi üniversite bölümlerini düşünüyorsun? (Birden fazla seçebilirsin)",
+      "type": "multiple_choice"
+    },
+    {
+      "stageId": "60001",
+      "ageGroup": "14-17",
+      "stageName": "Etap 1: Meslek Seçimi Yetkinlik Değerlendirmesi",
+      "id": "150049",
+      "order": "8",
+      "qText": "Bir meslek seçerken sana en önemli gelen faktör nedir?",
+      "type": "multiple_choice"
+    },
+    {
+      "stageId": "60001",
+      "ageGroup": "14-17",
+      "stageName": "Etap 1: Meslek Seçimi Yetkinlik Değerlendirmesi",
+      "id": "150050",
+      "order": "9",
+      "qText": "Zorlu bir matematik problemi veya bulmacayla karşılaştığında ne yaparsın?",
+      "type": "multiple_choice"
+    },
+    {
+      "stageId": "60001",
+      "ageGroup": "14-17",
+      "stageName": "Etap 1: Meslek Seçimi Yetkinlik Değerlendirmesi",
+      "id": "150051",
+      "order": "10",
+      "qText": "Okul dışında herhangi bir kursa, kulübe veya etkinliğe katılıyor musun?",
+      "type": "multiple_choice"
+    },
+    {
+      "stageId": "60001",
+      "ageGroup": "14-17",
+      "stageName": "Etap 1: Meslek Seçimi Yetkinlik Değerlendirmesi",
+      "id": "150052",
+      "order": "11",
+      "qText": "Hayatta seni en çok motive eden şey nedir?",
+      "type": "multiple_choice"
+    },
+    {
+      "stageId": "60001",
+      "ageGroup": "14-17",
+      "stageName": "Etap 1: Meslek Seçimi Yetkinlik Değerlendirmesi",
+      "id": "150053",
+      "order": "12",
+      "qText": "Eğer bir gün kendi işini kursaydın, ne tür bir iş kurardın? Kısaca açıkla.",
+      "type": "text"
+    },
+    {
+      "stageId": "60002",
+      "ageGroup": "14-17",
+      "stageName": "Etap 2: Yetenek Keşfi ve Mesleki Eğilim Analizi",
+      "id": "150078",
+      "order": "1",
+      "qText": "Bir arkadaşın sana bir konuda yardım istese, hangi alanda en çok yardımcı olabil",
+      "type": "multiple_choice"
+    },
+    {
+      "stageId": "60002",
+      "ageGroup": "14-17",
+      "stageName": "Etap 2: Yetenek Keşfi ve Mesleki Eğilim Analizi",
+      "id": "150079",
+      "order": "2",
+      "qText": "Hangi tür filmler veya diziler izlemekten keyif alırsın?",
+      "type": "multiple_choice"
+    },
+    {
+      "stageId": "60002",
+      "ageGroup": "14-17",
+      "stageName": "Etap 2: Yetenek Keşfi ve Mesleki Eğilim Analizi",
+      "id": "150080",
+      "order": "3",
+      "qText": "Aşağıdaki senaryolardan hangisi seni en çok heyecanlandırır?",
+      "type": "multiple_choice"
+    },
+    {
+      "stageId": "60002",
+      "ageGroup": "14-17",
+      "stageName": "Etap 2: Yetenek Keşfi ve Mesleki Eğilim Analizi",
+      "id": "150081",
+      "order": "4",
+      "qText": "Okul projeleri veya ödevlerde hangi tür çalışmalar seni daha çok zorluyor?",
+      "type": "multiple_choice"
+    },
+    {
+      "stageId": "60002",
+      "ageGroup": "14-17",
+      "stageName": "Etap 2: Yetenek Keşfi ve Mesleki Eğilim Analizi",
+      "id": "150082",
+      "order": "5",
+      "qText": "Gelecekte çalışmak istediğin insanlar kimler?",
+      "type": "multiple_choice"
+    },
+    {
+      "stageId": "60002",
+      "ageGroup": "14-17",
+      "stageName": "Etap 2: Yetenek Keşfi ve Mesleki Eğilim Analizi",
+      "id": "150083",
+      "order": "6",
+      "qText": "Seni en çok motive eden başarı türü hangisidir?",
+      "type": "multiple_choice"
+    },
+    {
+      "stageId": "60002",
+      "ageGroup": "14-17",
+      "stageName": "Etap 2: Yetenek Keşfi ve Mesleki Eğilim Analizi",
+      "id": "150084",
+      "order": "7",
+      "qText": "Türkiye'de hangi mesleklerin gelecekte daha çok ihtiyaç duyulacağını düşünüyorsu",
+      "type": "multiple_choice"
+    },
+    {
+      "stageId": "60002",
+      "ageGroup": "14-17",
+      "stageName": "Etap 2: Yetenek Keşfi ve Mesleki Eğilim Analizi",
+      "id": "150085",
+      "order": "8",
+      "qText": "Bir gün ünlü olsaydın, hangi alanda tanınmak isterdin?",
+      "type": "multiple_choice"
+    }
+  ],
+  "messages": [],
+  "stdout": "stageId\tageGroup\tstageName\tid\torder\tqText\ttype\n60001\t14-17\tEtap 1: Meslek Seçimi Yetkinlik Değerlendirmesi\t150042\t1\tOkulda en çok hangi dersleri seviyorsun? (En fazla 3 seçin)\tmultiple_choice\n60001\t14-17\tEtap 1: Meslek Seçimi Yetkinlik Değerlendirmesi\t150043\t2\tBoş zamanlarında en çok ne yapmaktan keyif alırsın? (En fazla 3 seçin)\tmultiple_choice\n60001\t14-17\tEtap 1: Meslek Seçimi Yetkinlik Değerlendirmesi\t150044\t3\tSınıfta ya da grup çalışmalarında genellikle hangi rolü üstlenirsin?\tmultiple_choice\n60001\t14-17\tEtap 1: Meslek Seçimi Yetkinlik Değerlendirmesi\t150045\t4\tGelecekte çalışmak istediğin ortam hangisine daha yakın?\tmultiple_choice\n60001\t14-17\tEtap 1: Meslek Seçimi Yetkinlik Değerlendirmesi\t150046\t5\tAilen senden hangi mesleği yapmanı bekliyor?\tmultiple_choice\n60001\t14-17\tEtap 1: Meslek Seçimi Yetkinlik Değerlendirmesi\t150047\t6\tÜniversite sınavına (YKS) ne kadar hazırlıklı hissediyorsun?\tlikert\n60001\t14-17\tEtap 1: Meslek Seçimi Yetkinlik Değerlendirmesi\t150048\t7\tHangi üniversite bölümlerini düşünüyorsun? (Birden fazla seçebilirsin)\tmultiple_choice\n60001\t14-17\tEtap 1: Meslek Seçimi Yetkinlik Değerlendirmesi\t150049\t8\tBir meslek seçerken sana en önemli gelen faktör nedir?\tmultiple_choice\n60001\t14-17\tEtap 1: Meslek Seçimi Yetkinlik Değerlendirmesi\t150050\t9\tZorlu bir matematik problemi veya bulmacayla karşılaştığında ne yaparsın?\tmultiple_choice\n60001\t14-17\tEtap 1: Meslek Seçimi Yetkinlik Değerlendirmesi\t150051\t10\tOkul dışında herhangi bir kursa, kulübe veya etkinliğe katılıyor musun?\tmultiple_choice\n60001\t14-17\tEtap 1: Meslek Seçimi Yetkinlik Değerlendirmesi\t150052\t11\tHayatta seni en çok motive eden şey nedir?\tmultiple_choice\n60001\t14-17\tEtap 1: Meslek Seçimi Yetkinlik Değerlendirmesi\t150053\t12\tEğer bir gün kendi işini kursaydın, ne tür bir iş kurardın? Kısaca açıkla.\ttext\n60002\t14-17\tEtap 2: Yetenek Keşfi ve Mesleki Eğilim Analizi\t150078\t1\tBir arkadaşın sana bir konuda yardım istese, hangi alanda en çok yardımcı olabil\tmultiple_choice\n60002\t14-17\tEtap 2: Yetenek Keşfi ve Mesleki Eğilim Analizi\t150079\t2\tHangi tür filmler veya diziler izlemekten keyif alırsın?\tmultiple_choice\n60002\t14-17\tEtap 2: Yetenek Keşfi ve Mesleki Eğilim Analizi\t150080\t3\tAşağıdaki senaryolardan hangisi seni en çok heyecanlandırır?\tmultiple_choice\n60002\t14-17\tEtap 2: Yetenek Keşfi ve Mesleki Eğilim Analizi\t150081\t4\tOkul projeleri veya ödevlerde hangi tür çalışmalar seni daha çok zorluyor?\tmultiple_choice\n60002\t14-17\tEtap 2: Yetenek Keşfi ve Mesleki Eğilim Analizi\t150082\t5\tGelecekte çalışmak istediğin insanlar kimler?\tmultiple_choice\n60002\t14-17\tEtap 2: Yetenek Keşfi ve Mesleki Eğilim Analizi\t150083\t6\tSeni en çok motive eden başarı türü hangisidir?\tmultiple_choice\n60002\t14-17\tEtap 2: Yetenek Keşfi ve Mesleki Eğilim Analizi\t150084\t7\tTürkiye'de hangi mesleklerin gelecekte daha çok ihtiyaç duyulacağını düşünüyorsu\tmultiple_choice\n60002\t14-17\tEtap 2: Yetenek Keşfi ve Mesleki Eğilim Analizi\t150085\t8\tBir gün ünlü olsaydın, hangi alanda tanınmak isterdin?\tmultiple_choice\n",
+  "stderr": "",
+  "execution_time_ms": 67
+}

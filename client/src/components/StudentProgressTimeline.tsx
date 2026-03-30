@@ -63,7 +63,7 @@ export default function StudentProgressTimeline({ stages }: StudentProgressTimel
                           ? 'bg-green-500'
                           : isActive
                           ? 'bg-blue-500'
-                          : 'bg-gray-300'
+                          : 'bg-gray-300 dark:bg-gray-700'
                       }
                     >
                       {isCompleted ? 'Tamamlandı' : isActive ? 'Aktif' : 'Kilitli'}

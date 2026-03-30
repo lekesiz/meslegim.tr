@@ -1,0 +1,60 @@
+{
+  "query": "SELECT id, text, options FROM questions WHERE text LIKE '%Ã%' OR text LIKE '%Ä%' OR options LIKE '%Ã%' OR options LIKE '%Ä%' LIMIT 10",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute SELECT id, text, options FROM questions WHERE text LIKE '%Ã%' OR text LIKE '%Ä%' OR options LIKE '%Ã%' OR options LIKE '%Ä%' LIMIT 10",
+  "rows": [
+    {
+      "id": "90001",
+      "text": "Şu anki eğitim durumunuz nedir?",
+      "options": "[\"Üniversite öğrencisiyim\", \"Yeni mezun oldum\", \"Çalışıyorum ve okuyorum\", \"Ara verdim\"]"
+    },
+    {
+      "id": "90002",
+      "text": "Hangi alanlarda kendinizi geliştirmek istiyorsunuz?",
+      "options": "[\"Teknik beceriler\", \"İletişim becerileri\", \"Liderlik\", \"Yabancı dil\", \"Proje yönetimi\"]"
+    },
+    {
+      "id": "90003",
+      "text": "Kariyer hedefleriniz ne kadar net?",
+      "options": "[\"Çok net\", \"Oldukça net\", \"Kararsızım\", \"Belirsiz\", \"Hiç fikrim yok\"]"
+    },
+    {
+      "id": "90004",
+      "text": "Hangi sektörlerde çalışmak istersiniz?",
+      "options": "[\"Teknoloji\", \"Finans\", \"Sağlık\", \"Eğitim\", \"Mühendislik\", \"Sanat/Tasarım\", \"Diğer\"]"
+    },
+    {
+      "id": "90005",
+      "text": "İş deneyiminiz var mı?",
+      "options": "[\"Evet, tam zamanlı\", \"Evet, part-time\", \"Staj yaptım\", \"Hayır\"]"
+    },
+    {
+      "id": "90006",
+      "text": "Problem çözme becerinizi nasıl değerlendirirsiniz?",
+      "options": "[\"Çok iyi\", \"İyi\", \"Orta\", \"Geliştirilmeli\", \"Zayıf\"]"
+    },
+    {
+      "id": "90007",
+      "text": "Takım çalışmasına yatkınlığınız nasıl?",
+      "options": "[\"Çok yüksek\", \"Yüksek\", \"Orta\", \"Düşük\", \"Çok düşük\"]"
+    },
+    {
+      "id": "90008",
+      "text": "Hangi teknik becerilere sahipsiniz?",
+      "options": "[\"Programlama\", \"Veri analizi\", \"Grafik tasarım\", \"Dijital pazarlama\", \"Proje yönetimi\", \"Diğer\"]"
+    },
+    {
+      "id": "90009",
+      "text": "Yabancı dil seviyeniz nedir?",
+      "options": "[\"İleri seviye\", \"Orta seviye\", \"Başlangıç seviyesi\", \"Bilmiyorum\"]"
+    },
+    {
+      "id": "90010",
+      "text": "Liderlik deneyiminiz var mı?",
+      "options": "[\"Evet, çok\", \"Biraz var\", \"Hayır ama öğrenmek isterim\", \"İlgimi çekmiyor\"]"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttext\toptions\n90001\tŞu anki eğitim durumunuz nedir?\t[\"Üniversite öğrencisiyim\", \"Yeni mezun oldum\", \"Çalışıyorum ve okuyorum\", \"Ara verdim\"]\n90002\tHangi alanlarda kendinizi geliştirmek istiyorsunuz?\t[\"Teknik beceriler\", \"İletişim becerileri\", \"Liderlik\", \"Yabancı dil\", \"Proje yönetimi\"]\n90003\tKariyer hedefleriniz ne kadar net?\t[\"Çok net\", \"Oldukça net\", \"Kararsızım\", \"Belirsiz\", \"Hiç fikrim yok\"]\n90004\tHangi sektörlerde çalışmak istersiniz?\t[\"Teknoloji\", \"Finans\", \"Sağlık\", \"Eğitim\", \"Mühendislik\", \"Sanat/Tasarım\", \"Diğer\"]\n90005\tİş deneyiminiz var mı?\t[\"Evet, tam zamanlı\", \"Evet, part-time\", \"Staj yaptım\", \"Hayır\"]\n90006\tProblem çözme becerinizi nasıl değerlendirirsiniz?\t[\"Çok iyi\", \"İyi\", \"Orta\", \"Geliştirilmeli\", \"Zayıf\"]\n90007\tTakım çalışmasına yatkınlığınız nasıl?\t[\"Çok yüksek\", \"Yüksek\", \"Orta\", \"Düşük\", \"Çok düşük\"]\n90008\tHangi teknik becerilere sahipsiniz?\t[\"Programlama\", \"Veri analizi\", \"Grafik tasarım\", \"Dijital pazarlama\", \"Proje yönetimi\", \"Diğer\"]\n90009\tYabancı dil seviyeniz nedir?\t[\"İleri seviye\", \"Orta seviye\", \"Başlangıç seviyesi\", \"Bilmiyorum\"]\n90010\tLiderlik deneyiminiz var mı?\t[\"Evet, çok\", \"Biraz var\", \"Hayır ama öğrenmek isterim\", \"İlgimi çekmiyor\"]\n",
+  "stderr": "",
+  "execution_time_ms": 64
+}
