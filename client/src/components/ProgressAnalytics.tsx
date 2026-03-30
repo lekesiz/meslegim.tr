@@ -240,7 +240,7 @@ export function ProgressAnalytics() {
                       <td className="text-right p-2 text-blue-600 font-medium">
                         {stage.inProgress}
                       </td>
-                      <td className="text-right p-2 text-gray-500">
+                      <td className="text-right p-2 text-muted-foreground">
                         {stage.notStarted}
                       </td>
                       <td className="text-right p-2">

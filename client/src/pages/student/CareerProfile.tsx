@@ -24,7 +24,7 @@ const riasecLabels: Record<string, { name: string; color: string; icon: string }
   A: { name: "Sanatsal", color: "bg-purple-100 text-purple-800 border-purple-200", icon: "🎨" },
   S: { name: "Sosyal", color: "bg-green-100 text-green-800 border-green-200", icon: "🤝" },
   E: { name: "Girişimci", color: "bg-red-100 text-red-800 border-red-200", icon: "🚀" },
-  C: { name: "Geleneksel", color: "bg-gray-100 text-gray-800 border-gray-200", icon: "📊" },
+  C: { name: "Geleneksel", color: "bg-muted text-foreground border-border", icon: "📊" },
 };
 
 // Big Five açıklamaları

@@ -247,7 +247,7 @@ export default function StudentDashboard() {
                     ) : stage.status === 'active' ? (
                       <Clock className="h-5 w-5 text-blue-600" />
                     ) : (
-                      <Lock className="h-5 w-5 text-gray-400" />
+                      <Lock className="h-5 w-5 text-muted-foreground/70" />
                     )}
                     <div>
                       <p className="font-medium">{stage.stageName}</p>

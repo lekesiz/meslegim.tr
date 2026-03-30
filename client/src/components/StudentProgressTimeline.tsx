@@ -43,12 +43,12 @@ export default function StudentProgressTimeline({ stages }: StudentProgressTimel
                         ? 'border-green-500 bg-green-100'
                         : isActive
                         ? 'border-blue-500 bg-blue-100'
-                        : 'border-gray-300 bg-gray-100'
+                        : 'border-gray-300 bg-muted'
                     }`}
                   >
                     {isCompleted && <CheckCircle className="h-6 w-6 text-green-600" />}
                     {isActive && <Clock className="h-6 w-6 text-blue-600" />}
-                    {isLocked && <Lock className="h-6 w-6 text-gray-400" />}
+                    {isLocked && <Lock className="h-6 w-6 text-muted-foreground/70" />}
                   </div>
                 </div>
 
@@ -76,7 +76,7 @@ export default function StudentProgressTimeline({ stages }: StudentProgressTimel
                     </p>
                   )}
                   {isLocked && stage.scheduledAt && (
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-muted-foreground">
                       Planlanan: {new Date(stage.scheduledAt).toLocaleDateString('tr-TR')}
                     </p>
                   )}

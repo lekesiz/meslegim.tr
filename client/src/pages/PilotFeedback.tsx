@@ -62,7 +62,7 @@ export default function PilotFeedback() {
         <Card className="max-w-lg w-full text-center">
           <CardContent className="py-12 space-y-4">
             <CheckCircle className="h-16 w-16 text-green-500 mx-auto" />
-            <h2 className="text-2xl font-bold text-gray-900">Teşekkür Ederiz!</h2>
+            <h2 className="text-2xl font-bold text-foreground">Teşekkür Ederiz!</h2>
             <p className="text-muted-foreground">
               Geri bildiriminiz bizim için çok değerli. Meslegim.tr'yi daha iyi hale getirmek için kullanacağız.
             </p>
@@ -110,7 +110,7 @@ export default function PilotFeedback() {
                           : i <= 8
                           ? "bg-yellow-500 text-white scale-110 shadow-lg"
                           : "bg-green-500 text-white scale-110 shadow-lg"
-                        : "bg-gray-100 hover:bg-gray-200 text-gray-700"
+                        : "bg-muted hover:bg-gray-200 text-foreground/80"
                     }`}
                   >
                     {i}

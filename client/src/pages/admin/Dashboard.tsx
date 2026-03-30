@@ -29,7 +29,7 @@ export default function AdminDashboard() {
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold">Tableau de bord Admin</h1>
-          <p className="text-gray-600">Vue d'ensemble de la plateforme</p>
+          <p className="text-muted-foreground">Vue d'ensemble de la plateforme</p>
         </div>
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -79,7 +79,7 @@ export default function AdminDashboard() {
             <CardTitle>Activité récente</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-gray-600">Aucune activité récente</p>
+            <p className="text-sm text-muted-foreground">Aucune activité récente</p>
           </CardContent>
         </Card>
       </div>

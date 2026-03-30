@@ -104,7 +104,7 @@ function BadgeCard({
       className={cn(
         "relative group rounded-xl border-2 p-4 transition-all duration-300 cursor-pointer",
         badge.earned
-          ? "bg-white border-indigo-200 shadow-md hover:shadow-lg hover:-translate-y-1"
+          ? "bg-card border-indigo-200 shadow-md hover:shadow-lg hover:-translate-y-1"
           : "bg-zinc-50 border-zinc-200 opacity-60 grayscale hover:opacity-80"
       )}
       onMouseEnter={() => setIsHovered(true)}
@@ -341,7 +341,7 @@ function LeaderboardMini() {
           key={entry.userId}
           className={cn(
             "flex items-center justify-between p-3 rounded-lg",
-            idx === 0 ? "bg-amber-50 border border-amber-200" : "bg-white border border-zinc-100"
+            idx === 0 ? "bg-amber-50 border border-amber-200" : "bg-card border border-zinc-100"
           )}
         >
           <div className="flex items-center gap-3">

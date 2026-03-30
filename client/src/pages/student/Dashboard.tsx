@@ -35,7 +35,7 @@ export default function StudentDashboard() {
             </CardHeader>
             <CardContent className="text-center space-y-4">
               <Clock className="w-16 h-16 mx-auto text-yellow-500" />
-              <p className="text-gray-600">
+              <p className="text-muted-foreground">
                 Votre compte est en attente d'approbation par un mentor. 
                 Vous recevrez un e-mail dès que votre compte sera activé.
               </p>
@@ -53,7 +53,7 @@ export default function StudentDashboard() {
   const getStatusIcon = (status: string) => {
     if (status === 'completed') return <CheckCircle className="w-5 h-5 text-green-500" />;
     if (status === 'active') return <Clock className="w-5 h-5 text-blue-500" />;
-    return <Lock className="w-5 h-5 text-gray-400" />;
+    return <Lock className="w-5 h-5 text-muted-foreground/70" />;
   };
 
   const getStatusText = (status: string) => {
@@ -67,7 +67,7 @@ export default function StudentDashboard() {
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold">Bienvenue, {user?.name}</h1>
-          <p className="text-gray-600">Suivez votre progression et complétez vos évaluations</p>
+          <p className="text-muted-foreground">Suivez votre progression et complétez vos évaluations</p>
         </div>
 
         <Card>
@@ -82,7 +82,7 @@ export default function StudentDashboard() {
               </div>
               <Progress value={progressPercentage} className="h-2" />
             </div>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-muted-foreground">
               Groupe d'âge: <span className="font-medium">{user?.ageGroup}</span>
             </p>
           </CardContent>
@@ -104,7 +104,7 @@ export default function StudentDashboard() {
                       {getStatusIcon(stage.status)}
                       <div>
                         <p className="font-medium">Étape {index + 1}</p>
-                        <p className="text-sm text-gray-600">{getStatusText(stage.status)}</p>
+                        <p className="text-sm text-muted-foreground">{getStatusText(stage.status)}</p>
                       </div>
                     </div>
                     {stage.status === 'active' && (
@@ -119,7 +119,7 @@ export default function StudentDashboard() {
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-muted-foreground">
                 Vos étapes seront disponibles une fois que votre compte sera activé.
               </p>
             )}
@@ -144,7 +144,7 @@ export default function StudentDashboard() {
                         <p className="font-medium">
                           {report.type === 'final' ? 'Rapport final' : `Rapport Étape ${report.stageId}`}
                         </p>
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm text-muted-foreground">
                           {report.status === 'approved' ? 'Approuvé' : 'En attente d\'approbation'}
                         </p>
                       </div>
