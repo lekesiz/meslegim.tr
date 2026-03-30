@@ -1,0 +1,610 @@
+{
+  "query": "SELECT q.id, q.stageId, q.text, q.type, q.options, q.metadata, q.`order`, q.category FROM questions q WHERE q.stageId IN (60001,60002,60003,60004,60005,60006,60007,60008,60009) ORDER BY q.stageId, q.`order` LIMIT 60;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute SELECT q.id, q.stageId, q.text, q.type, q.options, q.metadata, q.`order`, q.category FROM questions q WHERE q.stageId IN (60001,60002,60003,60004,60005,60006,60007,60008,60009) ORDER BY q.stageId, q.`order` LIMIT 60;",
+  "rows": [
+    {
+      "id": "150042",
+      "stageId": "60001",
+      "text": "Okulda en çok hangi dersleri seviyorsun? (En fazla 3 seçin)",
+      "type": "multiple_choice",
+      "options": "[\"Matematik\", \"Fizik\", \"Kimya\", \"Biyoloji\", \"Tarih / Coğrafya\", \"Türkçe / Edebiyat\", \"İngilizce / Yabancı Dil\", \"Bilişim / Teknoloji\", \"Beden Eğitimi / Spor\", \"Müzik / Görsel Sanatlar\"]",
+      "metadata": "{\"allowMultiple\": true}",
+      "order": "1",
+      "category": "NULL"
+    },
+    {
+      "id": "150043",
+      "stageId": "60001",
+      "text": "Boş zamanlarında en çok ne yapmaktan keyif alırsın? (En fazla 3 seçin)",
+      "type": "multiple_choice",
+      "options": "[\"Resim çizmek / el sanatları yapmak\", \"Müzik aleti çalmak veya şarkı söylemek\", \"Spor yapmak / antrenman\", \"Bilgisayar / kodlama / oyun geliştirme\", \"Kitap okumak / hikaye yazmak\", \"Arkadaşlarıma yardım etmek / sorunlarını dinlemek\", \"Doğada vakit geçirmek / hayvanlarla ilgilenmek\", \"Matematik / bulmaca çözmek\", \"Video / fotoğraf çekmek / içerik üretmek\", \"Sosyal medya / topluluk yönetimi\"]",
+      "metadata": "{\"allowMultiple\": true}",
+      "order": "2",
+      "category": "NULL"
+    },
+    {
+      "id": "150044",
+      "stageId": "60001",
+      "text": "Sınıfta ya da grup çalışmalarında genellikle hangi rolü üstlenirsin?",
+      "type": "multiple_choice",
+      "options": "[\"Lider: Grubu organize eder, kararları ben alırım\", \"Fikir üretici: Yaratıcı çözümler öneririm\", \"Araştırmacı: Bilgi toplar, analiz yaparım\", \"Uygulayıcı: Planlananı titizlikle hayata geçiririm\", \"Arabulucu: Grup içi uyumu sağlarım\", \"Takipçi: Grubun kararlarına uyarım\"]",
+      "metadata": "NULL",
+      "order": "3",
+      "category": "NULL"
+    },
+    {
+      "id": "150045",
+      "stageId": "60001",
+      "text": "Gelecekte çalışmak istediğin ortam hangisine daha yakın?",
+      "type": "multiple_choice",
+      "options": "[\"Ofis ortamı (masa başı, bilgisayar)\", \"Saha / dışarıda aktif çalışma\", \"Hastane / klinik / sağlık ortamı\", \"Okul / eğitim ortamı\", \"Atölye / laboratuvar / üretim alanı\", \"Sahne / stüdyo / yaratıcı ortam\", \"Uzaktan / evden çalışma\", \"Henüz bilmiyorum\"]",
+      "metadata": "NULL",
+      "order": "4",
+      "category": "NULL"
+    },
+    {
+      "id": "150046",
+      "stageId": "60001",
+      "text": "Ailen senden hangi mesleği yapmanı bekliyor?",
+      "type": "multiple_choice",
+      "options": "[\"Doktor / Mühendis / Avukat (klasik prestijli meslekler)\", \"Öğretmen / Akademisyen\", \"İş insanı / Girişimci\", \"Sanatçı / Sporcu / Yaratıcı alan\", \"Devlet memuru / Kamu görevlisi\", \"Ailemin beklentisi yok, kendi kararımı veriyorum\", \"Aile baskısı var ama farklı bir şey istiyorum\"]",
+      "metadata": "NULL",
+      "order": "5",
+      "category": "NULL"
+    },
+    {
+      "id": "150047",
+      "stageId": "60001",
+      "text": "Üniversite sınavına (YKS) ne kadar hazırlıklı hissediyorsun?",
+      "type": "likert",
+      "options": "[\"1 - Hiç hazır değilim, nereden başlayacağımı bilmiyorum\", \"2\", \"3 - Orta düzeyde, bazı eksiklerim var\", \"4\", \"5 - Çok hazırım, düzenli çalışıyorum\"]",
+      "metadata": "NULL",
+      "order": "6",
+      "category": "NULL"
+    },
+    {
+      "id": "150048",
+      "stageId": "60001",
+      "text": "Hangi üniversite bölümlerini düşünüyorsun? (Birden fazla seçebilirsin)",
+      "type": "multiple_choice",
+      "options": "[\"Tıp / Diş Hekimliği / Eczacılık\", \"Mühendislik (Bilgisayar, Makine, Elektrik vb.)\", \"Hukuk\", \"İşletme / Ekonomi / Finans\", \"Öğretmenlik / Eğitim\", \"Psikoloji / Sosyoloji / Sosyal Bilimler\", \"Güzel Sanatlar / Tasarım / Mimarlık\", \"İletişim / Medya / Gazetecilik\", \"Spor Bilimleri\", \"Henüz karar vermedim\"]",
+      "metadata": "{\"allowMultiple\": true}",
+      "order": "7",
+      "category": "NULL"
+    },
+    {
+      "id": "150049",
+      "stageId": "60001",
+      "text": "Bir meslek seçerken sana en önemli gelen faktör nedir?",
+      "type": "multiple_choice",
+      "options": "[\"Yüksek maaş ve maddi güvence\", \"Topluma faydalı olmak\", \"Yaratıcılık ve özgürlük\", \"Prestij ve toplumsal saygınlık\", \"İş güvencesi ve istikrar\", \"Sevdiğim şeyi yapabilmek\", \"Dünyayı gezmek / uluslararası fırsatlar\"]",
+      "metadata": "NULL",
+      "order": "8",
+      "category": "NULL"
+    },
+    {
+      "id": "150050",
+      "stageId": "60001",
+      "text": "Zorlu bir matematik problemi veya bulmacayla karşılaştığında ne yaparsın?",
+      "type": "multiple_choice",
+      "options": "[\"Çözene kadar üzerinde çalışmaya devam ederim, vazgeçmem\", \"Bir süre uğraşırım, sonra yardım isterim\", \"Hemen yardım isterim, zaman kaybetmek istemem\", \"Farklı bir yol denerim, yaratıcı çözüm ararım\", \"Genellikle bu tür problemlerden kaçınırım\"]",
+      "metadata": "NULL",
+      "order": "9",
+      "category": "NULL"
+    },
+    {
+      "id": "150051",
+      "stageId": "60001",
+      "text": "Okul dışında herhangi bir kursa, kulübe veya etkinliğe katılıyor musun?",
+      "type": "multiple_choice",
+      "options": "[\"Evet, spor kulübü / takımı\", \"Evet, müzik / sanat kursu\", \"Evet, kodlama / robotik / teknoloji kulübü\", \"Evet, dil kursu (İngilizce, Almanca vb.)\", \"Evet, münazara / tiyatro / sosyal kulüp\", \"Evet, gönüllülük / sivil toplum çalışması\", \"Hayır, okul dışında bir etkinliğe katılmıyorum\"]",
+      "metadata": "NULL",
+      "order": "10",
+      "category": "NULL"
+    },
+    {
+      "id": "150052",
+      "stageId": "60001",
+      "text": "Hayatta seni en çok motive eden şey nedir?",
+      "type": "multiple_choice",
+      "options": "[\"Başarı ve hedeflere ulaşmak\", \"Başkalarına yardım etmek ve fark yaratmak\", \"Yeni şeyler öğrenmek ve keşfetmek\", \"Tanınmak ve takdir görmek\", \"Özgür ve bağımsız olmak\", \"Güvende ve istikrarlı bir hayat sürmek\", \"Yaratıcılığımı ifade etmek\"]",
+      "metadata": "NULL",
+      "order": "11",
+      "category": "NULL"
+    },
+    {
+      "id": "150053",
+      "stageId": "60001",
+      "text": "Eğer bir gün kendi işini kursaydın, ne tür bir iş kurardın? Kısaca açıkla.",
+      "type": "text",
+      "options": "NULL",
+      "metadata": "NULL",
+      "order": "12",
+      "category": "NULL"
+    },
+    {
+      "id": "150078",
+      "stageId": "60002",
+      "text": "Bir arkadaşın sana bir konuda yardım istese, hangi alanda en çok yardımcı olabilirsin?",
+      "type": "multiple_choice",
+      "options": "[\"Matematik / fen bilimleri / problem çözme\", \"Yazı yazmak / ödev / sunum hazırlamak\", \"Duygusal destek / dinlemek / tavsiye vermek\", \"Spor / fiziksel aktivite\", \"Sanat / müzik / yaratıcı projeler\", \"Teknoloji / bilgisayar / oyun\", \"Organizasyon / plan yapma\"]",
+      "metadata": "NULL",
+      "order": "1",
+      "category": "NULL"
+    },
+    {
+      "id": "150079",
+      "stageId": "60002",
+      "text": "Hangi tür filmler veya diziler izlemekten keyif alırsın?",
+      "type": "multiple_choice",
+      "options": "[\"Bilim kurgu / teknoloji / uzay\", \"Tıp / hastane / sağlık\", \"Hukuk / polisiye / suç\", \"Tarih / belgesel / biyografi\", \"Spor / aksiyon / macera\", \"Sanat / müzik / dans\", \"Komedi / romantik\", \"Doğa / çevre / hayvanlar\"]",
+      "metadata": "NULL",
+      "order": "2",
+      "category": "NULL"
+    },
+    {
+      "id": "150080",
+      "stageId": "60002",
+      "text": "Aşağıdaki senaryolardan hangisi seni en çok heyecanlandırır?",
+      "type": "multiple_choice",
+      "options": "[\"Bir hastalığı tedavi eden yeni bir ilaç keşfetmek\", \"Milyonlarca insanın kullandığı bir uygulama geliştirmek\", \"Bir davayı kazanarak adaleti sağlamak\", \"Öğrencilerinin hayatını değiştiren bir öğretmen olmak\", \"Olimpiyatlarda ülkeni temsil etmek\", \"Dünyaca ünlü bir sanatçı / müzisyen olmak\", \"Kendi şirketini kurarak iş insanı olmak\", \"İnsanların psikolojik sorunlarını çözmelerine yardımcı olmak\"]",
+      "metadata": "NULL",
+      "order": "3",
+      "category": "NULL"
+    },
+    {
+      "id": "150081",
+      "stageId": "60002",
+      "text": "Okul projeleri veya ödevlerde hangi tür çalışmalar seni daha çok zorluyor?",
+      "type": "multiple_choice",
+      "options": "[\"Ezber gerektiren konular\", \"Matematik / formül / hesaplama\", \"Uzun yazı / kompozisyon yazmak\", \"Sunum / sınıf önünde konuşmak\", \"Grup çalışması / takım koordinasyonu\", \"Yaratıcı / açık uçlu projeler\", \"Hiçbiri, her türlü çalışmayı seviyorum\"]",
+      "metadata": "NULL",
+      "order": "4",
+      "category": "NULL"
+    },
+    {
+      "id": "150082",
+      "stageId": "60002",
+      "text": "Gelecekte çalışmak istediğin insanlar kimler?",
+      "type": "multiple_choice",
+      "options": "[\"Hastalar / hasta yakınları (sağlık sektörü)\", \"Öğrenciler / çocuklar (eğitim)\", \"Müşteriler / iş ortakları (ticaret)\", \"Mühendisler / bilim insanları (teknik)\", \"Sanatçılar / yaratıcılar (sanat/medya)\", \"Sporcular / antrenörler (spor)\", \"Avukatlar / yargıçlar / politikacılar (hukuk/siyaset)\", \"Yalnız çalışmayı tercih ederim\"]",
+      "metadata": "NULL",
+      "order": "5",
+      "category": "NULL"
+    },
+    {
+      "id": "150083",
+      "stageId": "60002",
+      "text": "Seni en çok motive eden başarı türü hangisidir?",
+      "type": "multiple_choice",
+      "options": "[\"Sınavda yüksek not almak\", \"Bir spor müsabakasını kazanmak\", \"Bir sanat eserini tamamlamak\", \"Zor bir problemi çözmek\", \"Birinin sorununu çözüp teşekkür almak\", \"Bir projeyi ekiple başarıyla bitirmek\", \"Yeni bir beceri öğrenmek\"]",
+      "metadata": "NULL",
+      "order": "6",
+      "category": "NULL"
+    },
+    {
+      "id": "150084",
+      "stageId": "60002",
+      "text": "Türkiye'de hangi mesleklerin gelecekte daha çok ihtiyaç duyulacağını düşünüyorsun?",
+      "type": "multiple_choice",
+      "options": "[\"Yazılım mühendisleri / yapay zeka uzmanları\", \"Sağlık profesyonelleri (doktor, hemşire, psikolog)\", \"Çevre / enerji mühendisleri\", \"İçerik üreticileri / dijital pazarlamacılar\", \"Öğretmenler / eğitimciler\", \"Girişimciler / iş insanları\", \"Hukuk ve finans uzmanları\"]",
+      "metadata": "NULL",
+      "order": "7",
+      "category": "NULL"
+    },
+    {
+      "id": "150085",
+      "stageId": "60002",
+      "text": "Bir gün ünlü olsaydın, hangi alanda tanınmak isterdin?",
+      "type": "multiple_choice",
+      "options": "[\"Bilim insanı / mucit\", \"Sporcu / şampiyon\", \"Sanatçı / müzisyen / oyuncu\", \"İş insanı / girişimci\", \"Politikacı / lider\", \"Yazar / gazeteci\", \"Doktor / insanlığa hizmet eden biri\", \"Ünlü olmak istemiyorum\"]",
+      "metadata": "NULL",
+      "order": "8",
+      "category": "NULL"
+    },
+    {
+      "id": "150086",
+      "stageId": "60002",
+      "text": "Yapay zekanın (AI) geleceğini nasıl değerlendiriyorsun?",
+      "type": "multiple_choice",
+      "options": "[\"Heyecan verici! Teknolojiye ilgi duyuyorum ve bu alanda çalışmak istiyorum\", \"Faydalı ama bazı meslekleri tehdit ediyor, dikkatli olmalıyız\", \"Korkutucu, insanların işini elimden alacak\", \"Pek ilgilenmiyorum, benim alanımı etkilemez\", \"Henüz yeterince bilgim yok bu konuda\"]",
+      "metadata": "NULL",
+      "order": "9",
+      "category": "NULL"
+    },
+    {
+      "id": "150087",
+      "stageId": "60002",
+      "text": "Hangi ders konuları seni gerçekten meraklandırıyor, daha fazla öğrenmek istiyorsun?",
+      "type": "multiple_choice",
+      "options": "[\"İnsan vücudu ve sağlık (biyoloji, anatomi)\", \"Uzay ve evren (astronomi, fizik)\", \"Tarih ve medeniyetler\", \"Psikoloji ve insan davranışı\", \"Matematik ve mantık\", \"Dil ve edebiyat\", \"Ekonomi ve iş dünyası\", \"Çevre ve doğa bilimleri\"]",
+      "metadata": "NULL",
+      "order": "10",
+      "category": "NULL"
+    },
+    {
+      "id": "150088",
+      "stageId": "60002",
+      "text": "Kariyer seçiminde seni en çok endişelendiren şey nedir?",
+      "type": "multiple_choice",
+      "options": "[\"Yanlış mesleği seçmek ve pişman olmak\", \"Ailem istediğim mesleği onaylamayacak\", \"Üniversite sınavında istediğim bölümü kazanamamak\", \"Seçtiğim meslekte iş bulamayacağım\", \"Maddi olarak yeterince kazanamayacağım\", \"Yeteneklerim yeterli olmayacak\", \"Şu an çok endişeli değilim\"]",
+      "metadata": "NULL",
+      "order": "11",
+      "category": "NULL"
+    },
+    {
+      "id": "150089",
+      "stageId": "60002",
+      "text": "Eğer para ve sınav sonucu önemli olmasaydı, hangi mesleği seçerdin? Neden?",
+      "type": "text",
+      "options": "NULL",
+      "metadata": "NULL",
+      "order": "12",
+      "category": "NULL"
+    },
+    {
+      "id": "150006",
+      "stageId": "60003",
+      "text": "Hayalinizdeki meslek nedir ve bu mesleği seçmenizin en önemli iki nedeni nedir? (Ailenizin beklentilerinden bağımsız, kendi görüşünüzü yazın.)",
+      "type": "text",
+      "options": "NULL",
+      "metadata": "NULL",
+      "order": "1",
+      "category": "NULL"
+    },
+    {
+      "id": "150007",
+      "stageId": "60003",
+      "text": "Hedeflediğiniz üniversite bölümü hangi puan türünü gerektiriyor?",
+      "type": "multiple_choice",
+      "options": "[\"SAY (Sayısal) – Mühendislik, Tıp, Fen\", \"SÖZ (Sözel) – Hukuk, Edebiyat, Tarih\", \"EA (Eşit Ağırlık) – İşletme, Psikoloji, Sosyal Bilimler\", \"DİL – Yabancı Dil Bölümleri\", \"Henüz karar vermedim\"]",
+      "metadata": "NULL",
+      "order": "2",
+      "category": "NULL"
+    },
+    {
+      "id": "150008",
+      "stageId": "60003",
+      "text": "Hedef bölümünüze girmek için gereken net sayısına şu an ne kadar yakınsınız?",
+      "type": "likert",
+      "options": "[\"1 - Çok uzaktayım, büyük bir açık var\", \"2\", \"3 - Orta düzeyde, çalışmaya devam ediyorum\", \"4\", \"5 - Hedef netimi yakalıyorum veya geçiyorum\"]",
+      "metadata": "NULL",
+      "order": "3",
+      "category": "NULL"
+    },
+    {
+      "id": "150009",
+      "stageId": "60003",
+      "text": "Aileniz meslek seçiminizde nasıl bir tutum sergiliyor?",
+      "type": "multiple_choice",
+      "options": "[\"Kendi seçimime tamamen saygı duyuyorlar\", \"Belirli meslekleri (doktor, mühendis vb.) tercih ediyorlar ama baskı yapmıyorlar\", \"Güçlü bir baskı var, kendi istediğim mesleği seçemiyorum\", \"Maddi kaygılarla yönlendiriyorlar (güvenceli iş, yüksek maaş)\", \"Henüz bu konuyu konuşmadık\"]",
+      "metadata": "NULL",
+      "order": "4",
+      "category": "NULL"
+    },
+    {
+      "id": "150010",
+      "stageId": "60003",
+      "text": "Hedeflediğiniz mesleğin günlük iş hayatı hakkında ne kadar bilgi sahibisiniz?",
+      "type": "multiple_choice",
+      "options": "[\"O alanda çalışan biriyle bizzat konuştum, gerçekçi bir fikrim var\", \"İnternetten araştırdım, genel bir fikrim var\", \"Sadece dizi/film/sosyal medyadan izledim\", \"Çok az bilgim var, tam olarak ne yapıldığını bilmiyorum\"]",
+      "metadata": "NULL",
+      "order": "5",
+      "category": "NULL"
+    },
+    {
+      "id": "150011",
+      "stageId": "60003",
+      "text": "Üniversite eğitiminizi finanse etmek için hangi seçenekleri düşünüyorsunuz? (Birden fazla seçebilirsiniz)",
+      "type": "multiple_choice",
+      "options": "[\"Aile desteği\", \"KYK bursu / devlet bursu\", \"Özel burs (vakıf, kurum)\", \"Yarı zamanlı çalışma\", \"Yurt dışı burs imkânları\", \"Henüz düşünmedim\"]",
+      "metadata": "{\"allowMultiple\": true}",
+      "order": "6",
+      "category": "NULL"
+    },
+    {
+      "id": "150012",
+      "stageId": "60003",
+      "text": "Hedef mesleğinizde Türkiye'deki ortalama başlangıç maaşı hakkında ne düşünüyorsunuz?",
+      "type": "multiple_choice",
+      "options": "[\"Araştırdım, gerçekçi bir beklentim var\", \"Yaklaşık bir fikrim var ama kesin rakam bilmiyorum\", \"Maaş benim için şu an öncelikli değil, işi sevmek daha önemli\", \"Hiç araştırmadım\"]",
+      "metadata": "NULL",
+      "order": "7",
+      "category": "NULL"
+    },
+    {
+      "id": "150013",
+      "stageId": "60003",
+      "text": "Yapay zeka ve teknoloji, hedef mesleğinizi nasıl etkileyecek?",
+      "type": "multiple_choice",
+      "options": "[\"Hedef mesleğim yapay zekadan güçlü biçimde etkilenecek, bunu göz önünde bulunduruyorum\", \"Kısmen etkilenecek ama insan faktörü hâlâ kritik\", \"Hedef mesleğim yapay zekadan çok az etkilenecek\", \"Bu konuyu henüz düşünmedim\"]",
+      "metadata": "NULL",
+      "order": "8",
+      "category": "NULL"
+    },
+    {
+      "id": "150014",
+      "stageId": "60003",
+      "text": "Hedef bölümünüze giremezseniz alternatif planınız nedir?",
+      "type": "multiple_choice",
+      "options": "[\"Benzer bir bölümü tercih ederim (2. tercih hazır)\", \"Bir yıl daha hazırlanıp tekrar denerim\", \"Yurt dışında okumayı düşünürüm\", \"Meslek yüksekokulu veya önlisans seçeneğini değerlendiririm\", \"Henüz alternatif planım yok\"]",
+      "metadata": "NULL",
+      "order": "9",
+      "category": "NULL"
+    },
+    {
+      "id": "150015",
+      "stageId": "60003",
+      "text": "Önümüzdeki 6 ay içinde meslek hedefinize ulaşmak için atacağınız 3 somut adımı yazın. (Örnek: \"Haftada 3 gün TYT matematik çalışacağım\", \"Bir doktorla gölge gün geçireceğim\")",
+      "type": "text",
+      "options": "NULL",
+      "metadata": "NULL",
+      "order": "10",
+      "category": "NULL"
+    },
+    {
+      "id": "150016",
+      "stageId": "60003",
+      "text": "Lise hayatınızda sizi en çok hangi ders veya etkinlik heyecanlandırdı?",
+      "type": "multiple_choice",
+      "options": "[\"Matematik / Fizik / Kimya / Biyoloji\", \"Edebiyat / Tarih / Felsefe / Sosyal Bilimler\", \"Sanat / Müzik / Tiyatro / Tasarım\", \"Teknoloji / Bilgisayar / Kodlama\", \"Spor / Liderlik / Kulüp faaliyetleri\", \"Yabancı Dil\"]",
+      "metadata": "NULL",
+      "order": "11",
+      "category": "NULL"
+    },
+    {
+      "id": "150017",
+      "stageId": "60003",
+      "text": "Bu değerlendirme sürecinde kendiniz hakkında fark ettiğiniz en önemli şey nedir? Kariyer planınızı nasıl şekillendiriyor?",
+      "type": "text",
+      "options": "NULL",
+      "metadata": "NULL",
+      "order": "12",
+      "category": "NULL"
+    },
+    {
+      "id": "150054",
+      "stageId": "60004",
+      "text": "Şu an ne yapıyorsun?",
+      "type": "multiple_choice",
+      "options": "[\"Üniversitede okuyorum (1. veya 2. sınıf)\", \"Üniversitede okuyorum (3. veya 4. sınıf)\", \"Üniversiteden yeni mezun oldum\", \"Üniversiteye hazırlanıyorum (tekrar yıl)\", \"Çalışıyorum ve üniversiteye devam ediyorum\", \"Üniversite okumuyorum, çalışıyorum\"]",
+      "metadata": "NULL",
+      "order": "1",
+      "category": "NULL"
+    },
+    {
+      "id": "150055",
+      "stageId": "60004",
+      "text": "Okuduğun bölümden ne kadar memnunsun?",
+      "type": "likert",
+      "options": "[\"1 - Hiç memnun değilim, yanlış seçim yaptım\", \"2\", \"3 - Orta düzeyde, bazı şeylerini seviyorum\", \"4\", \"5 - Çok memnunum, doğru seçim yaptım\"]",
+      "metadata": "NULL",
+      "order": "2",
+      "category": "NULL"
+    },
+    {
+      "id": "150056",
+      "stageId": "60004",
+      "text": "Kariyer hedeflerin ile okuduğun bölüm ne kadar örtüşüyor?",
+      "type": "multiple_choice",
+      "options": "[\"Tam örtüşüyor, bölümüm kariyer hedeflerime doğrudan katkı sağlıyor\", \"Kısmen örtüşüyor, bazı eksikler var\", \"Pek örtüşmüyor, farklı bir alanda kariyer yapmak istiyorum\", \"Henüz net bir kariyer hedefim yok\", \"Çift anadal / yan dal ile eksiklerimi tamamlamaya çalışıyorum\"]",
+      "metadata": "NULL",
+      "order": "3",
+      "category": "NULL"
+    },
+    {
+      "id": "150057",
+      "stageId": "60004",
+      "text": "Şimdiye kadar herhangi bir staj veya iş deneyimi yaşadın mı?",
+      "type": "multiple_choice",
+      "options": "[\"Evet, birden fazla staj yaptım\", \"Evet, bir staj yaptım\", \"Evet, yarı zamanlı çalıştım / çalışıyorum\", \"Henüz staj yapmadım ama bu dönem planlıyorum\", \"Staj fırsatı bulamadım\", \"Staj yapmak istemiyorum, akademik odaklanmak istiyorum\"]",
+      "metadata": "NULL",
+      "order": "4",
+      "category": "NULL"
+    },
+    {
+      "id": "150058",
+      "stageId": "60004",
+      "text": "Üniversitede herhangi bir kulüp, topluluk veya öğrenci organizasyonuna üye misin?",
+      "type": "multiple_choice",
+      "options": "[\"Evet, aktif üyeyim ve liderlik rolü üstlendim\", \"Evet, aktif üyeyim\", \"Evet, üyeyim ama pek aktif değilim\", \"Hayır, ama katılmayı düşünüyorum\", \"Hayır, katılmak istemiyorum\"]",
+      "metadata": "NULL",
+      "order": "5",
+      "category": "NULL"
+    },
+    {
+      "id": "150059",
+      "stageId": "60004",
+      "text": "Hangi teknik veya profesyonel becerilere sahip olduğunu düşünüyorsun? (En fazla 4 seçin)",
+      "type": "multiple_choice",
+      "options": "[\"Programlama / yazılım geliştirme\", \"Veri analizi / Excel / istatistik\", \"Yabancı dil (İngilizce B2+)\", \"Sunum ve iletişim becerileri\", \"Proje yönetimi\", \"Grafik tasarım / UI/UX\", \"Araştırma ve akademik yazarlık\", \"Satış ve müzakere\", \"Sosyal medya yönetimi\", \"Henüz güçlü bir teknik beceri geliştirmedim\"]",
+      "metadata": "{\"allowMultiple\": true}",
+      "order": "6",
+      "category": "NULL"
+    },
+    {
+      "id": "150060",
+      "stageId": "60004",
+      "text": "Mezuniyet sonrası ilk 1 yıl için planın nedir?",
+      "type": "multiple_choice",
+      "options": "[\"Büyük bir şirkette işe başlamak\", \"Startup veya KOBİ'de çalışmak\", \"Yüksek lisans yapmak (Türkiye)\", \"Yurt dışında yüksek lisans yapmak\", \"Kendi işimi kurmak\", \"Kamu sektöründe çalışmak (KPSS)\", \"Henüz karar vermedim\"]",
+      "metadata": "NULL",
+      "order": "7",
+      "category": "NULL"
+    },
+    {
+      "id": "150061",
+      "stageId": "60004",
+      "text": "Kariyer seçiminde seni en çok etkileyen faktör nedir?",
+      "type": "multiple_choice",
+      "options": "[\"Yüksek maaş ve maddi güvence\", \"İş-yaşam dengesi\", \"Toplumsal etki ve anlam\", \"Kariyer gelişim fırsatları\", \"Çalışma ortamı ve şirket kültürü\", \"Uluslararası fırsatlar\", \"Aile ve sosyal çevre beklentileri\"]",
+      "metadata": "NULL",
+      "order": "8",
+      "category": "NULL"
+    },
+    {
+      "id": "150062",
+      "stageId": "60004",
+      "text": "Akademik başarın (not ortalaması / GPA) kariyer hedeflerin için yeterli mi?",
+      "type": "likert",
+      "options": "[\"1 - Hayır, notlarım çok düşük ve endişeleniyorum\", \"2\", \"3 - Orta düzeyde, yeterli ama mükemmel değil\", \"4\", \"5 - Evet, notlarım kariyer hedeflerim için yeterince iyi\"]",
+      "metadata": "NULL",
+      "order": "9",
+      "category": "NULL"
+    },
+    {
+      "id": "150063",
+      "stageId": "60004",
+      "text": "Kariyer gelişimin için hangi adımları attın? (Birden fazla seçebilirsin)",
+      "type": "multiple_choice",
+      "options": "[\"Online sertifika aldım (Coursera, Udemy, Google vb.)\", \"LinkedIn profilimi oluşturdum / güncelliyorum\", \"Hackathon veya proje yarışmasına katıldım\", \"Kişisel proje veya portföy oluşturdum\", \"Sektör etkinliklerine / konferanslara katıldım\", \"Mentorluk aldım\", \"Henüz somut bir adım atmadım\"]",
+      "metadata": "{\"allowMultiple\": true}",
+      "order": "10",
+      "category": "NULL"
+    },
+    {
+      "id": "150064",
+      "stageId": "60004",
+      "text": "Üniversite hayatında seni en çok zorlayan şey nedir?",
+      "type": "multiple_choice",
+      "options": "[\"Akademik baskı ve sınav stresi\", \"Kariyer belirsizliği (ne yapacağımı bilmiyorum)\", \"Finansal zorluklar\", \"Sosyal uyum ve arkadaşlık ilişkileri\", \"Zaman yönetimi\", \"Aile beklentileri ile kendi isteklerim arasındaki çatışma\", \"Motivasyon eksikliği\"]",
+      "metadata": "NULL",
+      "order": "11",
+      "category": "NULL"
+    },
+    {
+      "id": "150065",
+      "stageId": "60004",
+      "text": "5 yıl sonra kendini nerede görüyorsun? Kariyer hedefini kısaca açıkla.",
+      "type": "text",
+      "options": "NULL",
+      "metadata": "NULL",
+      "order": "12",
+      "category": "NULL"
+    },
+    {
+      "id": "150090",
+      "stageId": "60005",
+      "text": "Hangi sektörde kariyer yapmak istiyorsun?",
+      "type": "multiple_choice",
+      "options": "[\"Teknoloji / Yazılım / Yapay Zeka\", \"Finans / Bankacılık / Yatırım\", \"Sağlık / Biyoteknoloji / Eczacılık\", \"Eğitim / Akademi / Araştırma\", \"Medya / İletişim / Reklamcılık\", \"Danışmanlık / Yönetim\", \"Kamu / Sivil Toplum\", \"Girişimcilik / Startup\", \"Mühendislik / Üretim / Enerji\", \"Hukuk / Adalet\"]",
+      "metadata": "NULL",
+      "order": "1",
+      "category": "NULL"
+    },
+    {
+      "id": "150091",
+      "stageId": "60005",
+      "text": "Liderlik rolü üstlenmek sana nasıl hissettiriyor?",
+      "type": "likert",
+      "options": "[\"1 - Hiç istemiyorum, sorumluluk almaktan kaçınırım\", \"2\", \"3 - Duruma göre, bazen evet bazen hayır\", \"4\", \"5 - Çok istiyorum, liderlik beni motive ediyor\"]",
+      "metadata": "NULL",
+      "order": "2",
+      "category": "NULL"
+    },
+    {
+      "id": "150092",
+      "stageId": "60005",
+      "text": "Hangi teknik becerilere sahipsin veya geliştirmek istiyorsun? (En fazla 4 seçin)",
+      "type": "multiple_choice",
+      "options": "[\"Programlama (Python, Java, JavaScript vb.)\", \"Veri analizi / istatistik / Excel\", \"Grafik tasarım / UI/UX\", \"Dijital pazarlama / SEO / sosyal medya\", \"Proje yönetimi (Agile, Scrum)\", \"Finansal modelleme / muhasebe\", \"Araştırma metodolojisi / akademik yazarlık\", \"Yabancı dil (C1+ seviyesi)\", \"Video prodüksiyon / içerik üretimi\", \"Henüz belirli bir teknik beceri geliştirmedim\"]",
+      "metadata": "{\"allowMultiple\": true}",
+      "order": "3",
+      "category": "NULL"
+    },
+    {
+      "id": "150093",
+      "stageId": "60005",
+      "text": "Belirsizlik ve değişimle başa çıkma konusunda kendini nasıl değerlendiriyorsun?",
+      "type": "likert",
+      "options": "[\"1 - Çok zorlanıyorum, belirsizlik beni strese sokuyor\", \"2\", \"3 - Orta düzeyde başa çıkabiliyorum\", \"4\", \"5 - Çok iyi başa çıkıyorum, değişim beni heyecanlandırıyor\"]",
+      "metadata": "NULL",
+      "order": "4",
+      "category": "NULL"
+    },
+    {
+      "id": "150094",
+      "stageId": "60005",
+      "text": "Kariyer gelişimin için hangi adımları atmayı planlıyorsun? (Birden fazla seçebilirsin)",
+      "type": "multiple_choice",
+      "options": "[\"Sektörel sertifika / kurs tamamlamak\", \"Staj / iş deneyimi edinmek\", \"Kişisel proje / portföy oluşturmak\", \"Profesyonel ağ (network) kurmak\", \"Yurt dışı deneyimi / değişim programı\", \"Yüksek lisans / MBA planlamak\", \"Girişim kurmak / startup fikri geliştirmek\", \"Henüz somut bir plan yapmadım\"]",
+      "metadata": "{\"allowMultiple\": true}",
+      "order": "5",
+      "category": "NULL"
+    },
+    {
+      "id": "150095",
+      "stageId": "60005",
+      "text": "Kariyer seçiminde aşağıdaki faktörleri önem sırasına göre değerlendir",
+      "type": "ranking",
+      "options": "[\"Yüksek maaş ve maddi güvence\", \"İş-yaşam dengesi\", \"Toplumsal etki ve anlam\", \"Kariyer gelişim fırsatları\", \"Çalışma ortamı ve şirket kültürü\", \"Uluslararası fırsatlar\"]",
+      "metadata": "NULL",
+      "order": "6",
+      "category": "NULL"
+    },
+    {
+      "id": "150096",
+      "stageId": "60005",
+      "text": "Üniversite hayatında karşılaştığın en zorlu deneyimi ve bu deneyimden ne öğrendiğini anlat.",
+      "type": "text",
+      "options": "NULL",
+      "metadata": "NULL",
+      "order": "7",
+      "category": "NULL"
+    },
+    {
+      "id": "150097",
+      "stageId": "60005",
+      "text": "Girişimcilik hakkındaki görüşün nedir?",
+      "type": "multiple_choice",
+      "options": "[\"Kesinlikle girişimci olmak istiyorum, kendi şirketimi kuracağım\", \"Önce deneyim kazanacağım, sonra girişimcilik düşünebilirim\", \"Belki, ama önce güvenli bir iş istiyorum\", \"Girişimcilik benim için değil, kurumsal kariyer tercih ederim\", \"Sosyal girişimcilik / sivil toplum alanında çalışmak istiyorum\"]",
+      "metadata": "NULL",
+      "order": "8",
+      "category": "NULL"
+    },
+    {
+      "id": "150098",
+      "stageId": "60005",
+      "text": "Ağ oluşturma (networking) ve profesyonel ilişkiler kurma konusunda ne kadar aktifsin?",
+      "type": "likert",
+      "options": "[\"1 - Hiç aktif değilim, bu konuda çok çekingenim\", \"2\", \"3 - Orta düzeyde, bazen katılıyorum\", \"4\", \"5 - Çok aktifim, düzenli etkinliklere katılıyorum\"]",
+      "metadata": "NULL",
+      "order": "9",
+      "category": "NULL"
+    },
+    {
+      "id": "150099",
+      "stageId": "60005",
+      "text": "Yapay zeka ve otomasyon trendleri kariyer planlamanı nasıl etkiliyor?",
+      "type": "multiple_choice",
+      "options": "[\"AI'ya dayanıklı alanlara yöneliyorum (insan ilişkileri, yaratıcılık, strateji)\", \"AI araçlarını öğrenmeye odaklanıyorum, teknolojiyle birlikte çalışacağım\", \"AI benim sektörümü çok etkilemez diye düşünüyorum\", \"Bu konuyu henüz yeterince düşünmedim\", \"AI beni endişelendiriyor ama ne yapacağımı bilmiyorum\"]",
+      "metadata": "NULL",
+      "order": "10",
+      "category": "NULL"
+    },
+    {
+      "id": "150100",
+      "stageId": "60005",
+      "text": "Hayran olduğun bir kariyer figürü veya mentor var mı? Bu kişiden ne öğrenmek istersin?",
+      "type": "text",
+      "options": "NULL",
+      "metadata": "NULL",
+      "order": "11",
+      "category": "NULL"
+    },
+    {
+      "id": "150101",
+      "stageId": "60005",
+      "text": "Yüksek lisans veya doktora yapmayı düşünüyor musun?",
+      "type": "multiple_choice",
+      "options": "[\"Evet, Türkiye'de yüksek lisans yapmak istiyorum\", \"Evet, yurt dışında yüksek lisans yapmak istiyorum\", \"Belki, henüz karar vermedim\", \"Hayır, iş hayatına odaklanmak istiyorum\", \"Hayır, girişimcilik / kendi işim daha cazip\"]",
+      "metadata": "NULL",
+      "order": "12",
+      "category": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tstageId\ttext\ttype\toptions\tmetadata\torder\tcategory\n150042\t60001\tOkulda en çok hangi dersleri seviyorsun? (En fazla 3 seçin)\tmultiple_choice\t[\"Matematik\", \"Fizik\", \"Kimya\", \"Biyoloji\", \"Tarih / Coğrafya\", \"Türkçe / Edebiyat\", \"İngilizce / Yabancı Dil\", \"Bilişim / Teknoloji\", \"Beden Eğitimi / Spor\", \"Müzik / Görsel Sanatlar\"]\t{\"allowMultiple\": true}\t1\tNULL\n150043\t60001\tBoş zamanlarında en çok ne yapmaktan keyif alırsın? (En fazla 3 seçin)\tmultiple_choice\t[\"Resim çizmek / el sanatları yapmak\", \"Müzik aleti çalmak veya şarkı söylemek\", \"Spor yapmak / antrenman\", \"Bilgisayar / kodlama / oyun geliştirme\", \"Kitap okumak / hikaye yazmak\", \"Arkadaşlarıma yardım etmek / sorunlarını dinlemek\", \"Doğada vakit geçirmek / hayvanlarla ilgilenmek\", \"Matematik / bulmaca çözmek\", \"Video / fotoğraf çekmek / içerik üretmek\", \"Sosyal medya / topluluk yönetimi\"]\t{\"allowMultiple\": true}\t2\tNULL\n150044\t60001\tSınıfta ya da grup çalışmalarında genellikle hangi rolü üstlenirsin?\tmultiple_choice\t[\"Lider: Grubu organize eder, kararları ben alırım\", \"Fikir üretici: Yaratıcı çözümler öneririm\", \"Araştırmacı: Bilgi toplar, analiz yaparım\", \"Uygulayıcı: Planlananı titizlikle hayata geçiririm\", \"Arabulucu: Grup içi uyumu sağlarım\", \"Takipçi: Grubun kararlarına uyarım\"]\tNULL\t3\tNULL\n150045\t60001\tGelecekte çalışmak istediğin ortam hangisine daha yakın?\tmultiple_choice\t[\"Ofis ortamı (masa başı, bilgisayar)\", \"Saha / dışarıda aktif çalışma\", \"Hastane / klinik / sağlık ortamı\", \"Okul / eğitim ortamı\", \"Atölye / laboratuvar / üretim alanı\", \"Sahne / stüdyo / yaratıcı ortam\", \"Uzaktan / evden çalışma\", \"Henüz bilmiyorum\"]\tNULL\t4\tNULL\n150046\t60001\tAilen senden hangi mesleği yapmanı bekliyor?\tmultiple_choice\t[\"Doktor / Mühendis / Avukat (klasik prestijli meslekler)\", \"Öğretmen / Akademisyen\", \"İş insanı / Girişimci\", \"Sanatçı / Sporcu / Yaratıcı alan\", \"Devlet memuru / Kamu görevlisi\", \"Ailemin beklentisi yok, kendi kararımı veriyorum\", \"Aile baskısı var ama farklı bir şey istiyorum\"]\tNULL\t5\tNULL\n150047\t60001\tÜniversite sınavına (YKS) ne kadar hazırlıklı hissediyorsun?\tlikert\t[\"1 - Hiç hazır değilim, nereden başlayacağımı bilmiyorum\", \"2\", \"3 - Orta düzeyde, bazı eksiklerim var\", \"4\", \"5 - Çok hazırım, düzenli çalışıyorum\"]\tNULL\t6\tNULL\n150048\t60001\tHangi üniversite bölümlerini düşünüyorsun? (Birden fazla seçebilirsin)\tmultiple_choice\t[\"Tıp / Diş Hekimliği / Eczacılık\", \"Mühendislik (Bilgisayar, Makine, Elektrik vb.)\", \"Hukuk\", \"İşletme / Ekonomi / Finans\", \"Öğretmenlik / Eğitim\", \"Psikoloji / Sosyoloji / Sosyal Bilimler\", \"Güzel Sanatlar / Tasarım / Mimarlık\", \"İletişim / Medya / Gazetecilik\", \"Spor Bilimleri\", \"Henüz karar vermedim\"]\t{\"allowMultiple\": true}\t7\tNULL\n150049\t60001\tBir meslek seçerken sana en önemli gelen faktör nedir?\tmultiple_choice\t[\"Yüksek maaş ve maddi güvence\", \"Topluma faydalı olmak\", \"Yaratıcılık ve özgürlük\", \"Prestij ve toplumsal saygınlık\", \"İş güvencesi ve istikrar\", \"Sevdiğim şeyi yapabilmek\", \"Dünyayı gezmek / uluslararası fırsatlar\"]\tNULL\t8\tNULL\n150050\t60001\tZorlu bir matematik problemi veya bulmacayla karşılaştığında ne yaparsın?\tmultiple_choice\t[\"Çözene kadar üzerinde çalışmaya devam ederim, vazgeçmem\", \"Bir süre uğraşırım, sonra yardım isterim\", \"Hemen yardım isterim, zaman kaybetmek istemem\", \"Farklı bir yol denerim, yaratıcı çözüm ararım\", \"Genellikle bu tür problemlerden kaçınırım\"]\tNULL\t9\tNULL\n150051\t60001\tOkul dışında herhangi bir kursa, kulübe veya etkinliğe katılıyor musun?\tmultiple_choice\t[\"Evet, spor kulübü / takımı\", \"Evet, müzik / sanat kursu\", \"Evet, kodlama / robotik / teknoloji kulübü\", \"Evet, dil kursu (İngilizce, Almanca vb.)\", \"Evet, münazara / tiyatro / sosyal kulüp\", \"Evet, gönüllülük / sivil toplum çalışması\", \"Hayır, okul dışında bir etkinliğe katılmıyorum\"]\tNULL\t10\tNULL\n150052\t60001\tHayatta seni en çok motive eden şey nedir?\tmultiple_choice\t[\"Başarı ve hedeflere ulaşmak\", \"Başkalarına yardım etmek ve fark yaratmak\", \"Yeni şeyler öğrenmek ve keşfetmek\", \"Tanınmak ve takdir görmek\", \"Özgür ve bağımsız olmak\", \"Güvende ve istikrarlı bir hayat sürmek\", \"Yaratıcılığımı ifade etmek\"]\tNULL\t11\tNULL\n150053\t60001\tEğer bir gün kendi işini kursaydın, ne tür bir iş kurardın? Kısaca açıkla.\ttext\tNULL\tNULL\t12\tNULL\n150078\t60002\tBir arkadaşın sana bir konuda yardım istese, hangi alanda en çok yardımcı olabilirsin?\tmultiple_choice\t[\"Matematik / fen bilimleri / problem çözme\", \"Yazı yazmak / ödev / sunum hazırlamak\", \"Duygusal destek / dinlemek / tavsiye vermek\", \"Spor / fiziksel aktivite\", \"Sanat / müzik / yaratıcı projeler\", \"Teknoloji / bilgisayar / oyun\", \"Organizasyon / plan yapma\"]\tNULL\t1\tNULL\n150079\t60002\tHangi tür filmler veya diziler izlemekten keyif alırsın?\tmultiple_choice\t[\"Bilim kurgu / teknoloji / uzay\", \"Tıp / hastane / sağlık\", \"Hukuk / polisiye / suç\", \"Tarih / belgesel / biyografi\", \"Spor / aksiyon / macera\", \"Sanat / müzik / dans\", \"Komedi / romantik\", \"Doğa / çevre / hayvanlar\"]\tNULL\t2\tNULL\n150080\t60002\tAşağıdaki senaryolardan hangisi seni en çok heyecanlandırır?\tmultiple_choice\t[\"Bir hastalığı tedavi eden yeni bir ilaç keşfetmek\", \"Milyonlarca insanın kullandığı bir uygulama geliştirmek\", \"Bir davayı kazanarak adaleti sağlamak\", \"Öğrencilerinin hayatını değiştiren bir öğretmen olmak\", \"Olimpiyatlarda ülkeni temsil etmek\", \"Dünyaca ünlü bir sanatçı / müzisyen olmak\", \"Kendi şirketini kurarak iş insanı olmak\", \"İnsanların psikolojik sorunlarını çözmelerine yardımcı olmak\"]\tNULL\t3\tNULL\n150081\t60002\tOkul projeleri veya ödevlerde hangi tür çalışmalar seni daha çok zorluyor?\tmultiple_choice\t[\"Ezber gerektiren konular\", \"Matematik / formül / hesaplama\", \"Uzun yazı / kompozisyon yazmak\", \"Sunum / sınıf önünde konuşmak\", \"Grup çalışması / takım koordinasyonu\", \"Yaratıcı / açık uçlu projeler\", \"Hiçbiri, her türlü çalışmayı seviyorum\"]\tNULL\t4\tNULL\n150082\t60002\tGelecekte çalışmak istediğin insanlar kimler?\tmultiple_choice\t[\"Hastalar / hasta yakınları (sağlık sektörü)\", \"Öğrenciler / çocuklar (eğitim)\", \"Müşteriler / iş ortakları (ticaret)\", \"Mühendisler / bilim insanları (teknik)\", \"Sanatçılar / yaratıcılar (sanat/medya)\", \"Sporcular / antrenörler (spor)\", \"Avukatlar / yargıçlar / politikacılar (hukuk/siyaset)\", \"Yalnız çalışmayı tercih ederim\"]\tNULL\t5\tNULL\n150083\t60002\tSeni en çok motive eden başarı türü hangisidir?\tmultiple_choice\t[\"Sınavda yüksek not almak\", \"Bir spor müsabakasını kazanmak\", \"Bir sanat eserini tamamlamak\", \"Zor bir problemi çözmek\", \"Birinin sorununu çözüp teşekkür almak\", \"Bir projeyi ekiple başarıyla bitirmek\", \"Yeni bir beceri öğrenmek\"]\tNULL\t6\tNULL\n150084\t60002\tTürkiye'de hangi mesleklerin gelecekte daha çok ihtiyaç duyulacağını düşünüyorsun?\tmultiple_choice\t[\"Yazılım mühendisleri / yapay zeka uzmanları\", \"Sağlık profesyonelleri (doktor, hemşire, psikolog)\", \"Çevre / enerji mühendisleri\", \"İçerik üreticileri / dijital pazarlamacılar\", \"Öğretmenler / eğitimciler\", \"Girişimciler / iş insanları\", \"Hukuk ve finans uzmanları\"]\tNULL\t7\tNULL\n150085\t60002\tBir gün ünlü olsaydın, hangi alanda tanınmak isterdin?\tmultiple_choice\t[\"Bilim insanı / mucit\", \"Sporcu / şampiyon\", \"Sanatçı / müzisyen / oyuncu\", \"İş insanı / girişimci\", \"Politikacı / lider\", \"Yazar / gazeteci\", \"Doktor / insanlığa hizmet eden biri\", \"Ünlü olmak istemiyorum\"]\tNULL\t8\tNULL\n150086\t60002\tYapay zekanın (AI) geleceğini nasıl değerlendiriyorsun?\tmultiple_choice\t[\"Heyecan verici! Teknolojiye ilgi duyuyorum ve bu alanda çalışmak istiyorum\", \"Faydalı ama bazı meslekleri tehdit ediyor, dikkatli olmalıyız\", \"Korkutucu, insanların işini elimden alacak\", \"Pek ilgilenmiyorum, benim alanımı etkilemez\", \"Henüz yeterince bilgim yok bu konuda\"]\tNULL\t9\tNULL\n150087\t60002\tHangi ders konuları seni gerçekten meraklandırıyor, daha fazla öğrenmek istiyorsun?\tmultiple_choice\t[\"İnsan vücudu ve sağlık (biyoloji, anatomi)\", \"Uzay ve evren (astronomi, fizik)\", \"Tarih ve medeniyetler\", \"Psikoloji ve insan davranışı\", \"Matematik ve mantık\", \"Dil ve edebiyat\", \"Ekonomi ve iş dünyası\", \"Çevre ve doğa bilimleri\"]\tNULL\t10\tNULL\n150088\t60002\tKariyer seçiminde seni en çok endişelendiren şey nedir?\tmultiple_choice\t[\"Yanlış mesleği seçmek ve pişman olmak\", \"Ailem istediğim mesleği onaylamayacak\", \"Üniversite sınavında istediğim bölümü kazanamamak\", \"Seçtiğim meslekte iş bulamayacağım\", \"Maddi olarak yeterince kazanamayacağım\", \"Yeteneklerim yeterli olmayacak\", \"Şu an çok endişeli değilim\"]\tNULL\t11\tNULL\n150089\t60002\tEğer para ve sınav sonucu önemli olmasaydı, hangi mesleği seçerdin? Neden?\ttext\tNULL\tNULL\t12\tNULL\n150006\t60003\tHayalinizdeki meslek nedir ve bu mesleği seçmenizin en önemli iki nedeni nedir? (Ailenizin beklentilerinden bağımsız, kendi görüşünüzü yazın.)\ttext\tNULL\tNULL\t1\tNULL\n150007\t60003\tHedeflediğiniz üniversite bölümü hangi puan türünü gerektiriyor?\tmultiple_choice\t[\"SAY (Sayısal) – Mühendislik, Tıp, Fen\", \"SÖZ (Sözel) – Hukuk, Edebiyat, Tarih\", \"EA (Eşit Ağırlık) – İşletme, Psikoloji, Sosyal Bilimler\", \"DİL – Yabancı Dil Bölümleri\", \"Henüz karar vermedim\"]\tNULL\t2\tNULL\n150008\t60003\tHedef bölümünüze girmek için gereken net sayısına şu an ne kadar yakınsınız?\tlikert\t[\"1 - Çok uzaktayım, büyük bir açık var\", \"2\", \"3 - Orta düzeyde, çalışmaya devam ediyorum\", \"4\", \"5 - Hedef netimi yakalıyorum veya geçiyorum\"]\tNULL\t3\tNULL\n150009\t60003\tAileniz meslek seçiminizde nasıl bir tutum sergiliyor?\tmultiple_choice\t[\"Kendi seçimime tamamen saygı duyuyorlar\", \"Belirli meslekleri (doktor, mühendis vb.) tercih ediyorlar ama baskı yapmıyorlar\", \"Güçlü bir baskı var, kendi istediğim mesleği seçemiyorum\", \"Maddi kaygılarla yönlendiriyorlar (güvenceli iş, yüksek maaş)\", \"Henüz bu konuyu konuşmadık\"]\tNULL\t4\tNULL\n150010\t60003\tHedeflediğiniz mesleğin günlük iş hayatı hakkında ne kadar bilgi sahibisiniz?\tmultiple_choice\t[\"O alanda çalışan biriyle bizzat konuştum, gerçekçi bir fikrim var\", \"İnternetten araştırdım, genel bir fikrim var\", \"Sadece dizi/film/sosyal medyadan izledim\", \"Çok az bilgim var, tam olarak ne yapıldığını bilmiyorum\"]\tNULL\t5\tNULL\n150011\t60003\tÜniversite eğitiminizi finanse etmek için hangi seçenekleri düşünüyorsunuz? (Birden fazla seçebilirsiniz)\tmultiple_choice\t[\"Aile desteği\", \"KYK bursu / devlet bursu\", \"Özel burs (vakıf, kurum)\", \"Yarı zamanlı çalışma\", \"Yurt dışı burs imkânları\", \"Henüz düşünmedim\"]\t{\"allowMultiple\": true}\t6\tNULL\n150012\t60003\tHedef mesleğinizde Türkiye'deki ortalama başlangıç maaşı hakkında ne düşünüyorsunuz?\tmultiple_choice\t[\"Araştırdım, gerçekçi bir beklentim var\", \"Yaklaşık bir fikrim var ama kesin rakam bilmiyorum\", \"Maaş benim için şu an öncelikli değil, işi sevmek daha önemli\", \"Hiç araştırmadım\"]\tNULL\t7\tNULL\n150013\t60003\tYapay zeka ve teknoloji, hedef mesleğinizi nasıl etkileyecek?\tmultiple_choice\t[\"Hedef mesleğim yapay zekadan güçlü biçimde etkilenecek, bunu göz önünde bulunduruyorum\", \"Kısmen etkilenecek ama insan faktörü hâlâ kritik\", \"Hedef mesleğim yapay zekadan çok az etkilenecek\", \"Bu konuyu henüz düşünmedim\"]\tNULL\t8\tNULL\n150014\t60003\tHedef bölümünüze giremezseniz alternatif planınız nedir?\tmultiple_choice\t[\"Benzer bir bölümü tercih ederim (2. tercih hazır)\", \"Bir yıl daha hazırlanıp tekrar denerim\", \"Yurt dışında okumayı düşünürüm\", \"Meslek yüksekokulu veya önlisans seçeneğini değerlendiririm\", \"Henüz alternatif planım yok\"]\tNULL\t9\tNULL\n150015\t60003\tÖnümüzdeki 6 ay içinde meslek hedefinize ulaşmak için atacağınız 3 somut adımı yazın. (Örnek: \"Haftada 3 gün TYT matematik çalışacağım\", \"Bir doktorla gölge gün geçireceğim\")\ttext\tNULL\tNULL\t10\tNULL\n150016\t60003\tLise hayatınızda sizi en çok hangi ders veya etkinlik heyecanlandırdı?\tmultiple_choice\t[\"Matematik / Fizik / Kimya / Biyoloji\", \"Edebiyat / Tarih / Felsefe / Sosyal Bilimler\", \"Sanat / Müzik / Tiyatro / Tasarım\", \"Teknoloji / Bilgisayar / Kodlama\", \"Spor / Liderlik / Kulüp faaliyetleri\", \"Yabancı Dil\"]\tNULL\t11\tNULL\n150017\t60003\tBu değerlendirme sürecinde kendiniz hakkında fark ettiğiniz en önemli şey nedir? Kariyer planınızı nasıl şekillendiriyor?\ttext\tNULL\tNULL\t12\tNULL\n150054\t60004\tŞu an ne yapıyorsun?\tmultiple_choice\t[\"Üniversitede okuyorum (1. veya 2. sınıf)\", \"Üniversitede okuyorum (3. veya 4. sınıf)\", \"Üniversiteden yeni mezun oldum\", \"Üniversiteye hazırlanıyorum (tekrar yıl)\", \"Çalışıyorum ve üniversiteye devam ediyorum\", \"Üniversite okumuyorum, çalışıyorum\"]\tNULL\t1\tNULL\n150055\t60004\tOkuduğun bölümden ne kadar memnunsun?\tlikert\t[\"1 - Hiç memnun değilim, yanlış seçim yaptım\", \"2\", \"3 - Orta düzeyde, bazı şeylerini seviyorum\", \"4\", \"5 - Çok memnunum, doğru seçim yaptım\"]\tNULL\t2\tNULL\n150056\t60004\tKariyer hedeflerin ile okuduğun bölüm ne kadar örtüşüyor?\tmultiple_choice\t[\"Tam örtüşüyor, bölümüm kariyer hedeflerime doğrudan katkı sağlıyor\", \"Kısmen örtüşüyor, bazı eksikler var\", \"Pek örtüşmüyor, farklı bir alanda kariyer yapmak istiyorum\", \"Henüz net bir kariyer hedefim yok\", \"Çift anadal / yan dal ile eksiklerimi tamamlamaya çalışıyorum\"]\tNULL\t3\tNULL\n150057\t60004\tŞimdiye kadar herhangi bir staj veya iş deneyimi yaşadın mı?\tmultiple_choice\t[\"Evet, birden fazla staj yaptım\", \"Evet, bir staj yaptım\", \"Evet, yarı zamanlı çalıştım / çalışıyorum\", \"Henüz staj yapmadım ama bu dönem planlıyorum\", \"Staj fırsatı bulamadım\", \"Staj yapmak istemiyorum, akademik odaklanmak istiyorum\"]\tNULL\t4\tNULL\n150058\t60004\tÜniversitede herhangi bir kulüp, topluluk veya öğrenci organizasyonuna üye misin?\tmultiple_choice\t[\"Evet, aktif üyeyim ve liderlik rolü üstlendim\", \"Evet, aktif üyeyim\", \"Evet, üyeyim ama pek aktif değilim\", \"Hayır, ama katılmayı düşünüyorum\", \"Hayır, katılmak istemiyorum\"]\tNULL\t5\tNULL\n150059\t60004\tHangi teknik veya profesyonel becerilere sahip olduğunu düşünüyorsun? (En fazla 4 seçin)\tmultiple_choice\t[\"Programlama / yazılım geliştirme\", \"Veri analizi / Excel / istatistik\", \"Yabancı dil (İngilizce B2+)\", \"Sunum ve iletişim becerileri\", \"Proje yönetimi\", \"Grafik tasarım / UI/UX\", \"Araştırma ve akademik yazarlık\", \"Satış ve müzakere\", \"Sosyal medya yönetimi\", \"Henüz güçlü bir teknik beceri geliştirmedim\"]\t{\"allowMultiple\": true}\t6\tNULL\n150060\t60004\tMezuniyet sonrası ilk 1 yıl için planın nedir?\tmultiple_choice\t[\"Büyük bir şirkette işe başlamak\", \"Startup veya KOBİ'de çalışmak\", \"Yüksek lisans yapmak (Türkiye)\", \"Yurt dışında yüksek lisans yapmak\", \"Kendi işimi kurmak\", \"Kamu sektöründe çalışmak (KPSS)\", \"Henüz karar vermedim\"]\tNULL\t7\tNULL\n150061\t60004\tKariyer seçiminde seni en çok etkileyen faktör nedir?\tmultiple_choice\t[\"Yüksek maaş ve maddi güvence\", \"İş-yaşam dengesi\", \"Toplumsal etki ve anlam\", \"Kariyer gelişim fırsatları\", \"Çalışma ortamı ve şirket kültürü\", \"Uluslararası fırsatlar\", \"Aile ve sosyal çevre beklentileri\"]\tNULL\t8\tNULL\n150062\t60004\tAkademik başarın (not ortalaması / GPA) kariyer hedeflerin için yeterli mi?\tlikert\t[\"1 - Hayır, notlarım çok düşük ve endişeleniyorum\", \"2\", \"3 - Orta düzeyde, yeterli ama mükemmel değil\", \"4\", \"5 - Evet, notlarım kariyer hedeflerim için yeterince iyi\"]\tNULL\t9\tNULL\n150063\t60004\tKariyer gelişimin için hangi adımları attın? (Birden fazla seçebilirsin)\tmultiple_choice\t[\"Online sertifika aldım (Coursera, Udemy, Google vb.)\", \"LinkedIn profilimi oluşturdum / güncelliyorum\", \"Hackathon veya proje yarışmasına katıldım\", \"Kişisel proje veya portföy oluşturdum\", \"Sektör etkinliklerine / konferanslara katıldım\", \"Mentorluk aldım\", \"Henüz somut bir adım atmadım\"]\t{\"allowMultiple\": true}\t10\tNULL\n150064\t60004\tÜniversite hayatında seni en çok zorlayan şey nedir?\tmultiple_choice\t[\"Akademik baskı ve sınav stresi\", \"Kariyer belirsizliği (ne yapacağımı bilmiyorum)\", \"Finansal zorluklar\", \"Sosyal uyum ve arkadaşlık ilişkileri\", \"Zaman yönetimi\", \"Aile beklentileri ile kendi isteklerim arasındaki çatışma\", \"Motivasyon eksikliği\"]\tNULL\t11\tNULL\n150065\t60004\t5 yıl sonra kendini nerede görüyorsun? Kariyer hedefini kısaca açıkla.\ttext\tNULL\tNULL\t12\tNULL\n150090\t60005\tHangi sektörde kariyer yapmak istiyorsun?\tmultiple_choice\t[\"Teknoloji / Yazılım / Yapay Zeka\", \"Finans / Bankacılık / Yatırım\", \"Sağlık / Biyoteknoloji / Eczacılık\", \"Eğitim / Akademi / Araştırma\", \"Medya / İletişim / Reklamcılık\", \"Danışmanlık / Yönetim\", \"Kamu / Sivil Toplum\", \"Girişimcilik / Startup\", \"Mühendislik / Üretim / Enerji\", \"Hukuk / Adalet\"]\tNULL\t1\tNULL\n150091\t60005\tLiderlik rolü üstlenmek sana nasıl hissettiriyor?\tlikert\t[\"1 - Hiç istemiyorum, sorumluluk almaktan kaçınırım\", \"2\", \"3 - Duruma göre, bazen evet bazen hayır\", \"4\", \"5 - Çok istiyorum, liderlik beni motive ediyor\"]\tNULL\t2\tNULL\n150092\t60005\tHangi teknik becerilere sahipsin veya geliştirmek istiyorsun? (En fazla 4 seçin)\tmultiple_choice\t[\"Programlama (Python, Java, JavaScript vb.)\", \"Veri analizi / istatistik / Excel\", \"Grafik tasarım / UI/UX\", \"Dijital pazarlama / SEO / sosyal medya\", \"Proje yönetimi (Agile, Scrum)\", \"Finansal modelleme / muhasebe\", \"Araştırma metodolojisi / akademik yazarlık\", \"Yabancı dil (C1+ seviyesi)\", \"Video prodüksiyon / içerik üretimi\", \"Henüz belirli bir teknik beceri geliştirmedim\"]\t{\"allowMultiple\": true}\t3\tNULL\n150093\t60005\tBelirsizlik ve değişimle başa çıkma konusunda kendini nasıl değerlendiriyorsun?\tlikert\t[\"1 - Çok zorlanıyorum, belirsizlik beni strese sokuyor\", \"2\", \"3 - Orta düzeyde başa çıkabiliyorum\", \"4\", \"5 - Çok iyi başa çıkıyorum, değişim beni heyecanlandırıyor\"]\tNULL\t4\tNULL\n150094\t60005\tKariyer gelişimin için hangi adımları atmayı planlıyorsun? (Birden fazla seçebilirsin)\tmultiple_choice\t[\"Sektörel sertifika / kurs tamamlamak\", \"Staj / iş deneyimi edinmek\", \"Kişisel proje / portföy oluşturmak\", \"Profesyonel ağ (network) kurmak\", \"Yurt dışı deneyimi / değişim programı\", \"Yüksek lisans / MBA planlamak\", \"Girişim kurmak / startup fikri geliştirmek\", \"Henüz somut bir plan yapmadım\"]\t{\"allowMultiple\": true}\t5\tNULL\n150095\t60005\tKariyer seçiminde aşağıdaki faktörleri önem sırasına göre değerlendir\tranking\t[\"Yüksek maaş ve maddi güvence\", \"İş-yaşam dengesi\", \"Toplumsal etki ve anlam\", \"Kariyer gelişim fırsatları\", \"Çalışma ortamı ve şirket kültürü\", \"Uluslararası fırsatlar\"]\tNULL\t6\tNULL\n150096\t60005\tÜniversite hayatında karşılaştığın en zorlu deneyimi ve bu deneyimden ne öğrendiğini anlat.\ttext\tNULL\tNULL\t7\tNULL\n150097\t60005\tGirişimcilik hakkındaki görüşün nedir?\tmultiple_choice\t[\"Kesinlikle girişimci olmak istiyorum, kendi şirketimi kuracağım\", \"Önce deneyim kazanacağım, sonra girişimcilik düşünebilirim\", \"Belki, ama önce güvenli bir iş istiyorum\", \"Girişimcilik benim için değil, kurumsal kariyer tercih ederim\", \"Sosyal girişimcilik / sivil toplum alanında çalışmak istiyorum\"]\tNULL\t8\tNULL\n150098\t60005\tAğ oluşturma (networking) ve profesyonel ilişkiler kurma konusunda ne kadar aktifsin?\tlikert\t[\"1 - Hiç aktif değilim, bu konuda çok çekingenim\", \"2\", \"3 - Orta düzeyde, bazen katılıyorum\", \"4\", \"5 - Çok aktifim, düzenli etkinliklere katılıyorum\"]\tNULL\t9\tNULL\n150099\t60005\tYapay zeka ve otomasyon trendleri kariyer planlamanı nasıl etkiliyor?\tmultiple_choice\t[\"AI'ya dayanıklı alanlara yöneliyorum (insan ilişkileri, yaratıcılık, strateji)\", \"AI araçlarını öğrenmeye odaklanıyorum, teknolojiyle birlikte çalışacağım\", \"AI benim sektörümü çok etkilemez diye düşünüyorum\", \"Bu konuyu henüz yeterince düşünmedim\", \"AI beni endişelendiriyor ama ne yapacağımı bilmiyorum\"]\tNULL\t10\tNULL\n150100\t60005\tHayran olduğun bir kariyer figürü veya mentor var mı? Bu kişiden ne öğrenmek istersin?\ttext\tNULL\tNULL\t11\tNULL\n150101\t60005\tYüksek lisans veya doktora yapmayı düşünüyor musun?\tmultiple_choice\t[\"Evet, Türkiye'de yüksek lisans yapmak istiyorum\", \"Evet, yurt dışında yüksek lisans yapmak istiyorum\", \"Belki, henüz karar vermedim\", \"Hayır, iş hayatına odaklanmak istiyorum\", \"Hayır, girişimcilik / kendi işim daha cazip\"]\tNULL\t12\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 63
+}

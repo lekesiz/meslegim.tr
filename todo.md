@@ -1212,3 +1212,46 @@ Platform **minimum seviyede sağlıklı** çalışıyor. Tüm temel özellikler 
 - [x] TypeScript hatasız (0 hata)
 - [x] 169/169 test geçiyor
 - [x] Dev server stabil çalışıyor
+
+## 🎯 Yaş Grubuna Özel Soru Güncelleme + Canlı Site Testi (30 Mart 2026)
+- [x] Mevcut soru yapısını analiz et (etap 1-3, 3 yaş grubu)
+- [x] 14-17 yaş grubu için Etap 1 soruları güncelle (lise odaklı)
+- [x] 14-17 yaş grubu için Etap 2 soruları güncelle (lise odaklı)
+- [x] 14-17 yaş grubu için Etap 3 soruları güncelle (lise odaklı)
+- [x] 18-21 yaş grubu için Etap 1 soruları güncelle (üniversite odaklı)
+- [x] 18-21 yaş grubu için Etap 2 soruları güncelle (üniversite odaklı)
+- [x] 18-21 yaş grubu için Etap 3 soruları güncelle (üniversite odaklı)
+- [x] 22-24 yaş grubu için Etap 1 soruları güncelle (kariyer odaklı)
+- [x] 22-24 yaş grubu için Etap 2 soruları güncelle (kariyer odaklı)
+- [x] 22-24 yaş grubu için Etap 3 soruları güncelle (kariyer odaklı)
+- [ ] Canlı site (meslegim.tr) A-Z kapsamlı test
+- [ ] Tespit edilen sorunları düzelt
+- [ ] Final checkpoint ve yayınlama
+
+## 🔥 Kapsamlı Proje Tamamlama (30 Mart 2026 - Prompt Bazlı)
+
+### KRİTİK - Hemen Düzelt
+- [ ] Çoktan seçmeli soruların seçenek uyumsuzluğunu kontrol et ve düzelt
+- [ ] Form UX edge case'leri test et (text, multiple_choice, likert, multi_select)
+- [ ] Tüm email şablonlarında production domain (meslegim.tr) kullanıldığını doğrula
+- [ ] Türkçe karakter sorunlarını tara ve düzelt
+
+### YÜKSEK ÖNCELİK
+- [ ] Paket bazlı etap kilitleme tutarlılığını doğrula (ücretsiz=1, temel=1-3, pro=1-6, kurumsal=tümü)
+- [ ] Admin ödeme yönetimi (getAllPurchases, refundPurchase) browser'da doğrula
+- [ ] Okul yönetimi akışını uçtan uca test et
+- [ ] Promotion kodu akışını uçtan uca test et
+
+### ORTA ÖNCELİK
+- [ ] Dark mode tüm sayfalarda uyumlu (hardcoded renkler → semantic renkler)
+- [ ] Responsive tasarım 3 breakpoint'te test et (375px, 768px, 1280px)
+- [ ] Loading ve empty state'ler her sayfada mevcut
+- [ ] Error handling tutarlı ve Türkçe
+
+### TEST
+- [ ] Admin (admin@test.com) ile uçtan uca test
+- [ ] Mentor (mentor@test.com) ile uçtan uca test
+- [ ] Student (student@test.com) ile uçtan uca test
+- [ ] Dark mode tüm sayfalarda kontrol
+- [ ] Mobil responsive kontrol
+- [ ] Stripe test ödemesi (4242 4242 4242 4242)

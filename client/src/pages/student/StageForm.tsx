@@ -301,18 +301,18 @@ export default function StageForm() {
           '5': 'Kesinlikle\nKatılıyorum',
         };
         const likertColors: Record<string, string> = {
-          '1': 'border-red-300 bg-red-50 text-red-700',
-          '2': 'border-orange-300 bg-orange-50 text-orange-700',
-          '3': 'border-gray-300 bg-muted/50 text-foreground/80',
-          '4': 'border-green-300 bg-green-50 text-green-700',
-          '5': 'border-emerald-300 bg-emerald-50 text-emerald-700',
+          '1': 'border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400',
+          '2': 'border-orange-300 dark:border-orange-700 bg-orange-50 dark:bg-orange-950/30 text-orange-700 dark:text-orange-400',
+          '3': 'border-gray-300 dark:border-gray-600 bg-muted/50 text-foreground/80',
+          '4': 'border-green-300 dark:border-green-700 bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-400',
+          '5': 'border-emerald-300 dark:border-emerald-700 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400',
         };
         const selectedLikertColors: Record<string, string> = {
-          '1': 'border-red-500 bg-red-100 ring-2 ring-red-500 text-red-800',
-          '2': 'border-orange-500 bg-orange-100 ring-2 ring-orange-500 text-orange-800',
+          '1': 'border-red-500 bg-red-100 dark:bg-red-900/40 ring-2 ring-red-500 text-red-800 dark:text-red-300',
+          '2': 'border-orange-500 bg-orange-100 dark:bg-orange-900/40 ring-2 ring-orange-500 text-orange-800 dark:text-orange-300',
           '3': 'border-gray-500 bg-muted ring-2 ring-gray-500 text-foreground',
-          '4': 'border-green-500 bg-green-100 ring-2 ring-green-500 text-green-800',
-          '5': 'border-emerald-500 bg-emerald-100 ring-2 ring-emerald-500 text-emerald-800',
+          '4': 'border-green-500 bg-green-100 dark:bg-green-900/40 ring-2 ring-green-500 text-green-800 dark:text-green-300',
+          '5': 'border-emerald-500 bg-emerald-100 dark:bg-emerald-900/40 ring-2 ring-emerald-500 text-emerald-800 dark:text-emerald-300',
         };
 
         // Use custom labels from metadata if available
