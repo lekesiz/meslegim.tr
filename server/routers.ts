@@ -6,7 +6,6 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import * as db from "./db";
 import { generateStageReportAsync } from './reportHelper';
-import Stripe from 'stripe';
 import { PRODUCTS, PACKAGE_ACCESS, type ProductId, formatPrice, getPackages } from './products';
 import { checkAndAwardBadges, getUserBadgesWithStatus, getUserTotalXP, getLeaderboard, markBadgesNotified, getUnnotifiedBadges } from './services/badgeEngine';
 import { generatePDF } from './services/pdfGenerator';
@@ -113,7 +112,7 @@ export const appRouter = router({
       .input(z.object({
         email: z.string().email(),
       }))
-      .mutation(async ({ input }) => {
+      .mutation(async ({ input, ctx }) => {
         const user = await db.getUserByEmail(input.email);
         if (!user) {
           // Don't reveal if email exists or not (security best practice)
@@ -127,7 +126,7 @@ export const appRouter = router({
         });
         
         // Send password reset email
-        const resetUrl = `${getBaseUrl()}/reset-password/${resetToken}`;
+        const resetUrl = `${getBaseUrl(ctx.req)}/reset-password/${resetToken}`;
         await sendEmail({
           to: user.email || '',
           subject: 'Meslegim.tr - Şifre Sıfırlama',
@@ -290,7 +289,7 @@ export const appRouter = router({
         const token = `ev_${Date.now()}_${Math.random().toString(36).substr(2, 16)}`;
         await db.setEmailVerificationToken(ctx.user.id, token);
         
-        const verifyUrl = `${getBaseUrl()}/verify-email/${token}`;
+        const verifyUrl = `${getBaseUrl(ctx.req)}/verify-email/${token}`;
         await sendEmail({
           to: user.email,
           subject: 'Meslegim.tr - E-posta Doğrulama',
@@ -919,6 +918,128 @@ export const appRouter = router({
         });
         return { success: true };
       }),
+
+    // === Ödeme Yönetimi ===
+    getAllPurchases: adminProcedure.query(async () => {
+      const dbInstance = await (await import('./db')).getDb();
+      if (!dbInstance) return [];
+      const { purchases } = await import('../drizzle/schema');
+      const { users } = await import('../drizzle/schema');
+      const { sql } = await import('drizzle-orm');
+      
+      const allPurchases = await dbInstance
+        .select({
+          id: purchases.id,
+          userId: purchases.userId,
+          productId: purchases.productId,
+          stripeSessionId: purchases.stripeSessionId,
+          stripePaymentIntentId: purchases.stripePaymentIntentId,
+          status: purchases.status,
+          amountInCents: purchases.amountInCents,
+          currency: purchases.currency,
+          metadata: purchases.metadata,
+          createdAt: purchases.createdAt,
+          completedAt: purchases.completedAt,
+          userName: users.name,
+          userEmail: users.email,
+        })
+        .from(purchases)
+        .leftJoin(users, sql`${purchases.userId} = ${users.id}`)
+        .orderBy(sql`${purchases.createdAt} DESC`);
+      
+      return allPurchases;
+    }),
+
+    refundPurchase: adminProcedure
+      .input(z.object({
+        purchaseId: z.number(),
+        reason: z.string().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const dbInstance = await (await import('./db')).getDb();
+        if (!dbInstance) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Veritabanı bağlantısı yok' });
+        const { purchases } = await import('../drizzle/schema');
+        const { users } = await import('../drizzle/schema');
+        const { eq, sql } = await import('drizzle-orm');
+        
+        // Get purchase
+        const [purchase] = await dbInstance.select().from(purchases).where(eq(purchases.id, input.purchaseId)).limit(1);
+        if (!purchase) {
+          throw new TRPCError({ code: 'NOT_FOUND', message: 'Satın alma kaydı bulunamadı' });
+        }
+        if (purchase.status === 'refunded') {
+          throw new TRPCError({ code: 'BAD_REQUEST', message: 'Bu ödeme zaten iade edilmiş' });
+        }
+        if (purchase.status !== 'completed') {
+          throw new TRPCError({ code: 'BAD_REQUEST', message: 'Sadece tamamlanmış ödemeler iade edilebilir' });
+        }
+        
+        // Stripe iade işlemi
+        if (purchase.stripePaymentIntentId) {
+          try {
+            const { getStripe } = await import('./stripeWebhook');
+            const stripe = getStripe();
+            await stripe.refunds.create({
+              payment_intent: purchase.stripePaymentIntentId,
+              reason: 'requested_by_customer',
+            });
+          } catch (stripeErr: any) {
+            console.error('[Admin Refund] Stripe refund failed:', stripeErr);
+            throw new TRPCError({ 
+              code: 'INTERNAL_SERVER_ERROR', 
+              message: `Stripe iade başarısız: ${stripeErr.message}` 
+            });
+          }
+        }
+        
+        // DB'de status'u refunded yap
+        await dbInstance.update(purchases)
+          .set({ status: 'refunded' })
+          .where(eq(purchases.id, input.purchaseId));
+        
+        // Kullanıcının paketini düşür (eğer paket satın almasıysa)
+        const packageProducts = ['basic_package', 'professional_package', 'enterprise_package'];
+        if (packageProducts.includes(purchase.productId)) {
+          // Kullanıcının başka aktif paketi var mı kontrol et
+          const otherPurchases = await dbInstance.select().from(purchases)
+            .where(sql`${purchases.userId} = ${purchase.userId} AND ${purchases.status} = 'completed' AND ${purchases.id} != ${input.purchaseId} AND ${purchases.productId} IN ('basic_package', 'professional_package', 'enterprise_package')`);
+          
+          if (otherPurchases.length === 0) {
+            // Başka paketi yok, free'ye düşür
+            await dbInstance.update(users)
+              .set({ purchasedPackage: 'free' })
+              .where(eq(users.id, purchase.userId));
+          }
+        }
+        
+        // Audit log
+        console.log(`[Admin Refund] Purchase #${input.purchaseId} refunded by admin ${ctx.user.id}. Reason: ${input.reason || 'N/A'}`);
+        
+        return { success: true, message: 'İade başarıyla gerçekleştirildi' };
+      }),
+
+    getPurchaseStats: adminProcedure.query(async () => {
+      const dbInstance = await (await import('./db')).getDb();
+      if (!dbInstance) return { totalRevenue: 0, totalPurchases: 0, completedPurchases: 0, refundedPurchases: 0, pendingPurchases: 0 };
+      const { purchases } = await import('../drizzle/schema');
+      const { sql } = await import('drizzle-orm');
+      
+      const [stats] = await dbInstance.select({
+        totalPurchases: sql<number>`COUNT(*)`,
+        completedPurchases: sql<number>`SUM(CASE WHEN ${purchases.status} = 'completed' THEN 1 ELSE 0 END)`,
+        refundedPurchases: sql<number>`SUM(CASE WHEN ${purchases.status} = 'refunded' THEN 1 ELSE 0 END)`,
+        pendingPurchases: sql<number>`SUM(CASE WHEN ${purchases.status} = 'pending' THEN 1 ELSE 0 END)`,
+        totalRevenue: sql<number>`SUM(CASE WHEN ${purchases.status} = 'completed' THEN ${purchases.amountInCents} ELSE 0 END)`,
+      }).from(purchases);
+      
+      return {
+        totalPurchases: Number(stats?.totalPurchases || 0),
+        completedPurchases: Number(stats?.completedPurchases || 0),
+        refundedPurchases: Number(stats?.refundedPurchases || 0),
+        pendingPurchases: Number(stats?.pendingPurchases || 0),
+        totalRevenue: Number(stats?.totalRevenue || 0),
+      };
+    }),
   }),
 
   // Mentor procedures
@@ -1423,9 +1544,6 @@ export const appRouter = router({
       const questions = await db.getQuestionsByStage(userStage.stageId);
       const answers = await db.getAnswersByUserAndStage(ctx.user.id, userStage.stageId);
       
-      // Debug log
-      console.log(`[getActiveStage] userId=${ctx.user.id}, stageId=${userStage.stageId}, questions=${questions.length}, answers=${answers.length}`);
-      console.log(`[getActiveStage] Answer IDs:`, answers.map((a: any) => ({ qId: a.questionId, answer: a.answer?.substring(0, 20) })));
       
       return {
         ...userStage,
@@ -1661,7 +1779,7 @@ export const appRouter = router({
       // Send certificate ready email
       if (ctx.user.email && ctx.user.name) {
         try {
-          const certificateUrl = `${getBaseUrl()}/dashboard`;
+          const certificateUrl = `${getBaseUrl(ctx.req)}/dashboard`;
           const { getCertificateReadyEmailTemplate } = await import('./_core/resend-email');
           await sendEmail({
             to: ctx.user.email,
@@ -1942,12 +2060,11 @@ export const appRouter = router({
         metadata: z.record(z.string(), z.string()).optional(), // ek bilgi (ör. stageId)
       }))
       .mutation(async ({ input, ctx }) => {
-        const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
-        if (!stripeSecretKey) {
+        const { getStripe } = await import('./stripeWebhook');
+        const stripe = getStripe();
+        if (!process.env.STRIPE_SECRET_KEY) {
           throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Ödeme sistemi yapılandırılmamış' });
         }
-
-        const stripe = new Stripe(stripeSecretKey, { apiVersion: '2025-03-31.basil' as any });
         const product = PRODUCTS[input.productId as ProductId];
         if (!product) {
           throw new TRPCError({ code: 'BAD_REQUEST', message: 'Geçersiz ürün' });
@@ -1971,6 +2088,7 @@ export const appRouter = router({
             quantity: 1,
           }],
           mode: 'payment',
+          allow_promotion_codes: true,
           success_url: `${baseUrl}/dashboard/student?payment=success&product=${input.productId}`,
           cancel_url: `${baseUrl}/fiyatlandirma?payment=cancelled`,
           metadata: {

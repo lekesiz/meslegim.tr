@@ -1,0 +1,35 @@
+{
+  "query": "SELECT id, LEFT(text, 60) as text_preview, CAST(metadata AS CHAR) as meta FROM questions WHERE metadata IS NOT NULL LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute SELECT id, LEFT(text, 60) as text_preview, CAST(metadata AS CHAR) as meta FROM questions WHERE metadata IS NOT NULL LIMIT 5;",
+  "rows": [
+    {
+      "id": "180001",
+      "text_preview": "İleride iyi para kazanmak benim için çok önemli.",
+      "meta": "{\"dimension\": \"ekonomik_guvence\", \"labels\": {\"1\": \"Kesinlikle Katılmıyorum\", \"2\": \"Katılmıyorum\", \"3\": \"Kararsızım\", \"4\": \"Katılıyorum\", \"5\": \"Kesinlikle Katılıyorum\"}, \"scale\": \"1-5\"}"
+    },
+    {
+      "id": "180002",
+      "text_preview": "Meslek seçerken maaşın yüksek olması en önemli kriterlerden ",
+      "meta": "{\"dimension\": \"ekonomik_guvence\", \"labels\": {\"1\": \"Kesinlikle Katılmıyorum\", \"2\": \"Katılmıyorum\", \"3\": \"Kararsızım\", \"4\": \"Katılıyorum\", \"5\": \"Kesinlikle Katılıyorum\"}, \"scale\": \"1-5\"}"
+    },
+    {
+      "id": "180003",
+      "text_preview": "Ailemi maddi olarak destekleyebilecek bir iş istiyorum.",
+      "meta": "{\"dimension\": \"ekonomik_guvence\", \"labels\": {\"1\": \"Kesinlikle Katılmıyorum\", \"2\": \"Katılmıyorum\", \"3\": \"Kararsızım\", \"4\": \"Katılıyorum\", \"5\": \"Kesinlikle Katılıyorum\"}, \"scale\": \"1-5\"}"
+    },
+    {
+      "id": "180004",
+      "text_preview": "Hobilerimi ve arkadaşlarımla vakit geçirmeyi işimden daha ço",
+      "meta": "{\"dimension\": \"is_yasam_dengesi\", \"labels\": {\"1\": \"Kesinlikle Katılmıyorum\", \"2\": \"Katılmıyorum\", \"3\": \"Kararsızım\", \"4\": \"Katılıyorum\", \"5\": \"Kesinlikle Katılıyorum\"}, \"scale\": \"1-5\"}"
+    },
+    {
+      "id": "180005",
+      "text_preview": "Çok çalışmak yerine dengeli bir yaşam sürmek istiyorum.",
+      "meta": "{\"dimension\": \"is_yasam_dengesi\", \"labels\": {\"1\": \"Kesinlikle Katılmıyorum\", \"2\": \"Katılmıyorum\", \"3\": \"Kararsızım\", \"4\": \"Katılıyorum\", \"5\": \"Kesinlikle Katılıyorum\"}, \"scale\": \"1-5\"}"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttext_preview\tmeta\n180001\tİleride iyi para kazanmak benim için çok önemli.\t{\"dimension\": \"ekonomik_guvence\", \"labels\": {\"1\": \"Kesinlikle Katılmıyorum\", \"2\": \"Katılmıyorum\", \"3\": \"Kararsızım\", \"4\": \"Katılıyorum\", \"5\": \"Kesinlikle Katılıyorum\"}, \"scale\": \"1-5\"}\n180002\tMeslek seçerken maaşın yüksek olması en önemli kriterlerden \t{\"dimension\": \"ekonomik_guvence\", \"labels\": {\"1\": \"Kesinlikle Katılmıyorum\", \"2\": \"Katılmıyorum\", \"3\": \"Kararsızım\", \"4\": \"Katılıyorum\", \"5\": \"Kesinlikle Katılıyorum\"}, \"scale\": \"1-5\"}\n180003\tAilemi maddi olarak destekleyebilecek bir iş istiyorum.\t{\"dimension\": \"ekonomik_guvence\", \"labels\": {\"1\": \"Kesinlikle Katılmıyorum\", \"2\": \"Katılmıyorum\", \"3\": \"Kararsızım\", \"4\": \"Katılıyorum\", \"5\": \"Kesinlikle Katılıyorum\"}, \"scale\": \"1-5\"}\n180004\tHobilerimi ve arkadaşlarımla vakit geçirmeyi işimden daha ço\t{\"dimension\": \"is_yasam_dengesi\", \"labels\": {\"1\": \"Kesinlikle Katılmıyorum\", \"2\": \"Katılmıyorum\", \"3\": \"Kararsızım\", \"4\": \"Katılıyorum\", \"5\": \"Kesinlikle Katılıyorum\"}, \"scale\": \"1-5\"}\n180005\tÇok çalışmak yerine dengeli bir yaşam sürmek istiyorum.\t{\"dimension\": \"is_yasam_dengesi\", \"labels\": {\"1\": \"Kesinlikle Katılmıyorum\", \"2\": \"Katılmıyorum\", \"3\": \"Kararsızım\", \"4\": \"Katılıyorum\", \"5\": \"Kesinlikle Katılıyorum\"}, \"scale\": \"1-5\"}\n",
+  "stderr": "",
+  "execution_time_ms": 65
+}

@@ -1,0 +1,14 @@
+{
+  "query": "SELECT id, text FROM questions WHERE text LIKE '%н%' OR text LIKE '%д%' OR text LIKE '%и%' OR text REGEXP '[а-яА-Я]' LIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute SELECT id, text FROM questions WHERE text LIKE '%н%' OR text LIKE '%д%' OR text LIKE '%и%' OR text REGEXP '[а-яА-Я]' LIMIT 20;",
+  "rows": [
+    {
+      "id": "150069",
+      "text": "İş hayatında şimdiye kadar hangi deneyimleri edindин? (Birden fazla seçin)"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttext\n150069\tİş hayatında şimdiye kadar hangi deneyimleri edindин? (Birden fazla seçin)\n",
+  "stderr": "",
+  "execution_time_ms": 58
+}

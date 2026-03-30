@@ -1,0 +1,40 @@
+{
+  "query": "SELECT DISTINCT CAST(options AS CHAR) as opts FROM questions WHERE type = 'likert' LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute SELECT DISTINCT CAST(options AS CHAR) as opts FROM questions WHERE type = 'likert' LIMIT 10;",
+  "rows": [
+    {
+      "opts": "[\"Kesinlikle evet\", \"Evet\", \"Kararsızım\", \"Hayır\", \"Kesinlikle hayır\"]"
+    },
+    {
+      "opts": "[\"Çok iyi\", \"İyi\", \"Orta\", \"Geliştirilmeli\", \"Yok\"]"
+    },
+    {
+      "opts": "[\"1 - Hiç hazırlamadım\", \"2\", \"3 - Temel düzeyde var, ama güçlendirmem gerekiyor\", \"4\", \"5 - Profesyonel düzeyde hazır, düzenli güncelliyorum\"]"
+    },
+    {
+      "opts": "[\"1 - Hiç sağlayamıyorum, iş hayatım her şeyi etkiliyor\", \"2\", \"3 - Orta düzeyde, zaman zaman zorlanıyorum\", \"4\", \"5 - İyi bir denge kurabiliyorum\"]"
+    },
+    {
+      "opts": "[\"1 - Kesinlikle hayır, sektör değiştirmek istiyorum\", \"2\", \"3 - Kararsızım, avantaj ve dezavantajları değerlendiriyorum\", \"4\", \"5 - Evet, bu sektörde uzmanlaşmak istiyorum\"]"
+    },
+    {
+      "opts": "[\"1 - Hiç memnun değilim, acil değişiklik gerekiyor\", \"2\", \"3 - Orta düzeyde, iyileştirme istiyorum\", \"4\", \"5 - Memnunum, piyasa koşullarına uygun\"]"
+    },
+    {
+      "opts": "[\"Çok net\", \"Oldukça net\", \"Kararsızım\", \"Belirsiz\", \"Hiç fikrim yok\"]"
+    },
+    {
+      "opts": "[\"Çok yüksek\", \"Yüksek\", \"Orta\", \"Düşük\", \"Çok düşük\"]"
+    },
+    {
+      "opts": "[\"1 - Hiç çalışmadım\", \"2\", \"3 - Başlangıç düzeyinde\", \"4\", \"5 - Aktif ve güçlü bir kişisel markam var\"]"
+    },
+    {
+      "opts": "[\"1 - Hayır, notlarım çok düşük ve endişeleniyorum\", \"2\", \"3 - Orta düzeyde, yeterli ama mükemmel değil\", \"4\", \"5 - Evet, notlarım kariyer hedeflerim için yeterince iyi\"]"
+    }
+  ],
+  "messages": [],
+  "stdout": "opts\n[\"Kesinlikle evet\", \"Evet\", \"Kararsızım\", \"Hayır\", \"Kesinlikle hayır\"]\n[\"Çok iyi\", \"İyi\", \"Orta\", \"Geliştirilmeli\", \"Yok\"]\n[\"1 - Hiç hazırlamadım\", \"2\", \"3 - Temel düzeyde var, ama güçlendirmem gerekiyor\", \"4\", \"5 - Profesyonel düzeyde hazır, düzenli güncelliyorum\"]\n[\"1 - Hiç sağlayamıyorum, iş hayatım her şeyi etkiliyor\", \"2\", \"3 - Orta düzeyde, zaman zaman zorlanıyorum\", \"4\", \"5 - İyi bir denge kurabiliyorum\"]\n[\"1 - Kesinlikle hayır, sektör değiştirmek istiyorum\", \"2\", \"3 - Kararsızım, avantaj ve dezavantajları değerlendiriyorum\", \"4\", \"5 - Evet, bu sektörde uzmanlaşmak istiyorum\"]\n[\"1 - Hiç memnun değilim, acil değişiklik gerekiyor\", \"2\", \"3 - Orta düzeyde, iyileştirme istiyorum\", \"4\", \"5 - Memnunum, piyasa koşullarına uygun\"]\n[\"Çok net\", \"Oldukça net\", \"Kararsızım\", \"Belirsiz\", \"Hiç fikrim yok\"]\n[\"Çok yüksek\", \"Yüksek\", \"Orta\", \"Düşük\", \"Çok düşük\"]\n[\"1 - Hiç çalışmadım\", \"2\", \"3 - Başlangıç düzeyinde\", \"4\", \"5 - Aktif ve güçlü bir kişisel markam var\"]\n[\"1 - Hayır, notlarım çok düşük ve endişeleniyorum\", \"2\", \"3 - Orta düzeyde, yeterli ama mükemmel değil\", \"4\", \"5 - Evet, notlarım kariyer hedeflerim için yeterince iyi\"]\n",
+  "stderr": "",
+  "execution_time_ms": 61
+}

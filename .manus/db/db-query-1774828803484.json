@@ -1,0 +1,115 @@
+{
+  "query": "SELECT stageId, COUNT(*) as q_count, GROUP_CONCAT(DISTINCT type) as types FROM questions GROUP BY stageId ORDER BY stageId;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute SELECT stageId, COUNT(*) as q_count, GROUP_CONCAT(DISTINCT type) as types FROM questions GROUP BY stageId ORDER BY stageId;",
+  "rows": [
+    {
+      "stageId": "4",
+      "q_count": "20",
+      "types": "multiple_choice,likert,ranking,text"
+    },
+    {
+      "stageId": "5",
+      "q_count": "20",
+      "types": "multiple_choice,likert,text"
+    },
+    {
+      "stageId": "6",
+      "q_count": "20",
+      "types": "text,multiple_choice,ranking,likert"
+    },
+    {
+      "stageId": "7",
+      "q_count": "20",
+      "types": "multiple_choice,likert,text"
+    },
+    {
+      "stageId": "8",
+      "q_count": "20",
+      "types": "multiple_choice,likert,text,ranking"
+    },
+    {
+      "stageId": "9",
+      "q_count": "20",
+      "types": "text,likert,multiple_choice"
+    },
+    {
+      "stageId": "60001",
+      "q_count": "12",
+      "types": "multiple_choice,likert,text"
+    },
+    {
+      "stageId": "60002",
+      "q_count": "12",
+      "types": "multiple_choice,text"
+    },
+    {
+      "stageId": "60003",
+      "q_count": "12",
+      "types": "text,multiple_choice,likert"
+    },
+    {
+      "stageId": "60004",
+      "q_count": "12",
+      "types": "multiple_choice,likert,text"
+    },
+    {
+      "stageId": "60005",
+      "q_count": "12",
+      "types": "multiple_choice,likert,ranking,text"
+    },
+    {
+      "stageId": "60006",
+      "q_count": "12",
+      "types": "text,multiple_choice,likert"
+    },
+    {
+      "stageId": "60007",
+      "q_count": "12",
+      "types": "multiple_choice,likert,text"
+    },
+    {
+      "stageId": "60008",
+      "q_count": "12",
+      "types": "multiple_choice,likert,text,ranking"
+    },
+    {
+      "stageId": "60009",
+      "q_count": "12",
+      "types": "text,multiple_choice,likert"
+    },
+    {
+      "stageId": "90001",
+      "q_count": "30",
+      "types": "likert"
+    },
+    {
+      "stageId": "90002",
+      "q_count": "30",
+      "types": "likert"
+    },
+    {
+      "stageId": "90003",
+      "q_count": "30",
+      "types": "likert"
+    },
+    {
+      "stageId": "90004",
+      "q_count": "10",
+      "types": "multiple_choice"
+    },
+    {
+      "stageId": "90005",
+      "q_count": "10",
+      "types": "multiple_choice"
+    },
+    {
+      "stageId": "90006",
+      "q_count": "10",
+      "types": "multiple_choice"
+    }
+  ],
+  "messages": [],
+  "stdout": "stageId\tq_count\ttypes\n4\t20\tmultiple_choice,likert,ranking,text\n5\t20\tmultiple_choice,likert,text\n6\t20\ttext,multiple_choice,ranking,likert\n7\t20\tmultiple_choice,likert,text\n8\t20\tmultiple_choice,likert,text,ranking\n9\t20\ttext,likert,multiple_choice\n60001\t12\tmultiple_choice,likert,text\n60002\t12\tmultiple_choice,text\n60003\t12\ttext,multiple_choice,likert\n60004\t12\tmultiple_choice,likert,text\n60005\t12\tmultiple_choice,likert,ranking,text\n60006\t12\ttext,multiple_choice,likert\n60007\t12\tmultiple_choice,likert,text\n60008\t12\tmultiple_choice,likert,text,ranking\n60009\t12\ttext,multiple_choice,likert\n90001\t30\tlikert\n90002\t30\tlikert\n90003\t30\tlikert\n90004\t10\tmultiple_choice\n90005\t10\tmultiple_choice\n90006\t10\tmultiple_choice\n",
+  "stderr": "",
+  "execution_time_ms": 57
+}

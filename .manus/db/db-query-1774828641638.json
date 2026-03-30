@@ -1,0 +1,9 @@
+{
+  "query": "UPDATE questions SET metadata = JSON_SET(COALESCE(metadata, '{}'), '$.allowMultiple', true) WHERE type = 'multiple_choice' AND (text LIKE '%birden%' OR text LIKE '%en fazla%' OR text LIKE '%seçebilirsin%' OR text LIKE '%seçiniz%' OR text LIKE '%Hangi alanlarda%' OR text LIKE '%Hangi sektörlerde%' OR text LIKE '%Hangi teknik%' OR text LIKE '%Hangi becerilerde%' OR text LIKE '%Hangi mesleki%' OR text LIKE '%Hangi platformları%' OR text LIKE '%Hangi üniversite%' OR text LIKE '%Hangi profesyonel%');",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute UPDATE questions SET metadata = JSON_SET(COALESCE(metadata, '{}'), '$.allowMultiple', true) WHERE type = 'multiple_choice' AND (text LIKE '%birden%' OR text LIKE '%en fazla%' OR text LIKE '%seçebilirsin%' OR text LIKE '%seçiniz%' OR text LIKE '%Hangi alanlarda%' OR text LIKE '%Hangi sektörlerde%' OR text LIKE '%Hangi teknik%' OR text LIKE '%Hangi becerilerde%' OR text LIKE '%Hangi mesleki%' OR text LIKE '%Hangi platformları%' OR text LIKE '%Hangi üniversite%' OR text LIKE '%Hangi profesyonel%');",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 67
+}

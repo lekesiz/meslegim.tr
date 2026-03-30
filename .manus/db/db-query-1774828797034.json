@@ -1,0 +1,9 @@
+{
+  "query": "SELECT q.id, q.stageId, LEFT(q.text, 60) as t, CAST(q.options AS CHAR) as opts FROM questions q WHERE q.type = 'multiple_choice' AND q.stageId = 1 ORDER BY q.`order` LIMIT 15;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute SELECT q.id, q.stageId, LEFT(q.text, 60) as t, CAST(q.options AS CHAR) as opts FROM questions q WHERE q.type = 'multiple_choice' AND q.stageId = 1 ORDER BY q.`order` LIMIT 15;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 52
+}

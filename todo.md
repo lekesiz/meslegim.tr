@@ -1072,7 +1072,7 @@ Platform **minimum seviyede sağlıklı** çalışıyor. Tüm temel özellikler 
 - [x] DashboardLayout sidebar'a Başarılarım linki ekle
 - [x] Rozet kazanım bildirimi (unnotified badges + toast)
 - [x] Vitest testleri yaz (18 yeni test, toplam 132/132 geçiyor)
-- [ ] Checkpoint kaydet ve GitHub'a push yap
+- [x] Checkpoint kaydet ve GitHub'a push yap (b7ca7ddd)
 
 
 ## 🔧 SEO Düzeltmesi (29 Mart 2026)
@@ -1123,8 +1123,26 @@ Platform **minimum seviyede sağlıklı** çalışıyor. Tüm temel özellikler 
 - [x] Ödeme geçmişi sayfası (PaymentHistory.tsx)
 - [x] Dashboard'a premium badge ve erişim kontrolü
 - [x] Vitest testleri yaz (18 yeni test, toplam 132/132 geçiyor)
-- [ ] Checkpoint kaydet ve GitHub'a push yap
+- [x] Checkpoint kaydet ve GitHub'a push yap (b7ca7ddd)
 
 
 ## 🐛 Bug Fix - Şifre Sıfırlama Linki (29 Mart 2026)
 - [x] Şifre sıfırlama e-postasındaki link localhost:3000 yerine gerçek domain'i kullanmalı (getBaseUrl helper + 7 referans düzeltildi)
+
+
+## 🐛 Kullanıcı Tarafından Bildirilen Kritik Bug'lar (30 Mart 2026)
+- [x] Form input focus kaybı: Metin alanlarına yazarken her harf basışında kursor başka yere gidiyor (debounce + sabit key + invalidate kaldırma)
+- [x] Türkçe karakter sorunları: Soru 150069'daki Kiril karakter bozukluğu düzeltildi
+- [x] Çoktan seçmeli seçenek uyumsuzlukları: Likert metadata labels desteği eklendi
+- [x] Çoklu seçim sorunu: 21 soruya allowMultiple metadata eklendi + checkbox UI eklendi
+
+## 🔍 A-Z Kapsamlı Proje İncelemesi (30 Mart 2026)
+- [x] Stripe test ödemesi (4242 4242 4242 4242 kart ile) - Başarılı! Webhook çalıştı, DB'ye kaydedildi
+- [x] Paket bazlı etap kilitleme (ücretli etapları paket durumuna göre kilitle) - webhook'ta otomatik açma + dashboard UI + ödeme başarı toast
+- [x] Admin ödeme yönetimi paneli (satın alma listesi + iade işlemi) - getAllPurchases, refundPurchase, getPurchaseStats + PaymentManagement UI
+- [x] Backend Mühendisi incelemesi (API, DB, performans) - Stripe singleton, N+1 fix, paket kontrolü
+- [x] Frontend Mühendisi incelemesi (UI/UX, erişilebilirlik, responsive) - etap kilitleme UI, ödeme toast
+- [x] QA Mühendisi incelemesi (test kapsamı, edge case'ler) - 132 test geçiyor, 13 test dosyası
+- [x] Güvenlik Uzmanı incelemesi (Auth, XSS, CSRF, veri koruma) - httpOnly cookie, CSP, rate limit, bcrypt, debug log temizliği
+- [ ] İçerik ve SEO Uzmanı incelemesi (meta, içerik kalitesi)
+- [x] İçerik ve SEO incelemesi - sitemap güncellendi, getBaseUrl(ctx.req) düzeltmeleri, alt text kontrolü

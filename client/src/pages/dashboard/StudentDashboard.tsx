@@ -5,7 +5,8 @@ import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { trpc } from "@/lib/trpc";
-import { Loader2, FileText, Clock, CheckCircle2, Lock, Award, MessageCircle, User, MessageSquareHeart, BarChart3 } from "lucide-react";
+import { Loader2, FileText, Clock, CheckCircle2, Lock, Award, MessageCircle, User, MessageSquareHeart, BarChart3, ShoppingCart, Crown } from "lucide-react";
+import { toast } from 'sonner';
 import { ChatDialog } from "@/components/ChatDialog";
 import { useState } from "react";
 import { DashboardSkeleton } from "@/components/DashboardSkeleton";
@@ -22,6 +23,29 @@ export default function StudentDashboard() {
   const { data: reports, isLoading: reportsLoading } = trpc.student.getMyReports.useQuery();
   const { data: certificate } = trpc.student.getMyCertificate.useQuery();
   const { data: isEligible } = trpc.student.checkCertificateEligibility.useQuery();
+  const { data: accessData } = trpc.payment.getMyAccess.useQuery();
+
+  // Ödeme başarı bildirimi
+  const [paymentNotified, setPaymentNotified] = useState(false);
+  const searchParams = new URLSearchParams(window.location.search);
+  const paymentStatus = searchParams.get('payment');
+  const paymentProduct = searchParams.get('product');
+  
+  if (paymentStatus === 'success' && !paymentNotified) {
+    setPaymentNotified(true);
+    const productNames: Record<string, string> = {
+      basic_package: 'Temel Paket',
+      professional_package: 'Profesyonel Paket',
+      enterprise_package: 'Kurumsal Paket',
+      ai_career_report: 'AI Kariyer Raporu',
+      single_stage_unlock: 'Tekli Etap Açma',
+    };
+    toast.success(`${productNames[paymentProduct || ''] || 'Satın alma'} işleminiz tamamlandı. Etaplarınız güncelleniyor.`, {
+      duration: 5000,
+    });
+    // URL'den query parametrelerini temizle
+    window.history.replaceState({}, '', '/dashboard/student');
+  }
   
   const generateCertificate = trpc.student.generateCertificate.useMutation({
     onSuccess: () => {
@@ -247,6 +271,17 @@ export default function StudentDashboard() {
                       ? 'Aktif'
                       : 'Kilitli'}
                   </Badge>
+                  {stage.status === 'locked' && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="ml-2 border-amber-300 text-amber-700 hover:bg-amber-50"
+                      onClick={() => setLocation('/fiyatlandirma')}
+                    >
+                      <ShoppingCart className="h-3 w-3 mr-1" />
+                      Aç
+                    </Button>
+                  )}
                 </div>
               ))}
             </div>

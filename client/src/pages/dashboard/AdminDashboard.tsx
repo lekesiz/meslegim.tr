@@ -13,7 +13,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { trpc } from '@/lib/trpc';
-import { Loader2, Users, FileQuestion, Layers, Plus, TrendingUp, Zap, MessageSquare, Eye, Settings } from 'lucide-react';
+import { Loader2, Users, FileQuestion, Layers, Plus, TrendingUp, Zap, MessageSquare, Eye, Settings, CreditCard } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -28,6 +28,7 @@ import { AdminFeedbackSummary } from '@/components/AdminFeedbackSummary';
 import { UserManagement } from '@/components/UserManagement';
 import { PlatformSettings } from '@/components/PlatformSettings';
 import { PilotFeedbackPanel } from '@/components/admin/PilotFeedbackPanel';
+import { PaymentManagement } from '@/components/admin/PaymentManagement';
 
 export default function AdminDashboard() {
   const { user } = useAuth();
@@ -163,6 +164,10 @@ export default function AdminDashboard() {
               <Users className="h-4 w-4 mr-2" />
               Kullanıcı Yönetimi
             </TabsTrigger>
+            <TabsTrigger value="payments">
+              <CreditCard className="h-4 w-4 mr-2" />
+              Ödeme Yönetimi
+            </TabsTrigger>
             <TabsTrigger value="pilot-feedback">
               <MessageSquare className="h-4 w-4 mr-2" />
               Pilot Geri Bildirim
@@ -196,6 +201,11 @@ export default function AdminDashboard() {
           {/* User Management Tab */}
           <TabsContent value="user-management">
             <UserManagement />
+          </TabsContent>
+
+          {/* Payments Tab */}
+          <TabsContent value="payments">
+            <PaymentManagement />
           </TabsContent>
 
           {/* Pilot Feedback Tab */}

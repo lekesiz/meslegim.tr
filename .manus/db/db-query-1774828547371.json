@@ -1,0 +1,85 @@
+{
+  "query": "SELECT id, type, LEFT(text, 80) as text_preview FROM questions WHERE type = 'multiple_choice' AND (text LIKE '%hangi%' OR text LIKE '%Hangi%' OR text LIKE '%seçiniz%' OR text LIKE '%birden%') ORDER BY stageId, `order` LIMIT 15;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute SELECT id, type, LEFT(text, 80) as text_preview FROM questions WHERE type = 'multiple_choice' AND (text LIKE '%hangi%' OR text LIKE '%Hangi%' OR text LIKE '%seçiniz%' OR text LIKE '%birden%') ORDER BY stageId, `order` LIMIT 15;",
+  "rows": [
+    {
+      "id": "90002",
+      "type": "multiple_choice",
+      "text_preview": "Hangi alanlarda kendinizi geliştirmek istiyorsunuz?"
+    },
+    {
+      "id": "90004",
+      "type": "multiple_choice",
+      "text_preview": "Hangi sektörlerde çalışmak istersiniz?"
+    },
+    {
+      "id": "90008",
+      "type": "multiple_choice",
+      "text_preview": "Hangi teknik becerilere sahipsiniz?"
+    },
+    {
+      "id": "90016",
+      "type": "multiple_choice",
+      "text_preview": "En çok hangi alanda desteğe ihtiyacınız var?"
+    },
+    {
+      "id": "90021",
+      "type": "multiple_choice",
+      "text_preview": "Hangi mesleki alanlara ilgi duyuyorsunuz?"
+    },
+    {
+      "id": "90031",
+      "type": "multiple_choice",
+      "text_preview": "Hangi becerilerde kendinizi güçlü hissediyorsunuz?"
+    },
+    {
+      "id": "90043",
+      "type": "multiple_choice",
+      "text_preview": "Networking için hangi platformları kullanıyorsunuz?"
+    },
+    {
+      "id": "90065",
+      "type": "multiple_choice",
+      "text_preview": "Hangi sektörlerde kariyer yapmak istiyorsunuz?"
+    },
+    {
+      "id": "90076",
+      "type": "multiple_choice",
+      "text_preview": "Hangi alanlarda gelişmeye ihtiyacınız var?"
+    },
+    {
+      "id": "150042",
+      "type": "multiple_choice",
+      "text_preview": "Okulda en çok hangi dersleri seviyorsun? (En fazla 3 seçin)"
+    },
+    {
+      "id": "150044",
+      "type": "multiple_choice",
+      "text_preview": "Sınıfta ya da grup çalışmalarında genellikle hangi rolü üstlenirsin?"
+    },
+    {
+      "id": "150045",
+      "type": "multiple_choice",
+      "text_preview": "Gelecekte çalışmak istediğin ortam hangisine daha yakın?"
+    },
+    {
+      "id": "150046",
+      "type": "multiple_choice",
+      "text_preview": "Ailen senden hangi mesleği yapmanı bekliyor?"
+    },
+    {
+      "id": "150048",
+      "type": "multiple_choice",
+      "text_preview": "Hangi üniversite bölümlerini düşünüyorsun? (Birden fazla seçebilirsin)"
+    },
+    {
+      "id": "150051",
+      "type": "multiple_choice",
+      "text_preview": "Okul dışında herhangi bir kursa, kulübe veya etkinliğe katılıyor musun?"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttype\ttext_preview\n90002\tmultiple_choice\tHangi alanlarda kendinizi geliştirmek istiyorsunuz?\n90004\tmultiple_choice\tHangi sektörlerde çalışmak istersiniz?\n90008\tmultiple_choice\tHangi teknik becerilere sahipsiniz?\n90016\tmultiple_choice\tEn çok hangi alanda desteğe ihtiyacınız var?\n90021\tmultiple_choice\tHangi mesleki alanlara ilgi duyuyorsunuz?\n90031\tmultiple_choice\tHangi becerilerde kendinizi güçlü hissediyorsunuz?\n90043\tmultiple_choice\tNetworking için hangi platformları kullanıyorsunuz?\n90065\tmultiple_choice\tHangi sektörlerde kariyer yapmak istiyorsunuz?\n90076\tmultiple_choice\tHangi alanlarda gelişmeye ihtiyacınız var?\n150042\tmultiple_choice\tOkulda en çok hangi dersleri seviyorsun? (En fazla 3 seçin)\n150044\tmultiple_choice\tSınıfta ya da grup çalışmalarında genellikle hangi rolü üstlenirsin?\n150045\tmultiple_choice\tGelecekte çalışmak istediğin ortam hangisine daha yakın?\n150046\tmultiple_choice\tAilen senden hangi mesleği yapmanı bekliyor?\n150048\tmultiple_choice\tHangi üniversite bölümlerini düşünüyorsun? (Birden fazla seçebilirsin)\n150051\tmultiple_choice\tOkul dışında herhangi bir kursa, kulübe veya etkinliğe katılıyor musun?\n",
+  "stderr": "",
+  "execution_time_ms": 70
+}

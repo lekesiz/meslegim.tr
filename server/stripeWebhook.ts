@@ -1,13 +1,22 @@
 import express from 'express';
 import Stripe from 'stripe';
 import { getDb } from './db';
-import { users, purchases } from '../drizzle/schema';
-import { eq } from 'drizzle-orm';
+import { users, purchases, userStages, stages } from '../drizzle/schema';
+import { eq, and, inArray } from 'drizzle-orm';
+import { PACKAGE_ACCESS } from './products';
 
+// Singleton Stripe instance
+let stripeInstance: Stripe | null = null;
+function getStripe(): Stripe {
+  if (!stripeInstance) {
+    stripeInstance = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
+      apiVersion: '2025-03-31.basil' as any,
+    });
+  }
+  return stripeInstance;
+}
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2025-03-31.basil' as any,
-});
+export { getStripe };
 
 export function registerStripeWebhook(app: express.Application) {
   // CRITICAL: This must be registered BEFORE express.json() middleware
@@ -23,7 +32,7 @@ export function registerStripeWebhook(app: express.Application) {
         return res.status(500).json({ error: 'Webhook secret not configured' });
       }
 
-      event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
+      event = getStripe().webhooks.constructEvent(req.body, sig, webhookSecret);
     } catch (err: any) {
       console.error(`[Stripe Webhook] Signature verification failed: ${err.message}`);
       return res.status(400).json({ error: `Webhook Error: ${err.message}` });
@@ -32,9 +41,7 @@ export function registerStripeWebhook(app: express.Application) {
     // Handle test events
     if (event.id.startsWith('evt_test_')) {
       console.log("[Webhook] Test event detected, returning verification response");
-      return res.json({ 
-        verified: true,
-      });
+      return res.json({ verified: true });
     }
 
     console.log(`[Stripe Webhook] Event received: ${event.type}`, event.id);
@@ -117,6 +124,9 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
         })
         .where(eq(users.id, userId));
     }
+
+    // Paket bazlı etap açma
+    await unlockStagesForPackage(userId, productId);
   }
 
   // If it's a single AI report purchase
@@ -129,7 +139,93 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       .where(eq(users.id, userId));
   }
 
+  // If it's a single stage unlock
+  if (productId === 'single_stage_unlock') {
+    const stageIdStr = session.metadata?.stage_id;
+    if (stageIdStr) {
+      const stageId = parseInt(stageIdStr);
+      await unlockSingleStage(userId, stageId);
+    }
+  }
+
   console.log(`[Stripe Webhook] Purchase completed for user ${userId}, product: ${productId}`);
+}
+
+/**
+ * Paket bazlı etap açma - satın alınan pakete göre kilitli etapları açar
+ */
+async function unlockStagesForPackage(userId: number, packageId: string) {
+  const db = await getDb();
+  if (!db) return;
+
+  const access = PACKAGE_ACCESS[packageId];
+  if (!access) return;
+
+  // Kullanıcının mevcut etaplarını al
+  const currentStages = await db
+    .select({
+      id: userStages.id,
+      stageId: userStages.stageId,
+      status: userStages.status,
+      stageOrder: stages.order,
+    })
+    .from(userStages)
+    .innerJoin(stages, eq(userStages.stageId, stages.id))
+    .where(eq(userStages.userId, userId))
+    .orderBy(stages.order);
+
+  // Paket erişim hakkına göre kilitli etapları aç
+  // maxStages: kaç etaba erişim hakkı var
+  const lockedStages = currentStages.filter(s => s.status === 'locked');
+  const completedOrActive = currentStages.filter(s => s.status !== 'locked').length;
+  
+  // Sıradaki kilitli etabı aç (bir önceki tamamlanmışsa)
+  // Mantık: Tamamlanan etap sayısı + 1 <= maxStages ise, sıradaki kilitli etabı aç
+  for (const lockedStage of lockedStages) {
+    if (lockedStage.stageOrder <= access.maxStages) {
+      // Bu etabın önceki etabı tamamlanmış mı kontrol et
+      const previousStage = currentStages.find(s => s.stageOrder === lockedStage.stageOrder - 1);
+      const canUnlock = !previousStage || previousStage.status === 'completed';
+      
+      if (canUnlock) {
+        await db
+          .update(userStages)
+          .set({ 
+            status: 'active', 
+            unlockedAt: new Date(),
+            updatedAt: new Date(),
+          })
+          .where(eq(userStages.id, lockedStage.id));
+        
+        console.log(`[Stripe Webhook] Unlocked stage ${lockedStage.stageId} (order: ${lockedStage.stageOrder}) for user ${userId} via package ${packageId}`);
+        // Sadece sıradaki bir etabı aç, geri kalanı tamamlandıkça açılacak
+        break;
+      }
+    }
+  }
+}
+
+/**
+ * Tekli etap açma - belirli bir etabı açar
+ */
+async function unlockSingleStage(userId: number, stageId: number) {
+  const db = await getDb();
+  if (!db) return;
+
+  await db
+    .update(userStages)
+    .set({ 
+      status: 'active', 
+      unlockedAt: new Date(),
+      updatedAt: new Date(),
+    })
+    .where(and(
+      eq(userStages.userId, userId),
+      eq(userStages.stageId, stageId),
+      eq(userStages.status, 'locked'),
+    ));
+
+  console.log(`[Stripe Webhook] Single stage unlock: stage ${stageId} for user ${userId}`);
 }
 
 async function handlePaymentFailed(paymentIntent: Stripe.PaymentIntent) {

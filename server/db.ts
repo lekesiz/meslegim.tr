@@ -474,12 +474,12 @@ export async function scheduleNextStage(userId: number, currentStageId: number) 
   if (!db) return;
 
   // Get current stage
-  const allStages = await getAllStages();
-  const currentStage = allStages.find(s => s.id === currentStageId);
+  const allStagesData = await getAllStages();
+  const currentStage = allStagesData.find(s => s.id === currentStageId);
   if (!currentStage) return;
 
   // Find next stage in the same age group
-  const nextStage = allStages.find(s => 
+  const nextStage = allStagesData.find(s => 
     s.ageGroup === currentStage.ageGroup && 
     s.order === currentStage.order + 1
   );
@@ -489,17 +489,43 @@ export async function scheduleNextStage(userId: number, currentStageId: number) 
     return;
   }
 
-  // Schedule next stage activation - use age-group specific delay if set, else global
-  const delayDays = await getTransitionDelayForAgeGroup(currentStage.ageGroup, 7);
-  const unlockedAt = new Date();
-  unlockedAt.setDate(unlockedAt.getDate() + delayDays);
+  // Check if user already has this stage
+  const existingStage = await db.select().from(userStages)
+    .where(and(eq(userStages.userId, userId), eq(userStages.stageId, nextStage.id)))
+    .limit(1);
+  
+  if (existingStage.length > 0) {
+    return; // Already exists
+  }
 
-  await db.insert(userStages).values({
-    userId,
-    stageId: nextStage.id,
-    status: 'locked',
-    unlockedAt,
-  });
+  // Paket bazlı erişim kontrolü
+  const { PACKAGE_ACCESS } = await import('./products');
+  const [user] = await db.select().from(users).where(eq(users.id, userId)).limit(1);
+  const pkg = user?.purchasedPackage || 'free';
+  const access = PACKAGE_ACCESS[pkg] || PACKAGE_ACCESS.free;
+  
+  // Eğer kullanıcının paketi bu etaba erişim izni veriyorsa, hemen aç
+  if (nextStage.order <= access.maxStages) {
+    // Paket kapsamında - normal gecikme süresi ile zamanla
+    const delayDays = await getTransitionDelayForAgeGroup(currentStage.ageGroup, 7);
+    const scheduledDate = new Date();
+    scheduledDate.setDate(scheduledDate.getDate() + delayDays);
+
+    await db.insert(userStages).values({
+      userId,
+      stageId: nextStage.id,
+      status: 'locked',
+      unlockedAt: scheduledDate,
+    });
+  } else {
+    // Paket kapsamı dışında - kilitli olarak oluştur (satın alma gerekli)
+    await db.insert(userStages).values({
+      userId,
+      stageId: nextStage.id,
+      status: 'locked',
+      unlockedAt: null,
+    });
+  }
 }
 
 export async function getStageWithAnswers(userId: number, stageId: number) {

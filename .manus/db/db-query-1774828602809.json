@@ -1,0 +1,110 @@
+{
+  "query": "SELECT id, text, CAST(metadata AS CHAR) as meta FROM questions WHERE type = 'multiple_choice' AND (text LIKE '%birden%' OR text LIKE '%en fazla%' OR text LIKE '%seçebilirsin%' OR text LIKE '%seçiniz%' OR text LIKE '%Hangi alanlarda%' OR text LIKE '%Hangi sektörlerde%' OR text LIKE '%Hangi teknik%' OR text LIKE '%Hangi becerilerde%' OR text LIKE '%Hangi mesleki%' OR text LIKE '%Hangi platformları%' OR text LIKE '%Hangi üniversite%') LIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute SELECT id, text, CAST(metadata AS CHAR) as meta FROM questions WHERE type = 'multiple_choice' AND (text LIKE '%birden%' OR text LIKE '%en fazla%' OR text LIKE '%seçebilirsin%' OR text LIKE '%seçiniz%' OR text LIKE '%Hangi alanlarda%' OR text LIKE '%Hangi sektörlerde%' OR text LIKE '%Hangi teknik%' OR text LIKE '%Hangi becerilerde%' OR text LIKE '%Hangi mesleki%' OR text LIKE '%Hangi platformları%' OR text LIKE '%Hangi üniversite%') LIMIT 20;",
+  "rows": [
+    {
+      "id": "90002",
+      "text": "Hangi alanlarda kendinizi geliştirmek istiyorsunuz?",
+      "meta": "NULL"
+    },
+    {
+      "id": "90004",
+      "text": "Hangi sektörlerde çalışmak istersiniz?",
+      "meta": "NULL"
+    },
+    {
+      "id": "90008",
+      "text": "Hangi teknik becerilere sahipsiniz?",
+      "meta": "NULL"
+    },
+    {
+      "id": "90021",
+      "text": "Hangi mesleki alanlara ilgi duyuyorsunuz?",
+      "meta": "NULL"
+    },
+    {
+      "id": "90031",
+      "text": "Hangi becerilerde kendinizi güçlü hissediyorsunuz?",
+      "meta": "NULL"
+    },
+    {
+      "id": "90043",
+      "text": "Networking için hangi platformları kullanıyorsunuz?",
+      "meta": "NULL"
+    },
+    {
+      "id": "90065",
+      "text": "Hangi sektörlerde kariyer yapmak istiyorsunuz?",
+      "meta": "NULL"
+    },
+    {
+      "id": "90076",
+      "text": "Hangi alanlarda gelişmeye ihtiyacınız var?",
+      "meta": "NULL"
+    },
+    {
+      "id": "150011",
+      "text": "Üniversite eğitiminizi finanse etmek için hangi seçenekleri düşünüyorsunuz? (Birden fazla seçebilirsiniz)",
+      "meta": "NULL"
+    },
+    {
+      "id": "150023",
+      "text": "Kariyer gelişiminiz için hangi adımları attınız? (Birden fazla seçebilirsiniz)",
+      "meta": "NULL"
+    },
+    {
+      "id": "150035",
+      "text": "Kariyer gelişiminizde hangi stratejileri aktif olarak kullanıyorsunuz? (Birden fazla seçebilirsiniz)",
+      "meta": "NULL"
+    },
+    {
+      "id": "150042",
+      "text": "Okulda en çok hangi dersleri seviyorsun? (En fazla 3 seçin)",
+      "meta": "NULL"
+    },
+    {
+      "id": "150043",
+      "text": "Boş zamanlarında en çok ne yapmaktan keyif alırsın? (En fazla 3 seçin)",
+      "meta": "NULL"
+    },
+    {
+      "id": "150048",
+      "text": "Hangi üniversite bölümlerini düşünüyorsun? (Birden fazla seçebilirsin)",
+      "meta": "NULL"
+    },
+    {
+      "id": "150059",
+      "text": "Hangi teknik veya profesyonel becerilere sahip olduğunu düşünüyorsun? (En fazla 4 seçin)",
+      "meta": "NULL"
+    },
+    {
+      "id": "150063",
+      "text": "Kariyer gelişimin için hangi adımları attın? (Birden fazla seçebilirsin)",
+      "meta": "NULL"
+    },
+    {
+      "id": "150069",
+      "text": "İş hayatında şimdiye kadar hangi deneyimleri edindин? (Birden fazla seçin)",
+      "meta": "NULL"
+    },
+    {
+      "id": "150070",
+      "text": "Hangi profesyonel yetkinliklerinin güçlü olduğunu düşünüyorsun? (En fazla 4 seçin)",
+      "meta": "NULL"
+    },
+    {
+      "id": "150092",
+      "text": "Hangi teknik becerilere sahipsin veya geliştirmek istiyorsun? (En fazla 4 seçin)",
+      "meta": "NULL"
+    },
+    {
+      "id": "150094",
+      "text": "Kariyer gelişimin için hangi adımları atmayı planlıyorsun? (Birden fazla seçebilirsin)",
+      "meta": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttext\tmeta\n90002\tHangi alanlarda kendinizi geliştirmek istiyorsunuz?\tNULL\n90004\tHangi sektörlerde çalışmak istersiniz?\tNULL\n90008\tHangi teknik becerilere sahipsiniz?\tNULL\n90021\tHangi mesleki alanlara ilgi duyuyorsunuz?\tNULL\n90031\tHangi becerilerde kendinizi güçlü hissediyorsunuz?\tNULL\n90043\tNetworking için hangi platformları kullanıyorsunuz?\tNULL\n90065\tHangi sektörlerde kariyer yapmak istiyorsunuz?\tNULL\n90076\tHangi alanlarda gelişmeye ihtiyacınız var?\tNULL\n150011\tÜniversite eğitiminizi finanse etmek için hangi seçenekleri düşünüyorsunuz? (Birden fazla seçebilirsiniz)\tNULL\n150023\tKariyer gelişiminiz için hangi adımları attınız? (Birden fazla seçebilirsiniz)\tNULL\n150035\tKariyer gelişiminizde hangi stratejileri aktif olarak kullanıyorsunuz? (Birden fazla seçebilirsiniz)\tNULL\n150042\tOkulda en çok hangi dersleri seviyorsun? (En fazla 3 seçin)\tNULL\n150043\tBoş zamanlarında en çok ne yapmaktan keyif alırsın? (En fazla 3 seçin)\tNULL\n150048\tHangi üniversite bölümlerini düşünüyorsun? (Birden fazla seçebilirsin)\tNULL\n150059\tHangi teknik veya profesyonel becerilere sahip olduğunu düşünüyorsun? (En fazla 4 seçin)\tNULL\n150063\tKariyer gelişimin için hangi adımları attın? (Birden fazla seçebilirsin)\tNULL\n150069\tİş hayatında şimdiye kadar hangi deneyimleri edindин? (Birden fazla seçin)\tNULL\n150070\tHangi profesyonel yetkinliklerinin güçlü olduğunu düşünüyorsun? (En fazla 4 seçin)\tNULL\n150092\tHangi teknik becerilere sahipsin veya geliştirmek istiyorsun? (En fazla 4 seçin)\tNULL\n150094\tKariyer gelişimin için hangi adımları atmayı planlıyorsun? (Birden fazla seçebilirsin)\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 65
+}

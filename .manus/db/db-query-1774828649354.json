@@ -1,0 +1,25 @@
+{
+  "query": "SELECT id, LEFT(text, 50) as t, CAST(metadata AS CHAR) as meta FROM questions WHERE id IN (90002, 150042, 150048) LIMIT 3;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute SELECT id, LEFT(text, 50) as t, CAST(metadata AS CHAR) as meta FROM questions WHERE id IN (90002, 150042, 150048) LIMIT 3;",
+  "rows": [
+    {
+      "id": "90002",
+      "t": "Hangi alanlarda kendinizi geliştirmek istiyorsunuz",
+      "meta": "{\"allowMultiple\": true}"
+    },
+    {
+      "id": "150042",
+      "t": "Okulda en çok hangi dersleri seviyorsun? (En fazla",
+      "meta": "{\"allowMultiple\": true}"
+    },
+    {
+      "id": "150048",
+      "t": "Hangi üniversite bölümlerini düşünüyorsun? (Birden",
+      "meta": "{\"allowMultiple\": true}"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tt\tmeta\n90002\tHangi alanlarda kendinizi geliştirmek istiyorsunuz\t{\"allowMultiple\": true}\n150042\tOkulda en çok hangi dersleri seviyorsun? (En fazla\t{\"allowMultiple\": true}\n150048\tHangi üniversite bölümlerini düşünüyorsun? (Birden\t{\"allowMultiple\": true}\n",
+  "stderr": "",
+  "execution_time_ms": 60
+}

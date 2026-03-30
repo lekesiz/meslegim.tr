@@ -1,0 +1,15 @@
+{
+  "query": "SELECT id, text, CAST(options AS CHAR) as opts FROM questions WHERE id = 150069;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute SELECT id, text, CAST(options AS CHAR) as opts FROM questions WHERE id = 150069;",
+  "rows": [
+    {
+      "id": "150069",
+      "text": "İş hayatında şimdiye kadar hangi deneyimleri edindин? (Birden fazla seçin)",
+      "opts": "[\"Kurumsal büyük şirkette çalıştım\", \"KOBİ / küçük işletmede çalıştım\", \"Startup'ta çalıştım\", \"Kamu sektöründe çalıştım\", \"Freelance / bağımsız çalıştım\", \"Yurt dışında çalışma / staj deneyimim var\", \"Henüz profesyonel iş deneyimim yok\"]"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttext\topts\n150069\tİş hayatında şimdiye kadar hangi deneyimleri edindин? (Birden fazla seçin)\t[\"Kurumsal büyük şirkette çalıştım\", \"KOBİ / küçük işletmede çalıştım\", \"Startup'ta çalıştım\", \"Kamu sektöründe çalıştım\", \"Freelance / bağımsız çalıştım\", \"Yurt dışında çalışma / staj deneyimim var\", \"Henüz profesyonel iş deneyimim yok\"]\n",
+  "stderr": "",
+  "execution_time_ms": 56
+}

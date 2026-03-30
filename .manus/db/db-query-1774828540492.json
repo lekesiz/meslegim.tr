@@ -1,0 +1,130 @@
+{
+  "query": "SELECT q.id, q.type, LEFT(q.text, 100) as text_preview, LEFT(CAST(q.options AS CHAR), 300) as options_preview FROM questions q ORDER BY q.stageId, q.`order` LIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute SELECT q.id, q.type, LEFT(q.text, 100) as text_preview, LEFT(CAST(q.options AS CHAR), 300) as options_preview FROM questions q ORDER BY q.stageId, q.`order` LIMIT 20;",
+  "rows": [
+    {
+      "id": "90001",
+      "type": "multiple_choice",
+      "text_preview": "Şu anki eğitim durumunuz nedir?",
+      "options_preview": "[\"Üniversite öğrencisiyim\", \"Yeni mezun oldum\", \"Çalışıyorum ve okuyorum\", \"Ara verdim\"]"
+    },
+    {
+      "id": "90002",
+      "type": "multiple_choice",
+      "text_preview": "Hangi alanlarda kendinizi geliştirmek istiyorsunuz?",
+      "options_preview": "[\"Teknik beceriler\", \"İletişim becerileri\", \"Liderlik\", \"Yabancı dil\", \"Proje yönetimi\"]"
+    },
+    {
+      "id": "90003",
+      "type": "likert",
+      "text_preview": "Kariyer hedefleriniz ne kadar net?",
+      "options_preview": "[\"Çok net\", \"Oldukça net\", \"Kararsızım\", \"Belirsiz\", \"Hiç fikrim yok\"]"
+    },
+    {
+      "id": "90004",
+      "type": "multiple_choice",
+      "text_preview": "Hangi sektörlerde çalışmak istersiniz?",
+      "options_preview": "[\"Teknoloji\", \"Finans\", \"Sağlık\", \"Eğitim\", \"Mühendislik\", \"Sanat/Tasarım\", \"Diğer\"]"
+    },
+    {
+      "id": "90005",
+      "type": "multiple_choice",
+      "text_preview": "İş deneyiminiz var mı?",
+      "options_preview": "[\"Evet, tam zamanlı\", \"Evet, part-time\", \"Staj yaptım\", \"Hayır\"]"
+    },
+    {
+      "id": "90006",
+      "type": "likert",
+      "text_preview": "Problem çözme becerinizi nasıl değerlendirirsiniz?",
+      "options_preview": "[\"Çok iyi\", \"İyi\", \"Orta\", \"Geliştirilmeli\", \"Zayıf\"]"
+    },
+    {
+      "id": "90007",
+      "type": "likert",
+      "text_preview": "Takım çalışmasına yatkınlığınız nasıl?",
+      "options_preview": "[\"Çok yüksek\", \"Yüksek\", \"Orta\", \"Düşük\", \"Çok düşük\"]"
+    },
+    {
+      "id": "90008",
+      "type": "multiple_choice",
+      "text_preview": "Hangi teknik becerilere sahipsiniz?",
+      "options_preview": "[\"Programlama\", \"Veri analizi\", \"Grafik tasarım\", \"Dijital pazarlama\", \"Proje yönetimi\", \"Diğer\"]"
+    },
+    {
+      "id": "90009",
+      "type": "multiple_choice",
+      "text_preview": "Yabancı dil seviyeniz nedir?",
+      "options_preview": "[\"İleri seviye\", \"Orta seviye\", \"Başlangıç seviyesi\", \"Bilmiyorum\"]"
+    },
+    {
+      "id": "90010",
+      "type": "multiple_choice",
+      "text_preview": "Liderlik deneyiminiz var mı?",
+      "options_preview": "[\"Evet, çok\", \"Biraz var\", \"Hayır ama öğrenmek isterim\", \"İlgimi çekmiyor\"]"
+    },
+    {
+      "id": "90011",
+      "type": "multiple_choice",
+      "text_preview": "İdeal iş ortamınız nasıl olmalı?",
+      "options_preview": "[\"Ofis\", \"Uzaktan\", \"Hibrit\", \"Saha\", \"Farketmez\"]"
+    },
+    {
+      "id": "90012",
+      "type": "ranking",
+      "text_preview": "Kariyer gelişiminizde en önemli faktör nedir?",
+      "options_preview": "[\"Maaş\", \"Gelişim fırsatları\", \"İş-yaşam dengesi\", \"Şirket kültürü\", \"Kariyer ilerlemesi\"]"
+    },
+    {
+      "id": "90013",
+      "type": "multiple_choice",
+      "text_preview": "Ne kadar sürede kariyer hedefinize ulaşmayı planlıyorsunuz?",
+      "options_preview": "[\"1-2 yıl\", \"3-5 yıl\", \"5-10 yıl\", \"Belirsiz\"]"
+    },
+    {
+      "id": "90014",
+      "type": "likert",
+      "text_preview": "Girişimcilik yapmayı düşünüyor musunuz?",
+      "options_preview": "[\"Kesinlikle evet\", \"Belki\", \"Kararsızım\", \"Pek düşünmüyorum\", \"Hayır\"]"
+    },
+    {
+      "id": "90015",
+      "type": "text",
+      "text_preview": "Hangi şehirlerde çalışmayı tercih edersiniz?",
+      "options_preview": "NULL"
+    },
+    {
+      "id": "90016",
+      "type": "multiple_choice",
+      "text_preview": "En çok hangi alanda desteğe ihtiyacınız var?",
+      "options_preview": "[\"CV hazırlama\", \"Mülakat teknikleri\", \"Networking\", \"Kişisel marka\", \"Teknik beceriler\"]"
+    },
+    {
+      "id": "90017",
+      "type": "likert",
+      "text_preview": "Mentorluk almayı ister misiniz?",
+      "options_preview": "[\"Kesinlikle evet\", \"Evet\", \"Kararsızım\", \"Gerek yok\", \"Hayır\"]"
+    },
+    {
+      "id": "90018",
+      "type": "likert",
+      "text_preview": "Online eğitimlere katılmaya açık mısınız?",
+      "options_preview": "[\"Çok açığım\", \"Açığım\", \"Kararsızım\", \"Pek açık değilim\", \"Açık değilim\"]"
+    },
+    {
+      "id": "90019",
+      "type": "text",
+      "text_preview": "Kariyer planlamasında en büyük engeliniz nedir?",
+      "options_preview": "NULL"
+    },
+    {
+      "id": "90020",
+      "type": "text",
+      "text_preview": "Gelecek 5 yılda kendinizi nerede görüyorsunuz?",
+      "options_preview": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttype\ttext_preview\toptions_preview\n90001\tmultiple_choice\tŞu anki eğitim durumunuz nedir?\t[\"Üniversite öğrencisiyim\", \"Yeni mezun oldum\", \"Çalışıyorum ve okuyorum\", \"Ara verdim\"]\n90002\tmultiple_choice\tHangi alanlarda kendinizi geliştirmek istiyorsunuz?\t[\"Teknik beceriler\", \"İletişim becerileri\", \"Liderlik\", \"Yabancı dil\", \"Proje yönetimi\"]\n90003\tlikert\tKariyer hedefleriniz ne kadar net?\t[\"Çok net\", \"Oldukça net\", \"Kararsızım\", \"Belirsiz\", \"Hiç fikrim yok\"]\n90004\tmultiple_choice\tHangi sektörlerde çalışmak istersiniz?\t[\"Teknoloji\", \"Finans\", \"Sağlık\", \"Eğitim\", \"Mühendislik\", \"Sanat/Tasarım\", \"Diğer\"]\n90005\tmultiple_choice\tİş deneyiminiz var mı?\t[\"Evet, tam zamanlı\", \"Evet, part-time\", \"Staj yaptım\", \"Hayır\"]\n90006\tlikert\tProblem çözme becerinizi nasıl değerlendirirsiniz?\t[\"Çok iyi\", \"İyi\", \"Orta\", \"Geliştirilmeli\", \"Zayıf\"]\n90007\tlikert\tTakım çalışmasına yatkınlığınız nasıl?\t[\"Çok yüksek\", \"Yüksek\", \"Orta\", \"Düşük\", \"Çok düşük\"]\n90008\tmultiple_choice\tHangi teknik becerilere sahipsiniz?\t[\"Programlama\", \"Veri analizi\", \"Grafik tasarım\", \"Dijital pazarlama\", \"Proje yönetimi\", \"Diğer\"]\n90009\tmultiple_choice\tYabancı dil seviyeniz nedir?\t[\"İleri seviye\", \"Orta seviye\", \"Başlangıç seviyesi\", \"Bilmiyorum\"]\n90010\tmultiple_choice\tLiderlik deneyiminiz var mı?\t[\"Evet, çok\", \"Biraz var\", \"Hayır ama öğrenmek isterim\", \"İlgimi çekmiyor\"]\n90011\tmultiple_choice\tİdeal iş ortamınız nasıl olmalı?\t[\"Ofis\", \"Uzaktan\", \"Hibrit\", \"Saha\", \"Farketmez\"]\n90012\tranking\tKariyer gelişiminizde en önemli faktör nedir?\t[\"Maaş\", \"Gelişim fırsatları\", \"İş-yaşam dengesi\", \"Şirket kültürü\", \"Kariyer ilerlemesi\"]\n90013\tmultiple_choice\tNe kadar sürede kariyer hedefinize ulaşmayı planlıyorsunuz?\t[\"1-2 yıl\", \"3-5 yıl\", \"5-10 yıl\", \"Belirsiz\"]\n90014\tlikert\tGirişimcilik yapmayı düşünüyor musunuz?\t[\"Kesinlikle evet\", \"Belki\", \"Kararsızım\", \"Pek düşünmüyorum\", \"Hayır\"]\n90015\ttext\tHangi şehirlerde çalışmayı tercih edersiniz?\tNULL\n90016\tmultiple_choice\tEn çok hangi alanda desteğe ihtiyacınız var?\t[\"CV hazırlama\", \"Mülakat teknikleri\", \"Networking\", \"Kişisel marka\", \"Teknik beceriler\"]\n90017\tlikert\tMentorluk almayı ister misiniz?\t[\"Kesinlikle evet\", \"Evet\", \"Kararsızım\", \"Gerek yok\", \"Hayır\"]\n90018\tlikert\tOnline eğitimlere katılmaya açık mısınız?\t[\"Çok açığım\", \"Açığım\", \"Kararsızım\", \"Pek açık değilim\", \"Açık değilim\"]\n90019\ttext\tKariyer planlamasında en büyük engeliniz nedir?\tNULL\n90020\ttext\tGelecek 5 yılda kendinizi nerede görüyorsunuz?\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 66
+}

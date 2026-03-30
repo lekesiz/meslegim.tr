@@ -1,0 +1,73 @@
+{
+  "query": "SELECT id FROM questions WHERE type = 'multiple_choice' AND (text LIKE '%birden%' OR text LIKE '%en fazla%' OR text LIKE '%seçebilirsin%' OR text LIKE '%seçiniz%' OR text LIKE '%Hangi alanlarda%' OR text LIKE '%Hangi sektörlerde%' OR text LIKE '%Hangi teknik%' OR text LIKE '%Hangi becerilerde%' OR text LIKE '%Hangi mesleki%' OR text LIKE '%Hangi platformları%' OR text LIKE '%Hangi üniversite%' OR text LIKE '%Hangi profesyonel%');",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute SELECT id FROM questions WHERE type = 'multiple_choice' AND (text LIKE '%birden%' OR text LIKE '%en fazla%' OR text LIKE '%seçebilirsin%' OR text LIKE '%seçiniz%' OR text LIKE '%Hangi alanlarda%' OR text LIKE '%Hangi sektörlerde%' OR text LIKE '%Hangi teknik%' OR text LIKE '%Hangi becerilerde%' OR text LIKE '%Hangi mesleki%' OR text LIKE '%Hangi platformları%' OR text LIKE '%Hangi üniversite%' OR text LIKE '%Hangi profesyonel%');",
+  "rows": [
+    {
+      "id": "90002"
+    },
+    {
+      "id": "90004"
+    },
+    {
+      "id": "90008"
+    },
+    {
+      "id": "90021"
+    },
+    {
+      "id": "90031"
+    },
+    {
+      "id": "90043"
+    },
+    {
+      "id": "90065"
+    },
+    {
+      "id": "90076"
+    },
+    {
+      "id": "150011"
+    },
+    {
+      "id": "150023"
+    },
+    {
+      "id": "150035"
+    },
+    {
+      "id": "150042"
+    },
+    {
+      "id": "150043"
+    },
+    {
+      "id": "150048"
+    },
+    {
+      "id": "150059"
+    },
+    {
+      "id": "150063"
+    },
+    {
+      "id": "150069"
+    },
+    {
+      "id": "150070"
+    },
+    {
+      "id": "150092"
+    },
+    {
+      "id": "150094"
+    },
+    {
+      "id": "150107"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\n90002\n90004\n90008\n90021\n90031\n90043\n90065\n90076\n150011\n150023\n150035\n150042\n150043\n150048\n150059\n150063\n150069\n150070\n150092\n150094\n150107\n",
+  "stderr": "",
+  "execution_time_ms": 107
+}

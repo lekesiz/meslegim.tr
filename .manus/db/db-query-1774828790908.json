@@ -1,0 +1,9 @@
+{
+  "query": "SELECT id, LEFT(text, 60) as t, JSON_LENGTH(options) as opt_count FROM questions WHERE type = 'likert' AND JSON_LENGTH(options) != 5 LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute SELECT id, LEFT(text, 60) as t, JSON_LENGTH(options) as opt_count FROM questions WHERE type = 'likert' AND JSON_LENGTH(options) != 5 LIMIT 10;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 55
+}
