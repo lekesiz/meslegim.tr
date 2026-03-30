@@ -28,14 +28,14 @@ export default function AdminDashboard() {
     <DashboardLayout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold">Tableau de bord Admin</h1>
-          <p className="text-muted-foreground">Vue d'ensemble de la plateforme</p>
+          <h1 className="text-3xl font-bold">Yönetici Paneli</h1>
+          <p className="text-muted-foreground">Platform genel görünümü</p>
         </div>
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Utilisateurs</CardTitle>
+              <CardTitle className="text-sm font-medium">Toplam Kullanıcı</CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -45,7 +45,7 @@ export default function AdminDashboard() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Étudiants</CardTitle>
+              <CardTitle className="text-sm font-medium">Öğrenciler</CardTitle>
               <GraduationCap className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -55,7 +55,7 @@ export default function AdminDashboard() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Mentors</CardTitle>
+              <CardTitle className="text-sm font-medium">Mentorlar</CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -65,7 +65,7 @@ export default function AdminDashboard() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">En attente</CardTitle>
+              <CardTitle className="text-sm font-medium">Onay Bekleyen</CardTitle>
               <CheckCircle className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -76,10 +76,10 @@ export default function AdminDashboard() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Activité récente</CardTitle>
+            <CardTitle>Son Aktiviteler</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-muted-foreground">Aucune activité récente</p>
+            <p className="text-sm text-muted-foreground">Henüz kayıtlı aktivite bulunmuyor.</p>
           </CardContent>
         </Card>
       </div>

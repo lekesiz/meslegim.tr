@@ -26,11 +26,11 @@ export default function AdminUsers() {
   const { data: users, isLoading, refetch } = trpc.admin.getUsers.useQuery();
   const updateUserMutation = trpc.admin.updateUser.useMutation({
     onSuccess: () => {
-      toast.success("Utilisateur mis à jour");
+      toast.success("Kullanıcı başarıyla güncellendi");
       refetch();
     },
     onError: () => {
-      toast.error("Erreur lors de la mise à jour");
+      toast.error("Güncelleme sırasında bir hata oluştu");
     },
   });
 
@@ -62,17 +62,17 @@ export default function AdminUsers() {
 
   const getRoleBadge = (role: string) => {
     const colors = {
-      admin: "bg-red-100 text-red-800",
-      mentor: "bg-blue-100 text-blue-800",
-      student: "bg-green-100 text-green-800",
+      admin: "bg-red-100 dark:bg-red-900/50 text-red-800 dark:text-red-300",
+      mentor: "bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-300",
+      student: "bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-300",
     };
     return colors[role as keyof typeof colors] || "bg-muted text-foreground";
   };
 
   const getStatusBadge = (status: string) => {
     const colors = {
-      active: "bg-green-100 text-green-800",
-      pending: "bg-yellow-100 text-yellow-800",
+      active: "bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-300",
+      pending: "bg-yellow-100 dark:bg-yellow-900/50 text-yellow-800 dark:text-yellow-300",
       inactive: "bg-muted text-foreground",
     };
     return colors[status as keyof typeof colors] || "bg-muted text-foreground";
@@ -82,74 +82,76 @@ export default function AdminUsers() {
     <DashboardLayout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold">Gestion des utilisateurs</h1>
-          <p className="text-muted-foreground">Gérer tous les utilisateurs de la plateforme</p>
+          <h1 className="text-3xl font-bold">Kullanıcı Yönetimi</h1>
+          <p className="text-muted-foreground">Platformdaki tüm kullanıcıları yönetin</p>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle>Liste des utilisateurs ({users?.length || 0})</CardTitle>
+            <CardTitle>Kullanıcı Listesi ({users?.length || 0})</CardTitle>
           </CardHeader>
           <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Nom</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Rôle</TableHead>
-                  <TableHead>Statut</TableHead>
-                  <TableHead>Groupe d'âge</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {users?.map((user) => (
-                  <TableRow key={user.id}>
-                    <TableCell className="font-medium">{user.name}</TableCell>
-                    <TableCell>{user.email}</TableCell>
-                    <TableCell>
-                      {editingUser === user.id ? (
-                        <Select
-                          defaultValue={user.role}
-                          onValueChange={(value) => {
-                            handleUpdateRole(user.id, value);
-                            setEditingUser(null);
-                          }}
-                        >
-                          <SelectTrigger className="w-32">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="student">Étudiant</SelectItem>
-                            <SelectItem value="mentor">Mentor</SelectItem>
-                            <SelectItem value="admin">Admin</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      ) : (
-                        <Badge className={getRoleBadge(user.role)}>
-                          {user.role}
-                        </Badge>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <Badge className={getStatusBadge(user.status)}>
-                        {user.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>{user.ageGroup || "-"}</TableCell>
-                    <TableCell>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setEditingUser(user.id)}
-                      >
-                        Modifier
-                      </Button>
-                    </TableCell>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Ad Soyad</TableHead>
+                    <TableHead>E-posta</TableHead>
+                    <TableHead>Rol</TableHead>
+                    <TableHead>Durum</TableHead>
+                    <TableHead>Yaş Grubu</TableHead>
+                    <TableHead>İşlemler</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {users?.map((user) => (
+                    <TableRow key={user.id}>
+                      <TableCell className="font-medium">{user.name}</TableCell>
+                      <TableCell>{user.email}</TableCell>
+                      <TableCell>
+                        {editingUser === user.id ? (
+                          <Select
+                            defaultValue={user.role}
+                            onValueChange={(value) => {
+                              handleUpdateRole(user.id, value);
+                              setEditingUser(null);
+                            }}
+                          >
+                            <SelectTrigger className="w-32">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="student">Öğrenci</SelectItem>
+                              <SelectItem value="mentor">Mentor</SelectItem>
+                              <SelectItem value="admin">Admin</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        ) : (
+                          <Badge className={getRoleBadge(user.role)}>
+                            {user.role === 'student' ? 'Öğrenci' : user.role === 'mentor' ? 'Mentor' : 'Admin'}
+                          </Badge>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <Badge className={getStatusBadge(user.status)}>
+                          {user.status === 'active' ? 'Aktif' : user.status === 'pending' ? 'Beklemede' : 'Pasif'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>{user.ageGroup || "-"}</TableCell>
+                      <TableCell>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setEditingUser(user.id)}
+                        >
+                          Düzenle
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           </CardContent>
         </Card>
       </div>

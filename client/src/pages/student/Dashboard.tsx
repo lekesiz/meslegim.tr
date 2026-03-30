@@ -3,8 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { trpc } from "@/lib/trpc";
-import { CheckCircle, Clock, FileText, Lock } from "lucide-react";
-import { Loader2 } from "lucide-react";
+import { CheckCircle, Clock, FileText, Lock, Loader2 } from "lucide-react";
 import { useAuth } from "@/_core/hooks/useAuth";
 
 export default function StudentDashboard() {
@@ -31,13 +30,13 @@ export default function StudentDashboard() {
         <div className="flex items-center justify-center h-64">
           <Card className="max-w-md">
             <CardHeader>
-              <CardTitle className="text-center">Compte en attente</CardTitle>
+              <CardTitle className="text-center">Hesap Onay Bekliyor</CardTitle>
             </CardHeader>
             <CardContent className="text-center space-y-4">
               <Clock className="w-16 h-16 mx-auto text-yellow-500" />
               <p className="text-muted-foreground">
-                Votre compte est en attente d'approbation par un mentor. 
-                Vous recevrez un e-mail dès que votre compte sera activé.
+                Hesabınız mentor onayı bekliyor. 
+                Hesabınız aktif edildiğinde size e-posta ile bildirim gönderilecektir.
               </p>
             </CardContent>
           </Card>
@@ -57,40 +56,40 @@ export default function StudentDashboard() {
   };
 
   const getStatusText = (status: string) => {
-    if (status === 'completed') return 'Terminée';
-    if (status === 'active') return 'En cours';
-    return 'Verrouillée';
+    if (status === 'completed') return 'Tamamlandı';
+    if (status === 'active') return 'Devam Ediyor';
+    return 'Kilitli';
   };
 
   return (
     <DashboardLayout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold">Bienvenue, {user?.name}</h1>
-          <p className="text-muted-foreground">Suivez votre progression et complétez vos évaluations</p>
+          <h1 className="text-3xl font-bold">Hoş Geldin, {user?.name}</h1>
+          <p className="text-muted-foreground">İlerlemenizi takip edin ve değerlendirmelerinizi tamamlayın</p>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle>Progression globale</CardTitle>
+            <CardTitle>Genel İlerleme</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
               <div className="flex justify-between text-sm mb-2">
-                <span>Étapes complétées</span>
+                <span>Tamamlanan Etaplar</span>
                 <span className="font-medium">{completedStages} / {totalStages}</span>
               </div>
               <Progress value={progressPercentage} className="h-2" />
             </div>
             <p className="text-sm text-muted-foreground">
-              Groupe d'âge: <span className="font-medium">{user?.ageGroup}</span>
+              Yaş Grubu: <span className="font-medium">{user?.ageGroup}</span>
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle>Vos étapes</CardTitle>
+            <CardTitle>Etaplarınız</CardTitle>
           </CardHeader>
           <CardContent>
             {progress && progress.length > 0 ? (
@@ -103,13 +102,13 @@ export default function StudentDashboard() {
                     <div className="flex items-center gap-4">
                       {getStatusIcon(stage.status)}
                       <div>
-                        <p className="font-medium">Étape {index + 1}</p>
+                        <p className="font-medium">Etap {index + 1}</p>
                         <p className="text-sm text-muted-foreground">{getStatusText(stage.status)}</p>
                       </div>
                     </div>
                     {stage.status === 'active' && (
                       <Button onClick={() => window.location.href = '/dashboard/student/stage'}>
-                        Commencer
+                        Başla
                       </Button>
                     )}
                     {stage.status === 'completed' && (
@@ -120,7 +119,7 @@ export default function StudentDashboard() {
               </div>
             ) : (
               <p className="text-sm text-muted-foreground">
-                Vos étapes seront disponibles une fois que votre compte sera activé.
+                Hesabınız aktif edildiğinde etaplarınız burada görünecektir.
               </p>
             )}
           </CardContent>
@@ -129,7 +128,7 @@ export default function StudentDashboard() {
         {reports && reports.length > 0 && (
           <Card>
             <CardHeader>
-              <CardTitle>Vos rapports</CardTitle>
+              <CardTitle>Raporlarınız</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -142,16 +141,16 @@ export default function StudentDashboard() {
                       <FileText className="w-5 h-5 text-blue-500" />
                       <div>
                         <p className="font-medium">
-                          {report.type === 'final' ? 'Rapport final' : `Rapport Étape ${report.stageId}`}
+                          {report.type === 'final' ? 'Final Raporu' : `Etap ${report.stageId} Raporu`}
                         </p>
                         <p className="text-sm text-muted-foreground">
-                          {report.status === 'approved' ? 'Approuvé' : 'En attente d\'approbation'}
+                          {report.status === 'approved' ? 'Onaylandı' : 'Onay Bekliyor'}
                         </p>
                       </div>
                     </div>
                     {report.status === 'approved' && report.fileUrl && (
                       <Button variant="outline" onClick={() => window.open(report.fileUrl!, '_blank')}>
-                        Télécharger
+                        İndir
                       </Button>
                     )}
                   </div>

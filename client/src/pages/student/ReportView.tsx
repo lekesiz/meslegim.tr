@@ -125,8 +125,8 @@ export default function ReportView() {
         </CardHeader>
         <CardContent>
           {report.status === 'pending' && (
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
-              <p className="text-sm text-yellow-800">
+            <div className="bg-yellow-50 dark:bg-yellow-950/50 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 mb-6">
+              <p className="text-sm text-yellow-800 dark:text-yellow-300">
                 <Clock className="w-4 h-4 inline mr-2" />
                 Bu rapor henüz mentor tarafından onaylanmamıştır. Onaylandıktan sonra PDF olarak indirebilirsiniz.
               </p>
@@ -134,8 +134,8 @@ export default function ReportView() {
           )}
 
           {report.status === 'rejected' && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-              <p className="text-sm text-red-800">
+            <div className="bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-6">
+              <p className="text-sm text-red-800 dark:text-red-300">
                 <XCircle className="w-4 h-4 inline mr-2" />
                 Bu rapor mentor tarafından reddedilmiştir.
               </p>
