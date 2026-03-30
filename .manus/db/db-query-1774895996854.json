@@ -1,0 +1,50 @@
+{
+  "query": "SELECT id, SUBSTRING(text, 1, 80) as text_preview FROM questions WHERE text LIKE '%Ð%' OR text LIKE '%Ñ%' OR text REGEXP '[А-Яа-я]' LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute SELECT id, SUBSTRING(text, 1, 80) as text_preview FROM questions WHERE text LIKE '%Ð%' OR text LIKE '%Ñ%' OR text REGEXP '[А-Яа-я]' LIMIT 10;",
+  "rows": [
+    {
+      "id": "90001",
+      "text_preview": "Şu anki eğitim durumunuz nedir?"
+    },
+    {
+      "id": "90002",
+      "text_preview": "Hangi alanlarda kendinizi geliştirmek istiyorsunuz?"
+    },
+    {
+      "id": "90003",
+      "text_preview": "Kariyer hedefleriniz ne kadar net?"
+    },
+    {
+      "id": "90004",
+      "text_preview": "Hangi sektörlerde çalışmak istersiniz?"
+    },
+    {
+      "id": "90005",
+      "text_preview": "İş deneyiminiz var mı?"
+    },
+    {
+      "id": "90006",
+      "text_preview": "Problem çözme becerinizi nasıl değerlendirirsiniz?"
+    },
+    {
+      "id": "90007",
+      "text_preview": "Takım çalışmasına yatkınlığınız nasıl?"
+    },
+    {
+      "id": "90008",
+      "text_preview": "Hangi teknik becerilere sahipsiniz?"
+    },
+    {
+      "id": "90009",
+      "text_preview": "Yabancı dil seviyeniz nedir?"
+    },
+    {
+      "id": "90010",
+      "text_preview": "Liderlik deneyiminiz var mı?"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttext_preview\n90001\tŞu anki eğitim durumunuz nedir?\n90002\tHangi alanlarda kendinizi geliştirmek istiyorsunuz?\n90003\tKariyer hedefleriniz ne kadar net?\n90004\tHangi sektörlerde çalışmak istersiniz?\n90005\tİş deneyiminiz var mı?\n90006\tProblem çözme becerinizi nasıl değerlendirirsiniz?\n90007\tTakım çalışmasına yatkınlığınız nasıl?\n90008\tHangi teknik becerilere sahipsiniz?\n90009\tYabancı dil seviyeniz nedir?\n90010\tLiderlik deneyiminiz var mı?\n",
+  "stderr": "",
+  "execution_time_ms": 124
+}

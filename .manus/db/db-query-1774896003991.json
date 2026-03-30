@@ -1,0 +1,9 @@
+{
+  "query": "SELECT q.id, SUBSTRING(q.text, 1, 50) as question, SUBSTRING(q.options, 1, 200) as options_preview FROM questions q WHERE q.options LIKE '%Ð%' OR q.options LIKE '%Ñ%' LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute SELECT q.id, SUBSTRING(q.text, 1, 50) as question, SUBSTRING(q.options, 1, 200) as options_preview FROM questions q WHERE q.options LIKE '%Ð%' OR q.options LIKE '%Ñ%' LIMIT 5;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 68
+}

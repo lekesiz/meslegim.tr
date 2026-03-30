@@ -1,12 +1,14 @@
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, FileText } from "lucide-react";
+import { SEO } from "@/components/SEO";
 
 export default function KullanimSartlari() {
   const [, setLocation] = useLocation();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-950 dark:to-gray-900">
+      <SEO title="Kullanım Şartları" description="Meslegim.tr kullanım şartları ve hizmet koşulları." />
       {/* Header */}
       <header className="bg-card border-b sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center gap-4">

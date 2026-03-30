@@ -618,7 +618,7 @@ export const appRouter = router({
         studentIds: z.array(z.number()).optional(),
         activateAll: z.boolean().optional(),
       }))
-      .mutation(async ({ input }) => {
+      .mutation(async ({ input, ctx }) => {
         let studentsToActivate: number[] = [];
         
         if (input.activateAll) {
@@ -640,7 +640,7 @@ export const appRouter = router({
             const student = await db.getUserById(studentId);
             if (student?.email && student?.name) {
               try {
-                const loginUrl = `${getBaseUrl()}/login`;
+                const loginUrl = `${getBaseUrl(ctx.req)}/login`;
                 await sendEmail({
                   to: student.email,
                   subject: '🎉 Başvurunuz Onaylandı - Meslegim.tr',
@@ -1013,7 +1013,7 @@ export const appRouter = router({
         }
         
         // Audit log
-        console.log(`[Admin Refund] Purchase #${input.purchaseId} refunded by admin ${ctx.user.id}. Reason: ${input.reason || 'N/A'}`);
+        // console.log(`[Admin Refund] Purchase #${input.purchaseId} refunded by admin ${ctx.user.id}. Reason: ${input.reason || 'N/A'}`);
         
         return { success: true, message: 'İade başarıyla gerçekleştirildi' };
       }),
@@ -1091,7 +1091,7 @@ export const appRouter = router({
         // Send activation email
         if (student.email && student.name) {
           try {
-            const loginUrl = `${getBaseUrl()}/login`;
+            const loginUrl = `${getBaseUrl(ctx.req)}/login`;
             await sendEmail({
               to: student.email,
               subject: '🎉 Başvurunuz Onaylandı - Meslegim.tr',
@@ -1219,7 +1219,7 @@ export const appRouter = router({
         // Send email (approval or rejection)
         if (student?.email && student?.name && stage?.name) {
           try {
-            const reportUrl = `${getBaseUrl()}/reports/${report.id}`;
+            const reportUrl = `${getBaseUrl(ctx.req)}/reports/${report.id}`;
             const subject = input.approved 
               ? '✅ Raporunuz Onaylandı - Meslegim.tr'
               : '⚠️ Raporunuz İnceleme Bekliyor - Meslegim.tr';
@@ -1615,7 +1615,7 @@ export const appRouter = router({
                     <p style="margin: 10px 0 0 0;"><strong>Tamamlanma Tarihi:</strong> ${new Date().toLocaleDateString('tr-TR')}</p>
                   </div>
                   <p>Öğrencinin ilerlemesini kontrol etmek ve raporu onaylamak için lütfen platforma giriş yapın.</p>
-                  <a href="${getBaseUrl()}/dashboard/mentor" style="display: inline-block; background-color: #4F46E5; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin-top: 20px;">
+                  <a href="${getBaseUrl(ctx.req)}/dashboard/mentor" style="display: inline-block; background-color: #4F46E5; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin-top: 20px;">
                     Mentor Paneline Git
                   </a>
                   <p style="color: #6B7280; font-size: 14px; margin-top: 30px;">

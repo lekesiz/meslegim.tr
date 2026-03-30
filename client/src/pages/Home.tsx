@@ -486,7 +486,7 @@ export default function Home() {
             <a href="/kullanim-sartlari" className="hover:text-indigo-600 transition-colors">
               Kullanım Şartları
             </a>
-            <a href="/gizlilik-politikasi" className="hover:text-indigo-600 transition-colors">
+            <a href="/gizlilik-politikasi#kvkk" className="hover:text-indigo-600 transition-colors">
               KVKK Aydınlatma Metni
             </a>
             <a href="mailto:destek@meslegim.tr" className="hover:text-indigo-600 transition-colors">

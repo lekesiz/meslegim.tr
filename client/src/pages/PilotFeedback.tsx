@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { useLocation } from "wouter";
 import { ArrowLeft, MessageSquareHeart, Star, CheckCircle } from "lucide-react";
 import { analytics } from "@/lib/analytics";
+import { SEO } from "@/components/SEO";
 
 const npsLabels: Record<number, string> = {
   0: "Kesinlikle önermem",
@@ -58,7 +59,7 @@ export default function PilotFeedback() {
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-gray-950 dark:to-gray-900 flex items-center justify-center p-4">
         <Card className="max-w-lg w-full text-center">
           <CardContent className="py-12 space-y-4">
             <CheckCircle className="h-16 w-16 text-green-500 mx-auto" />
@@ -76,7 +77,8 @@ export default function PilotFeedback() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-gray-950 dark:to-gray-900">
+      <SEO title="Geri Bildirim" description="Meslegim.tr deneyiminizi paylaşın ve platformu geliştirmemize yardımcı olun." />
       <div className="container max-w-2xl py-8">
         <Button variant="ghost" onClick={() => setLocation("/dashboard")} className="mb-6">
           <ArrowLeft className="h-4 w-4 mr-2" /> Geri Dön
