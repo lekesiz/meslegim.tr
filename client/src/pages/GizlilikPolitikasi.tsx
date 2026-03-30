@@ -1,12 +1,14 @@
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Shield } from "lucide-react";
+import { SEO } from "@/components/SEO";
 
 export default function GizlilikPolitikasi() {
   const [, setLocation] = useLocation();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-950 dark:to-gray-900">
+      <SEO title="Gizlilik Politikası" description="Meslegim.tr gizlilik politikası ve KVKK aydınlatma metni." />
       {/* Header */}
       <header className="bg-card border-b sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center gap-4">
@@ -84,7 +86,7 @@ export default function GizlilikPolitikasi() {
               </ul>
             </section>
 
-            <section>
+            <section id="kvkk">
               <h2 className="text-xl font-semibold text-foreground mb-3">6. Haklarınız (KVKK Kapsamında)</h2>
               <p className="text-muted-foreground leading-relaxed mb-3">
                 6698 sayılı Kişisel Verilerin Korunması Kanunu kapsamında aşağıdaki haklara sahipsiniz:

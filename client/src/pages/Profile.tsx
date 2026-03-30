@@ -22,13 +22,13 @@ export default function Profile() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-gray-950 dark:to-gray-900">
       <div className="container max-w-4xl py-8">
         <Button variant="ghost" onClick={() => navigate("/dashboard")} className="mb-6 gap-2">
           <ArrowLeft className="h-4 w-4" /> Panele Dön
         </Button>
         
-        <h1 className="text-3xl font-bold mb-8 text-slate-800">Profil Ayarları</h1>
+        <h1 className="text-3xl font-bold mb-8 text-foreground">Profil Ayarları</h1>
         
         <div className="space-y-6">
           <ProfileInfoCard />

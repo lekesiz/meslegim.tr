@@ -1,0 +1,60 @@
+{
+  "query": "SELECT id, SUBSTRING(text, 1, 60) as question, metadata FROM questions WHERE JSON_EXTRACT(metadata, '$.allowMultiple') = true LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute SELECT id, SUBSTRING(text, 1, 60) as question, metadata FROM questions WHERE JSON_EXTRACT(metadata, '$.allowMultiple') = true LIMIT 10;",
+  "rows": [
+    {
+      "id": "90002",
+      "question": "Hangi alanlarda kendinizi geliştirmek istiyorsunuz?",
+      "metadata": "{\"allowMultiple\": true}"
+    },
+    {
+      "id": "90004",
+      "question": "Hangi sektörlerde çalışmak istersiniz?",
+      "metadata": "{\"allowMultiple\": true}"
+    },
+    {
+      "id": "90008",
+      "question": "Hangi teknik becerilere sahipsiniz?",
+      "metadata": "{\"allowMultiple\": true}"
+    },
+    {
+      "id": "90021",
+      "question": "Hangi mesleki alanlara ilgi duyuyorsunuz?",
+      "metadata": "{\"allowMultiple\": true}"
+    },
+    {
+      "id": "90031",
+      "question": "Hangi becerilerde kendinizi güçlü hissediyorsunuz?",
+      "metadata": "{\"allowMultiple\": true}"
+    },
+    {
+      "id": "90043",
+      "question": "Networking için hangi platformları kullanıyorsunuz?",
+      "metadata": "{\"allowMultiple\": true}"
+    },
+    {
+      "id": "90065",
+      "question": "Hangi sektörlerde kariyer yapmak istiyorsunuz?",
+      "metadata": "{\"allowMultiple\": true}"
+    },
+    {
+      "id": "90076",
+      "question": "Hangi alanlarda gelişmeye ihtiyacınız var?",
+      "metadata": "{\"allowMultiple\": true}"
+    },
+    {
+      "id": "150011",
+      "question": "Üniversite eğitiminizi finanse etmek için hangi seçenekleri ",
+      "metadata": "{\"allowMultiple\": true}"
+    },
+    {
+      "id": "150023",
+      "question": "Kariyer gelişiminiz için hangi adımları attınız? (Birden faz",
+      "metadata": "{\"allowMultiple\": true}"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tquestion\tmetadata\n90002\tHangi alanlarda kendinizi geliştirmek istiyorsunuz?\t{\"allowMultiple\": true}\n90004\tHangi sektörlerde çalışmak istersiniz?\t{\"allowMultiple\": true}\n90008\tHangi teknik becerilere sahipsiniz?\t{\"allowMultiple\": true}\n90021\tHangi mesleki alanlara ilgi duyuyorsunuz?\t{\"allowMultiple\": true}\n90031\tHangi becerilerde kendinizi güçlü hissediyorsunuz?\t{\"allowMultiple\": true}\n90043\tNetworking için hangi platformları kullanıyorsunuz?\t{\"allowMultiple\": true}\n90065\tHangi sektörlerde kariyer yapmak istiyorsunuz?\t{\"allowMultiple\": true}\n90076\tHangi alanlarda gelişmeye ihtiyacınız var?\t{\"allowMultiple\": true}\n150011\tÜniversite eğitiminizi finanse etmek için hangi seçenekleri \t{\"allowMultiple\": true}\n150023\tKariyer gelişiminiz için hangi adımları attınız? (Birden faz\t{\"allowMultiple\": true}\n",
+  "stderr": "",
+  "execution_time_ms": 97
+}

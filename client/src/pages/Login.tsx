@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { useLocation } from "wouter";
 import { Briefcase, ArrowLeft, AlertCircle, CheckCircle } from "lucide-react";
 import { analytics } from "@/lib/analytics";
+import { SEO } from "@/components/SEO";
 
 export default function Login() {
   const [, setLocation] = useLocation();
@@ -62,7 +63,8 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 flex items-center justify-center p-4">
+      <SEO title="Giriş Yap" description="Meslegim.tr kariyer değerlendirme platformuna giriş yapın." noIndex />
       <div className="w-full max-w-md space-y-6">
         {/* Logo */}
         <div className="text-center">
@@ -77,7 +79,7 @@ export default function Login() {
           <p className="text-sm text-muted-foreground">Kariyer Değerlendirme Platformu</p>
         </div>
 
-        <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
+        <Card className="shadow-lg border-0 bg-card/80 backdrop-blur-sm">
           <CardHeader className="text-center pb-4">
             <CardTitle className="text-xl">Hesabınıza Giriş Yapın</CardTitle>
             <CardDescription>E-posta ve şifrenizle devam edin</CardDescription>
@@ -85,9 +87,9 @@ export default function Login() {
           <CardContent>
             {/* Şifre sıfırlama başarı mesajı */}
             {resetSuccess && (
-              <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg flex items-start gap-2">
-                <CheckCircle className="w-4 h-4 text-green-600 mt-0.5 shrink-0" />
-                <p className="text-sm text-green-700">{resetSuccess}</p>
+              <div className="mb-4 p-3 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded-lg flex items-start gap-2">
+                <CheckCircle className="w-4 h-4 text-green-600 dark:text-green-400 mt-0.5 shrink-0" />
+                <p className="text-sm text-green-700 dark:text-green-300">{resetSuccess}</p>
               </div>
             )}
 
@@ -126,9 +128,9 @@ export default function Login() {
 
               {/* Hata mesajı */}
               {errorMessage && (
-                <div className="p-3 bg-red-50 border border-red-200 rounded-lg flex items-start gap-2">
-                  <AlertCircle className="w-4 h-4 text-red-600 mt-0.5 shrink-0" />
-                  <p className="text-sm text-red-700">{errorMessage}</p>
+                <div className="p-3 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-lg flex items-start gap-2">
+                  <AlertCircle className="w-4 h-4 text-red-600 dark:text-red-400 mt-0.5 shrink-0" />
+                  <p className="text-sm text-red-700 dark:text-red-300">{errorMessage}</p>
                 </div>
               )}
 
@@ -172,9 +174,9 @@ export default function Login() {
                         />
                       </div>
                       {resetError && (
-                        <div className="p-3 bg-red-50 border border-red-200 rounded-lg flex items-start gap-2">
-                          <AlertCircle className="w-4 h-4 text-red-600 mt-0.5 shrink-0" />
-                          <p className="text-sm text-red-700">{resetError}</p>
+                        <div className="p-3 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-lg flex items-start gap-2">
+                          <AlertCircle className="w-4 h-4 text-red-600 dark:text-red-400 mt-0.5 shrink-0" />
+                          <p className="text-sm text-red-700 dark:text-red-300">{resetError}</p>
                         </div>
                       )}
                       <Button

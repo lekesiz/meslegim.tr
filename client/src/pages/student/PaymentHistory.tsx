@@ -74,13 +74,13 @@ export default function PaymentHistory() {
               {purchases.map((purchase: any) => {
                 const status = statusMap[purchase.status] || statusMap.pending;
                 return (
-                  <div key={purchase.id} className="flex items-center justify-between p-4 border rounded-lg">
+                  <div key={purchase.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-3 sm:p-4 border rounded-lg gap-2 sm:gap-3">
                     <div className="flex items-center gap-3">
-                      <div className="bg-primary/10 rounded-full p-2">
+                      <div className="bg-primary/10 rounded-full p-2 shrink-0">
                         <CreditCard className="h-4 w-4 text-primary" />
                       </div>
-                      <div>
-                        <p className="font-medium text-sm">
+                      <div className="min-w-0">
+                        <p className="font-medium text-sm truncate">
                           {productNameMap[purchase.productId] || purchase.productId}
                         </p>
                         <p className="text-xs text-muted-foreground">
@@ -94,7 +94,7 @@ export default function PaymentHistory() {
                         </p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 ml-11 sm:ml-0">
                       <span className="font-semibold text-sm">
                         {(purchase.amountInCents / 100).toFixed(0)} ₺
                       </span>

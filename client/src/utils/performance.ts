@@ -86,7 +86,7 @@ export function logPerformanceMetrics() {
     const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
     
     if (navigation) {
-      console.log('Performance Metrics:', {
+      if (import.meta.env.DEV) console.log('Performance Metrics:', {
         'DNS Lookup': `${(navigation.domainLookupEnd - navigation.domainLookupStart).toFixed(2)}ms`,
         'TCP Connection': `${(navigation.connectEnd - navigation.connectStart).toFixed(2)}ms`,
         'Request Time': `${(navigation.responseStart - navigation.requestStart).toFixed(2)}ms`,
