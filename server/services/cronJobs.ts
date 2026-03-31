@@ -4,6 +4,7 @@ import { userStages, stages, users } from '../../drizzle/schema';
 import { eq, and, lt, gt, between } from 'drizzle-orm';
 import { sendEmail } from '../_core/resend-email';
 import { getNewStageActivatedEmailTemplate, getStageReminderEmailTemplate } from './emailService';
+import { startReminderService } from './reminderService';
 
 /**
  * Check and activate stages that should be unlocked based on configurable delay
@@ -64,20 +65,30 @@ export async function checkAndActivateStages() {
 
       console.log(`[Cron] Activated stage ${stageName} for user ${stage.userId}`);
 
-      // Send email notification
+      // Send email + push notification
       if (stage.userEmail && stage.userName) {
         try {
+          const { notify } = await import('./notificationService');
           const emailHtml = getNewStageActivatedEmailTemplate(
             stage.userName,
             stageName
           );
-          await sendEmail({
-            to: stage.userEmail,
-            subject: `🔓 Yeni Etap Açıldı: ${stageName}`,
-            html: emailHtml,
+          await notify({
+            userId: stage.userId,
+            title: '🔓 Yeni Etap Açıldı!',
+            message: `"${stageName}" etabı açıldı. Hemen başlayabilirsiniz!`,
+            event: 'stage_activation',
+            link: '/dashboard/student',
+            emailSubject: `🔓 Yeni Etap Açıldı: ${stageName}`,
+            emailHtml,
+            pushPayload: {
+              body: `"${stageName}" etabı açıldı. Hemen başlayabilirsiniz!`,
+              url: '/dashboard/student',
+              tag: `cron-stage-activated-${stage.stageId}`,
+            },
           });
-        } catch (emailErr) {
-          console.warn(`[Cron] Email send failed for user ${stage.userId}:`, emailErr);
+        } catch (err) {
+          console.warn(`[Cron] Notification failed for user ${stage.userId}:`, err);
         }
       }
     }
@@ -156,15 +167,25 @@ export async function sendStageReminderEmails() {
           openDate
         );
 
-        await sendEmail({
-          to: item.userEmail,
-          subject: `⏳ ${item.stageName} etabınız ${reminderDaysBefore} gün sonra açılıyor!`,
-          html: emailHtml,
+        const { notify } = await import('./notificationService');
+        await notify({
+          userId: item.userId,
+          title: `⏳ ${item.stageName} etabınız ${reminderDaysBefore} gün sonra açılıyor!`,
+          message: `"${item.stageName}" etabınız ${openDate} tarihinde açılacak. Hazır olun!`,
+          event: 'stage_reminder',
+          link: '/dashboard/student',
+          emailSubject: `⏳ ${item.stageName} etabınız ${reminderDaysBefore} gün sonra açılıyor!`,
+          emailHtml,
+          pushPayload: {
+            body: `"${item.stageName}" etabınız ${openDate} tarihinde açılacak. Hazır olun!`,
+            url: '/dashboard/student',
+            tag: `stage-opening-reminder-${item.stageId}`,
+          },
         });
 
         console.log(`[Cron] Reminder sent to user ${item.userId} for stage ${item.stageName}`);
-      } catch (emailErr) {
-        console.warn(`[Cron] Reminder email failed for user ${item.userId}:`, emailErr);
+      } catch (err) {
+        console.warn(`[Cron] Reminder failed for user ${item.userId}:`, err);
       }
     }
 
@@ -199,4 +220,7 @@ export function initializeCronJobs() {
     console.log('[Cron] Running initial stage activation check...');
     checkAndActivateStages();
   }, 5000);
+
+  // Start push notification reminder service
+  startReminderService();
 }

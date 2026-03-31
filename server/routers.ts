@@ -785,13 +785,20 @@ export const appRouter = router({
           studentName: result.userName,
         });
 
-        // Create in-app notification for student
+        // Create in-app + push notification for student
         try {
-          await db.createNotification({
+          const { notify } = await import('./services/notificationService');
+          await notify({
             userId: input.userId,
             title: '🔓 Yeni Etabınız Açıldı!',
             message: `"${result.stageName}" etabı admin tarafından açıldı. Hemen başlayabilirsiniz!`,
-            type: 'stage_unlocked',
+            event: 'stage_activation',
+            link: '/dashboard/student',
+            pushPayload: {
+              body: `"${result.stageName}" etabı açıldı. Hemen başlayabilirsiniz!`,
+              url: '/dashboard/student',
+              tag: `stage-unlocked-${result.stageId}`,
+            },
           });
         } catch (notifErr) {
           console.error('Failed to create unlock notification:', notifErr);
@@ -1244,16 +1251,25 @@ export const appRouter = router({
           }
         }
         
-        // Create in-app notification for student
+        // Create in-app + push notification for student
         if (report.userId) {
           try {
-            await db.createNotification({
+            const { notify } = await import('./services/notificationService');
+            const title = input.approved ? '✅ Raporunuz Onaylandı!' : '⚠️ Raporunuz İnceleme Bekliyor';
+            const message = input.approved 
+              ? `"${stage?.name || 'Etap'}" raporunuz mentorünüz tarafından onaylandı. PDF olarak indirebilirsiniz.`
+              : `"${stage?.name || 'Etap'}" raporunuz için geri bildirim verildi: ${input.feedback || 'Lütfen tekrar inceleyin.'}`;
+            await notify({
               userId: report.userId,
-              title: input.approved ? '✅ Raporunuz Onaylandı!' : '⚠️ Raporunuz İnceleme Bekliyor',
-              message: input.approved 
-                ? `"${stage?.name || 'Etap'}" raporunuz mentorünüz tarafından onaylandı. PDF olarak indirebilirsiniz.`
-                : `"${stage?.name || 'Etap'}" raporunuz için geri bildirim verildi: ${input.feedback || 'Lütfen tekrar inceleyin.'}`,
-              type: input.approved ? 'report_approved' : 'report_rejected',
+              title,
+              message,
+              event: input.approved ? 'report_approved' : 'report_rejected',
+              link: '/dashboard/student/reports',
+              pushPayload: {
+                body: message,
+                url: '/dashboard/student/reports',
+                tag: `report-review-${input.reportId}`,
+              },
             });
           } catch (notifErr) {
             console.error('Failed to create notification:', notifErr);
@@ -1498,13 +1514,20 @@ export const appRouter = router({
           console.warn('[Mentor] Admin notification failed:', e);
         }
 
-         // Create in-app notification for student
+         // Create in-app + push notification for student
         try {
-          await db.createNotification({
+          const { notify } = await import('./services/notificationService');
+          await notify({
             userId: input.userId,
             title: '🔓 Yeni Etabınız Açıldı!',
             message: `"${result.stageName}" etabı mentorünüz tarafından açıldı. Hemen başlayabilirsiniz!`,
-            type: 'stage_unlocked',
+            event: 'stage_activation',
+            link: '/dashboard/student',
+            pushPayload: {
+              body: `"${result.stageName}" etabı açıldı. Hemen başlayabilirsiniz!`,
+              url: '/dashboard/student',
+              tag: `stage-unlocked-${result.stageId}`,
+            },
           });
         } catch (notifErr) {
           console.error('Failed to create unlock notification:', notifErr);
@@ -1636,21 +1659,34 @@ export const appRouter = router({
           }
         }
         
-        // Create in-app notification for student
+        // Create in-app + push notification for student and mentor
         try {
-          await db.createNotification({
+          const { notify } = await import('./services/notificationService');
+          await notify({
             userId,
             title: '🎉 Etap Tamamlandı!',
             message: `${stage?.name || 'Etap'} başarıyla tamamlandı. Raporunuz hazırlanıyor...`,
-            type: 'stage_completed',
+            event: 'report_ready',
+            link: '/dashboard/student/reports',
+            pushPayload: {
+              body: `${stage?.name || 'Etap'} başarıyla tamamlandı. Raporunuz hazırlanıyor...`,
+              url: '/dashboard/student/reports',
+              tag: `stage-completed-${stageId}`,
+            },
           });
-          // Notify mentor in-app
+          // Notify mentor
           if (student && student.mentorId) {
-            await db.createNotification({
+            await notify({
               userId: student.mentorId,
               title: '📚 Öğrenci Etap Tamamladı',
               message: `${student.name} "${stage?.name || 'Etap'}" etabını tamamladı. Raporu incelemeyi unutmayın.`,
-              type: 'student_progress',
+              event: 'report_ready',
+              link: '/dashboard/mentor/students',
+              pushPayload: {
+                body: `${student.name} "${stage?.name || 'Etap'}" etabını tamamladı.`,
+                url: '/dashboard/mentor/students',
+                tag: `student-completed-${stageId}`,
+              },
             });
           }
         } catch (notifErr) {
@@ -1955,13 +1991,20 @@ export const appRouter = router({
         fileKey: null,
       });
       
-      // Create notification
+      // Create notification (in-app + push)
       try {
-        await db.createNotification({
+        const { notify } = await import('./services/notificationService');
+        await notify({
           userId,
           title: '📊 Kariyer Profili Raporunuz Hazır!',
           message: 'Kapsamlı kariyer profili özet raporunuz oluşturuldu. Raporlarım sayfasından inceleyebilirsiniz.',
-          type: 'report_ready',
+          event: 'report_ready',
+          link: '/dashboard/student/reports',
+          pushPayload: {
+            body: 'Kapsamlı kariyer profili özet raporunuz oluşturuldu.',
+            url: '/dashboard/student/reports',
+            tag: 'career-report-ready',
+          },
         });
       } catch (e) { console.error('Notification failed:', e); }
       

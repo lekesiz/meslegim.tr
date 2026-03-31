@@ -1296,3 +1296,31 @@ Platform **minimum seviyede sağlıklı** çalışıyor. Tüm temel özellikler 
 - [x] Hata mesajları Türkçe ve anlaşılır
 - [x] Console'da gereksiz debug log yok
 - [x] Soru tipi dağılımı: likert(178), multiple_choice(126), text(65), ranking(6) = 375 soru
+
+## 🔥 Yeni Özellikler (31 Mart 2026 - Playwright E2E + Push Notification)
+
+### Playwright E2E Test Altyapısı
+- [x] Playwright kurulumu ve yapılandırması (Chromium, workers:1, cookie login helper)
+- [x] Temel E2E testleri: ana sayfa, login, kayıt akışı (34 test)
+- [x] Rol bazlı E2E testleri: admin, mentor, student, school_admin dashboard
+- [x] Stripe ödeme akışı E2E testi (fiyatlandırma, checkout, ödeme geçmişi)
+- [x] Kayıt formu E2E testi (form validation, zorunlu alanlar)
+- [x] Dark mode ve responsive E2E testi (tema değiştirme, mobil görünüm)
+
+### Push Notification Sistemi
+- [x] Service Worker push event handler aktif (sw.js - push, notificationclick)
+- [x] Frontend push notification izin isteme UI (usePushNotifications hook, NotificationSettings sayfası)
+- [x] Push subscription backend'e kaydetme (notifications.subscribePush, unsubscribePush)
+- [x] Etap açılma push bildirimi (admin, mentor, cron otomatik açılma)
+- [x] Etap hatırlatma push bildirimleri (cron job + reminderService)
+- [x] Rapor hazır/onay/red push bildirimi
+- [x] Rozet kazanım push bildirimi (badgeEngine entegrasyonu)
+- [x] Mentor'ın öğrenci ilerleme push bildirimi
+- [x] Tüm createNotification çağrıları notify() ile değiştirildi (in-app + push)
+- [x] Push notification Vitest testleri (17 test)
+
+### Canlı Yayın Hazırlığı
+- [x] TypeScript 0 hata doğrulandı
+- [x] Vitest: 15 dosya, 186/186 test BAŞARILI
+- [x] Playwright E2E: 34/34 test BAŞARILI
+- [x] Final checkpoint kaydedildi
