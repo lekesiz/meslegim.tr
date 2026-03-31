@@ -40,14 +40,14 @@ const studentProcedure = protectedProcedure.use(({ ctx, next }) => {
 });
 
 const mentorProcedure = protectedProcedure.use(({ ctx, next }) => {
-  if (!hasAnyRole(ctx.user.role, ['mentor', 'admin'])) {
+  if (!hasAnyRole(ctx.user.role, ['mentor', 'admin', 'super_admin'])) {
     throw new TRPCError({ code: 'FORBIDDEN', message: 'Bu işlem yalnızca mentorlara özeldir' });
   }
   return next({ ctx });
 });
 
 const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
-  if (!hasRole(ctx.user.role, 'admin')) {
+  if (!isAdminLevel(ctx.user.role)) {
     throw new TRPCError({ code: 'FORBIDDEN', message: 'Bu işlem yalnızca yöneticilere özeldir' });
   }
   return next({ ctx });
@@ -86,9 +86,16 @@ export const appRouter = router({
           throw new TRPCError({ code: 'UNAUTHORIZED', message: 'E-posta veya şifre hatalı' });
         }
         
-        // Check if user is active
+        // Check if user is active (admin roles are auto-activated)
         if (user.status !== 'active') {
-          throw new TRPCError({ code: 'FORBIDDEN', message: 'Hesabınız henüz aktif değil. Mentor onayı bekleniyor.' });
+          const adminRoles = ['admin', 'super_admin', 'school_admin'];
+          const isAdminRole = adminRoles.some(r => user.role.includes(r));
+          if (isAdminRole) {
+            // Auto-activate admin roles on first login
+            await db.updateUser(user.id, { status: 'active' });
+          } else {
+            throw new TRPCError({ code: 'FORBIDDEN', message: 'Hesabınız henüz aktif değil. Yönetici onayından sonra e-posta ile bilgilendirileceksiniz.' });
+          }
         }
         
         // If user has no openId (email/password registered users), assign one

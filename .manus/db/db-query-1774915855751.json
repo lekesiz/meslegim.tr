@@ -1,0 +1,35 @@
+{
+  "query": "SELECT id, type, metadata FROM questions WHERE metadata LIKE '%allowMultiple%' LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute SELECT id, type, metadata FROM questions WHERE metadata LIKE '%allowMultiple%' LIMIT 5;",
+  "rows": [
+    {
+      "id": "90002",
+      "type": "multiple_choice",
+      "metadata": "{\"allowMultiple\": true}"
+    },
+    {
+      "id": "90004",
+      "type": "multiple_choice",
+      "metadata": "{\"allowMultiple\": true}"
+    },
+    {
+      "id": "90008",
+      "type": "multiple_choice",
+      "metadata": "{\"allowMultiple\": true}"
+    },
+    {
+      "id": "90021",
+      "type": "multiple_choice",
+      "metadata": "{\"allowMultiple\": true}"
+    },
+    {
+      "id": "90031",
+      "type": "multiple_choice",
+      "metadata": "{\"allowMultiple\": true}"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttype\tmetadata\n90002\tmultiple_choice\t{\"allowMultiple\": true}\n90004\tmultiple_choice\t{\"allowMultiple\": true}\n90008\tmultiple_choice\t{\"allowMultiple\": true}\n90021\tmultiple_choice\t{\"allowMultiple\": true}\n90031\tmultiple_choice\t{\"allowMultiple\": true}\n",
+  "stderr": "",
+  "execution_time_ms": 56
+}

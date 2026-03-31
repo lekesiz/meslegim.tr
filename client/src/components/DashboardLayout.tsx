@@ -51,7 +51,11 @@ const getMenuItems = (role: string) => {
     { icon: CreditCard, label: "Ödeme Geçmişi", path: "/dashboard/student/payment-history" },
   ];
   
-  if (role === 'admin') return adminItems;
+  if (role === 'admin' || role === 'super_admin') return adminItems;
+  if (role === 'school_admin') return [
+    { icon: LayoutDashboard, label: "Panel", path: "/dashboard/school-admin" },
+    { icon: Users, label: "\u00d6\u011frenci Y\u00f6netimi", path: "/dashboard/school-admin" },
+  ];
   if (role === 'mentor') return mentorItems;
   return studentItems;
 };
@@ -86,10 +90,10 @@ export default function DashboardLayout({
         <div className="flex flex-col items-center gap-8 p-8 max-w-md w-full">
           <div className="flex flex-col items-center gap-6">
             <h1 className="text-2xl font-semibold tracking-tight text-center">
-              Sign in to continue
+              Devam etmek için giriş yapın
             </h1>
             <p className="text-sm text-muted-foreground text-center max-w-sm">
-              Access to this dashboard requires authentication. Continue to launch the login flow.
+              Bu panele erişmek için kimlik doğrulaması gereklidir. Giriş yapmak için devam edin.
             </p>
           </div>
           <Button
@@ -99,7 +103,7 @@ export default function DashboardLayout({
             size="lg"
             className="w-full shadow-lg hover:shadow-xl transition-all"
           >
-            Sign in
+            Giriş Yap
           </Button>
         </div>
       </div>
@@ -136,7 +140,14 @@ function DashboardLayoutContent({
   const isCollapsed = state === "collapsed";
   const [isResizing, setIsResizing] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
-  const menuItems = getMenuItems(user?.role || 'student');
+  // Multi-role support: pick highest priority role
+  const roles = (user?.role || 'student').split(',').map(r => r.trim());
+  const primaryRole = roles.includes('super_admin') ? 'super_admin' 
+    : roles.includes('admin') ? 'admin'
+    : roles.includes('school_admin') ? 'school_admin'
+    : roles.includes('mentor') ? 'mentor'
+    : 'student';
+  const menuItems = getMenuItems(primaryRole);
   const activeMenuItem = menuItems.find(item => item.path === location);
   const isMobile = useIsMobile();
 
@@ -208,7 +219,7 @@ function DashboardLayoutContent({
               {menuItems.map(item => {
                 const isActive = location === item.path;
                 return (
-                  <SidebarMenuItem key={item.path}>
+                  <SidebarMenuItem key={`${item.path}-${item.label}`}>
                     <SidebarMenuButton
                       isActive={isActive}
                       onClick={() => setLocation(item.path)}

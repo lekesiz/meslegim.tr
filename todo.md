@@ -1274,4 +1274,25 @@ Platform **minimum seviyede sağlıklı** çalışıyor. Tüm temel özellikler 
 - [x] Admin ödeme yönetimi çalışıyor
 - [x] Form UX edge case'leri test edildi - likert responsive düzeltildi
 - [x] Responsive 3 breakpoint'te test edildi (375px, 768px, 1280px) - tablo overflow, likert grid
-- [ ] GitHub repository'yi son durumla güncelle
+- [x] GitHub repository'yi son durumla güncelle - 9727e0f push edildi
+
+## 🔥 Final Validasyon Düzeltmeleri (31 Mart 2026 - Son Kontrol)
+
+### Bug Düzeltmeleri
+- [x] Promosyon kodu oluşturma - discountType 'fixed' → 'fixed_amount' uyumsuzluğu düzeltildi
+- [x] Promosyon kodu oluşturma - expiresAt toISOString() → Date nesnesi düzeltildi (superjson uyumu)
+- [x] DashboardLayout duplicate key hatası düzeltildi (path+label key)
+- [x] DashboardLayout İngilizce metinler Türkçe'ye çevrildi (Sign in → Giriş Yap)
+
+### Doğrulama Sonuçları
+- [x] Tüm Vitest testleri geçiyor - 14 dosya, 169/169 test BAŞARILI
+- [x] TypeScript 0 hata
+- [x] 5 kullanıcı rolü ile uçtan uca test (admin, mentor, school_admin, student, admin+mentor)
+- [x] Stripe test ödemesi başarılı (checkout → webhook → DB kaydı id:60001 → etap açma)
+- [x] Promosyon kodu API ile başarıyla oluşturuldu (TEST50, %50 indirim)
+- [x] Dark mode tüm sayfalarda uyumlu
+- [x] Tüm form tipleri çalışıyor (text:65, multiple_choice:126, likert:178, ranking:6)
+- [x] Boş durum ve loading state'ler mevcut (170+ referans)
+- [x] Hata mesajları Türkçe ve anlaşılır
+- [x] Console'da gereksiz debug log yok
+- [x] Soru tipi dağılımı: likert(178), multiple_choice(126), text(65), ranking(6) = 375 soru

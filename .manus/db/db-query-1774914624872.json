@@ -1,0 +1,213 @@
+{
+  "query": "SELECT id, name, email, role, status FROM users ORDER BY role, id LIMIT 30;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute SELECT id, name, email, role, status FROM users ORDER BY role, id LIMIT 30;",
+  "rows": [
+    {
+      "id": "1",
+      "name": "Mikail Lekesiz",
+      "email": "mikail@netzinformatique.fr",
+      "role": "admin",
+      "status": "active"
+    },
+    {
+      "id": "180024",
+      "name": "Test Admin",
+      "email": "admin@test.com",
+      "role": "admin",
+      "status": "active"
+    },
+    {
+      "id": "1140080",
+      "name": "Platform Admin",
+      "email": "admin@meslegim.tr",
+      "role": "admin",
+      "status": "active"
+    },
+    {
+      "id": "240003",
+      "name": "Mikail Lekesiz",
+      "email": "mikaillekesiz@gmail.com",
+      "role": "admin,mentor",
+      "status": "active"
+    },
+    {
+      "id": "180023",
+      "name": "Test Mentor",
+      "email": "mentor@test.com",
+      "role": "mentor",
+      "status": "active"
+    },
+    {
+      "id": "570040",
+      "name": "Hilal Lekesiz",
+      "email": "hilallekesizkilic@gmail.com",
+      "role": "mentor",
+      "status": "active"
+    },
+    {
+      "id": "930014",
+      "name": "Test Mentor",
+      "email": "test.mentor@gmail.com",
+      "role": "mentor",
+      "status": "active"
+    },
+    {
+      "id": "1680046",
+      "name": "Test Okul Yöneticisi",
+      "email": "school@test.com",
+      "role": "school_admin",
+      "status": "active"
+    },
+    {
+      "id": "150002",
+      "name": "Mehmet Demir (Edited)",
+      "email": "mehmet.demir@test.com",
+      "role": "student",
+      "status": "active"
+    },
+    {
+      "id": "180022",
+      "name": "Test Öğrenci",
+      "email": "student@test.com",
+      "role": "student",
+      "status": "active"
+    },
+    {
+      "id": "180160",
+      "name": "Ahmet Yılmaz",
+      "email": "ahmet@test.com",
+      "role": "student",
+      "status": "active"
+    },
+    {
+      "id": "330003",
+      "name": "Test Kullanıcı Final",
+      "email": "test.final@meslegim.tr",
+      "role": "student",
+      "status": "active"
+    },
+    {
+      "id": "330016",
+      "name": "Yusuf özcan",
+      "email": "yusuf.ozcan69@gmail.com",
+      "role": "student",
+      "status": "active"
+    },
+    {
+      "id": "450001",
+      "name": "Mikail Lekesiz",
+      "email": "mikail@lekesiz.org",
+      "role": "student",
+      "status": "active"
+    },
+    {
+      "id": "630089",
+      "name": "Test Öğrenci Dört",
+      "email": "test.ogrenci4@test.com",
+      "role": "student",
+      "status": "active"
+    },
+    {
+      "id": "660002",
+      "name": "Test Network Debug",
+      "email": "test.network@test.com",
+      "role": "student",
+      "status": "active"
+    },
+    {
+      "id": "780066",
+      "name": "Test Öğrenci",
+      "email": "test@student.com",
+      "role": "student",
+      "status": "active"
+    },
+    {
+      "id": "930011",
+      "name": "Test Öğrenci 1 (14-17)",
+      "email": "test.ogrenci1@gmail.com",
+      "role": "student",
+      "status": "active"
+    },
+    {
+      "id": "930012",
+      "name": "Test Öğrenci 2 (18-21)",
+      "email": "test.ogrenci2@gmail.com",
+      "role": "student",
+      "status": "active"
+    },
+    {
+      "id": "930013",
+      "name": "Test Öğrenci 3 (22-24)",
+      "email": "test.ogrenci3@gmail.com",
+      "role": "student",
+      "status": "active"
+    },
+    {
+      "id": "930101",
+      "name": "Zeynep Arslan",
+      "email": "zeynep.arslan.beta@gmail.com",
+      "role": "student",
+      "status": "active"
+    },
+    {
+      "id": "930102",
+      "name": "Emre Kaya",
+      "email": "emre.kaya.beta@gmail.com",
+      "role": "student",
+      "status": "active"
+    },
+    {
+      "id": "1140010",
+      "name": "Test Kullanıcı",
+      "email": "testuser2026@gmail.com",
+      "role": "student",
+      "status": "active"
+    },
+    {
+      "id": "1170022",
+      "name": "Ayşe Yıldız",
+      "email": "ayse.yildiz.test@gmail.com",
+      "role": "student",
+      "status": "active"
+    },
+    {
+      "id": "1320001",
+      "name": "Mikail lekesiz ",
+      "email": "mikail@lekesiz.fr",
+      "role": "student",
+      "status": "active"
+    },
+    {
+      "id": "1440004",
+      "name": "Test Öğrenci",
+      "email": "test.ogrenci@example.com",
+      "role": "student",
+      "status": "active"
+    },
+    {
+      "id": "1470001",
+      "name": "Test Öğrenci Lise",
+      "email": "testlise2026@test.com",
+      "role": "student",
+      "status": "active"
+    },
+    {
+      "id": "1530198",
+      "name": "Mikail Lekesiz",
+      "email": "mikail@lekesiz.tr",
+      "role": "student",
+      "status": "active"
+    },
+    {
+      "id": "1680047",
+      "name": "Test Süper Admin",
+      "email": "superadmin@test.com",
+      "role": "super_admin",
+      "status": "active"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\trole\tstatus\n1\tMikail Lekesiz\tmikail@netzinformatique.fr\tadmin\tactive\n180024\tTest Admin\tadmin@test.com\tadmin\tactive\n1140080\tPlatform Admin\tadmin@meslegim.tr\tadmin\tactive\n240003\tMikail Lekesiz\tmikaillekesiz@gmail.com\tadmin,mentor\tactive\n180023\tTest Mentor\tmentor@test.com\tmentor\tactive\n570040\tHilal Lekesiz\thilallekesizkilic@gmail.com\tmentor\tactive\n930014\tTest Mentor\ttest.mentor@gmail.com\tmentor\tactive\n1680046\tTest Okul Yöneticisi\tschool@test.com\tschool_admin\tactive\n150002\tMehmet Demir (Edited)\tmehmet.demir@test.com\tstudent\tactive\n180022\tTest Öğrenci\tstudent@test.com\tstudent\tactive\n180160\tAhmet Yılmaz\tahmet@test.com\tstudent\tactive\n330003\tTest Kullanıcı Final\ttest.final@meslegim.tr\tstudent\tactive\n330016\tYusuf özcan\tyusuf.ozcan69@gmail.com\tstudent\tactive\n450001\tMikail Lekesiz\tmikail@lekesiz.org\tstudent\tactive\n630089\tTest Öğrenci Dört\ttest.ogrenci4@test.com\tstudent\tactive\n660002\tTest Network Debug\ttest.network@test.com\tstudent\tactive\n780066\tTest Öğrenci\ttest@student.com\tstudent\tactive\n930011\tTest Öğrenci 1 (14-17)\ttest.ogrenci1@gmail.com\tstudent\tactive\n930012\tTest Öğrenci 2 (18-21)\ttest.ogrenci2@gmail.com\tstudent\tactive\n930013\tTest Öğrenci 3 (22-24)\ttest.ogrenci3@gmail.com\tstudent\tactive\n930101\tZeynep Arslan\tzeynep.arslan.beta@gmail.com\tstudent\tactive\n930102\tEmre Kaya\temre.kaya.beta@gmail.com\tstudent\tactive\n1140010\tTest Kullanıcı\ttestuser2026@gmail.com\tstudent\tactive\n1170022\tAyşe Yıldız\tayse.yildiz.test@gmail.com\tstudent\tactive\n1320001\tMikail lekesiz \tmikail@lekesiz.fr\tstudent\tactive\n1440004\tTest Öğrenci\ttest.ogrenci@example.com\tstudent\tactive\n1470001\tTest Öğrenci Lise\ttestlise2026@test.com\tstudent\tactive\n1530198\tMikail Lekesiz\tmikail@lekesiz.tr\tstudent\tactive\n1680047\tTest Süper Admin\tsuperadmin@test.com\tsuper_admin\tactive\n",
+  "stderr": "",
+  "execution_time_ms": 53
+}
