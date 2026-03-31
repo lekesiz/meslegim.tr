@@ -289,6 +289,11 @@ export async function checkAndAwardBadges(userId: number): Promise<BadgeCheckRes
           message: badge.description || `Tebrikler! "${badge.name}" rozetini kazandınız! (+${badge.xpReward} XP)`,
           event: 'badge_earned',
           link: '/dashboard/student/achievements',
+          pushPayload: {
+            body: `Tebrikler! "${badge.name}" rozetini kazandınız! (+${badge.xpReward} XP)`,
+            url: '/dashboard/student/achievements',
+            tag: `badge-earned-${badge.id}`,
+          },
           emailSubject: `Tebrikler! "${badge.name}" rozetini kazandınız!`,
           emailHtml: `
             <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">

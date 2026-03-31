@@ -1,0 +1,80 @@
+{
+  "query": "SELECT id, name, email, role, status FROM users WHERE role IN ('student', 'school_admin') LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute SELECT id, name, email, role, status FROM users WHERE role IN ('student', 'school_admin') LIMIT 10;",
+  "rows": [
+    {
+      "id": "150002",
+      "name": "Mehmet Demir (Edited)",
+      "email": "mehmet.demir@test.com",
+      "role": "student",
+      "status": "active"
+    },
+    {
+      "id": "180022",
+      "name": "Test Öğrenci",
+      "email": "student@test.com",
+      "role": "student",
+      "status": "active"
+    },
+    {
+      "id": "180160",
+      "name": "Ahmet Yılmaz",
+      "email": "ahmet@test.com",
+      "role": "student",
+      "status": "active"
+    },
+    {
+      "id": "330003",
+      "name": "Test Kullanıcı Final",
+      "email": "test.final@meslegim.tr",
+      "role": "student",
+      "status": "active"
+    },
+    {
+      "id": "330016",
+      "name": "Yusuf özcan",
+      "email": "yusuf.ozcan69@gmail.com",
+      "role": "student",
+      "status": "active"
+    },
+    {
+      "id": "450001",
+      "name": "Mikail Lekesiz",
+      "email": "mikail@lekesiz.org",
+      "role": "student",
+      "status": "active"
+    },
+    {
+      "id": "630089",
+      "name": "Test Öğrenci Dört",
+      "email": "test.ogrenci4@test.com",
+      "role": "student",
+      "status": "active"
+    },
+    {
+      "id": "660002",
+      "name": "Test Network Debug",
+      "email": "test.network@test.com",
+      "role": "student",
+      "status": "active"
+    },
+    {
+      "id": "780066",
+      "name": "Test Öğrenci",
+      "email": "test@student.com",
+      "role": "student",
+      "status": "active"
+    },
+    {
+      "id": "930011",
+      "name": "Test Öğrenci 1 (14-17)",
+      "email": "test.ogrenci1@gmail.com",
+      "role": "student",
+      "status": "active"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\trole\tstatus\n150002\tMehmet Demir (Edited)\tmehmet.demir@test.com\tstudent\tactive\n180022\tTest Öğrenci\tstudent@test.com\tstudent\tactive\n180160\tAhmet Yılmaz\tahmet@test.com\tstudent\tactive\n330003\tTest Kullanıcı Final\ttest.final@meslegim.tr\tstudent\tactive\n330016\tYusuf özcan\tyusuf.ozcan69@gmail.com\tstudent\tactive\n450001\tMikail Lekesiz\tmikail@lekesiz.org\tstudent\tactive\n630089\tTest Öğrenci Dört\ttest.ogrenci4@test.com\tstudent\tactive\n660002\tTest Network Debug\ttest.network@test.com\tstudent\tactive\n780066\tTest Öğrenci\ttest@student.com\tstudent\tactive\n930011\tTest Öğrenci 1 (14-17)\ttest.ogrenci1@gmail.com\tstudent\tactive\n",
+  "stderr": "",
+  "execution_time_ms": 54
+}

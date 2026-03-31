@@ -81,6 +81,11 @@ export async function checkAndCreateReminders() {
         message: `"${stage.stageName}" etabını tamamlamayı unutmayın! Son güncellemenizden ${STAGE_INACTIVE_DAYS} gün geçti.`,
         event: 'stage_reminder',
         link: `/dashboard/student/stage/${stage.stageId}`,
+        pushPayload: {
+          body: `"${stage.stageName}" etabını tamamlamayı unutmayın! Son güncellemenizden ${STAGE_INACTIVE_DAYS} gün geçti.`,
+          url: `/dashboard/student/stage/${stage.stageId}`,
+          tag: `stage-reminder-${stage.stageId}`,
+        },
         emailSubject: `Hatırlatma: "${stage.stageName}" etabınız sizi bekliyor!`,
         emailHtml: `
           <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
