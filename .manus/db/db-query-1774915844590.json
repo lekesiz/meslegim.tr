@@ -1,0 +1,26 @@
+{
+  "query": "SELECT type, COUNT(*) as count FROM questions GROUP BY type;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute SELECT type, COUNT(*) as count FROM questions GROUP BY type;",
+  "rows": [
+    {
+      "type": "likert",
+      "count": "178"
+    },
+    {
+      "type": "multiple_choice",
+      "count": "126"
+    },
+    {
+      "type": "text",
+      "count": "65"
+    },
+    {
+      "type": "ranking",
+      "count": "6"
+    }
+  ],
+  "messages": [],
+  "stdout": "type\tcount\nlikert\t178\nmultiple_choice\t126\ntext\t65\nranking\t6\n",
+  "stderr": "",
+  "execution_time_ms": 173
+}

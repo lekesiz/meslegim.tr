@@ -1,0 +1,37 @@
+{
+  "query": "SELECT id, userId, productId, status, amountInCents, createdAt, completedAt FROM purchases ORDER BY createdAt DESC LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute SELECT id, userId, productId, status, amountInCents, createdAt, completedAt FROM purchases ORDER BY createdAt DESC LIMIT 5;",
+  "rows": [
+    {
+      "id": "60001",
+      "userId": "240003",
+      "productId": "basic_package",
+      "status": "completed",
+      "amountInCents": "14900",
+      "createdAt": "2026-03-30 23:57:54",
+      "completedAt": "2026-03-30 23:59:00"
+    },
+    {
+      "id": "30001",
+      "userId": "180023",
+      "productId": "basic_package",
+      "status": "completed",
+      "amountInCents": "14900",
+      "createdAt": "2026-03-30 22:47:14",
+      "completedAt": "2026-03-30 22:48:44"
+    },
+    {
+      "id": "1",
+      "userId": "180022",
+      "productId": "professional_package",
+      "status": "completed",
+      "amountInCents": "29900",
+      "createdAt": "2026-03-30 00:00:28",
+      "completedAt": "2026-03-30 00:01:49"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuserId\tproductId\tstatus\tamountInCents\tcreatedAt\tcompletedAt\n60001\t240003\tbasic_package\tcompleted\t14900\t2026-03-30 23:57:54\t2026-03-30 23:59:00\n30001\t180023\tbasic_package\tcompleted\t14900\t2026-03-30 22:47:14\t2026-03-30 22:48:44\n1\t180022\tprofessional_package\tcompleted\t29900\t2026-03-30 00:00:28\t2026-03-30 00:01:49\n",
+  "stderr": "",
+  "execution_time_ms": 64
+}

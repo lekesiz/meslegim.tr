@@ -1,0 +1,15 @@
+{
+  "query": "SELECT id, email, password FROM users WHERE email = 'test.ogrenci1@gmail.com';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute SELECT id, email, password FROM users WHERE email = 'test.ogrenci1@gmail.com';",
+  "rows": [
+    {
+      "id": "930011",
+      "email": "test.ogrenci1@gmail.com",
+      "password": "$2b$10$gNo54bQjtVOHyxH6XcQPUufzx73bUxGfH/hnu3PdfDYaGq4kPUT22"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\temail\tpassword\n930011\ttest.ogrenci1@gmail.com\t$2b$10$gNo54bQjtVOHyxH6XcQPUufzx73bUxGfH/hnu3PdfDYaGq4kPUT22\n",
+  "stderr": "",
+  "execution_time_ms": 61
+}

@@ -1,0 +1,24 @@
+{
+  "query": "SELECT id, name, email, role, status FROM users WHERE email IN ('superadmin@test.com', 'school@test.com');",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute SELECT id, name, email, role, status FROM users WHERE email IN ('superadmin@test.com', 'school@test.com');",
+  "rows": [
+    {
+      "id": "1680047",
+      "name": "Test Süper Admin",
+      "email": "superadmin@test.com",
+      "role": "super_admin",
+      "status": "pending"
+    },
+    {
+      "id": "1680046",
+      "name": "Test Okul Yöneticisi",
+      "email": "school@test.com",
+      "role": "school_admin",
+      "status": "pending"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\trole\tstatus\n1680047\tTest Süper Admin\tsuperadmin@test.com\tsuper_admin\tpending\n1680046\tTest Okul Yöneticisi\tschool@test.com\tschool_admin\tpending\n",
+  "stderr": "",
+  "execution_time_ms": 52
+}

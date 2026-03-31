@@ -1,0 +1,9 @@
+{
+  "query": "INSERT INTO users (name, email, password, role, schoolId, createdAt, updatedAt) VALUES ('Test Okul Yöneticisi', 'school@test.com', '$2b$10$UHTOGx026qHtHBKiSaWrk.21Nb8d1jB1WJcjU4X5FGJ8xZ58aGnOO', 'school_admin', 1, NOW(), NOW()); INSERT INTO users (name, email, password, role, createdAt, updatedAt) VALUES ('Test Süper Admin', 'superadmin@test.com', '$2b$10$UHTOGx026qHtHBKiSaWrk.21Nb8d1jB1WJcjU4X5FGJ8xZ58aGnOO', 'super_admin', NOW(), NOW());",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute INSERT INTO users (name, email, password, role, schoolId, createdAt, updatedAt) VALUES ('Test Okul Yöneticisi', 'school@test.com', '$2b$10$UHTOGx026qHtHBKiSaWrk.21Nb8d1jB1WJcjU4X5FGJ8xZ58aGnOO', 'school_admin', 1, NOW(), NOW()); INSERT INTO users (name, email, password, role, createdAt, updatedAt) VALUES ('Test Süper Admin', 'superadmin@test.com', '$2b$10$UHTOGx026qHtHBKiSaWrk.21Nb8d1jB1WJcjU4X5FGJ8xZ58aGnOO', 'super_admin', NOW(), NOW());",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 70
+}

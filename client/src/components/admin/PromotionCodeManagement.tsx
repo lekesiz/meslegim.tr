@@ -228,7 +228,7 @@ function PromoCodeForm({ onSubmit, isPending, onCancel }: {
       discountValue: parseFloat(discountValue),
       maxUses: maxUses ? parseInt(maxUses) : undefined,
       maxUsesPerUser: maxUsesPerUser ? parseInt(maxUsesPerUser) : 1,
-      expiresAt: expiresAt ? new Date(expiresAt).toISOString() : undefined,
+      expiresAt: expiresAt ? new Date(expiresAt) : undefined,
     });
   };
 
@@ -256,7 +256,7 @@ function PromoCodeForm({ onSubmit, isPending, onCancel }: {
             <SelectTrigger><SelectValue /></SelectTrigger>
             <SelectContent>
               <SelectItem value="percentage">Yüzde (%)</SelectItem>
-              <SelectItem value="fixed">Sabit (TL)</SelectItem>
+              <SelectItem value="fixed_amount">Sabit (TL)</SelectItem>
             </SelectContent>
           </Select>
         </div>

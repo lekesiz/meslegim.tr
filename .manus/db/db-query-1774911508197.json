@@ -1,0 +1,13 @@
+{
+  "query": "SELECT id FROM schools WHERE name = 'Test Anadolu Lisesi' LIMIT 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3GB82FZGmc2ADuw.a7b90b108d57 --database jiPvNqaHRUg9H2uZgXUx3J --execute SELECT id FROM schools WHERE name = 'Test Anadolu Lisesi' LIMIT 1;",
+  "rows": [
+    {
+      "id": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\n1\n",
+  "stderr": "",
+  "execution_time_ms": 62
+}
