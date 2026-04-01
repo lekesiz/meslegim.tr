@@ -1,4 +1,4 @@
-import { COOKIE_NAME } from "@shared/const";
+import { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router, protectedProcedure } from "./_core/trpc";
@@ -57,7 +57,11 @@ export const appRouter = router({
   system: systemRouter,
   
   auth: router({
-    me: publicProcedure.query(opts => opts.ctx.user),
+    me: publicProcedure.query(opts => {
+      if (!opts.ctx.user) return null;
+      const { password: _, ...safeUser } = opts.ctx.user;
+      return safeUser;
+    }),
     logout: publicProcedure.mutation(({ ctx }) => {
       const cookieOptions = getSessionCookieOptions(ctx.req);
       ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
@@ -111,9 +115,11 @@ export const appRouter = router({
         
         // Set session cookie
         const cookieOptions = getSessionCookieOptions(ctx.req);
-        ctx.res.cookie(COOKIE_NAME, sessionToken, cookieOptions);
+        ctx.res.cookie(COOKIE_NAME, sessionToken, { ...cookieOptions, maxAge: ONE_YEAR_MS });
         
-        return { success: true, user };
+        // Never return password hash to client
+        const { password: _, ...safeUser } = user;
+        return { success: true, user: safeUser };
       }),
     requestPasswordReset: publicProcedure
       .input(z.object({
@@ -267,6 +273,10 @@ export const appRouter = router({
       }))
       .mutation(async ({ ctx, input }) => {
         const updated = await db.updateUserProfile(ctx.user.id, input);
+        if (updated) {
+          const { password: _, ...safeUpdated } = updated;
+          return { success: true, user: safeUpdated };
+        }
         return { success: true, user: updated };
       }),
     changePassword: protectedProcedure
@@ -1061,7 +1071,8 @@ export const appRouter = router({
     getPendingStudents: mentorProcedure.query(async ({ ctx }) => {
       // Mentors see only their assigned students, admins see all
       const mentorId = hasRole(ctx.user.role, 'mentor') && !hasRole(ctx.user.role, 'admin') ? ctx.user.id : undefined;
-      return await db.getPendingStudents(mentorId);
+      const pending = await db.getPendingStudents(mentorId);
+      return pending.map(({ password: _, ...safe }) => safe);
     }),
     
     activateStudent: mentorProcedure
@@ -1125,7 +1136,8 @@ export const appRouter = router({
         // Admins see all students
         return (await db.getAllUsers()).filter(u => hasRole(u.role, 'student'));
       }
-      return await db.getStudentsByMentor(ctx.user.id);
+      const students = await db.getStudentsByMentor(ctx.user.id);
+      return students.map(({ password: _, ...safe }) => safe);
     }),
     
     getStudentDetails: mentorProcedure
@@ -2359,7 +2371,8 @@ export const appRouter = router({
       }))
       .query(async ({ ctx, input }) => {
         if (!isSchoolAdminLevel(ctx.user.role)) throw new TRPCError({ code: 'FORBIDDEN' });
-        return db.getUsersBySchool(input.schoolId, { role: 'student', status: input.status, search: input.search });
+        const schoolUsers = await db.getUsersBySchool(input.schoolId, { role: 'student', status: input.status, search: input.search });
+        return schoolUsers.map(({ password: _, ...safe }) => safe);
       }),
 
     // Okul istatistikleri
@@ -2562,7 +2575,8 @@ export const appRouter = router({
       .query(async ({ ctx, input }) => {
         if (!isSchoolAdminLevel(ctx.user.role)) throw new TRPCError({ code: 'FORBIDDEN' });
         if (!ctx.user.schoolId) return [];
-        return db.getUsersBySchool(ctx.user.schoolId, { role: 'student', ...input });
+        const schoolStudents = await db.getUsersBySchool(ctx.user.schoolId, { role: 'student', ...input });
+        return schoolStudents.map(({ password: _, ...safe }) => safe);
       }),
 
     // Kendi okulundaki mentorları getir

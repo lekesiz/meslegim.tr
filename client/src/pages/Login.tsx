@@ -39,7 +39,6 @@ export default function Login() {
     onSuccess: () => {
       setErrorMessage("");
       analytics.login('user');
-      // Hard redirect so auth state is fully refreshed
       window.location.replace('/dashboard');
     },
     onError: (error: any) => {
@@ -63,16 +62,16 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-sky-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 flex items-center justify-center p-4">
       <SEO title="Giriş Yap" description="Meslegim.tr kariyer değerlendirme platformuna giriş yapın." noIndex />
       <div className="w-full max-w-md space-y-6">
         {/* Logo */}
         <div className="text-center">
           <div className="inline-flex items-center gap-2 mb-2">
-            <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+            <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
               <Briefcase className="w-5 h-5 text-white" />
             </div>
-            <span className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+            <span className="text-2xl font-bold bg-gradient-to-r from-blue-700 to-indigo-600 bg-clip-text text-transparent">
               Meslegim.tr
             </span>
           </div>
@@ -93,13 +92,15 @@ export default function Login() {
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4" autoComplete="off">
               <div className="space-y-2">
-                <Label htmlFor="email">E-posta</Label>
+                <Label htmlFor="login-email">E-posta</Label>
                 <Input
-                  id="email"
+                  id="login-email"
+                  name="login-email"
                   type="email"
                   required
+                  autoComplete="username"
                   value={formData.email}
                   onChange={(e) => {
                     setFormData({ ...formData, email: e.target.value });
@@ -111,11 +112,13 @@ export default function Login() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password">Şifre</Label>
+                <Label htmlFor="login-password">Şifre</Label>
                 <Input
-                  id="password"
+                  id="login-password"
+                  name="login-password"
                   type="password"
                   required
+                  autoComplete="current-password"
                   value={formData.password}
                   onChange={(e) => {
                     setFormData({ ...formData, password: e.target.value });
@@ -137,7 +140,7 @@ export default function Login() {
               <Button
                 type="submit"
                 disabled={loginMutation.isPending}
-                className="w-full h-11 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
+                className="w-full h-11 !bg-blue-600 hover:!bg-blue-700 text-white font-medium"
               >
                 {loginMutation.isPending ? "Giriş yapılıyor..." : "Giriş Yap"}
               </Button>
@@ -147,7 +150,7 @@ export default function Login() {
                   <DialogTrigger asChild>
                     <button
                       type="button"
-                      className="text-indigo-600 hover:underline font-medium"
+                      className="text-blue-600 dark:text-blue-400 hover:underline font-medium"
                     >
                       Şifremi Unuttum
                     </button>
@@ -209,7 +212,7 @@ export default function Login() {
                 <button
                   type="button"
                   onClick={() => setLocation('/?kayit=1')}
-                  className="text-indigo-600 hover:underline font-semibold"
+                  className="text-blue-600 dark:text-blue-400 hover:underline font-semibold"
                 >
                   Ücretsiz Kayıt Ol
                 </button>

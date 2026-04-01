@@ -94,8 +94,13 @@ export async function checkAndActivateStages() {
     }
 
     console.log(`[Cron] Stage activation check complete: ${stagesToActivate.length} stages activated`);
-  } catch (error) {
-    console.error('[Cron] Error in checkAndActivateStages:', error);
+  } catch (error: any) {
+    const msg = error?.message || String(error);
+    if (msg.includes('ECONNRESET') || msg.includes('ETIMEDOUT')) {
+      console.warn('[Cron] DB ba\u011flant\u0131 hatas\u0131 (checkAndActivateStages), sonraki d\u00f6ng\u00fcde tekrar denenecek');
+    } else {
+      console.error('[Cron] checkAndActivateStages hatas\u0131:', msg);
+    }
   }
 }
 
@@ -190,8 +195,13 @@ export async function sendStageReminderEmails() {
     }
 
     console.log(`[Cron] Reminder emails complete: ${stagesToRemind.length} sent`);
-  } catch (error) {
-    console.error('[Cron] Error in sendStageReminderEmails:', error);
+  } catch (error: any) {
+    const msg = error?.message || String(error);
+    if (msg.includes('ECONNRESET') || msg.includes('ETIMEDOUT')) {
+      console.warn('[Cron] DB ba\u011flant\u0131 hatas\u0131 (sendStageReminderEmails), sonraki d\u00f6ng\u00fcde tekrar denenecek');
+    } else {
+      console.error('[Cron] sendStageReminderEmails hatas\u0131:', msg);
+    }
   }
 }
 
