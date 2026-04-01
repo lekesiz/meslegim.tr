@@ -140,7 +140,7 @@ export const appRouter = router({
           html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
               <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 20px; text-align: center;">
-                <img src="https://meslegim-tr.manus.space/logo.png" alt="Meslegim.tr Logo" style="height: 50px; margin-bottom: 20px;" />
+                <img src="https://d2xsxph8kpxj0f.cloudfront.net/310419663028218705/jiPvNqaHRUg9H2uZgXUx3J/logo_3458a270.png" alt="Meslegim.tr Logo" style="height: 50px; margin-bottom: 20px;" />
                 <h1 style="color: white; margin: 0;">Meslegim.tr</h1>
                 <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0 0;">Kariyer Değerlendirme Platformu</p>
               </div>
