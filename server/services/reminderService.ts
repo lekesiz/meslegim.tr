@@ -119,8 +119,13 @@ export async function checkAndCreateReminders() {
 
       created++;
     }
-  } catch (err) {
-    console.error('[ReminderService] Error checking reminders:', err);
+  } catch (err: any) {
+    const errMsg = err?.message || String(err);
+    if (errMsg.includes('ECONNRESET') || errMsg.includes('PROTOCOL_CONNECTION_LOST') || errMsg.includes('ETIMEDOUT')) {
+      console.warn('[ReminderService] DB ba\u011flant\u0131 hatas\u0131, sonraki d\u00f6ng\u00fcde tekrar denenecek');
+    } else {
+      console.error('[ReminderService] Beklenmeyen hata:', errMsg);
+    }
   }
 
   if (created > 0) {
