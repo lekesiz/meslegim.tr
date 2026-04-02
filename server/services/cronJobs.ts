@@ -5,6 +5,7 @@ import { eq, and, lt, gt, between } from 'drizzle-orm';
 import { sendEmail } from '../_core/resend-email';
 import { getNewStageActivatedEmailTemplate, getStageReminderEmailTemplate } from './emailService';
 import { startReminderService } from './reminderService';
+import { sendScheduledKPIReport } from './scheduledReports';
 
 /**
  * Check and activate stages that should be unlocked based on configurable delay
@@ -223,7 +224,19 @@ export function initializeCronJobs() {
     await sendStageReminderEmails();
   });
 
-  console.log('[Cron] Cron jobs initialized (activation at 00:00, reminders at 09:00)');
+  // Weekly KPI report: every Monday at 08:00
+  cron.schedule('0 8 * * 1', async () => {
+    console.log('[Cron] Sending weekly KPI report...');
+    await sendScheduledKPIReport('weekly');
+  });
+
+  // Monthly KPI report: 1st of each month at 08:00
+  cron.schedule('0 8 1 * *', async () => {
+    console.log('[Cron] Sending monthly KPI report...');
+    await sendScheduledKPIReport('monthly');
+  });
+
+  console.log('[Cron] Cron jobs initialized (activation at 00:00, reminders at 09:00, weekly report Mon 08:00, monthly report 1st 08:00)');
 
   // Run activation once on startup
   setTimeout(() => {
