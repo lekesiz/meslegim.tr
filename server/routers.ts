@@ -1188,6 +1188,44 @@ export const appRouter = router({
         const end = input?.endDate ? new Date(input.endDate) : undefined;
         return await db.getPackageDistribution(start, end);
       }),
+
+    // CSV Export Log procedures
+    logCsvExport: adminProcedure
+      .input(z.object({
+        exportType: z.string(),
+        fileName: z.string(),
+        recordCount: z.number().optional(),
+        dateFilterPreset: z.string().optional(),
+        dateFilterStart: z.string().optional(),
+        dateFilterEnd: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        await db.logCsvExport({
+          userId: ctx.user.id,
+          exportType: input.exportType,
+          fileName: input.fileName,
+          recordCount: input.recordCount,
+          dateFilterPreset: input.dateFilterPreset,
+          dateFilterStart: input.dateFilterStart ? new Date(input.dateFilterStart) : undefined,
+          dateFilterEnd: input.dateFilterEnd ? new Date(input.dateFilterEnd) : undefined,
+        });
+        return { success: true };
+      }),
+
+    getCsvExportLogs: adminProcedure
+      .input(z.object({
+        limit: z.number().optional().default(50),
+        offset: z.number().optional().default(0),
+      }).optional())
+      .query(async ({ input }) => {
+        const limit = input?.limit ?? 50;
+        const offset = input?.offset ?? 0;
+        const [logs, total] = await Promise.all([
+          db.getCsvExportLogs(limit, offset),
+          db.getCsvExportLogCount(),
+        ]);
+        return { logs, total };
+      }),
   }),
 
   // Mentor procedures

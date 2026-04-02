@@ -1,6 +1,6 @@
 import { eq, and, or, desc, inArray, gte, lte } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, stages, questions, answers, userStages, reports, mentorNotes, messages, feedbacks, certificates, platformSettings, stageUnlockLogs, notifications, pilotFeedbacks, purchases, schools, schoolMentors, promotionCodes, promotionCodeUsages, activityLogs } from "../drizzle/schema";
+import { InsertUser, users, stages, questions, answers, userStages, reports, mentorNotes, messages, feedbacks, certificates, platformSettings, stageUnlockLogs, notifications, pilotFeedbacks, purchases, schools, schoolMentors, promotionCodes, promotionCodeUsages, activityLogs, csvExportLogs } from "../drizzle/schema";
 import { ENV } from './_core/env';
 import { sql } from 'drizzle-orm';
 
@@ -2725,4 +2725,66 @@ export async function getDashboardKPIs(customStart?: Date, customEnd?: Date) {
     students: students.length,
     mentors: allUsers.filter(u => u.role === 'mentor').length,
   };
+}
+
+// ─── CSV Export Log Functions ────────────────────────────────────────────────
+
+export async function logCsvExport(data: {
+  userId: number;
+  exportType: string;
+  fileName: string;
+  recordCount?: number;
+  dateFilterPreset?: string;
+  dateFilterStart?: Date;
+  dateFilterEnd?: Date;
+}) {
+  const database = await getDb();
+  if (!database) throw new Error('Database not available');
+  
+  const result = await database.insert(csvExportLogs).values({
+    userId: data.userId,
+    exportType: data.exportType,
+    fileName: data.fileName,
+    recordCount: data.recordCount ?? null,
+    dateFilterPreset: data.dateFilterPreset ?? null,
+    dateFilterStart: data.dateFilterStart ?? null,
+    dateFilterEnd: data.dateFilterEnd ?? null,
+  });
+  return result;
+}
+
+export async function getCsvExportLogs(limit = 50, offset = 0) {
+  const database = await getDb();
+  if (!database) return [];
+  
+  const logs = await database
+    .select({
+      id: csvExportLogs.id,
+      userId: csvExportLogs.userId,
+      userName: users.name,
+      exportType: csvExportLogs.exportType,
+      fileName: csvExportLogs.fileName,
+      recordCount: csvExportLogs.recordCount,
+      dateFilterPreset: csvExportLogs.dateFilterPreset,
+      dateFilterStart: csvExportLogs.dateFilterStart,
+      dateFilterEnd: csvExportLogs.dateFilterEnd,
+      createdAt: csvExportLogs.createdAt,
+    })
+    .from(csvExportLogs)
+    .leftJoin(users, eq(csvExportLogs.userId, users.id))
+    .orderBy(desc(csvExportLogs.createdAt))
+    .limit(limit)
+    .offset(offset);
+  
+  return logs;
+}
+
+export async function getCsvExportLogCount() {
+  const database = await getDb();
+  if (!database) return 0;
+  
+  const result = await database
+    .select({ count: sql<number>`count(*)` })
+    .from(csvExportLogs);
+  return Number(result[0]?.count || 0);
 }

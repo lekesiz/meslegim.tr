@@ -1515,3 +1515,13 @@ Platform **minimum seviyede sağlıklı** çalışıyor. Tüm temel özellikler 
 - [x] Frontend: CSV export özelliği (tüm analitik veriler için - 7 ayrı CSV + toplu dışa aktarma)
 - [x] TypeScript + Vitest doğrulama (0 hata, 223/223 test geçiyor)
 - [x] Test ve doğrulama (analytics.test.ts: 37 yeni test eklendi)
+
+## Oturum 8 - CSV Export Geçmişi Kayıt Sistemi (2 Nisan 2026)
+
+- [x] Veritabanı: csv_export_logs tablosu oluştur (admin, tarih, tip, filtre bilgileri)
+- [x] Backend: Export kayıt ve listeleme prosedürleri ekle (logCsvExport, getCsvExportLogs)
+- [x] Frontend: Admin paneline "Rapor Geçmişi" bölümü ekle (ExportHistory bileşeni)
+- [x] AnalyticsDashboard'a export kayıt entegrasyonu (7 export tipi + toplu export)
+- [x] TypeScript doğrulama (0 hata)
+- [x] Vitest testleri yaz ve çalıştır (csv-export-log.test.ts: 15 test, toplam 238/238)
+- [x] Production build doğrulama

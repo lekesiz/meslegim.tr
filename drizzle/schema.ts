@@ -532,3 +532,25 @@ export const activityLogs = mysqlTable("activity_logs", {
 }));
 export type ActivityLog = typeof activityLogs.$inferSelect;
 export type InsertActivityLog = typeof activityLogs.$inferInsert;
+
+
+/**
+ * CSV Export Logs - Admin CSV dışa aktarma geçmişi
+ */
+export const csvExportLogs = mysqlTable("csv_export_logs", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(), // Export yapan admin
+  exportType: varchar("exportType", { length: 50 }).notNull(), // "kpi", "daily_registrations", "monthly_revenue", "daily_revenue", "report_stats", "user_activity", "package_distribution", "all"
+  fileName: varchar("fileName", { length: 255 }).notNull(),
+  recordCount: int("recordCount"), // Dışa aktarılan kayıt sayısı
+  dateFilterPreset: varchar("dateFilterPreset", { length: 20 }), // "today", "last7", "last30", "last90", "all", "custom"
+  dateFilterStart: timestamp("dateFilterStart"),
+  dateFilterEnd: timestamp("dateFilterEnd"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+  userIdIdx: index("cel_user_id_idx").on(table.userId),
+  exportTypeIdx: index("cel_export_type_idx").on(table.exportType),
+  createdAtIdx: index("cel_created_at_idx").on(table.createdAt),
+}));
+export type CsvExportLog = typeof csvExportLogs.$inferSelect;
+export type InsertCsvExportLog = typeof csvExportLogs.$inferInsert;
