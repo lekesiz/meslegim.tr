@@ -1559,5 +1559,5 @@ Platform **minimum seviyede sağlıklı** çalışıyor. Tüm temel özellikler 
 - [x] TypeScript doğrulama (0 hata)
 - [x] Vitest testleri yaz ve çalıştır (session10-features.test.ts: 17 test, toplam 274/274)
 - [x] Genel A-Z full test (tüm sayfalar, production build başarılı)
-- [ ] GitHub'a push et (https://github.com/lekesiz/meslegim.tr)
-- [ ] Checkpoint kaydet
+- [x] GitHub'a push et (https://github.com/lekesiz/meslegim.tr) - b5e1266
+- [x] Checkpoint kaydet
