@@ -1606,7 +1606,7 @@ Platform **minimum seviyede sağlıklı** çalışıyor. Tüm temel özellikler 
 - [x] PDF raporuna segmentasyon özeti ekle (yaş grubu + paket türü tablosu)
 
 ### Doğrulama ve Deploy
-- [ ] TypeScript doğrulama (0 hata)
-- [ ] Vitest testleri yaz ve çalıştır
-- [ ] GitHub'a push et
-- [ ] Checkpoint kaydet
+- [x] TypeScript doğrulama (0 hata)
+- [x] Vitest testleri yaz ve çalıştır (segmentation-pdf.test.ts: 16 test, toplam 321/321)
+- [x] GitHub'a push et (159ad07)
+- [x] Checkpoint kaydet
