@@ -2788,3 +2788,90 @@ export async function getCsvExportLogCount() {
     .from(csvExportLogs);
   return Number(result[0]?.count || 0);
 }
+
+
+/**
+ * Haftalık kayıt trendi - son N hafta
+ */
+export async function getWeeklyRegistrationTrend(weeks: number = 12, customStart?: Date, customEnd?: Date) {
+  const db = await getDb();
+  if (!db) return [];
+  const startDate = customStart || (() => { const d = new Date(); d.setDate(d.getDate() - weeks * 7); return d; })();
+  const endDate = customEnd || new Date();
+  
+  const result = await db.execute(sql`
+    SELECT 
+      DATE_FORMAT(DATE_SUB(createdAt, INTERVAL WEEKDAY(createdAt) DAY), '%Y-%m-%d') as weekStart,
+      role,
+      COUNT(*) as count
+    FROM users
+    WHERE createdAt >= ${startDate} AND createdAt <= ${endDate}
+    GROUP BY weekStart, role
+    ORDER BY weekStart ASC
+  `);
+  
+  return (result as any)[0] || [];
+}
+
+/**
+ * Yaş grubu dağılımı
+ */
+export async function getAgeGroupDistribution() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const result = await db.select({
+    ageGroup: users.ageGroup,
+    count: sql<number>`COUNT(*)`.as('count'),
+  })
+  .from(users)
+  .groupBy(users.ageGroup);
+  
+  return result;
+}
+
+/**
+ * Soru kategorisi dağılımı (RIASEC, Big Five, Values, Skills vb.)
+ */
+export async function getQuestionCategoryDistribution() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const result = await db.execute(sql`
+    SELECT 
+      COALESCE(q.category, 'Belirtilmemiş') as category,
+      COUNT(DISTINCT q.id) as questionCount,
+      COUNT(DISTINCT a.id) as answerCount
+    FROM questions q
+    LEFT JOIN answers a ON a.questionId = q.id
+    GROUP BY q.category
+    ORDER BY answerCount DESC
+  `);
+  
+  return (result as any)[0] || [];
+}
+
+/**
+ * Etap tamamlama trendi (haftalık)
+ */
+export async function getStageCompletionTrend(weeks: number = 12, customStart?: Date, customEnd?: Date) {
+  const db = await getDb();
+  if (!db) return [];
+  const startDate = customStart || (() => { const d = new Date(); d.setDate(d.getDate() - weeks * 7); return d; })();
+  const endDate = customEnd || new Date();
+  
+  const result = await db.execute(sql`
+    SELECT 
+      DATE_FORMAT(DATE_SUB(completedAt, INTERVAL WEEKDAY(completedAt) DAY), '%Y-%m-%d') as weekStart,
+      COUNT(*) as completedCount
+    FROM user_stages
+    WHERE status = 'completed' 
+      AND completedAt IS NOT NULL 
+      AND completedAt >= ${startDate} 
+      AND completedAt <= ${endDate}
+    GROUP BY weekStart
+    ORDER BY weekStart ASC
+  `);
+  
+  return (result as any)[0] || [];
+}

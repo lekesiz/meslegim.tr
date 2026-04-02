@@ -10,10 +10,11 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { trpc } from '@/lib/trpc';
-import { Loader2, FileDown, ChevronLeft, ChevronRight, Clock, User, Filter } from 'lucide-react';
-import { useState, useMemo } from 'react';
+import { Loader2, FileDown, ChevronLeft, ChevronRight, Clock, User, Filter, RefreshCw, Download } from 'lucide-react';
+import { useState, useMemo, useCallback } from 'react';
 import { format } from 'date-fns';
 import { tr } from 'date-fns/locale';
+import { toast } from 'sonner';
 
 const EXPORT_TYPE_LABELS: Record<string, string> = {
   kpi: 'KPI Özet',
@@ -49,15 +50,158 @@ function getExportTypeBadgeColor(type: string): string {
   }
 }
 
+// CSV download utility
+function downloadCSV(data: Record<string, unknown>[], filename: string, headers?: Record<string, string>): boolean {
+  if (!data || data.length === 0) return false;
+  
+  const keys = Object.keys(data[0]);
+  const headerRow = keys.map(k => headers?.[k] || k).join(',');
+  const rows = data.map(row => 
+    keys.map(k => {
+      const val = row[k];
+      if (val === null || val === undefined) return '';
+      const str = String(val);
+      if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+        return `"${str.replace(/"/g, '""')}"`;
+      }
+      return str;
+    }).join(',')
+  );
+  
+  const bom = '\uFEFF';
+  const csv = bom + [headerRow, ...rows].join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `${filename}_${format(new Date(), 'yyyy-MM-dd')}.csv`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+  return true;
+}
+
+// Format export data based on type for CSV download
+function formatExportData(type: string, data: any): { rows: Record<string, unknown>[]; filename: string; headers: Record<string, string> } | null {
+  if (!data) return null;
+
+  switch (type) {
+    case 'kpi':
+      return {
+        rows: [{
+          toplam_kullanici: data.totalUsers,
+          bu_ay_yeni_kayit: data.thisMonthNewUsers,
+          gecen_ay_yeni_kayit: data.lastMonthNewUsers,
+          kullanici_buyume_yuzde: data.userGrowthPercent,
+          toplam_gelir_kurus: data.totalRevenue,
+          bu_ay_gelir_kurus: data.thisMonthRevenue,
+          gecen_ay_gelir_kurus: data.lastMonthRevenue,
+          gelir_buyume_yuzde: data.revenueGrowthPercent,
+          tamamlanan_etap: data.totalCompletedStages,
+          toplam_rapor: data.totalReports,
+          bekleyen_rapor: data.pendingReports,
+          aktif_kullanici_7gun: data.activeUsersWeek,
+          donusum_orani: data.conversionRate,
+          toplam_satis: data.totalPurchases,
+        }],
+        filename: 'kpi_ozet',
+        headers: {
+          toplam_kullanici: 'Toplam Kullanıcı',
+          bu_ay_yeni_kayit: 'Bu Ay Yeni Kayıt',
+          gecen_ay_yeni_kayit: 'Geçen Ay Yeni Kayıt',
+          kullanici_buyume_yuzde: 'Kullanıcı Büyüme %',
+          toplam_gelir_kurus: 'Toplam Gelir (kuruş)',
+          bu_ay_gelir_kurus: 'Bu Ay Gelir (kuruş)',
+          gecen_ay_gelir_kurus: 'Geçen Ay Gelir (kuruş)',
+          gelir_buyume_yuzde: 'Gelir Büyüme %',
+          tamamlanan_etap: 'Tamamlanan Etap',
+          toplam_rapor: 'Toplam Rapor',
+          bekleyen_rapor: 'Bekleyen Rapor',
+          aktif_kullanici_7gun: 'Aktif Kullanıcı (7 gün)',
+          donusum_orani: 'Dönüşüm Oranı %',
+          toplam_satis: 'Toplam Satış',
+        },
+      };
+    case 'daily_registrations':
+      return {
+        rows: (data as any[]).map((r: any) => ({ tarih: r.date, rol: r.role, kayit_sayisi: r.count })),
+        filename: 'gunluk_kayitlar',
+        headers: { tarih: 'Tarih', rol: 'Rol', kayit_sayisi: 'Kayıt Sayısı' },
+      };
+    case 'monthly_revenue':
+      return {
+        rows: (data as any[]).map((r: any) => ({
+          ay: r.month,
+          toplam_gelir_tl: (Number(r.totalRevenue) / 100).toFixed(2),
+          satis_sayisi: r.count,
+          tamamlanan_satis: r.completedCount,
+        })),
+        filename: 'aylik_gelir',
+        headers: { ay: 'Ay', toplam_gelir_tl: 'Toplam Gelir (₺)', satis_sayisi: 'Satış Sayısı', tamamlanan_satis: 'Tamamlanan Satış' },
+      };
+    case 'daily_revenue':
+      return {
+        rows: (data as any[]).map((r: any) => ({
+          tarih: r.date,
+          gelir_tl: (Number(r.totalRevenue) / 100).toFixed(2),
+          satis_sayisi: r.count,
+        })),
+        filename: 'gunluk_gelir',
+        headers: { tarih: 'Tarih', gelir_tl: 'Gelir (₺)', satis_sayisi: 'Satış Sayısı' },
+      };
+    case 'report_stats':
+      return {
+        rows: (data as any[]).map((r: any) => ({
+          ay: r.month, toplam: r.total, onaylanan: r.approved, bekleyen: r.pending,
+        })),
+        filename: 'rapor_istatistikleri',
+        headers: { ay: 'Ay', toplam: 'Toplam', onaylanan: 'Onaylanan', bekleyen: 'Bekleyen' },
+      };
+    case 'user_activity':
+      return {
+        rows: [{
+          toplam: data.total,
+          bugun_aktif: data.activeToday,
+          hafta_aktif: data.activeWeek,
+          ay_aktif: data.activeMonth,
+          ogrenci: data.byRole?.student ?? 0,
+          mentor: data.byRole?.mentor ?? 0,
+          admin: data.byRole?.admin ?? 0,
+        }],
+        filename: 'kullanici_aktivite',
+        headers: {
+          toplam: 'Toplam', bugun_aktif: 'Bugün Aktif', hafta_aktif: 'Bu Hafta Aktif',
+          ay_aktif: 'Bu Ay Aktif', ogrenci: 'Öğrenci', mentor: 'Mentor', admin: 'Admin',
+        },
+      };
+    case 'package_distribution':
+      return {
+        rows: (data as any[]).map((r: any) => ({
+          urun_id: r.productId,
+          satis_sayisi: r.count,
+          toplam_gelir_tl: (Number(r.totalRevenue) / 100).toFixed(2),
+        })),
+        filename: 'paket_dagilimi',
+        headers: { urun_id: 'Ürün ID', satis_sayisi: 'Satış Sayısı', toplam_gelir_tl: 'Toplam Gelir (₺)' },
+      };
+    default:
+      return null;
+  }
+}
+
 const PAGE_SIZE = 20;
 
 export function ExportHistory() {
   const [page, setPage] = useState(0);
+  const [reRunningId, setReRunningId] = useState<number | null>(null);
 
   const { data, isLoading } = trpc.admin.getCsvExportLogs.useQuery({
     limit: PAGE_SIZE,
     offset: page * PAGE_SIZE,
   });
+
+  const logExportMutation = trpc.admin.logCsvExport.useMutation();
 
   const logs = data?.logs ?? [];
   const total = data?.total ?? 0;
@@ -77,6 +221,59 @@ export function ExportHistory() {
       byType: Array.from(typeCount.entries()).sort((a, b) => b[1] - a[1]),
     };
   }, [logs, total]);
+
+  // Re-run export handler
+  const handleReRun = useCallback(async (log: typeof logs[0]) => {
+    if (log.exportType === 'all') {
+      toast.info('Toplu export için lütfen Analitik paneldeki "Tümünü Dışa Aktar" butonunu kullanın.');
+      return;
+    }
+
+    setReRunningId(log.id);
+    try {
+      const response = await fetch(`/api/trpc/admin.reRunCsvExport?input=${encodeURIComponent(JSON.stringify({
+        exportType: log.exportType,
+        dateFilterPreset: log.dateFilterPreset ?? undefined,
+        dateFilterStart: log.dateFilterStart ?? undefined,
+        dateFilterEnd: log.dateFilterEnd ?? undefined,
+      }))}`, {
+        credentials: 'include',
+      });
+      
+      const json = await response.json();
+      const result = json?.result?.data;
+      
+      if (!result?.data) {
+        toast.error('Veri alınamadı. Lütfen tekrar deneyin.');
+        return;
+      }
+
+      const formatted = formatExportData(log.exportType, result.data);
+      if (!formatted) {
+        toast.error('Bu export tipi için yeniden indirme desteklenmiyor.');
+        return;
+      }
+
+      const success = downloadCSV(formatted.rows, formatted.filename, formatted.headers);
+      if (success) {
+        // Log the re-run export
+        logExportMutation.mutate({
+          exportType: log.exportType,
+          fileName: `${formatted.filename}_${format(new Date(), 'yyyy-MM-dd')}.csv`,
+          recordCount: formatted.rows.length,
+          dateFilterPreset: log.dateFilterPreset ?? undefined,
+          dateFilterStart: log.dateFilterStart ? new Date(log.dateFilterStart).toISOString() : undefined,
+          dateFilterEnd: log.dateFilterEnd ? new Date(log.dateFilterEnd).toISOString() : undefined,
+        });
+
+        toast.success(`${EXPORT_TYPE_LABELS[log.exportType] || log.exportType} verileri yeniden indirildi.`);
+      }
+    } catch (error) {
+      toast.error('Export sırasında bir hata oluştu. Lütfen tekrar deneyin.');
+    } finally {
+      setReRunningId(null);
+    }
+  }, [logExportMutation]);
 
   if (isLoading) {
     return (
@@ -152,6 +349,7 @@ export function ExportHistory() {
                       <TableHead>Dosya Adı</TableHead>
                       <TableHead className="text-center">Kayıt Sayısı</TableHead>
                       <TableHead>Tarih Filtresi</TableHead>
+                      <TableHead className="text-center w-[120px]">İşlem</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -208,6 +406,26 @@ export function ExportHistory() {
                               </span>
                             )}
                           </div>
+                        </TableCell>
+                        <TableCell className="text-center">
+                          {log.exportType !== 'all' ? (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="h-7 gap-1 text-xs"
+                              onClick={() => handleReRun(log)}
+                              disabled={reRunningId === log.id}
+                            >
+                              {reRunningId === log.id ? (
+                                <Loader2 className="h-3 w-3 animate-spin" />
+                              ) : (
+                                <Download className="h-3 w-3" />
+                              )}
+                              Yeniden İndir
+                            </Button>
+                          ) : (
+                            <span className="text-xs text-muted-foreground">-</span>
+                          )}
                         </TableCell>
                       </TableRow>
                     ))}

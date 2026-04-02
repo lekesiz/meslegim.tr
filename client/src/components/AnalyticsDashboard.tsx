@@ -334,6 +334,18 @@ export function AnalyticsDashboard() {
       ? { startDate: dateParams.startDate, endDate: dateParams.endDate }
       : undefined
   );
+  const { data: weeklyRegTrend } = trpc.admin.getWeeklyRegistrationTrend.useQuery({
+    weeks: 12,
+    ...(dateParams.startDate ? { startDate: dateParams.startDate } : {}),
+    ...(dateParams.endDate ? { endDate: dateParams.endDate } : {}),
+  });
+  const { data: ageGroupDist } = trpc.admin.getAgeGroupDistribution.useQuery();
+  const { data: questionCatDist } = trpc.admin.getQuestionCategoryDistribution.useQuery();
+  const { data: stageCompTrend } = trpc.admin.getStageCompletionTrend.useQuery({
+    weeks: 12,
+    ...(dateParams.startDate ? { startDate: dateParams.startDate } : {}),
+    ...(dateParams.endDate ? { endDate: dateParams.endDate } : {}),
+  });
 
   // CSV Export log mutation
   const logExportMutation = trpc.admin.logCsvExport.useMutation();
@@ -687,6 +699,115 @@ export function AnalyticsDashboard() {
       }],
     };
   }, [userActivity]);
+
+  // Weekly registration trend chart
+  const weeklyRegChartData = useMemo(() => {
+    if (!weeklyRegTrend || !Array.isArray(weeklyRegTrend) || weeklyRegTrend.length === 0) return null;
+    
+    const weekMap = new Map<string, { student: number; mentor: number; other: number }>();
+    (weeklyRegTrend as any[]).forEach((r: any) => {
+      const existing = weekMap.get(r.weekStart) || { student: 0, mentor: 0, other: 0 };
+      if (r.role === 'student') existing.student += Number(r.count);
+      else if (r.role === 'mentor') existing.mentor += Number(r.count);
+      else existing.other += Number(r.count);
+      weekMap.set(r.weekStart, existing);
+    });
+    
+    const weeks = Array.from(weekMap.keys()).sort();
+    return {
+      labels: weeks.map(w => formatDate(w)),
+      datasets: [
+        {
+          label: 'Öğrenci',
+          data: weeks.map(w => weekMap.get(w)?.student || 0),
+          backgroundColor: 'rgba(59, 130, 246, 0.2)',
+          borderColor: 'rgba(59, 130, 246, 1)',
+          borderWidth: 2,
+          fill: true,
+          tension: 0.4,
+        },
+        {
+          label: 'Mentor',
+          data: weeks.map(w => weekMap.get(w)?.mentor || 0),
+          backgroundColor: 'rgba(168, 85, 247, 0.2)',
+          borderColor: 'rgba(168, 85, 247, 1)',
+          borderWidth: 2,
+          fill: true,
+          tension: 0.4,
+        },
+      ],
+    };
+  }, [weeklyRegTrend]);
+
+  // Age group distribution chart
+  const ageGroupChartData = useMemo(() => {
+    if (!ageGroupDist || !Array.isArray(ageGroupDist) || ageGroupDist.length === 0) return null;
+    
+    const AGE_LABELS: Record<string, string> = {
+      '14-17': '14-17 Yaş',
+      '18-21': '18-21 Yaş',
+      '22-24': '22-24 Yaş',
+    };
+    
+    return {
+      labels: (ageGroupDist as any[]).map((r: any) => AGE_LABELS[r.ageGroup] || r.ageGroup || 'Belirtilmemiş'),
+      datasets: [{
+        data: (ageGroupDist as any[]).map((r: any) => Number(r.count)),
+        backgroundColor: [
+          'rgba(59, 130, 246, 0.8)',
+          'rgba(34, 197, 94, 0.8)',
+          'rgba(245, 158, 11, 0.8)',
+          'rgba(168, 85, 247, 0.8)',
+        ],
+        borderWidth: 0,
+      }],
+    };
+  }, [ageGroupDist]);
+
+  // Question category distribution chart
+  const questionCatChartData = useMemo(() => {
+    if (!questionCatDist || !Array.isArray(questionCatDist) || questionCatDist.length === 0) return null;
+    
+    const CATEGORY_COLORS = [
+      'rgba(59, 130, 246, 0.7)',
+      'rgba(168, 85, 247, 0.7)',
+      'rgba(34, 197, 94, 0.7)',
+      'rgba(245, 158, 11, 0.7)',
+      'rgba(239, 68, 68, 0.7)',
+      'rgba(14, 165, 233, 0.7)',
+      'rgba(236, 72, 153, 0.7)',
+      'rgba(132, 204, 22, 0.7)',
+    ];
+    
+    return {
+      labels: (questionCatDist as any[]).map((r: any) => r.category),
+      datasets: [{
+        label: 'Cevap Sayısı',
+        data: (questionCatDist as any[]).map((r: any) => Number(r.answerCount)),
+        backgroundColor: (questionCatDist as any[]).map((_: any, i: number) => CATEGORY_COLORS[i % CATEGORY_COLORS.length]),
+        borderWidth: 1,
+      }],
+    };
+  }, [questionCatDist]);
+
+  // Stage completion trend chart
+  const stageCompChartData = useMemo(() => {
+    if (!stageCompTrend || !Array.isArray(stageCompTrend) || stageCompTrend.length === 0) return null;
+    
+    const weeks = (stageCompTrend as any[]).sort((a: any, b: any) => a.weekStart.localeCompare(b.weekStart));
+    return {
+      labels: weeks.map((w: any) => formatDate(w.weekStart)),
+      datasets: [{
+        label: 'Tamamlanan Etap',
+        data: weeks.map((w: any) => Number(w.completedCount)),
+        backgroundColor: 'rgba(34, 197, 94, 0.2)',
+        borderColor: 'rgba(34, 197, 94, 1)',
+        borderWidth: 2,
+        fill: true,
+        tension: 0.4,
+      }],
+    };
+  }, [stageCompTrend]);
 
   const chartOptions = {
     responsive: true,
@@ -1078,6 +1199,112 @@ export function AnalyticsDashboard() {
           </CardContent>
         </Card>
       )}
+
+      {/* Section: Interaction Trends */}
+      <div className="grid gap-6 lg:grid-cols-2">
+        {/* Weekly Registration Trend */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <TrendingUp className="h-5 w-5 text-blue-600" />
+              Haftalık Kayıt Trendi
+            </CardTitle>
+            <CardDescription>Son 12 haftalık yeni kullanıcı kayıt trendi</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[280px]">
+              {weeklyRegChartData ? (
+                <Line data={weeklyRegChartData} options={lineOptions} />
+              ) : (
+                <div className="flex items-center justify-center h-full text-muted-foreground">
+                  <div className="text-center">
+                    <Users className="h-8 w-8 mx-auto mb-2 opacity-30" />
+                    <p className="text-sm">Henüz yeterli veri yok</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Stage Completion Trend */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Target className="h-5 w-5 text-green-600" />
+              Etap Tamamlama Trendi
+            </CardTitle>
+            <CardDescription>Son 12 haftalık etap tamamlama sayıları</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[280px]">
+              {stageCompChartData ? (
+                <Line data={stageCompChartData} options={lineOptions} />
+              ) : (
+                <div className="flex items-center justify-center h-full text-muted-foreground">
+                  <div className="text-center">
+                    <Target className="h-8 w-8 mx-auto mb-2 opacity-30" />
+                    <p className="text-sm">Henüz yeterli veri yok</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Section: Demographics & Categories */}
+      <div className="grid gap-6 lg:grid-cols-3">
+        {/* Age Group Distribution */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Users className="h-5 w-5 text-blue-600" />
+              Yaş Grubu Dağılımı
+            </CardTitle>
+            <CardDescription>Kullanıcıların yaş gruplarına göre dağılımı</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[250px]">
+              {ageGroupChartData ? (
+                <Doughnut data={ageGroupChartData} options={doughnutOptions} />
+              ) : (
+                <div className="flex items-center justify-center h-full text-muted-foreground">
+                  <div className="text-center">
+                    <Users className="h-8 w-8 mx-auto mb-2 opacity-30" />
+                    <p className="text-sm">Henüz yeterli veri yok</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Question Category Distribution */}
+        <Card className="lg:col-span-2">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <BarChart3 className="h-5 w-5 text-purple-600" />
+              Değerlendirme Kategorisi Dağılımı
+            </CardTitle>
+            <CardDescription>Soru kategorilerine göre cevap dağılımı (RIASEC, Big Five vb.)</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[250px]">
+              {questionCatChartData ? (
+                <Bar data={questionCatChartData} options={chartOptions} />
+              ) : (
+                <div className="flex items-center justify-center h-full text-muted-foreground">
+                  <div className="text-center">
+                    <BarChart3 className="h-8 w-8 mx-auto mb-2 opacity-30" />
+                    <p className="text-sm">Henüz yeterli veri yok</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

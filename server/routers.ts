@@ -1226,6 +1226,83 @@ export const appRouter = router({
         ]);
         return { logs, total };
       }),
+
+    reRunCsvExport: adminProcedure
+      .input(z.object({
+        exportType: z.string(),
+        dateFilterPreset: z.string().optional(),
+        dateFilterStart: z.string().optional(),
+        dateFilterEnd: z.string().optional(),
+      }))
+      .query(async ({ input }) => {
+        const start = input.dateFilterStart ? new Date(input.dateFilterStart) : undefined;
+        const end = input.dateFilterEnd ? new Date(input.dateFilterEnd) : undefined;
+        
+        switch (input.exportType) {
+          case 'kpi': {
+            const kpis = await db.getDashboardKPIs(start, end);
+            return { type: 'kpi', data: kpis };
+          }
+          case 'daily_registrations': {
+            const regs = await db.getDailyRegistrations(30, start, end);
+            return { type: 'daily_registrations', data: regs };
+          }
+          case 'monthly_revenue': {
+            const rev = await db.getMonthlyRevenue(12, start, end);
+            return { type: 'monthly_revenue', data: rev };
+          }
+          case 'daily_revenue': {
+            const rev = await db.getDailyRevenue(30, start, end);
+            return { type: 'daily_revenue', data: rev };
+          }
+          case 'report_stats': {
+            const stats = await db.getReportGenerationStats(6, start, end);
+            return { type: 'report_stats', data: stats };
+          }
+          case 'user_activity': {
+            const activity = await db.getUserActivitySummary();
+            return { type: 'user_activity', data: activity };
+          }
+          case 'package_distribution': {
+            const dist = await db.getPackageDistribution(start, end);
+            return { type: 'package_distribution', data: dist };
+          }
+          default:
+            return { type: input.exportType, data: null };
+        }
+      }),
+
+    getWeeklyRegistrationTrend: adminProcedure
+      .input(z.object({
+        weeks: z.number().optional().default(12),
+        startDate: z.string().optional(),
+        endDate: z.string().optional(),
+      }).optional())
+      .query(async ({ input }) => {
+        const start = input?.startDate ? new Date(input.startDate) : undefined;
+        const end = input?.endDate ? new Date(input.endDate) : undefined;
+        return await db.getWeeklyRegistrationTrend(input?.weeks ?? 12, start, end);
+      }),
+
+    getAgeGroupDistribution: adminProcedure.query(async () => {
+      return await db.getAgeGroupDistribution();
+    }),
+
+    getQuestionCategoryDistribution: adminProcedure.query(async () => {
+      return await db.getQuestionCategoryDistribution();
+    }),
+
+    getStageCompletionTrend: adminProcedure
+      .input(z.object({
+        weeks: z.number().optional().default(12),
+        startDate: z.string().optional(),
+        endDate: z.string().optional(),
+      }).optional())
+      .query(async ({ input }) => {
+        const start = input?.startDate ? new Date(input.startDate) : undefined;
+        const end = input?.endDate ? new Date(input.endDate) : undefined;
+        return await db.getStageCompletionTrend(input?.weeks ?? 12, start, end);
+      }),
   }),
 
   // Mentor procedures

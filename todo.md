@@ -1525,3 +1525,13 @@ Platform **minimum seviyede sağlıklı** çalışıyor. Tüm temel özellikler 
 - [x] TypeScript doğrulama (0 hata)
 - [x] Vitest testleri yaz ve çalıştır (csv-export-log.test.ts: 15 test, toplam 238/238)
 - [x] Production build doğrulama
+
+## Oturum 9 - Yeniden İndir Butonu ve Etkileşim Grafikleri (2 Nisan 2026)
+
+- [x] ExportHistory tablosuna "Yeniden İndir" butonu ekle (geçmiş exportları yeniden oluşturma)
+- [x] Backend: reRunCsvExport prosedürü ekle (export tipine göre veri çek + CSV oluştur)
+- [x] Dashboard'a haftalık kayıt trendi grafiği ekle (Line chart)
+- [x] Dashboard'a yaş grubu dağılımı, soru kategorisi dağılımı, etap tamamlama trendi grafikleri ekle
+- [x] TypeScript doğrulama (0 hata)
+- [x] Vitest testleri yaz ve çalıştır (analytics-charts.test.ts: 19 test, toplam 257/257)
+- [x] Checkpoint kaydet
