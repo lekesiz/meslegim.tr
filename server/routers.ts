@@ -1048,6 +1048,16 @@ export const appRouter = router({
         return await db.getCohortAnalysis(input?.weeksBack || 12);
       }),
 
+    // === Dönüşüm Hunisi ===
+    getConversionFunnel: adminProcedure
+      .input(z.object({
+        startDate: z.string().optional(),
+        endDate: z.string().optional(),
+      }).optional())
+      .query(async ({ input }) => {
+        return await db.getConversionFunnel(input?.startDate, input?.endDate);
+      }),
+
     // === Zamanlanmış Raporlama ===
     getScheduledReportSettings: adminProcedure.query(async () => {
       const weeklyEnabled = await db.getPlatformSetting('scheduled_report_weekly');

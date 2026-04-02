@@ -431,6 +431,11 @@ export function AnalyticsDashboard() {
     ...(dateParams.endDate ? { endDate: dateParams.endDate } : {}),
   });
   const { data: cohortData } = trpc.admin.getCohortAnalysis.useQuery({ weeksBack: 12 });
+  const { data: funnelData } = trpc.admin.getConversionFunnel.useQuery(
+    dateParams.startDate || dateParams.endDate
+      ? { startDate: dateParams.startDate, endDate: dateParams.endDate }
+      : undefined
+  );
 
   // CSV Export log mutation
   const logExportMutation = trpc.admin.logCsvExport.useMutation();
@@ -1447,6 +1452,110 @@ export function AnalyticsDashboard() {
                 <Users className="h-8 w-8 mx-auto mb-2 opacity-30" />
                 <p className="text-sm">Henüz yeterli kohort verisi yok</p>
                 <p className="text-xs mt-1">Kullanıcılar kaydoldukça kohort verileri oluşacaktır</p>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Dönüşüm Hunisi (Conversion Funnel) */}
+      <Card className="col-span-full">
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div>
+            <CardTitle className="text-lg font-semibold">Dönüşüm Hunisi</CardTitle>
+            <p className="text-sm text-muted-foreground mt-1">
+              Kayıt &rarr; Test Başlatma &rarr; Test Tamamlama &rarr; Rapor Görüntüleme &rarr; Premium Yükseltme
+            </p>
+          </div>
+          <Filter className="h-5 w-5 text-muted-foreground" />
+        </CardHeader>
+        <CardContent>
+          {funnelData && funnelData.length > 0 ? (
+            <div className="space-y-3">
+              {funnelData.map((step, idx) => {
+                const maxCount = funnelData[0]?.count || 1;
+                const barWidth = Math.max((step.count / maxCount) * 100, 4);
+                const colors = [
+                  'bg-blue-500',
+                  'bg-indigo-500',
+                  'bg-violet-500',
+                  'bg-purple-500',
+                  'bg-fuchsia-500',
+                ];
+                const bgColors = [
+                  'bg-blue-50 dark:bg-blue-950/30',
+                  'bg-indigo-50 dark:bg-indigo-950/30',
+                  'bg-violet-50 dark:bg-violet-950/30',
+                  'bg-purple-50 dark:bg-purple-950/30',
+                  'bg-fuchsia-50 dark:bg-fuchsia-950/30',
+                ];
+
+                return (
+                  <div key={step.step} className="group">
+                    <div className="flex items-center justify-between mb-1.5">
+                      <div className="flex items-center gap-2">
+                        <span className={`flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold text-white ${colors[idx]}`}>
+                          {idx + 1}
+                        </span>
+                        <span className="text-sm font-medium">{step.label}</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="text-sm font-bold">{step.count.toLocaleString('tr-TR')}</span>
+                        <span className="text-xs text-muted-foreground">(%{step.percentage})</span>
+                        {idx > 0 && step.dropoff > 0 && (
+                          <span className="text-xs font-medium text-red-500 flex items-center gap-0.5">
+                            <ArrowDownRight className="h-3 w-3" />
+                            %{step.dropoff} düşüş
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <div className={`relative h-8 rounded-lg overflow-hidden ${bgColors[idx]}`}>
+                      <div
+                        className={`absolute inset-y-0 left-0 rounded-lg ${colors[idx]} transition-all duration-700 ease-out`}
+                        style={{ width: `${barWidth}%` }}
+                      />
+                      <div className="absolute inset-0 flex items-center px-3">
+                        <span className={`text-xs font-semibold ${barWidth > 20 ? 'text-white' : 'text-foreground ml-[calc(var(--bar-w)+8px)]'}`}>
+                          {step.count > 0 ? `${step.count.toLocaleString('tr-TR')} kullanıcı` : 'Henüz veri yok'}
+                        </span>
+                      </div>
+                    </div>
+                    {idx < funnelData.length - 1 && (
+                      <div className="flex justify-center my-1">
+                        <div className="w-px h-3 bg-border" />
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+
+              {/* Özet Kartları */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-6 pt-4 border-t">
+                <div className="text-center p-3 rounded-lg bg-muted/50">
+                  <p className="text-xs text-muted-foreground">Toplam Kayıt</p>
+                  <p className="text-lg font-bold">{funnelData[0]?.count.toLocaleString('tr-TR') || 0}</p>
+                </div>
+                <div className="text-center p-3 rounded-lg bg-muted/50">
+                  <p className="text-xs text-muted-foreground">Test Başlatma Oranı</p>
+                  <p className="text-lg font-bold">%{funnelData[1]?.percentage || 0}</p>
+                </div>
+                <div className="text-center p-3 rounded-lg bg-muted/50">
+                  <p className="text-xs text-muted-foreground">Tamamlama Oranı</p>
+                  <p className="text-lg font-bold">%{funnelData[2]?.percentage || 0}</p>
+                </div>
+                <div className="text-center p-3 rounded-lg bg-muted/50">
+                  <p className="text-xs text-muted-foreground">Premium Dönüşüm</p>
+                  <p className="text-lg font-bold">%{funnelData[4]?.percentage || 0}</p>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-center justify-center h-[200px] text-muted-foreground">
+              <div className="text-center">
+                <Filter className="h-8 w-8 mx-auto mb-2 opacity-30" />
+                <p className="text-sm">Henüz dönüşüm verisi yok</p>
+                <p className="text-xs mt-1">Kullanıcılar kaydoldukça huni verileri oluşacaktır</p>
               </div>
             </div>
           )}
