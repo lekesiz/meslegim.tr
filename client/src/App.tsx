@@ -36,6 +36,8 @@ const NotificationSettings = lazy(() => import("./pages/student/NotificationSett
 const Pricing = lazy(() => import("./pages/Pricing"));
 const SchoolAdminDashboard = lazy(() => import("./pages/dashboard/SchoolAdminDashboard"));
 const PaymentHistory = lazy(() => import("./pages/student/PaymentHistory"));
+const SSS = lazy(() => import("./pages/SSS"));
+const Iletisim = lazy(() => import("./pages/Iletisim"));
 
 function PageLoader() {
   return (
@@ -62,6 +64,8 @@ function Router() {
         <Route path="/verify-email/:token" component={VerifyEmail} />
         <Route path="/geri-bildirim" component={PilotFeedback} />
         <Route path="/fiyatlandirma" component={Pricing} />
+        <Route path="/sss" component={SSS} />
+        <Route path="/iletisim" component={Iletisim} />
         
         {/* Dashboard - role-based routing */}
         <Route path="/dashboard" component={Dashboard} />

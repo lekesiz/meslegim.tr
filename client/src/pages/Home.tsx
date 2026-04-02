@@ -321,6 +321,9 @@ export default function Home() {
               <a href="/fiyatlandirma">Fiyatlandırma</a>
             </Button>
             <Button variant="ghost" asChild>
+              <a href="/sss">SSS</a>
+            </Button>
+            <Button variant="ghost" asChild>
               <a href="/login">Giriş Yap</a>
             </Button>
             <Button onClick={() => setShowForm(true)}>
@@ -342,6 +345,12 @@ export default function Home() {
                 <nav className="flex flex-col gap-4 mt-8">
                   <a href="/fiyatlandirma" className="text-lg font-medium text-foreground hover:text-primary transition-colors py-2">
                     Fiyatlandırma
+                  </a>
+                  <a href="/sss" className="text-lg font-medium text-foreground hover:text-primary transition-colors py-2">
+                    SSS
+                  </a>
+                  <a href="/iletisim" className="text-lg font-medium text-foreground hover:text-primary transition-colors py-2">
+                    İletişim
                   </a>
                   <a href="/login" className="text-lg font-medium text-foreground hover:text-primary transition-colors py-2">
                     Giriş Yap
@@ -558,7 +567,10 @@ export default function Home() {
             <a href="/gizlilik-politikasi#kvkk" className="hover:text-indigo-600 transition-colors">
               KVKK Aydınlatma Metni
             </a>
-            <a href="mailto:destek@meslegim.tr" className="hover:text-indigo-600 transition-colors">
+            <a href="/sss" className="hover:text-indigo-600 transition-colors">
+              SSS
+            </a>
+            <a href="/iletisim" className="hover:text-indigo-600 transition-colors">
               İletişim
             </a>
           </div>
