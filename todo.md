@@ -1631,3 +1631,27 @@ Platform **minimum seviyede sağlıklı** çalışıyor. Tüm temel özellikler 
 - [x] Vitest testleri yaz ve çalıştır (realtime-anomaly.test.ts: 21 test, toplam 342/342)
 - [x] GitHub'a push et (0ee28aa)
 - [x] Checkpoint kaydet
+
+## Oturum 15 - Staging Düzeltme, User Journey Map, Özelleştirilebilir Widget'lar
+
+### GitHub Actions Staging Workflow
+- [x] GitHub Actions staging workflow dosyasını incele
+- [x] Staging hatasını tespit et ve düzelt (ci.yml, cd.yml, dependency-update.yml - pnpm version parametresi kaldırıldı, packageManager alanı kullanılıyor)
+
+### Kullanıcı Yolculuk Haritası (User Journey Map)
+- [x] Backend: getUserJourneyMap fonksiyonu (kullanıcı adımları zaman çizelgesi)
+- [x] Backend: getUserJourneyList fonksiyonu (kullanıcı listesi, arama, sayfalama)
+- [x] Backend: getUserJourneyMap ve getUserJourneyList prosédürleri
+- [x] Frontend: UserJourneyMap bileşeni (zaman çizelgesi, takılma noktaları, olay filtreleme)
+- [x] AdminDashboard'a User Journey Map entegrasyonu (Yolculuk Haritası tabı)
+### Özelleştirilebilir Dashboard Widget'ıları
+- [x] Backend: Widget tercihleri kaydetme/yükleme fonksiyonları
+- [x] Veritabanı: admin_widget_preferences tablosu
+- [x] Frontend: Sürükle-bırak widget düzenleme ve görünürlük ayarları (WidgetCustomizer bileşeni)
+- [x] AdminDashboard widget sistemi entegrasyonu (Analitik Panel'e Widget Düzeni butonu eklendi)
+
+### Doğrulama ve Deploy
+- [x] TypeScript doğrulama (0 hata)
+- [x] Vitest testleri yaz ve çalıştır (24 dosya, 354 test, hepsi geçti)
+- [ ] GitHub'a push et
+- [ ] Checkpoint kaydet

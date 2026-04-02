@@ -4,7 +4,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { trpc } from '@/lib/trpc';
-import { Loader2, Users, TrendingUp, DollarSign, BarChart3, Activity, Target, ArrowUpRight, ArrowDownRight, FileText, Award, UserCheck, Download, CalendarIcon, Filter, FileDown } from 'lucide-react';
+import { Loader2, Users, TrendingUp, DollarSign, BarChart3, Activity, Target, ArrowUpRight, ArrowDownRight, FileText, Award, UserCheck, Download, CalendarIcon, Filter, FileDown, Settings2 } from 'lucide-react';
 import { toast } from 'sonner';
 import {
   Chart as ChartJS,
@@ -20,7 +20,8 @@ import {
   Filler,
 } from 'chart.js';
 import { Bar, Doughnut, Line } from 'react-chartjs-2';
-import { useMemo, useState, useCallback } from 'react';
+import { useMemo, useState, useCallback, useEffect } from 'react';
+import { WidgetCustomizer, DEFAULT_WIDGETS, type WidgetConfig } from './admin/WidgetCustomizer';
 import { format } from 'date-fns';
 import { tr } from 'date-fns/locale';
 import type { DateRange } from 'react-day-picker';
@@ -372,6 +373,27 @@ function RetentionCell({ value }: { value: number | null }) {
 }
 
 export function AnalyticsDashboard() {
+  // Widget customization
+  const [showCustomizer, setShowCustomizer] = useState(false);
+  const { data: savedWidgets } = trpc.admin.getWidgetPreferences.useQuery();
+  const [widgets, setWidgets] = useState<WidgetConfig[]>(DEFAULT_WIDGETS);
+
+  useEffect(() => {
+    if (savedWidgets) {
+      setWidgets(savedWidgets);
+    }
+  }, [savedWidgets]);
+
+  const isWidgetVisible = useCallback((widgetId: string) => {
+    const widget = widgets.find(w => w.id === widgetId);
+    return widget ? widget.visible : true;
+  }, [widgets]);
+
+  const getWidgetOrder = useCallback((widgetId: string) => {
+    const widget = widgets.find(w => w.id === widgetId);
+    return widget ? widget.order : 999;
+  }, [widgets]);
+
   // Date filter state
   const [datePreset, setDatePreset] = useState<DatePreset>('all');
   const [customRange, setCustomRange] = useState<DateRange | undefined>(undefined);
@@ -977,13 +999,22 @@ export function AnalyticsDashboard() {
                 Tümünü Dışa Aktar (CSV)
               </Button>
               <PdfExportButton datePreset={datePreset} customRange={customRange} />
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowCustomizer(true)}
+                className="h-9 gap-2"
+              >
+                <Settings2 className="h-4 w-4" />
+                Widget Düzeni
+              </Button>
             </div>
           </div>
         </CardContent>
       </Card>
 
       {/* Section: KPI Cards */}
-      <div>
+      {isWidgetVisible('kpi-cards') && <div>
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold">Temel Göstergeler (KPI)</h3>
           <ExportButton onClick={handleExportKPIs} label="KPI CSV" disabled={!kpis} />
@@ -1020,10 +1051,10 @@ export function AnalyticsDashboard() {
             color="orange"
           />
         </div>
-      </div>
+      </div>}
 
       {/* Section: Secondary KPIs */}
-      <div className="grid gap-4 grid-cols-2 lg:grid-cols-5">
+      {isWidgetVisible('kpi-cards') && <div className="grid gap-4 grid-cols-2 lg:grid-cols-5">
         <Card className="col-span-1">
           <CardHeader className="pb-2">
             <CardTitle className="text-xs font-medium text-muted-foreground">Bu Ay Yeni Kayıt</CardTitle>
@@ -1071,10 +1102,10 @@ export function AnalyticsDashboard() {
             </p>
           </CardContent>
         </Card>
-      </div>
+      </div>}
 
       {/* Section: Revenue Charts */}
-      <div className="grid gap-6 lg:grid-cols-2">
+      {(isWidgetVisible('monthly-revenue') || isWidgetVisible('daily-revenue')) && <div className="grid gap-6 lg:grid-cols-2">
         {/* Monthly Revenue */}
         <Card>
           <CardHeader>
@@ -1128,10 +1159,10 @@ export function AnalyticsDashboard() {
             </div>
           </CardContent>
         </Card>
-      </div>
+      </div>}
 
       {/* Section: User Analytics */}
-      <div className="grid gap-6 lg:grid-cols-3">
+      {(isWidgetVisible('daily-registrations') || isWidgetVisible('weekly-reg-trend') || isWidgetVisible('stage-completion-trend')) && <div className="grid gap-6 lg:grid-cols-3">
         {/* Daily Registrations */}
         <Card className="lg:col-span-2">
           <CardHeader>
@@ -1180,10 +1211,10 @@ export function AnalyticsDashboard() {
             </div>
           </CardContent>
         </Card>
-      </div>
+      </div>}
 
       {/* Section: Package & Status Distribution */}
-      <div className="grid gap-6 lg:grid-cols-3">
+      {isWidgetVisible('package-dist') && <div className="grid gap-6 lg:grid-cols-3">
         {/* Package Distribution */}
         <Card>
           <CardHeader>
@@ -1259,10 +1290,10 @@ export function AnalyticsDashboard() {
             </div>
           </CardContent>
         </Card>
-      </div>
+      </div>}
 
       {/* Section: Activity Summary */}
-      {userActivity && (
+      {isWidgetVisible('user-activity') && userActivity && (
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
@@ -1300,7 +1331,7 @@ export function AnalyticsDashboard() {
       )}
 
       {/* Section: Interaction Trends */}
-      <div className="grid gap-6 lg:grid-cols-2">
+      {isWidgetVisible('report-stats') && <div className="grid gap-6 lg:grid-cols-2">
         {/* Weekly Registration Trend */}
         <Card>
           <CardHeader>
@@ -1350,10 +1381,10 @@ export function AnalyticsDashboard() {
             </div>
           </CardContent>
         </Card>
-      </div>
+      </div>}
 
       {/* Section: Demographics & Categories */}
-      <div className="grid gap-6 lg:grid-cols-3">
+      {(isWidgetVisible('age-group-dist') || isWidgetVisible('question-cat-dist')) && <div className="grid gap-6 lg:grid-cols-3">
         {/* Age Group Distribution */}
         <Card>
           <CardHeader>
@@ -1403,9 +1434,10 @@ export function AnalyticsDashboard() {
             </div>
           </CardContent>
         </Card>
-      </div>
+      </div>}
 
       {/* Kohort Analizi - Retention Heatmap */}
+      {isWidgetVisible('cohort-analysis') && (
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -1465,8 +1497,10 @@ export function AnalyticsDashboard() {
           )}
         </CardContent>
       </Card>
+      )}
 
       {/* Dönüşüm Hunisi (Conversion Funnel) */}
+      {isWidgetVisible('conversion-funnel') && (
       <Card className="col-span-full">
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
@@ -1569,8 +1603,10 @@ export function AnalyticsDashboard() {
           )}
         </CardContent>
       </Card>
+      )}
 
       {/* ==================== Kullanıcı Segmentasyon Analizi ==================== */}
+      {isWidgetVisible('segmentation') && (
       <Card>
         <CardHeader>
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
@@ -1766,6 +1802,15 @@ export function AnalyticsDashboard() {
           )}
         </CardContent>
       </Card>
+      )}
+
+      {/* Widget Customizer Modal */}
+      <WidgetCustomizer
+        isOpen={showCustomizer}
+        onClose={() => setShowCustomizer(false)}
+        widgets={widgets}
+        onWidgetsChange={setWidgets}
+      />
     </div>
   );
 }

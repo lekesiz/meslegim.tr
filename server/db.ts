@@ -1,6 +1,6 @@
 import { eq, and, or, desc, inArray, gte, lte } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, stages, questions, answers, userStages, reports, mentorNotes, messages, feedbacks, certificates, platformSettings, stageUnlockLogs, notifications, pilotFeedbacks, purchases, schools, schoolMentors, promotionCodes, promotionCodeUsages, activityLogs, csvExportLogs, kpiAnomalies } from "../drizzle/schema";
+import { InsertUser, users, stages, questions, answers, userStages, reports, mentorNotes, messages, feedbacks, certificates, platformSettings, stageUnlockLogs, notifications, pilotFeedbacks, purchases, schools, schoolMentors, promotionCodes, promotionCodeUsages, activityLogs, csvExportLogs, kpiAnomalies, adminWidgetPreferences } from "../drizzle/schema";
 import { ENV } from './_core/env';
 import { sql } from 'drizzle-orm';
 
@@ -3513,4 +3513,301 @@ export async function getAnomalySummary(): Promise<{
     todayCount: Number(row?.todayCount) || 0,
     thisWeekCount: Number(row?.thisWeekCount) || 0,
   };
+}
+
+
+// ==================== User Journey Map ====================
+
+export interface JourneyEvent {
+  timestamp: string;
+  eventType: string;
+  eventLabel: string;
+  details: string | null;
+  entityId: number | null;
+}
+
+export interface UserJourney {
+  userId: number;
+  userName: string | null;
+  email: string | null;
+  ageGroup: string | null;
+  registeredAt: string;
+  events: JourneyEvent[];
+  currentStage: string | null;
+  completionPercent: number;
+  isPremium: boolean;
+}
+
+export async function getUserJourneyMap(userId: number): Promise<UserJourney | null> {
+  const db = await getDb();
+  if (!db) return null;
+
+  // Get user info
+  const [user] = await db.execute(sql`
+    SELECT id, name, email, ageGroup, purchasedPackage, createdAt, status
+    FROM users WHERE id = ${userId}
+  `);
+  const userData = (user as any)[0];
+  if (!userData) return null;
+
+  // Collect all events for this user
+  const events: JourneyEvent[] = [];
+
+  // 1. Registration event
+  events.push({
+    timestamp: userData.createdAt?.toISOString?.() || String(userData.createdAt),
+    eventType: 'registration',
+    eventLabel: 'Kayıt',
+    details: `${userData.ageGroup || 'Belirtilmemiş'} yaş grubu`,
+    entityId: null,
+  });
+
+  // 2. Stage events (unlock, active, completed)
+  const [stageEvents] = await db.execute(sql`
+    SELECT us.id, us.stageId, us.status, us.unlockedAt, us.completedAt, us.createdAt, s.name as stageName, s.\`order\` as stageOrder
+    FROM user_stages us
+    LEFT JOIN stages s ON us.stageId = s.id
+    WHERE us.userId = ${userId}
+    ORDER BY us.createdAt ASC
+  `);
+  for (const se of (stageEvents as unknown as any[])) {
+    if (se.unlockedAt) {
+      events.push({
+        timestamp: se.unlockedAt?.toISOString?.() || String(se.unlockedAt),
+        eventType: 'stage_unlock',
+        eventLabel: `Etap Açıldı: ${se.stageName || 'Etap ' + se.stageOrder}`,
+        details: null,
+        entityId: se.stageId,
+      });
+    }
+    if (se.completedAt) {
+      events.push({
+        timestamp: se.completedAt?.toISOString?.() || String(se.completedAt),
+        eventType: 'stage_complete',
+        eventLabel: `Etap Tamamlandı: ${se.stageName || 'Etap ' + se.stageOrder}`,
+        details: null,
+        entityId: se.stageId,
+      });
+    }
+  }
+
+  // 3. Answer submissions (grouped by stage)
+  const [answerEvents] = await db.execute(sql`
+    SELECT a.createdAt, q.stageId, s.name as stageName, COUNT(*) as answerCount
+    FROM answers a
+    JOIN questions q ON a.questionId = q.id
+    LEFT JOIN stages s ON q.stageId = s.id
+    WHERE a.userId = ${userId}
+    GROUP BY DATE(a.createdAt), q.stageId, s.name
+    ORDER BY a.createdAt ASC
+  `);
+  for (const ae of (answerEvents as unknown as any[])) {
+    events.push({
+      timestamp: ae.createdAt?.toISOString?.() || String(ae.createdAt),
+      eventType: 'answer_submit',
+      eventLabel: `Cevap Gönderildi: ${ae.stageName || 'Bilinmeyen Etap'}`,
+      details: `${ae.answerCount} cevap`,
+      entityId: ae.stageId,
+    });
+  }
+
+  // 4. Report events
+  const [reportEvents] = await db.execute(sql`
+    SELECT r.id, r.type, r.status, r.createdAt, r.approvedAt, s.name as stageName
+    FROM reports r
+    LEFT JOIN stages s ON r.stageId = s.id
+    WHERE r.userId = ${userId}
+    ORDER BY r.createdAt ASC
+  `);
+  for (const re of (reportEvents as unknown as any[])) {
+    events.push({
+      timestamp: re.createdAt?.toISOString?.() || String(re.createdAt),
+      eventType: 'report_created',
+      eventLabel: `Rapor Oluşturuldu: ${re.stageName || (re.type === 'final' ? 'Final Rapor' : 'Genel')}`,
+      details: `Tür: ${re.type}, Durum: ${re.status}`,
+      entityId: re.id,
+    });
+    if (re.approvedAt) {
+      events.push({
+        timestamp: re.approvedAt?.toISOString?.() || String(re.approvedAt),
+        eventType: 'report_approved',
+        eventLabel: `Rapor Onaylandı: ${re.stageName || (re.type === 'final' ? 'Final Rapor' : 'Genel')}`,
+        details: null,
+        entityId: re.id,
+      });
+    }
+  }
+
+  // 5. Purchase events
+  const [purchaseEvents] = await db.execute(sql`
+    SELECT id, productId, status, amountInCents, createdAt, completedAt
+    FROM purchases
+    WHERE userId = ${userId}
+    ORDER BY createdAt ASC
+  `);
+  for (const pe of (purchaseEvents as unknown as any[])) {
+    if (pe.status === 'completed' && pe.completedAt) {
+      events.push({
+        timestamp: pe.completedAt?.toISOString?.() || String(pe.completedAt),
+        eventType: 'purchase',
+        eventLabel: `Premium Satın Alma`,
+        details: `Paket: ${pe.productId}, Tutar: ${(pe.amountInCents / 100).toFixed(2)} TL`,
+        entityId: pe.id,
+      });
+    }
+  }
+
+  // 6. Login events from activity logs
+  const [loginEvents] = await db.execute(sql`
+    SELECT createdAt, action, details
+    FROM activity_logs
+    WHERE userId = ${userId} AND action IN ('user.login', 'user.register')
+    ORDER BY createdAt ASC
+    LIMIT 50
+  `);
+  for (const le of (loginEvents as unknown as any[])) {
+    if (le.action === 'user.login') {
+      events.push({
+        timestamp: le.createdAt?.toISOString?.() || String(le.createdAt),
+        eventType: 'login',
+        eventLabel: 'Giriş Yapıldı',
+        details: null,
+        entityId: null,
+      });
+    }
+  }
+
+  // Sort events by timestamp
+  events.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+
+  // Calculate completion percent
+  const totalStages = (stageEvents as unknown as any[]).length;
+  const completedStages = (stageEvents as unknown as any[]).filter((s: any) => s.status === 'completed').length;
+  const completionPercent = totalStages > 0 ? Math.round((completedStages / totalStages) * 100) : 0;
+
+  // Current active stage
+  const activeStage = (stageEvents as unknown as any[]).find((s: any) => s.status === 'active');
+
+  return {
+    userId: userData.id,
+    userName: userData.name,
+    email: userData.email,
+    ageGroup: userData.ageGroup,
+    registeredAt: userData.createdAt?.toISOString?.() || String(userData.createdAt),
+    events,
+    currentStage: activeStage?.stageName || null,
+    completionPercent,
+    isPremium: !!(userData.purchasedPackage && userData.purchasedPackage !== 'free'),
+  };
+}
+
+export async function getUserJourneyList(options?: { search?: string; limit?: number; offset?: number }): Promise<{
+  users: Array<{
+    id: number;
+    name: string | null;
+    email: string | null;
+    ageGroup: string | null;
+    status: string;
+    purchasedPackage: string | null;
+    createdAt: string;
+    eventCount: number;
+    completedStages: number;
+    totalStages: number;
+  }>;
+  total: number;
+}> {
+  const db = await getDb();
+  if (!db) return { users: [], total: 0 };
+
+  const limit = options?.limit || 20;
+  const offset = options?.offset || 0;
+  const search = options?.search?.trim();
+
+  let whereClause = sql`WHERE u.role = 'student'`;
+  if (search) {
+    whereClause = sql`WHERE u.role = 'student' AND (u.name LIKE ${`%${search}%`} OR u.email LIKE ${`%${search}%`})`;
+  }
+
+  // Count total
+  const [countResult] = await db.execute(sql`
+    SELECT COUNT(*) as total FROM users u ${whereClause}
+  `);
+  const total = Number((countResult as any)[0]?.total) || 0;
+
+  // Get users with journey summary
+  const [usersResult] = await db.execute(sql`
+    SELECT 
+      u.id, u.name, u.email, u.ageGroup, u.status, u.purchasedPackage, u.createdAt,
+      (SELECT COUNT(*) FROM activity_logs al WHERE al.userId = u.id) as eventCount,
+      (SELECT COUNT(*) FROM user_stages us WHERE us.userId = u.id AND us.status = 'completed') as completedStages,
+      (SELECT COUNT(*) FROM user_stages us WHERE us.userId = u.id) as totalStages
+    FROM users u
+    ${whereClause}
+    ORDER BY u.createdAt DESC
+    LIMIT ${limit} OFFSET ${offset}
+  `);
+
+  return {
+    users: (usersResult as unknown as any[]).map(u => ({
+      id: u.id,
+      name: u.name,
+      email: u.email,
+      ageGroup: u.ageGroup,
+      status: u.status,
+      purchasedPackage: u.purchasedPackage,
+      createdAt: u.createdAt?.toISOString?.() || String(u.createdAt),
+      eventCount: Number(u.eventCount) || 0,
+      completedStages: Number(u.completedStages) || 0,
+      totalStages: Number(u.totalStages) || 0,
+    })),
+    total,
+  };
+}
+
+// ==================== Admin Widget Preferences ====================
+
+export interface WidgetConfig {
+  id: string;
+  label: string;
+  visible: boolean;
+  order: number;
+}
+
+export async function getWidgetPreferences(userId: number): Promise<WidgetConfig[] | null> {
+  const db = await getDb();
+  if (!db) return null;
+
+  const [result] = await db.execute(sql`
+    SELECT widgetLayout FROM admin_widget_preferences WHERE userId = ${userId} LIMIT 1
+  `);
+  const row = (result as any)[0];
+  if (!row?.widgetLayout) return null;
+
+  try {
+    return JSON.parse(row.widgetLayout);
+  } catch {
+    return null;
+  }
+}
+
+export async function saveWidgetPreferences(userId: number, layout: WidgetConfig[]): Promise<void> {
+  const db = await getDb();
+  if (!db) return;
+
+  const layoutJson = JSON.stringify(layout);
+
+  // Upsert: check if exists first
+  const [existing] = await db.execute(sql`
+    SELECT id FROM admin_widget_preferences WHERE userId = ${userId} LIMIT 1
+  `);
+
+  if ((existing as any)[0]) {
+    await db.execute(sql`
+      UPDATE admin_widget_preferences SET widgetLayout = ${layoutJson} WHERE userId = ${userId}
+    `);
+  } else {
+    await db.execute(sql`
+      INSERT INTO admin_widget_preferences (userId, widgetLayout) VALUES (${userId}, ${layoutJson})
+    `);
+  }
 }
