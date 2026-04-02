@@ -1627,7 +1627,7 @@ Platform **minimum seviyede sağlıklı** çalışıyor. Tüm temel özellikler 
 - [x] Frontend: Anomali geçmişi tablosu ve dashboard entegrasyonu (AnomalyHistory tab)
 
 ### Doğrulama ve Deploy
-- [ ] TypeScript doğrulama (0 hata)
-- [ ] Vitest testleri yaz ve çalıştır
-- [ ] GitHub'a push et
-- [ ] Checkpoint kaydet
+- [x] TypeScript doğrulama (0 hata)
+- [x] Vitest testleri yaz ve çalıştır (realtime-anomaly.test.ts: 21 test, toplam 342/342)
+- [x] GitHub'a push et (0ee28aa)
+- [x] Checkpoint kaydet
