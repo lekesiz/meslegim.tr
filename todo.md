@@ -1586,7 +1586,7 @@ Platform **minimum seviyede sağlıklı** çalışıyor. Tüm temel özellikler 
 - [x] AnalyticsDashboard'a funnel bölümü entegrasyonu (renkli bar + özet kartları)
 
 ### Doğrulama ve Deploy
-- [ ] TypeScript doğrulama (0 hata)
-- [ ] Vitest testleri yaz ve çalıştır
-- [ ] GitHub'a push et
-- [ ] Checkpoint kaydet ve deploy
+- [x] TypeScript doğrulama (0 hata)
+- [x] Vitest testleri yaz ve çalıştır (conversion-funnel.test.ts: 16 test, toplam 305/305)
+- [x] GitHub'a push et (0fe0c0d)
+- [x] Checkpoint kaydet ve deploy
