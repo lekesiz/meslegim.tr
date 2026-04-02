@@ -1576,3 +1576,17 @@ Platform **minimum seviyede sağlıklı** çalışıyor. Tüm temel özellikler 
 - [x] Vitest testleri yaz ve çalıştır (cohort-analysis.test.ts: 15 test, toplam 289/289)
 - [x] GitHub'a push et (6a3d658)
 - [x] Checkpoint kaydet
+
+## Oturum 12 - Dönüşüm Hunisi (Conversion Funnel) Analizi
+
+### Funnel Analizi
+- [x] Backend: Funnel veri hesaplama fonksiyonu (kayıt → test başlatma → test tamamlama → rapor görüntüleme → premium yükseltme)
+- [x] Backend: getConversionFunnel prosedürü (tarih filtresi destekli)
+- [x] Frontend: Funnel grafiği bileşeni (her adımda kullanıcı sayısı + düşüş oranı)
+- [x] AnalyticsDashboard'a funnel bölümü entegrasyonu (renkli bar + özet kartları)
+
+### Doğrulama ve Deploy
+- [ ] TypeScript doğrulama (0 hata)
+- [ ] Vitest testleri yaz ve çalıştır
+- [ ] GitHub'a push et
+- [ ] Checkpoint kaydet ve deploy

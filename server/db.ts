@@ -3035,3 +3035,92 @@ export async function getCohortAnalysis(weeksBack: number = 12): Promise<CohortR
     week8: row.week8 !== null && row.week8 !== undefined ? Number(row.week8) : null,
   }));
 }
+
+
+// ==================== Conversion Funnel ====================
+
+export interface FunnelStep {
+  step: string;
+  label: string;
+  count: number;
+  percentage: number; // percentage of total (step 1)
+  dropoff: number; // percentage drop from previous step
+}
+
+/**
+ * Dönüşüm hunisi verilerini hesapla.
+ * Adımlar: Kayıt → Test Başlatma → Test Tamamlama → Rapor Görüntüleme → Premium Yükseltme
+ */
+export async function getConversionFunnel(startDate?: string, endDate?: string): Promise<FunnelStep[]> {
+  const db = await getDb();
+  if (!db) return [];
+
+  const dateConditions: string[] = [];
+  if (startDate) {
+    dateConditions.push(`u.createdAt >= '${new Date(startDate).toISOString().slice(0, 19).replace('T', ' ')}'`);
+  }
+  if (endDate) {
+    dateConditions.push(`u.createdAt <= '${new Date(endDate).toISOString().slice(0, 19).replace('T', ' ')}'`);
+  }
+  const dateWhere = dateConditions.length > 0 ? ` AND ${dateConditions.join(' AND ')}` : '';
+
+  // Step 1: Kayıt olan kullanıcılar (role = student)
+  const [registeredResult] = await db.execute(sql.raw(`
+    SELECT COUNT(DISTINCT u.id) as cnt 
+    FROM users u 
+    WHERE u.role = 'student'${dateWhere}
+  `));
+  const registered = Number((registeredResult as any)[0]?.cnt || 0);
+
+  // Step 2: En az bir test/etap başlatan kullanıcılar
+  const [startedResult] = await db.execute(sql.raw(`
+    SELECT COUNT(DISTINCT us.userId) as cnt 
+    FROM user_stages us
+    JOIN users u ON u.id = us.userId
+    WHERE us.status IN ('active', 'completed') AND u.role = 'student'${dateWhere}
+  `));
+  const started = Number((startedResult as any)[0]?.cnt || 0);
+
+  // Step 3: En az bir test/etap tamamlayan kullanıcılar
+  const [completedResult] = await db.execute(sql.raw(`
+    SELECT COUNT(DISTINCT us.userId) as cnt 
+    FROM user_stages us
+    JOIN users u ON u.id = us.userId
+    WHERE us.status = 'completed' AND u.role = 'student'${dateWhere}
+  `));
+  const completed = Number((completedResult as any)[0]?.cnt || 0);
+
+  // Step 4: En az bir rapor görüntüleyen kullanıcılar
+  const [reportResult] = await db.execute(sql.raw(`
+    SELECT COUNT(DISTINCT r.userId) as cnt 
+    FROM reports r
+    JOIN users u ON u.id = r.userId
+    WHERE u.role = 'student'${dateWhere}
+  `));
+  const reportViewed = Number((reportResult as any)[0]?.cnt || 0);
+
+  // Step 5: Premium yükseltme yapan kullanıcılar
+  const [premiumResult] = await db.execute(sql.raw(`
+    SELECT COUNT(DISTINCT p.userId) as cnt 
+    FROM purchases p
+    JOIN users u ON u.id = p.userId
+    WHERE p.status = 'completed' AND u.role = 'student'${dateWhere}
+  `));
+  const premium = Number((premiumResult as any)[0]?.cnt || 0);
+
+  const steps = [
+    { step: 'registration', label: 'Kayıt', count: registered },
+    { step: 'test_started', label: 'Test Başlatma', count: started },
+    { step: 'test_completed', label: 'Test Tamamlama', count: completed },
+    { step: 'report_viewed', label: 'Rapor Görüntüleme', count: reportViewed },
+    { step: 'premium_upgrade', label: 'Premium Yükseltme', count: premium },
+  ];
+
+  const total = registered || 1; // avoid division by zero
+
+  return steps.map((s, i) => ({
+    ...s,
+    percentage: Math.round(s.count * 100.0 / total * 10) / 10,
+    dropoff: i === 0 ? 0 : Math.round((1 - s.count / (steps[i - 1].count || 1)) * 100 * 10) / 10,
+  }));
+}
