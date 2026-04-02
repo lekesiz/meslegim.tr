@@ -1039,6 +1039,15 @@ export const appRouter = router({
         return { url };
       }),
 
+    // === Kohort Analizi ===
+    getCohortAnalysis: adminProcedure
+      .input(z.object({
+        weeksBack: z.number().min(4).max(52).optional(),
+      }).optional())
+      .query(async ({ input }) => {
+        return await db.getCohortAnalysis(input?.weeksBack || 12);
+      }),
+
     // === Zamanlanmış Raporlama ===
     getScheduledReportSettings: adminProcedure.query(async () => {
       const weeklyEnabled = await db.getPlatformSetting('scheduled_report_weekly');

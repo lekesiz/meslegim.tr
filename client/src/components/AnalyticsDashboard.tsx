@@ -331,6 +331,46 @@ function PdfExportButton({ datePreset, customRange }: { datePreset: DatePreset; 
   );
 }
 
+/**
+ * Retention heatmap hücre bileşeni.
+ * Yüzdeye göre arka plan rengi değişir (kırmızı → sarı → yeşil).
+ */
+function RetentionCell({ value }: { value: number | null }) {
+  if (value === null || value === undefined) {
+    return (
+      <span className="inline-block px-3 py-1.5 rounded-md text-xs font-medium bg-muted text-muted-foreground">
+        —
+      </span>
+    );
+  }
+
+  // Renk hesaplama: 0% = kırmızı, 50% = sarı, 100% = yeşil
+  let bgClass: string;
+  let textClass: string;
+  if (value >= 60) {
+    bgClass = 'bg-green-100 dark:bg-green-900/40';
+    textClass = 'text-green-800 dark:text-green-300';
+  } else if (value >= 40) {
+    bgClass = 'bg-emerald-100 dark:bg-emerald-900/40';
+    textClass = 'text-emerald-800 dark:text-emerald-300';
+  } else if (value >= 25) {
+    bgClass = 'bg-yellow-100 dark:bg-yellow-900/40';
+    textClass = 'text-yellow-800 dark:text-yellow-300';
+  } else if (value >= 10) {
+    bgClass = 'bg-orange-100 dark:bg-orange-900/40';
+    textClass = 'text-orange-800 dark:text-orange-300';
+  } else {
+    bgClass = 'bg-red-100 dark:bg-red-900/40';
+    textClass = 'text-red-800 dark:text-red-300';
+  }
+
+  return (
+    <span className={`inline-block px-3 py-1.5 rounded-md text-xs font-semibold ${bgClass} ${textClass}`}>
+      %{value}
+    </span>
+  );
+}
+
 export function AnalyticsDashboard() {
   // Date filter state
   const [datePreset, setDatePreset] = useState<DatePreset>('all');
@@ -390,6 +430,7 @@ export function AnalyticsDashboard() {
     ...(dateParams.startDate ? { startDate: dateParams.startDate } : {}),
     ...(dateParams.endDate ? { endDate: dateParams.endDate } : {}),
   });
+  const { data: cohortData } = trpc.admin.getCohortAnalysis.useQuery({ weeksBack: 12 });
 
   // CSV Export log mutation
   const logExportMutation = trpc.admin.logCsvExport.useMutation();
@@ -1350,6 +1391,67 @@ export function AnalyticsDashboard() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Kohort Analizi - Retention Heatmap */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Users className="h-5 w-5" />
+            Kohort Analizi - Elde Tutma Oranları
+          </CardTitle>
+          <CardDescription>
+            Haftalık kayıt kohortlarına göre kullanıcı elde tutma (retention) oranları. Renkler yüzdeye göre değişir.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {cohortData && cohortData.length > 0 ? (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b">
+                    <th className="text-left py-3 px-3 font-semibold text-muted-foreground">Kohort Haftası</th>
+                    <th className="text-center py-3 px-3 font-semibold text-muted-foreground">Kullanıcı</th>
+                    <th className="text-center py-3 px-3 font-semibold text-muted-foreground">1. Hafta</th>
+                    <th className="text-center py-3 px-3 font-semibold text-muted-foreground">2. Hafta</th>
+                    <th className="text-center py-3 px-3 font-semibold text-muted-foreground">4. Hafta</th>
+                    <th className="text-center py-3 px-3 font-semibold text-muted-foreground">8. Hafta</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {cohortData.map((row, idx) => (
+                    <tr key={idx} className="border-b last:border-0">
+                      <td className="py-2.5 px-3 font-medium">
+                        {row.cohortWeek ? format(new Date(row.cohortWeek + 'T00:00:00'), 'd MMM yyyy', { locale: tr }) : '-'}
+                      </td>
+                      <td className="py-2.5 px-3 text-center font-semibold">{row.cohortSize}</td>
+                      <td className="py-2.5 px-3 text-center">
+                        <RetentionCell value={row.week1} />
+                      </td>
+                      <td className="py-2.5 px-3 text-center">
+                        <RetentionCell value={row.week2} />
+                      </td>
+                      <td className="py-2.5 px-3 text-center">
+                        <RetentionCell value={row.week4} />
+                      </td>
+                      <td className="py-2.5 px-3 text-center">
+                        <RetentionCell value={row.week8} />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className="flex items-center justify-center h-[200px] text-muted-foreground">
+              <div className="text-center">
+                <Users className="h-8 w-8 mx-auto mb-2 opacity-30" />
+                <p className="text-sm">Henüz yeterli kohort verisi yok</p>
+                <p className="text-xs mt-1">Kullanıcılar kaydoldukça kohort verileri oluşacaktır</p>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }
