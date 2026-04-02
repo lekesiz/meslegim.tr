@@ -2946,3 +2946,92 @@ export async function getAdminActivityFeed(limit = 50) {
     .orderBy(desc(notifications.createdAt))
     .limit(limit);
 }
+
+
+// ============================================================
+// Kohort Analizi (Retention Heatmap)
+// ============================================================
+
+export interface CohortRow {
+  cohortWeek: string; // ISO week start date (YYYY-MM-DD)
+  cohortSize: number;
+  week1: number | null; // retention % at week 1
+  week2: number | null;
+  week4: number | null;
+  week8: number | null;
+}
+
+/**
+ * Haftalık kohort analizi hesapla.
+ * Her kohort = belirli bir haftada kayıt olan kullanıcılar.
+ * Retention = o kohorttan N hafta sonra hâlâ aktif olan kullanıcı oranı.
+ * Aktivite: userStages, reports, answers, messages tablolarındaki createdAt ile ölçülür.
+ */
+export async function getCohortAnalysis(weeksBack: number = 12): Promise<CohortRow[]> {
+  const db = await getDb();
+  if (!db) return [];
+
+  const result = await db.execute(sql`
+    WITH cohorts AS (
+      SELECT 
+        u.id AS userId,
+        DATE(DATE_SUB(u.createdAt, INTERVAL WEEKDAY(u.createdAt) DAY)) AS cohort_week_start,
+        u.createdAt AS registered_at
+      FROM users u
+      WHERE u.role = 'student'
+        AND u.createdAt >= DATE_SUB(CURDATE(), INTERVAL ${weeksBack} WEEK)
+    ),
+    activity AS (
+      SELECT userId, createdAt AS activity_date FROM user_stages WHERE createdAt IS NOT NULL
+      UNION ALL
+      SELECT userId, createdAt AS activity_date FROM reports WHERE createdAt IS NOT NULL
+      UNION ALL
+      SELECT userId, createdAt AS activity_date FROM answers WHERE createdAt IS NOT NULL
+      UNION ALL
+      SELECT senderId AS userId, createdAt AS activity_date FROM messages WHERE createdAt IS NOT NULL
+    ),
+    cohort_retention AS (
+      SELECT
+        c.cohort_week_start,
+        COUNT(DISTINCT c.userId) AS cohort_size,
+        COUNT(DISTINCT CASE 
+          WHEN a.activity_date >= DATE_ADD(c.registered_at, INTERVAL 1 WEEK)
+           AND a.activity_date < DATE_ADD(c.registered_at, INTERVAL 2 WEEK)
+          THEN c.userId END) AS active_week1,
+        COUNT(DISTINCT CASE 
+          WHEN a.activity_date >= DATE_ADD(c.registered_at, INTERVAL 2 WEEK)
+           AND a.activity_date < DATE_ADD(c.registered_at, INTERVAL 3 WEEK)
+          THEN c.userId END) AS active_week2,
+        COUNT(DISTINCT CASE 
+          WHEN a.activity_date >= DATE_ADD(c.registered_at, INTERVAL 4 WEEK)
+           AND a.activity_date < DATE_ADD(c.registered_at, INTERVAL 5 WEEK)
+          THEN c.userId END) AS active_week4,
+        COUNT(DISTINCT CASE 
+          WHEN a.activity_date >= DATE_ADD(c.registered_at, INTERVAL 8 WEEK)
+           AND a.activity_date < DATE_ADD(c.registered_at, INTERVAL 9 WEEK)
+          THEN c.userId END) AS active_week8
+      FROM cohorts c
+      LEFT JOIN activity a ON c.userId = a.userId
+      GROUP BY c.cohort_week_start
+    )
+    SELECT
+      cohort_week_start,
+      cohort_size,
+      CASE WHEN cohort_size > 0 THEN ROUND(active_week1 * 100.0 / cohort_size, 1) ELSE NULL END AS week1,
+      CASE WHEN cohort_size > 0 THEN ROUND(active_week2 * 100.0 / cohort_size, 1) ELSE NULL END AS week2,
+      CASE WHEN cohort_size > 0 THEN ROUND(active_week4 * 100.0 / cohort_size, 1) ELSE NULL END AS week4,
+      CASE WHEN cohort_size > 0 THEN ROUND(active_week8 * 100.0 / cohort_size, 1) ELSE NULL END AS week8
+    FROM cohort_retention
+    ORDER BY cohort_week_start DESC
+  `);
+
+  const rows = (result as any)[0] || [];
+  return rows.map((row: any) => ({
+    cohortWeek: row.cohort_week_start ? new Date(row.cohort_week_start).toISOString().split('T')[0] : '',
+    cohortSize: Number(row.cohort_size) || 0,
+    week1: row.week1 !== null && row.week1 !== undefined ? Number(row.week1) : null,
+    week2: row.week2 !== null && row.week2 !== undefined ? Number(row.week2) : null,
+    week4: row.week4 !== null && row.week4 !== undefined ? Number(row.week4) : null,
+    week8: row.week8 !== null && row.week8 !== undefined ? Number(row.week8) : null,
+  }));
+}

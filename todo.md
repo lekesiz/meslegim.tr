@@ -1561,3 +1561,18 @@ Platform **minimum seviyede sağlıklı** çalışıyor. Tüm temel özellikler 
 - [x] Genel A-Z full test (tüm sayfalar, production build başarılı)
 - [x] GitHub'a push et (https://github.com/lekesiz/meslegim.tr) - b5e1266
 - [x] Checkpoint kaydet
+
+## Oturum 11 - Kohort Analizi (Retention Heatmap)
+
+### Kohort Analizi
+- [x] Backend: Haftalık kohort veri hesaplama fonksiyonu (db.ts)
+- [x] Backend: getCohortAnalysis prosedürü (routers.ts)
+- [x] Frontend: CohortHeatmap bileşeni (renkli ısı haritası tablosu - RetentionCell)
+- [x] AnalyticsDashboard'a kohort analizi bölümü entegrasyonu
+- [x] 1., 2., 4. ve 8. hafta retention oranları (5 kademeli renk ısı haritası)
+
+### Doğrulama ve Test
+- [ ] TypeScript doğrulama (0 hata)
+- [ ] Vitest testleri yaz ve çalıştır
+- [ ] GitHub'a push et
+- [ ] Checkpoint kaydet
