@@ -554,3 +554,31 @@ export const csvExportLogs = mysqlTable("csv_export_logs", {
 }));
 export type CsvExportLog = typeof csvExportLogs.$inferSelect;
 export type InsertCsvExportLog = typeof csvExportLogs.$inferInsert;
+
+/**
+ * KPI Anomalies - Günlük KPI anomali tespiti kayıtları
+ */
+export const kpiAnomalies = mysqlTable("kpi_anomalies", {
+  id: int("id").autoincrement().primaryKey(),
+  date: timestamp("date").notNull(), // Anomali tespit edilen gün
+  kpiName: varchar("kpiName", { length: 100 }).notNull(), // "daily_registrations", "test_completion_rate", "premium_conversion"
+  kpiLabel: varchar("kpiLabel", { length: 255 }).notNull(), // Türkçe etiket
+  currentValue: int("currentValue").notNull(), // O günkü değer
+  avgValue: int("avgValue").notNull(), // Son 7 günlük ortalama (x100 hassasiyet)
+  deviationPercent: int("deviationPercent").notNull(), // Sapma yüzdesi (x100)
+  direction: mysqlEnum("direction", ["up", "down"]).notNull(), // Artış mı düşüş mü
+  severity: mysqlEnum("severity", ["warning", "critical"]).default("warning").notNull(), // %30-50 = warning, %50+ = critical
+  alertSent: boolean("alertSent").default(false).notNull(), // Email gönderildi mi
+  acknowledged: boolean("acknowledged").default(false).notNull(), // Admin tarafından onaylandı mı
+  acknowledgedBy: int("acknowledgedBy"), // Onaylayan admin ID
+  acknowledgedAt: timestamp("acknowledgedAt"),
+  notes: text("notes"), // Admin notları
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+  dateIdx: index("ka_date_idx").on(table.date),
+  kpiNameIdx: index("ka_kpi_name_idx").on(table.kpiName),
+  severityIdx: index("ka_severity_idx").on(table.severity),
+  acknowledgedIdx: index("ka_acknowledged_idx").on(table.acknowledged),
+}));
+export type KpiAnomaly = typeof kpiAnomalies.$inferSelect;
+export type InsertKpiAnomaly = typeof kpiAnomalies.$inferInsert;

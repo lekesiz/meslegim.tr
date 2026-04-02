@@ -6,6 +6,7 @@ import { sendEmail } from '../_core/resend-email';
 import { getNewStageActivatedEmailTemplate, getStageReminderEmailTemplate } from './emailService';
 import { startReminderService } from './reminderService';
 import { sendScheduledKPIReport } from './scheduledReports';
+import { runDailyAnomalyCheck } from './anomalyDetection';
 
 /**
  * Check and activate stages that should be unlocked based on configurable delay
@@ -236,7 +237,13 @@ export function initializeCronJobs() {
     await sendScheduledKPIReport('monthly');
   });
 
-  console.log('[Cron] Cron jobs initialized (activation at 00:00, reminders at 09:00, weekly report Mon 08:00, monthly report 1st 08:00)');
+  // Daily KPI anomaly detection: every day at 07:00
+  cron.schedule('0 7 * * *', async () => {
+    console.log('[Cron] Running daily KPI anomaly detection...');
+    await runDailyAnomalyCheck();
+  });
+
+  console.log('[Cron] Cron jobs initialized (activation at 00:00, reminders at 09:00, anomaly check at 07:00, weekly report Mon 08:00, monthly report 1st 08:00)');
 
   // Run activation once on startup
   setTimeout(() => {
