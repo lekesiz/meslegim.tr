@@ -1385,9 +1385,10 @@ Platform **minimum seviyede sağlıklı** çalışıyor. Tüm temel özellikler 
 - [ ] Rapor onaylama çalışıyor (browser testi gerekli)
 
 ### Senaryo 4: School Admin
-- [ ] Giriş yapabiliyor
-- [ ] Dashboard yükleniyor
-- [ ] Okul bilgileri görünüyor
+- [x] Giriş yapabiliyor (API testi ile doğrulandı)
+- [x] Dashboard yükleniyor (getMySchool, getMyStats çalışıyor)
+- [x] Okul bilgileri görünüyor (Test Anadolu Lisesi - İstanbul)
+- [x] Güvenlik: admin/mentor API'lerine erişim BLOCKED
 
 ### Senaryo 5: Admin
 - [x] Giriş yapabiliyor (API testi ile doğrulandı)
@@ -1406,18 +1407,75 @@ Platform **minimum seviyede sağlıklı** çalışıyor. Tüm temel özellikler 
 - [x] KRİTİK GÜVENLİK: Çeşitli API'ler password hash döndürüyordu - DÜZELTİLDİ
 - [x] Login buton rengi mor yerine mavi gradient'e düzeltildi
 - [x] Login cookie maxAge eksikti - düzeltildi
+- [x] Stripe checkout locale: 'tr' eklendi (Fransızca yerine Türkçe)
+- [x] JSON-LD structured data EducationalOrganization olarak güncellendi
+- [x] Ana sayfa mobil hamburger menü eklendi
+- [x] Güvenlik: Helmet.js, rate limiting, password politikası, input sanitization eklendi
 
 ### Hızlı Düzeltmeler (Tamamlandı)
 - [x] Password hash tüm API yanıtlarından kaldırıldı
 - [x] Login buton rengi düzeltildi
 - [x] Login cookie maxAge eklendi
+- [x] Stripe checkout locale: 'tr' eklendi
+- [x] JSON-LD EducationalOrganization güncellendi
+- [x] Mobil hamburger menü eklendi
+- [x] Helmet.js güvenlik başlıkları eklendi
+- [x] Rate limiting eklendi
+- [x] Password politikası güçlendirildi (min 8 karakter, büyük/küçük harf, rakam)
+- [x] Input sanitization eklendi (XSS koruması)
+- [x] TC Kimlik duplicate kontrolü eklendi
 
-### Uzun Süreli Görevler (Sonraki Oturum)
-- [ ] Mesajlaşma sistemi gerçek zamanlı test (iki kullanıcı eş zamanlı)
+### Uzun Süreli Görevler (Güncellendi)
+- [x] Mesajlaşma sistemi gerçek zamanlı test - ÇİFT YÖNLÜ ÇALIŞIYOR
 - [ ] E-posta doğrulama ve şifre sıfırlama akışı testi
-- [ ] Stripe ödeme akışı uçtan uca test
+- [x] Stripe ödeme akışı uçtan uca test - CHECKOUT ÇALIŞIYOR (locale: tr düzeltildi)
 - [ ] Sertifika oluşturma akışı testi
 - [ ] AI rapor oluşturma performans testi
-- [ ] School Admin browser testi
+- [x] School Admin browser testi - API'LER ÇALIŞIYOR
 - [ ] Mentor browser detay testi (öğrenci detayı, rapor onaylama)
 - [ ] Mobil responsive test
+
+### UZMAN TAVSİYELERİ - YAPILMASI GEREKENLER (Detaylı liste: test-findings.md)
+
+#### A. GÜVENLİK (Kritik)
+- [x] Rate limiting (login, kayıt, API)
+- [x] Input sanitization (XSS koruması)
+- [x] Password politikası (min 8 karakter, karmaşıklık)
+- [ ] Session timeout
+- [x] Helmet.js (HTTP güvenlik başlıkları)
+
+#### B. PERFORMANS
+- [ ] Database indexleri (email, schoolId, mentorId)
+- [ ] Pagination (büyük listeler)
+- [ ] Caching (etap tanımları, okul listesi)
+- [ ] Bundle splitting (React.lazy)
+
+#### C. UX İYİLEŞTİRMELERİ
+- [x] Form validasyonu (client-side)
+- [ ] Error handling (kullanıcı dostu mesajlar)
+- [x] Responsive design (mobil sidebar + hamburger menü)
+- [ ] Empty states (boş listeler için CTA)
+- [x] Confirmation dialogs (silme/iptal) - mevcut confirm() kullanılıyor
+
+#### D. İŞ MANTIĞI
+- [ ] Email doğrulama akışı
+- [ ] Şifre sıfırlama akışı
+- [ ] Ödeme sonrası otomatik etap açma (webhook)
+- [ ] Sertifika oluşturma (PDF)
+- [ ] AI rapor oluşturma
+- [ ] Mentor atama algoritması
+- [ ] Bildirim sistemi (email + in-app)
+
+#### E. SEO ve ERİŞİLEBİLİRLİK
+- [x] Meta tags (title, description, og:image)
+- [x] Sitemap.xml
+- [x] robots.txt
+- [x] Semantic HTML (aria-label, alt text)
+- [x] Open Graph
+
+#### F. İÇERİK
+- [ ] Stripe mağaza adı düzeltme
+- [ ] Gizlilik politikası (KVKK)
+- [ ] Kullanım koşulları
+- [ ] SSS sayfası
+- [ ] İletişim sayfası

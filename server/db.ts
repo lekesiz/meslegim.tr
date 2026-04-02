@@ -132,6 +132,14 @@ export async function getUserByEmail(email: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
+export async function getUserByTcKimlik(tcKimlik: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db.select().from(users).where(eq(users.tcKimlik, tcKimlik)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
 export async function createUser(data: Omit<InsertUser, 'openId'> & { openId?: string }) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
