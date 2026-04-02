@@ -1572,7 +1572,7 @@ Platform **minimum seviyede sağlıklı** çalışıyor. Tüm temel özellikler 
 - [x] 1., 2., 4. ve 8. hafta retention oranları (5 kademeli renk ısı haritası)
 
 ### Doğrulama ve Test
-- [ ] TypeScript doğrulama (0 hata)
-- [ ] Vitest testleri yaz ve çalıştır
-- [ ] GitHub'a push et
-- [ ] Checkpoint kaydet
+- [x] TypeScript doğrulama (0 hata)
+- [x] Vitest testleri yaz ve çalıştır (cohort-analysis.test.ts: 15 test, toplam 289/289)
+- [x] GitHub'a push et (6a3d658)
+- [x] Checkpoint kaydet
