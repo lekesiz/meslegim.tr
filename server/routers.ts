@@ -146,7 +146,7 @@ export const appRouter = router({
           subject: 'Meslegim.tr - Şifre Sıfırlama',
           html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-              <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 20px; text-align: center;">
+              <div style="background: linear-gradient(135deg, #3b82f6 0%, #4f46e5 100%); padding: 40px 20px; text-align: center;">
                 <img src="https://d2xsxph8kpxj0f.cloudfront.net/310419663028218705/jiPvNqaHRUg9H2uZgXUx3J/logo_3458a270.png" alt="Meslegim.tr Logo" style="height: 50px; margin-bottom: 20px;" />
                 <h1 style="color: white; margin: 0;">Meslegim.tr</h1>
                 <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0 0;">Kariyer Değerlendirme Platformu</p>
@@ -156,7 +156,7 @@ export const appRouter = router({
                 <p style="color: #666; line-height: 1.6;">Merhaba ${user.name},</p>
                 <p style="color: #666; line-height: 1.6;">Şifrenizi sıfırlamak için aşağıdaki butona tıklayın. Bu link 1 saat geçerlidir.</p>
                 <div style="text-align: center; margin: 30px 0;">
-                  <a href="${resetUrl}" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 40px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: bold;">Şifremi Sıfırla</a>
+                  <a href="${resetUrl}" style="background: linear-gradient(135deg, #3b82f6 0%, #4f46e5 100%); color: white; padding: 15px 40px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: bold;">Şifremi Sıfırla</a>
                 </div>
                 <p style="color: #999; font-size: 14px; line-height: 1.6;">Eğer bu talebi siz yapmadıysanız, bu e-postayı görmezden gelebilirsiniz.</p>
               </div>
@@ -173,9 +173,24 @@ export const appRouter = router({
     resetPassword: publicProcedure
       .input(z.object({
         token: z.string(),
-        newPassword: z.string().min(6),
+        newPassword: z.string().min(8),
       }))
       .mutation(async ({ input }) => {
+        // Validate password strength
+        const pwd = input.newPassword;
+        if (pwd.length < 8) {
+          throw new TRPCError({ code: 'BAD_REQUEST', message: 'Şifre en az 8 karakter olmalıdır' });
+        }
+        if (!/[A-Z]/.test(pwd)) {
+          throw new TRPCError({ code: 'BAD_REQUEST', message: 'Şifre en az bir büyük harf içermelidir' });
+        }
+        if (!/[a-z]/.test(pwd)) {
+          throw new TRPCError({ code: 'BAD_REQUEST', message: 'Şifre en az bir küçük harf içermelidir' });
+        }
+        if (!/[0-9]/.test(pwd)) {
+          throw new TRPCError({ code: 'BAD_REQUEST', message: 'Şifre en az bir rakam içermelidir' });
+        }
+        
         // Verify token and get user
         let userOpenId: string;
         try {
@@ -339,7 +354,7 @@ export const appRouter = router({
           subject: 'Meslegim.tr - E-posta Doğrulama',
           html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-              <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 20px; text-align: center;">
+              <div style="background: linear-gradient(135deg, #3b82f6 0%, #4f46e5 100%); padding: 40px 20px; text-align: center;">
                 <h1 style="color: white; margin: 0;">Meslegim.tr</h1>
                 <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0 0;">E-posta Doğrulama</p>
               </div>
@@ -347,7 +362,7 @@ export const appRouter = router({
                 <p style="color: #666;">Merhaba ${user.name},</p>
                 <p style="color: #666;">E-posta adresinizi doğrulamak için aşağıdaki butona tıklayın:</p>
                 <div style="text-align: center; margin: 30px 0;">
-                  <a href="${verifyUrl}" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 40px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: bold;">E-postamı Doğrula</a>
+                  <a href="${verifyUrl}" style="background: linear-gradient(135deg, #3b82f6 0%, #4f46e5 100%); color: white; padding: 15px 40px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: bold;">E-postamı Doğrula</a>
                 </div>
               </div>
             </div>
@@ -622,7 +637,7 @@ export const appRouter = router({
                 subject: input.subject,
                 html: `
                   <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center;">
+                    <div style="background: linear-gradient(135deg, #3b82f6 0%, #4f46e5 100%); padding: 30px; text-align: center;">
                       <h1 style="color: white; margin: 0;">Meslegim.tr</h1>
                       <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0 0;">Kariyer Değerlendirme Platformu</p>
                     </div>
@@ -2226,6 +2241,9 @@ export const appRouter = router({
             ...input.metadata,
           },
           customer_email: ctx.user.email || undefined,
+          payment_intent_data: {
+            statement_descriptor: 'MESLEGIM.TR',
+          },
         });
 
         // Promotion kodu kullanımını kaydet

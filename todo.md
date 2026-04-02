@@ -1474,8 +1474,18 @@ Platform **minimum seviyede sağlıklı** çalışıyor. Tüm temel özellikler 
 - [x] Open Graph
 
 #### F. İÇERİK
-- [ ] Stripe mağaza adı düzeltme
-- [ ] Gizlilik politikası (KVKK)
-- [ ] Kullanım koşulları
+- [x] Stripe mağaza adı düzeltme (statement_descriptor: MESLEGIM.TR)
+- [x] Gizlilik politikası (KVKK)
+- [x] Kullanım koşulları
 - [ ] SSS sayfası
 - [ ] İletişim sayfası
+
+## Oturum 4 - KVKK, Şifre Sıfırlama, Stripe (2 Nisan 2026)
+
+- [x] KVKK/Gizlilik Politikası sayfası oluştur (kapsamlı KVKK aydınlatma metni)
+- [x] Kullanım Koşulları sayfası oluştur (14 maddelik hizmet sözleşmesi)
+- [x] Şifre sıfırlama akışı - backend (token, email, password politikası)
+- [x] Şifre sıfırlama akışı - frontend (form, doğrulama, password strength göstergesi)
+- [x] Stripe mağaza adı düzeltme (statement_descriptor: MESLEGIM.TR)
+- [x] Footer'a KVKK ve Kullanım Koşulları linkleri ekle (zaten mevcut)
+- [x] Login sayfasında "Şifremi Unuttum" akışını bağla (zaten bağlıydı)
