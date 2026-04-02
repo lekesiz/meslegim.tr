@@ -3124,3 +3124,122 @@ export async function getConversionFunnel(startDate?: string, endDate?: string):
     dropoff: i === 0 ? 0 : Math.round((1 - s.count / (steps[i - 1].count || 1)) * 100 * 10) / 10,
   }));
 }
+
+
+// ==================== Kullanıcı Segmentasyon Analizi ====================
+
+export interface SegmentData {
+  segment: string;
+  userCount: number;
+  avgCompletionRate: number;
+  avgStagesCompleted: number;
+  premiumRate: number;
+  avgDaysOnPlatform: number;
+}
+
+export async function getUserSegmentation(
+  segmentBy: 'ageGroup' | 'purchasedPackage' | 'stageName' | 'role',
+  startDate?: string,
+  endDate?: string
+): Promise<SegmentData[]> {
+  const db = await getDb();
+  if (!db) return [];
+
+  const dateConditions: string[] = [];
+  if (startDate) dateConditions.push(`u.createdAt >= '${startDate}'`);
+  if (endDate) dateConditions.push(`u.createdAt <= '${endDate}'`);
+  const dateWhere = dateConditions.length > 0 ? `AND ${dateConditions.join(' AND ')}` : '';
+
+  if (segmentBy === 'stageName') {
+    const result = await db.execute(sql.raw(`
+      SELECT 
+        CASE 
+          WHEN completed_stages = 0 OR completed_stages IS NULL THEN 'Hiç Tamamlamadı'
+          WHEN completed_stages BETWEEN 1 AND 3 THEN '1-3 Etap'
+          WHEN completed_stages BETWEEN 4 AND 6 THEN '4-6 Etap'
+          ELSE '7+ Etap'
+        END as segment,
+        COUNT(*) as userCount,
+        ROUND(AVG(CASE WHEN total_stages > 0 THEN (completed_stages * 100.0 / total_stages) ELSE 0 END), 1) as avgCompletionRate,
+        ROUND(AVG(COALESCE(completed_stages, 0)), 1) as avgStagesCompleted,
+        ROUND(AVG(CASE WHEN u.purchasedPackage IS NOT NULL AND u.purchasedPackage != '' THEN 1 ELSE 0 END) * 100, 1) as premiumRate,
+        ROUND(AVG(DATEDIFF(NOW(), u.createdAt)), 0) as avgDaysOnPlatform
+      FROM users u
+      LEFT JOIN (
+        SELECT userId, 
+          COUNT(*) as total_stages,
+          SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) as completed_stages
+        FROM user_stages
+        GROUP BY userId
+      ) us_stats ON u.id = us_stats.userId
+      WHERE u.role = 'student' ${dateWhere}
+      GROUP BY segment
+      ORDER BY 
+        CASE segment
+          WHEN 'Hiç Tamamlamadı' THEN 1
+          WHEN '1-3 Etap' THEN 2
+          WHEN '4-6 Etap' THEN 3
+          ELSE 4
+        END
+    `));
+    return (result[0] as unknown as any[]).map((row: any) => ({
+      segment: row.segment || 'Bilinmiyor',
+      userCount: Number(row.userCount) || 0,
+      avgCompletionRate: Number(row.avgCompletionRate) || 0,
+      avgStagesCompleted: Number(row.avgStagesCompleted) || 0,
+      premiumRate: Number(row.premiumRate) || 0,
+      avgDaysOnPlatform: Number(row.avgDaysOnPlatform) || 0,
+    }));
+  }
+
+  let segmentLabel: string;
+  let groupByField: string;
+
+  switch (segmentBy) {
+    case 'ageGroup':
+      groupByField = 'u.ageGroup';
+      segmentLabel = "COALESCE(u.ageGroup, 'Belirtilmemiş')";
+      break;
+    case 'purchasedPackage':
+      groupByField = 'u.purchasedPackage';
+      segmentLabel = "COALESCE(u.purchasedPackage, 'Ücretsiz')";
+      break;
+    case 'role':
+      groupByField = 'u.role';
+      segmentLabel = "u.role";
+      break;
+    default:
+      groupByField = 'u.ageGroup';
+      segmentLabel = "COALESCE(u.ageGroup, 'Belirtilmemiş')";
+  }
+
+  const result = await db.execute(sql.raw(`
+    SELECT 
+      ${segmentLabel} as segment,
+      COUNT(*) as userCount,
+      ROUND(AVG(CASE WHEN us_stats.total_stages > 0 THEN (us_stats.completed_stages * 100.0 / us_stats.total_stages) ELSE 0 END), 1) as avgCompletionRate,
+      ROUND(AVG(COALESCE(us_stats.completed_stages, 0)), 1) as avgStagesCompleted,
+      ROUND(AVG(CASE WHEN u.purchasedPackage IS NOT NULL AND u.purchasedPackage != '' THEN 1 ELSE 0 END) * 100, 1) as premiumRate,
+      ROUND(AVG(DATEDIFF(NOW(), u.createdAt)), 0) as avgDaysOnPlatform
+    FROM users u
+    LEFT JOIN (
+      SELECT userId, 
+        COUNT(*) as total_stages,
+        SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) as completed_stages
+      FROM user_stages
+      GROUP BY userId
+    ) us_stats ON u.id = us_stats.userId
+    WHERE u.role = 'student' ${dateWhere}
+    GROUP BY ${groupByField}
+    ORDER BY userCount DESC
+  `));
+
+  return (result[0] as unknown as any[]).map((row: any) => ({
+    segment: row.segment || 'Bilinmiyor',
+    userCount: Number(row.userCount) || 0,
+    avgCompletionRate: Number(row.avgCompletionRate) || 0,
+    avgStagesCompleted: Number(row.avgStagesCompleted) || 0,
+    premiumRate: Number(row.premiumRate) || 0,
+    avgDaysOnPlatform: Number(row.avgDaysOnPlatform) || 0,
+  }));
+}

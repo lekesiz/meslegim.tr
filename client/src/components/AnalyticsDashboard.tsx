@@ -437,6 +437,14 @@ export function AnalyticsDashboard() {
       : undefined
   );
 
+  // Segmentasyon analizi
+  const [segmentBy, setSegmentBy] = useState<'ageGroup' | 'purchasedPackage' | 'stageName' | 'role'>('ageGroup');
+  const { data: segmentData } = trpc.admin.getUserSegmentation.useQuery({
+    segmentBy,
+    startDate: dateParams.startDate,
+    endDate: dateParams.endDate,
+  });
+
   // CSV Export log mutation
   const logExportMutation = trpc.admin.logCsvExport.useMutation();
 
@@ -1556,6 +1564,203 @@ export function AnalyticsDashboard() {
                 <Filter className="h-8 w-8 mx-auto mb-2 opacity-30" />
                 <p className="text-sm">Henüz dönüşüm verisi yok</p>
                 <p className="text-xs mt-1">Kullanıcılar kaydoldukça huni verileri oluşacaktır</p>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* ==================== Kullanıcı Segmentasyon Analizi ==================== */}
+      <Card>
+        <CardHeader>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="h-5 w-5 text-violet-500" />
+                Kullanıcı Segmentasyon Analizi
+              </CardTitle>
+              <p className="text-sm text-muted-foreground mt-1">
+                Kullanıcıları farklı kriterlere göre segmentlere ayırarak karşılaştırmalı analiz
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <Select value={segmentBy} onValueChange={(v) => setSegmentBy(v as any)}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ageGroup">Yaş Grubu</SelectItem>
+                  <SelectItem value="purchasedPackage">Paket Türü</SelectItem>
+                  <SelectItem value="stageName">Etap İlerlemesi</SelectItem>
+                  <SelectItem value="role">Kullanıcı Rolü</SelectItem>
+                </SelectContent>
+              </Select>
+              <ExportButton
+                onClick={() => {
+                  if (!segmentData || segmentData.length === 0) return;
+                  const csvData = segmentData.map(s => ({
+                    segment: s.segment,
+                    userCount: s.userCount,
+                    avgCompletionRate: s.avgCompletionRate,
+                    avgStagesCompleted: s.avgStagesCompleted,
+                    premiumRate: s.premiumRate,
+                    avgDaysOnPlatform: s.avgDaysOnPlatform,
+                  }));
+                  const result = downloadCSV(
+                    csvData,
+                    `segmentasyon_${segmentBy}`,
+                    {
+                      segment: 'Segment',
+                      userCount: 'Kullanıcı Sayısı',
+                      avgCompletionRate: 'Ort. Tamamlama Oranı (%)',
+                      avgStagesCompleted: 'Ort. Tamamlanan Etap',
+                      premiumRate: 'Premium Oranı (%)',
+                      avgDaysOnPlatform: 'Ort. Platform Süresi (Gün)',
+                    }
+                  );
+                  logExport('segmentasyon', result);
+                }}
+                label="CSV"
+              />
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {segmentData && segmentData.length > 0 ? (
+            <div className="space-y-6">
+              {/* Segmentasyon Tablosu */}
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="text-left py-3 px-4 font-medium text-muted-foreground">Segment</th>
+                      <th className="text-right py-3 px-4 font-medium text-muted-foreground">Kullanıcı</th>
+                      <th className="text-right py-3 px-4 font-medium text-muted-foreground">Tamamlama %</th>
+                      <th className="text-right py-3 px-4 font-medium text-muted-foreground">Ort. Etap</th>
+                      <th className="text-right py-3 px-4 font-medium text-muted-foreground">Premium %</th>
+                      <th className="text-right py-3 px-4 font-medium text-muted-foreground">Ort. Süre (Gün)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {segmentData.map((seg, idx) => {
+                      const maxUsers = Math.max(...segmentData.map(s => s.userCount));
+                      const barWidth = maxUsers > 0 ? (seg.userCount / maxUsers) * 100 : 0;
+                      return (
+                        <tr key={idx} className="border-b last:border-0 hover:bg-muted/50 transition-colors">
+                          <td className="py-3 px-4">
+                            <div className="flex items-center gap-3">
+                              <div className="w-2 h-2 rounded-full" style={{ backgroundColor: `hsl(${(idx * 60) % 360}, 70%, 50%)` }} />
+                              <span className="font-medium">{seg.segment}</span>
+                            </div>
+                          </td>
+                          <td className="text-right py-3 px-4">
+                            <div className="flex items-center justify-end gap-2">
+                              <div className="w-20 h-2 bg-muted rounded-full overflow-hidden">
+                                <div className="h-full rounded-full bg-violet-500" style={{ width: `${barWidth}%` }} />
+                              </div>
+                              <span className="font-mono text-xs w-8 text-right">{seg.userCount}</span>
+                            </div>
+                          </td>
+                          <td className="text-right py-3 px-4">
+                            <span className={`font-mono text-xs px-2 py-0.5 rounded-full ${
+                              seg.avgCompletionRate >= 70 ? 'bg-emerald-500/10 text-emerald-600' :
+                              seg.avgCompletionRate >= 40 ? 'bg-amber-500/10 text-amber-600' :
+                              'bg-red-500/10 text-red-600'
+                            }`}>
+                              %{seg.avgCompletionRate}
+                            </span>
+                          </td>
+                          <td className="text-right py-3 px-4 font-mono text-xs">{seg.avgStagesCompleted}</td>
+                          <td className="text-right py-3 px-4">
+                            <span className={`font-mono text-xs px-2 py-0.5 rounded-full ${
+                              seg.premiumRate >= 50 ? 'bg-violet-500/10 text-violet-600' :
+                              seg.premiumRate >= 20 ? 'bg-blue-500/10 text-blue-600' :
+                              'bg-gray-500/10 text-gray-600'
+                            }`}>
+                              %{seg.premiumRate}
+                            </span>
+                          </td>
+                          <td className="text-right py-3 px-4 font-mono text-xs">{seg.avgDaysOnPlatform}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Segment Karşılaştırma Grafikleri */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Tamamlama Oranı Karşılaştırması */}
+                <div className="p-4 bg-muted/30 rounded-lg">
+                  <h4 className="text-sm font-medium mb-3">Tamamlama Oranı Karşılaştırması</h4>
+                  <div className="space-y-2">
+                    {segmentData.map((seg, idx) => (
+                      <div key={idx} className="flex items-center gap-2">
+                        <span className="text-xs w-28 truncate" title={seg.segment}>{seg.segment}</span>
+                        <div className="flex-1 h-5 bg-muted rounded-full overflow-hidden">
+                          <div
+                            className="h-full rounded-full transition-all duration-500"
+                            style={{
+                              width: `${seg.avgCompletionRate}%`,
+                              backgroundColor: `hsl(${(idx * 60) % 360}, 70%, 50%)`,
+                            }}
+                          />
+                        </div>
+                        <span className="text-xs font-mono w-10 text-right">%{seg.avgCompletionRate}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Premium Oranı Karşılaştırması */}
+                <div className="p-4 bg-muted/30 rounded-lg">
+                  <h4 className="text-sm font-medium mb-3">Premium Dönüşüm Oranı</h4>
+                  <div className="space-y-2">
+                    {segmentData.map((seg, idx) => (
+                      <div key={idx} className="flex items-center gap-2">
+                        <span className="text-xs w-28 truncate" title={seg.segment}>{seg.segment}</span>
+                        <div className="flex-1 h-5 bg-muted rounded-full overflow-hidden">
+                          <div
+                            className="h-full rounded-full transition-all duration-500"
+                            style={{
+                              width: `${seg.premiumRate}%`,
+                              backgroundColor: `hsl(${(idx * 60 + 180) % 360}, 70%, 50%)`,
+                            }}
+                          />
+                        </div>
+                        <span className="text-xs font-mono w-10 text-right">%{seg.premiumRate}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Özet Kartları */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div className="p-3 bg-violet-500/10 rounded-lg text-center">
+                  <p className="text-xs text-muted-foreground">Toplam Segment</p>
+                  <p className="text-lg font-bold">{segmentData.length}</p>
+                </div>
+                <div className="p-3 bg-emerald-500/10 rounded-lg text-center">
+                  <p className="text-xs text-muted-foreground">En Yüksek Tamamlama</p>
+                  <p className="text-lg font-bold">%{Math.max(...segmentData.map(s => s.avgCompletionRate))}</p>
+                </div>
+                <div className="p-3 bg-blue-500/10 rounded-lg text-center">
+                  <p className="text-xs text-muted-foreground">En Yüksek Premium</p>
+                  <p className="text-lg font-bold">%{Math.max(...segmentData.map(s => s.premiumRate))}</p>
+                </div>
+                <div className="p-3 bg-amber-500/10 rounded-lg text-center">
+                  <p className="text-xs text-muted-foreground">Ort. Platform Süresi</p>
+                  <p className="text-lg font-bold">{Math.round(segmentData.reduce((sum, s) => sum + s.avgDaysOnPlatform * s.userCount, 0) / Math.max(segmentData.reduce((sum, s) => sum + s.userCount, 0), 1))} gün</p>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-center justify-center h-[200px] text-muted-foreground">
+              <div className="text-center">
+                <Users className="h-8 w-8 mx-auto mb-2 opacity-30" />
+                <p className="text-sm">Henüz segmentasyon verisi yok</p>
+                <p className="text-xs mt-1">Kullanıcılar kaydoldukça segmentasyon verileri oluşacaktır</p>
               </div>
             </div>
           )}

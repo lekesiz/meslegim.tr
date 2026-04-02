@@ -1590,3 +1590,23 @@ Platform **minimum seviyede sağlıklı** çalışıyor. Tüm temel özellikler 
 - [x] Vitest testleri yaz ve çalıştır (conversion-funnel.test.ts: 16 test, toplam 305/305)
 - [x] GitHub'a push et (0fe0c0d)
 - [x] Checkpoint kaydet ve deploy
+
+## Oturum 13 - Kullanıcı Segmentasyon Analizi ve PDF Rapor Güncelleme
+
+### Kullanıcı Segmentasyon Analizi
+- [x] Backend: Birleşik segmentasyon fonksiyonu (yaş grubu, paket, etap ilerlemesi, rol)
+- [x] Backend: getUserSegmentation prosedürü (4 segment tipi destekli)
+- [x] Frontend: Segmentasyon analizi bileşeni (tablo + bar grafikler + özet kartları)
+- [x] AnalyticsDashboard'a segmentasyon bölümü entegrasyonu (4 segment tipi, CSV export)
+
+### PDF Rapor Güncelleme
+- [x] PDF raporuna dönüşüm hunisi tablosu ekle (renkli düşüş oranları)
+- [x] PDF raporuna kohort analizi tablosu ekle (haftalık retention)
+- [x] PDF raporuna segmentasyon tabloları ekle (yaş grubu + paket türü)
+- [x] PDF raporuna segmentasyon özeti ekle (yaş grubu + paket türü tablosu)
+
+### Doğrulama ve Deploy
+- [ ] TypeScript doğrulama (0 hata)
+- [ ] Vitest testleri yaz ve çalıştır
+- [ ] GitHub'a push et
+- [ ] Checkpoint kaydet
