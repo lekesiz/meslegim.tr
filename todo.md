@@ -1489,3 +1489,11 @@ Platform **minimum seviyede sağlıklı** çalışıyor. Tüm temel özellikler 
 - [x] Stripe mağaza adı düzeltme (statement_descriptor: MESLEGIM.TR)
 - [x] Footer'a KVKK ve Kullanım Koşulları linkleri ekle (zaten mevcut)
 - [x] Login sayfasında "Şifremi Unuttum" akışını bağla (zaten bağlıydı)
+
+## Oturum 5 - SSS, İletişim, Stripe Mağaza Adı (2 Nisan 2026)
+
+- [x] SSS (Sıkça Sorulan Sorular) sayfası oluştur (8 kategori, 30+ soru)
+- [x] İletişim sayfası oluştur (destek formu + iletişim bilgileri + notifyOwner entegrasyonu)
+- [ ] Stripe mağaza adını düzelt (Settings > Payment)
+- [x] Route'ları App.tsx'e ekle (/sss, /iletisim)
+- [x] Navbar ve footer'a SSS ve İletişim linkleri ekle

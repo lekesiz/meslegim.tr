@@ -2638,7 +2638,36 @@ export const appRouter = router({
       if (!ctx.user.schoolId) return { studentCount: 0, mentorCount: 0, activeStudents: 0, completedStages: 0 };
       return db.getSchoolStats(ctx.user.schoolId);
     }),
+   }),
+
+  // İletişim formu
+  contact: router({
+    submit: publicProcedure
+      .input(z.object({
+        name: z.string().min(2, 'Adınız en az 2 karakter olmalıdır'),
+        email: z.string().email('Geçerli bir e-posta adresi giriniz'),
+        subject: z.string().min(3, 'Konu en az 3 karakter olmalıdır'),
+        message: z.string().min(10, 'Mesajınız en az 10 karakter olmalıdır').max(2000, 'Mesajınız en fazla 2000 karakter olabilir'),
+        category: z.enum(['genel', 'teknik', 'odeme', 'oneri', 'sikayet']),
+      }))
+      .mutation(async ({ input }) => {
+        const categoryLabels: Record<string, string> = {
+          genel: 'Genel Bilgi',
+          teknik: 'Teknik Destek',
+          odeme: 'Ödeme/Fatura',
+          oneri: 'Öneri/Geri Bildirim',
+          sikayet: 'Şikayet',
+        };
+        try {
+          await notifyOwner({
+            title: `📩 İletişim Formu: ${categoryLabels[input.category] || input.category}`,
+            content: `**Gönderen:** ${input.name} (${input.email})\n**Kategori:** ${categoryLabels[input.category]}\n**Konu:** ${input.subject}\n\n**Mesaj:**\n${input.message}`,
+          });
+        } catch (e) {
+          console.warn('[Contact] Notification failed:', e);
+        }
+        return { success: true, message: 'Mesajınız başarıyla gönderildi. En kısa sürede size dönüş yapacağız.' };
+      }),
   }),
 });
-
 export type AppRouter = typeof appRouter;
