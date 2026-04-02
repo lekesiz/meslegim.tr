@@ -14,6 +14,7 @@ import { notifyOwner } from './_core/notification';
 import bcrypt from 'bcryptjs';
 import { sdk } from './_core/sdk';
 import { hasRole, hasAnyRole, isSuperAdmin, isAdminLevel, isSchoolAdminLevel, hasRoleLevel, getHighestRole, addRole, removeRole } from './roleHelper';
+import { sanitizeHtml, sanitizeEmail, sanitizeTcKimlik, sanitizePhone } from './utils/sanitization';
 
 // Production'da gerçek domain'i kullan, development'ta localhost
 function getBaseUrl(req?: { headers: { origin?: string; host?: string } }): string {
@@ -202,18 +203,44 @@ export const appRouter = router({
       }),
     register: publicProcedure
       .input(z.object({
-        name: z.string().min(1),
+        name: z.string().min(1).max(100),
         email: z.string().email(),
-        phone: z.string().min(10),
+        phone: z.string().min(10).max(15),
         tcKimlik: z.string().length(11),
         ageGroup: z.enum(['14-17', '18-21', '22-24']),
-        password: z.string().min(6),
+        password: z.string()
+          .min(8, 'Şifre en az 8 karakter olmalıdır')
+          .max(128, 'Şifre en fazla 128 karakter olabilir')
+          .regex(/[A-Z]/, 'Şifre en az bir büyük harf içermelidir')
+          .regex(/[a-z]/, 'Şifre en az bir küçük harf içermelidir')
+          .regex(/[0-9]/, 'Şifre en az bir rakam içermelidir'),
       }))
       .mutation(async ({ input }) => {
+        // Sanitize inputs
+        const sanitizedEmail = sanitizeEmail(input.email);
+        if (!sanitizedEmail) {
+          throw new TRPCError({ code: 'BAD_REQUEST', message: 'Geçersiz e-posta adresi' });
+        }
+        const sanitizedPhone = sanitizePhone(input.phone);
+        if (!sanitizedPhone) {
+          throw new TRPCError({ code: 'BAD_REQUEST', message: 'Geçersiz telefon numarası' });
+        }
+        const sanitizedTcKimlik = sanitizeTcKimlik(input.tcKimlik);
+        if (!sanitizedTcKimlik) {
+          throw new TRPCError({ code: 'BAD_REQUEST', message: 'Geçersiz TC Kimlik numarası' });
+        }
+        const sanitizedName = sanitizeHtml(input.name.trim());
+        
         // Check if user already exists
-        const existingUser = await db.getUserByEmail(input.email);
+        const existingUser = await db.getUserByEmail(sanitizedEmail);
         if (existingUser) {
           throw new TRPCError({ code: 'CONFLICT', message: 'Bu e-posta adresi zaten kayıtlı' });
+        }
+        
+        // Check if TC Kimlik already exists
+        const existingTcKimlik = await db.getUserByTcKimlik(sanitizedTcKimlik);
+        if (existingTcKimlik) {
+          throw new TRPCError({ code: 'CONFLICT', message: 'Bu TC Kimlik numarası zaten kayıtlı' });
         }
         
         // Hash password
@@ -221,11 +248,11 @@ export const appRouter = router({
         
         // Create new student with pending status
         const newUser = await db.createUser({
-          name: input.name,
-          email: input.email,
+          name: sanitizedName,
+          email: sanitizedEmail,
           password: hashedPassword,
-          phone: input.phone,
-          tcKimlik: input.tcKimlik,
+          phone: sanitizedPhone,
+          tcKimlik: sanitizedTcKimlik,
           ageGroup: input.ageGroup,
           role: 'student',
           status: 'pending',
@@ -2171,6 +2198,7 @@ export const appRouter = router({
 
         // Stripe Checkout Session oluştur
         const session = await stripe.checkout.sessions.create({
+          locale: 'tr',
           payment_method_types: ['card'],
           line_items: [{
             price_data: {

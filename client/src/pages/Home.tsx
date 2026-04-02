@@ -24,6 +24,8 @@ import {
 } from "lucide-react";
 import { analytics } from "@/lib/analytics";
 import { SEO } from "@/components/SEO";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Menu } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 export default function Home() {
@@ -80,6 +82,31 @@ export default function Home() {
       setFormError("Lütfen yaş grubunuzu seçiniz");
       return;
     }
+
+    // Password policy validation
+    if (formData.password.length < 8) {
+      setFormError("Şifre en az 8 karakter olmalıdır");
+      return;
+    }
+    if (!/[A-Z]/.test(formData.password)) {
+      setFormError("Şifre en az bir büyük harf içermelidir");
+      return;
+    }
+    if (!/[a-z]/.test(formData.password)) {
+      setFormError("Şifre en az bir küçük harf içermelidir");
+      return;
+    }
+    if (!/[0-9]/.test(formData.password)) {
+      setFormError("Şifre en az bir rakam içermelidir");
+      return;
+    }
+
+    // TC Kimlik validation
+    if (formData.tcKimlik.length !== 11 || !/^\d{11}$/.test(formData.tcKimlik) || formData.tcKimlik[0] === '0') {
+      setFormError("Geçerli bir TC Kimlik numarası giriniz (11 haneli, 0 ile başlamaz)");
+      return;
+    }
+
     registerMutation.mutate({
       name: formData.name,
       email: formData.email,
@@ -168,13 +195,29 @@ export default function Home() {
                 id="password"
                 type="password"
                 required
-                minLength={6}
+                minLength={8}
                 value={formData.password}
                 onChange={(e) =>
                   setFormData({ ...formData, password: e.target.value })
                 }
-                placeholder="En az 6 karakter"
+                placeholder="En az 8 karakter, büyük/küçük harf ve rakam"
               />
+              {formData.password && formData.password.length > 0 && (
+                <div className="mt-1 space-y-0.5 text-xs">
+                  <div className={formData.password.length >= 8 ? "text-green-600" : "text-red-500"}>
+                    {formData.password.length >= 8 ? "✓" : "✗"} En az 8 karakter
+                  </div>
+                  <div className={/[A-Z]/.test(formData.password) ? "text-green-600" : "text-red-500"}>
+                    {/[A-Z]/.test(formData.password) ? "✓" : "✗"} En az bir büyük harf
+                  </div>
+                  <div className={/[a-z]/.test(formData.password) ? "text-green-600" : "text-red-500"}>
+                    {/[a-z]/.test(formData.password) ? "✓" : "✗"} En az bir küçük harf
+                  </div>
+                  <div className={/[0-9]/.test(formData.password) ? "text-green-600" : "text-red-500"}>
+                    {/[0-9]/.test(formData.password) ? "✓" : "✗"} En az bir rakam
+                  </div>
+                </div>
+              )}
             </div>
 
             <div>
@@ -272,7 +315,8 @@ export default function Home() {
             />
             <span className="text-2xl font-bold text-foreground">Meslegim.tr</span>
           </div>
-          <div className="flex items-center gap-4">
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center gap-4">
             <Button variant="ghost" asChild>
               <a href="/fiyatlandirma">Fiyatlandırma</a>
             </Button>
@@ -283,6 +327,31 @@ export default function Home() {
               Ücretsiz Başla
             </Button>
             <ThemeToggle />
+          </div>
+          {/* Mobile Navigation */}
+          <div className="flex md:hidden items-center gap-2">
+            <ThemeToggle />
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <Menu className="h-5 w-5" />
+                  <span className="sr-only">Menü</span>
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-[280px] sm:w-[320px]">
+                <nav className="flex flex-col gap-4 mt-8">
+                  <a href="/fiyatlandirma" className="text-lg font-medium text-foreground hover:text-primary transition-colors py-2">
+                    Fiyatlandırma
+                  </a>
+                  <a href="/login" className="text-lg font-medium text-foreground hover:text-primary transition-colors py-2">
+                    Giriş Yap
+                  </a>
+                  <Button onClick={() => setShowForm(true)} className="mt-2">
+                    Ücretsiz Başla
+                  </Button>
+                </nav>
+              </SheetContent>
+            </Sheet>
           </div>
         </div>
       </nav>

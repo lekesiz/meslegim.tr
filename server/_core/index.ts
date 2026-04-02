@@ -102,6 +102,10 @@ async function startServer() {
       skipSuccessfulRequests: true,
     });
     app.use("/api/oauth", authLimiter);
+    // Also rate limit tRPC auth mutations (login, register)
+    app.use("/api/trpc/auth.login", authLimiter);
+    app.use("/api/trpc/auth.register", authLimiter);
+    app.use("/api/trpc/auth.requestPasswordReset", authLimiter);
   }
 
   // Stripe webhook MUST be registered BEFORE body parsers (needs raw body)
