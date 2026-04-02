@@ -1,4 +1,4 @@
-import { getDashboardKPIs, getDailyRegistrations, getMonthlyRevenue, getStageCompletionStats, getReportGenerationStats, getPackageDistribution } from '../db';
+import { getDashboardKPIs, getDailyRegistrations, getMonthlyRevenue, getStageCompletionStats, getReportGenerationStats, getPackageDistribution, getConversionFunnel, getCohortAnalysis, getUserSegmentation } from '../db';
 import { storagePut } from '../storage';
 import { exec } from 'child_process';
 import { promisify } from 'util';
@@ -46,6 +46,10 @@ export async function generateAnalyticsPDF(options: AnalyticsPdfOptions): Promis
     const stageStats = await getStageCompletionStats();
     const reportDist = await getReportGenerationStats(6, options.startDate, options.endDate);
     const packageDist = await getPackageDistribution();
+    const funnelData = await getConversionFunnel(options.startDate?.toISOString().split('T')[0], options.endDate?.toISOString().split('T')[0]);
+    const cohortData = await getCohortAnalysis(8);
+    const segmentAgeGroup = await getUserSegmentation('ageGroup', options.startDate?.toISOString().split('T')[0], options.endDate?.toISOString().split('T')[0]);
+    const segmentPackage = await getUserSegmentation('purchasedPackage', options.startDate?.toISOString().split('T')[0], options.endDate?.toISOString().split('T')[0]);
 
     const now = new Date();
     const dateRange = options.startDate && options.endDate
@@ -207,6 +211,50 @@ export async function generateAnalyticsPDF(options: AnalyticsPdfOptions): Promis
       <table>
         <thead><tr><th>Paket</th><th style="text-align:right;">Kullanıcı</th></tr></thead>
         <tbody>${packageRows || '<tr><td colspan="2" style="text-align:center;color:#94a3b8;">Veri yok</td></tr>'}</tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Dönüşüm Hunisi -->
+  <h2>\uD83D\uDD04 Dönüşüm Hunisi</h2>
+  <table>
+    <thead><tr><th>Adım</th><th style="text-align:right;">Kullanıcı</th><th style="text-align:right;">Oran (%)</th><th style="text-align:right;">Düşüş (%)</th></tr></thead>
+    <tbody>${(funnelData || []).map((f: any) =>
+      `<tr><td>${f.step}</td><td style="text-align:right;font-weight:600;">${f.count}</td><td style="text-align:right;">${f.percentage}%</td><td style="text-align:right;color:${f.dropoff > 30 ? '#dc2626' : f.dropoff > 15 ? '#f59e0b' : '#16a34a'};">${f.dropoff}%</td></tr>`
+    ).join('') || '<tr><td colspan="4" style="text-align:center;color:#94a3b8;">Veri yok</td></tr>'}</tbody>
+  </table>
+
+  <!-- Kohort Analizi -->
+  <h2>\uD83D\uDCCA Kohort Analizi (Haftalık Retention)</h2>
+  <table>
+    <thead><tr><th>Kohort</th><th style="text-align:right;">Kullanıcı</th>${[1,2,4,8].map(w => `<th style="text-align:right;">Hafta ${w}</th>`).join('')}</tr></thead>
+    <tbody>${(cohortData || []).map((c: any) => {
+      const getColor = (rate: number) => rate >= 70 ? '#16a34a' : rate >= 40 ? '#f59e0b' : '#dc2626';
+      return `<tr><td>${c.cohortWeek}</td><td style="text-align:right;font-weight:600;">${c.cohortSize}</td>${(c.retentionRates || []).map((r: any) =>
+        `<td style="text-align:right;color:${getColor(r.rate)};font-weight:600;">${r.rate}%</td>`
+      ).join('')}</tr>`;
+    }).join('') || '<tr><td colspan="6" style="text-align:center;color:#94a3b8;">Veri yok</td></tr>'}</tbody>
+  </table>
+
+  <!-- Segmentasyon Analizi -->
+  <h2>\uD83D\uDC65 Kullanıcı Segmentasyonu</h2>
+  <div class="two-col">
+    <div>
+      <h3 style="font-size:11pt;color:#4f46e5;">Yaş Grubuna Göre</h3>
+      <table>
+        <thead><tr><th>Segment</th><th style="text-align:right;">Kullanıcı</th><th style="text-align:right;">Tamamlama %</th><th style="text-align:right;">Premium %</th></tr></thead>
+        <tbody>${(segmentAgeGroup || []).map((s: any) =>
+          `<tr><td>${s.segment}</td><td style="text-align:right;font-weight:600;">${s.userCount}</td><td style="text-align:right;">${s.avgCompletionRate}%</td><td style="text-align:right;">${s.premiumRate}%</td></tr>`
+        ).join('') || '<tr><td colspan="4" style="text-align:center;color:#94a3b8;">Veri yok</td></tr>'}</tbody>
+      </table>
+    </div>
+    <div>
+      <h3 style="font-size:11pt;color:#4f46e5;">Paket Türüne Göre</h3>
+      <table>
+        <thead><tr><th>Segment</th><th style="text-align:right;">Kullanıcı</th><th style="text-align:right;">Tamamlama %</th><th style="text-align:right;">Ort. Süre (Gün)</th></tr></thead>
+        <tbody>${(segmentPackage || []).map((s: any) =>
+          `<tr><td>${s.segment}</td><td style="text-align:right;font-weight:600;">${s.userCount}</td><td style="text-align:right;">${s.avgCompletionRate}%</td><td style="text-align:right;">${s.avgDaysOnPlatform}</td></tr>`
+        ).join('') || '<tr><td colspan="4" style="text-align:center;color:#94a3b8;">Veri yok</td></tr>'}</tbody>
       </table>
     </div>
   </div>

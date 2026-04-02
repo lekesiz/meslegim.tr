@@ -1058,6 +1058,17 @@ export const appRouter = router({
         return await db.getConversionFunnel(input?.startDate, input?.endDate);
       }),
 
+    // === Kullanıcı Segmentasyon Analizi ===
+    getUserSegmentation: adminProcedure
+      .input(z.object({
+        segmentBy: z.enum(['ageGroup', 'purchasedPackage', 'stageName', 'role']),
+        startDate: z.string().optional(),
+        endDate: z.string().optional(),
+      }))
+      .query(async ({ input }) => {
+        return await db.getUserSegmentation(input.segmentBy, input.startDate, input.endDate);
+      }),
+
     // === Zamanlanmış Raporlama ===
     getScheduledReportSettings: adminProcedure.query(async () => {
       const weeklyEnabled = await db.getPlatformSetting('scheduled_report_weekly');
