@@ -2875,3 +2875,74 @@ export async function getStageCompletionTrend(weeks: number = 12, customStart?: 
   
   return (result as any)[0] || [];
 }
+
+
+// ─── Scheduled Report Functions ────────────────────────────────────────────────
+
+/**
+ * Admin kullanıcılarının email listesini getir
+ */
+export async function getAdminEmails(): Promise<string[]> {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const admins = await db.select({ email: users.email })
+    .from(users)
+    .where(eq(users.role, 'admin'));
+  
+  return admins.filter(a => a.email).map(a => a.email!);
+}
+
+
+// ─── Admin Notification Functions ────────────────────────────────────────────
+
+/**
+ * Admin kullanıcılarının ID listesini getir
+ */
+export async function getAdminUserIds(): Promise<number[]> {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const admins = await db.select({ id: users.id })
+    .from(users)
+    .where(eq(users.role, 'admin'));
+  
+  return admins.map(a => a.id);
+}
+
+/**
+ * Tüm admin'lere bildirim gönder
+ */
+export async function notifyAdmins(data: {
+  title: string;
+  message: string;
+  type?: string;
+  link?: string;
+}) {
+  const adminIds = await getAdminUserIds();
+  for (const adminId of adminIds) {
+    await createNotification({
+      userId: adminId,
+      title: data.title,
+      message: data.message,
+      type: data.type || 'info',
+      link: data.link,
+    });
+  }
+}
+
+/**
+ * Admin bildirimlerini getir (tüm admin'lerin bildirimlerini birleştir)
+ */
+export async function getAdminActivityFeed(limit = 50) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const adminIds = await getAdminUserIds();
+  if (adminIds.length === 0) return [];
+  
+  return await db.select().from(notifications)
+    .where(sql`${notifications.userId} IN (${sql.join(adminIds.map(id => sql`${id}`), sql`, `)})`)
+    .orderBy(desc(notifications.createdAt))
+    .limit(limit);
+}

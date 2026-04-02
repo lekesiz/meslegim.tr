@@ -285,6 +285,18 @@ export const appRouter = router({
           // Don't fail the registration if email fails
         }
         
+        // Admin'lere yeni kayıt bildirimi gönder
+        try {
+          await db.notifyAdmins({
+            title: '👤 Yeni Öğrenci Kaydı',
+            message: `${sanitizedName} (${sanitizedEmail}) yeni kayıt oluşturdu. Onay bekliyor.`,
+            type: 'info',
+            link: '/dashboard/admin?tab=students',
+          });
+        } catch (e) {
+          console.warn('Failed to notify admins about new registration:', e);
+        }
+        
         return { success: true, userId: newUser.id };
       }),
   }),
@@ -983,6 +995,87 @@ export const appRouter = router({
           html,
         });
         return { success: true };
+      }),
+
+    // === Admin Bildirim Feed ===
+    getAdminActivityFeed: adminProcedure
+      .input(z.object({ limit: z.number().min(1).max(200).optional() }).optional())
+      .query(async ({ input }) => {
+        return await db.getAdminActivityFeed(input?.limit || 50);
+      }),
+
+    markAdminNotificationRead: adminProcedure
+      .input(z.object({ notificationId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        await db.markNotificationAsRead(input.notificationId, ctx.user.id);
+        return { success: true };
+      }),
+
+    markAllAdminNotificationsRead: adminProcedure
+      .mutation(async ({ ctx }) => {
+        await db.markAllNotificationsAsRead(ctx.user.id);
+        return { success: true };
+      }),
+
+    getAdminUnreadCount: adminProcedure.query(async ({ ctx }) => {
+      return await db.getUnreadNotificationCount(ctx.user.id);
+    }),
+
+    // === PDF Rapor Oluşturma ===
+    generateAnalyticsPdf: adminProcedure
+      .input(z.object({
+        startDate: z.string().optional(),
+        endDate: z.string().optional(),
+      }).optional())
+      .mutation(async ({ ctx, input }) => {
+        const { generateAnalyticsPDF } = await import('./services/analyticsPdfGenerator');
+        const startDate = input?.startDate ? new Date(input.startDate) : undefined;
+        const endDate = input?.endDate ? new Date(input.endDate) : undefined;
+        const url = await generateAnalyticsPDF({
+          startDate,
+          endDate,
+          generatedBy: ctx.user.name || 'Admin',
+        });
+        return { url };
+      }),
+
+    // === Zamanlanmış Raporlama ===
+    getScheduledReportSettings: adminProcedure.query(async () => {
+      const weeklyEnabled = await db.getPlatformSetting('scheduled_report_weekly');
+      const monthlyEnabled = await db.getPlatformSetting('scheduled_report_monthly');
+      const lastWeekly = await db.getPlatformSetting('last_weekly_report_sent');
+      const lastMonthly = await db.getPlatformSetting('last_monthly_report_sent');
+      return {
+        weeklyEnabled: weeklyEnabled !== 'false', // default true
+        monthlyEnabled: monthlyEnabled !== 'false', // default true
+        lastWeeklySent: lastWeekly || null,
+        lastMonthlySent: lastMonthly || null,
+      };
+    }),
+
+    setScheduledReportSetting: adminProcedure
+      .input(z.object({
+        period: z.enum(['weekly', 'monthly']),
+        enabled: z.boolean(),
+      }))
+      .mutation(async ({ input }) => {
+        await db.setPlatformSetting(
+          `scheduled_report_${input.period}`,
+          String(input.enabled),
+          `${input.period === 'weekly' ? 'Haftalık' : 'Aylık'} otomatik KPI raporu`
+        );
+        return { success: true };
+      }),
+
+    sendManualKPIReport: adminProcedure
+      .mutation(async ({ ctx }) => {
+        const { sendManualKPIReport } = await import('./services/scheduledReports');
+        const email = ctx.user.email;
+        if (!email) {
+          throw new TRPCError({ code: 'BAD_REQUEST', message: 'Admin email bulunamadı' });
+        }
+        const sent = await sendManualKPIReport(email);
+        return { success: sent };
       }),
 
     // === Ödeme Yönetimi ===
@@ -1944,6 +2037,18 @@ export const appRouter = router({
           console.error('Failed to create notification:', notifErr);
         }
         
+        // Admin'lere rapor gönderim bildirimi
+        try {
+          await db.notifyAdmins({
+            title: '📝 Yeni Rapor Gönderimi',
+            message: `${student?.name || 'Öğrenci'} "${stage?.name || 'Etap'}" etabını tamamladı. Rapor inceleme bekliyor.`,
+            type: 'info',
+            link: '/dashboard/admin?tab=reports',
+          });
+        } catch (e) {
+          console.warn('Failed to notify admins about report submission:', e);
+        }
+
         // Auto-check badges after stage completion
         try {
           await checkAndAwardBadges(userId);

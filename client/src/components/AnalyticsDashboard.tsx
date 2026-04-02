@@ -4,7 +4,8 @@ import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { trpc } from '@/lib/trpc';
-import { Loader2, Users, TrendingUp, DollarSign, BarChart3, Activity, Target, ArrowUpRight, ArrowDownRight, FileText, Award, UserCheck, Download, CalendarIcon, Filter } from 'lucide-react';
+import { Loader2, Users, TrendingUp, DollarSign, BarChart3, Activity, Target, ArrowUpRight, ArrowDownRight, FileText, Award, UserCheck, Download, CalendarIcon, Filter, FileDown } from 'lucide-react';
+import { toast } from 'sonner';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -283,6 +284,49 @@ function ExportButton({ onClick, label, disabled }: { onClick: () => void; label
     >
       <Download className="h-3.5 w-3.5" />
       {label}
+    </Button>
+  );
+}
+
+function PdfExportButton({ datePreset, customRange }: { datePreset: DatePreset; customRange: DateRange | undefined }) {
+  const generatePdf = trpc.admin.generateAnalyticsPdf.useMutation({
+    onSuccess: (data) => {
+      window.open(data.url, '_blank');
+      toast.success('PDF raporu oluşturuldu ve yeni sekmede açıldı.');
+    },
+    onError: (err) => {
+      toast.error(`PDF oluşturulamadı: ${err.message}`);
+    },
+  });
+
+  const handleClick = () => {
+    let startDate: string | undefined;
+    let endDate: string | undefined;
+    if (datePreset === 'custom' && customRange?.from) {
+      startDate = customRange.from.toISOString();
+      endDate = customRange.to ? customRange.to.toISOString() : new Date().toISOString();
+    } else if (datePreset !== 'all') {
+      const now = new Date();
+      const presetDays: Record<string, number> = { today: 0, '7d': 7, '30d': 30, '90d': 90 };
+      const days = presetDays[datePreset] ?? 0;
+      const start = new Date(now);
+      start.setDate(start.getDate() - days);
+      startDate = start.toISOString();
+      endDate = now.toISOString();
+    }
+    generatePdf.mutate({ startDate, endDate });
+  };
+
+  return (
+    <Button
+      variant="outline"
+      size="sm"
+      onClick={handleClick}
+      disabled={generatePdf.isPending}
+      className="h-9 gap-2"
+    >
+      {generatePdf.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileDown className="h-4 w-4" />}
+      PDF Rapor
     </Button>
   );
 }
@@ -878,6 +922,7 @@ export function AnalyticsDashboard() {
                 <Download className="h-4 w-4" />
                 Tümünü Dışa Aktar (CSV)
               </Button>
+              <PdfExportButton datePreset={datePreset} customRange={customRange} />
             </div>
           </div>
         </CardContent>

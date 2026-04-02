@@ -13,7 +13,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { trpc } from '@/lib/trpc';
-import { Loader2, Users, FileQuestion, Layers, Plus, TrendingUp, Zap, MessageSquare, Eye, Settings, CreditCard, BarChart3, FileDown } from 'lucide-react';
+import { Loader2, Users, FileQuestion, Layers, Plus, TrendingUp, Zap, MessageSquare, Eye, Settings, CreditCard, BarChart3, FileDown, Mail } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -34,6 +34,8 @@ import { SchoolManagement } from '@/components/admin/SchoolManagement';
 import { PromotionCodeManagement } from '@/components/admin/PromotionCodeManagement';
 import { ActivityLogViewer } from '@/components/admin/ActivityLogViewer';
 import { ExportHistory } from '@/components/admin/ExportHistory';
+import ScheduledReports from '@/components/admin/ScheduledReports';
+import { AdminActivityFeed } from '@/components/admin/AdminActivityFeed';
 
 export default function AdminDashboard() {
   const { user } = useAuth();
@@ -197,6 +199,10 @@ export default function AdminDashboard() {
               <MessageSquare className="h-4 w-4 mr-2" />
               Pilot Geri Bildirim
             </TabsTrigger>
+            <TabsTrigger value="scheduled-reports">
+              <Mail className="h-4 w-4 mr-2" />
+              Otomatik Raporlama
+            </TabsTrigger>
             <TabsTrigger value="platform-settings">
               <Settings className="h-4 w-4 mr-2" />
               Platform Ayarları
@@ -205,7 +211,12 @@ export default function AdminDashboard() {
 
           {/* Dashboard Analytics Tab */}
           <TabsContent value="dashboard-analytics">
-            <AnalyticsDashboard />
+            <div className="grid gap-6 lg:grid-cols-[1fr_380px]">
+              <AnalyticsDashboard />
+              <div className="space-y-4">
+                <AdminActivityFeed />
+              </div>
+            </div>
           </TabsContent>
 
           {/* Progress Analytics Tab */}
@@ -261,6 +272,11 @@ export default function AdminDashboard() {
           {/* Pilot Feedback Tab */}
           <TabsContent value="pilot-feedback">
             <PilotFeedbackPanel />
+          </TabsContent>
+
+          {/* Scheduled Reports Tab */}
+          <TabsContent value="scheduled-reports">
+            <ScheduledReports />
           </TabsContent>
 
           {/* Platform Settings Tab */}

@@ -1,6 +1,6 @@
 import express from 'express';
 import Stripe from 'stripe';
-import { getDb } from './db';
+import { getDb, notifyAdmins } from './db';
 import { users, purchases, userStages, stages } from '../drizzle/schema';
 import { eq, and, inArray } from 'drizzle-orm';
 import { PACKAGE_ACCESS } from './products';
@@ -149,6 +149,28 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   }
 
   console.log(`[Stripe Webhook] Purchase completed for user ${userId}, product: ${productId}`);
+
+  // Admin'lere satın alma bildirimi gönder
+  try {
+    const [user] = await db.select({ name: users.name, email: users.email }).from(users).where(eq(users.id, userId));
+    const productNames: Record<string, string> = {
+      basic_package: 'Temel Paket',
+      professional_package: 'Profesyonel Paket',
+      enterprise_package: 'Kurumsal Paket',
+      ai_career_report: 'AI Kariyer Raporu',
+      single_stage_unlock: 'Tekli Etap Açma',
+    };
+    const productName = productNames[productId] || productId;
+    const amount = session.amount_total ? `${(session.amount_total / 100).toFixed(2)} ${session.currency?.toUpperCase() || 'TRY'}` : '';
+    await notifyAdmins({
+      title: '💳 Yeni Satın Alma',
+      message: `${user?.name || 'Kullanıcı'} (${user?.email || ''}) ${productName} satın aldı.${amount ? ` Tutar: ${amount}` : ''}`,
+      type: 'success',
+      link: '/dashboard/admin?tab=payments',
+    });
+  } catch (e) {
+    console.warn('Failed to notify admins about purchase:', e);
+  }
 }
 
 /**
