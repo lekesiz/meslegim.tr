@@ -110,9 +110,9 @@ const PRESET_LABELS: Record<DatePreset, string> = {
   custom: 'Özel Aralık',
 };
 
-// CSV Export utility
-function downloadCSV(data: Record<string, unknown>[], filename: string, headers?: Record<string, string>) {
-  if (!data || data.length === 0) return;
+// CSV Export utility - returns record count and filename for logging
+function downloadCSV(data: Record<string, unknown>[], filename: string, headers?: Record<string, string>): { recordCount: number; fileName: string } | null {
+  if (!data || data.length === 0) return null;
   
   const keys = Object.keys(data[0]);
   const headerRow = keys.map(k => headers?.[k] || k).join(',');
@@ -135,12 +135,14 @@ function downloadCSV(data: Record<string, unknown>[], filename: string, headers?
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
+  const fullFileName = `${filename}_${format(new Date(), 'yyyy-MM-dd')}.csv`;
   link.href = url;
-  link.download = `${filename}_${format(new Date(), 'yyyy-MM-dd')}.csv`;
+  link.download = fullFileName;
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
   URL.revokeObjectURL(url);
+  return { recordCount: data.length, fileName: fullFileName };
 }
 
 // KPI Card with trend indicator
@@ -333,10 +335,26 @@ export function AnalyticsDashboard() {
       : undefined
   );
 
+  // CSV Export log mutation
+  const logExportMutation = trpc.admin.logCsvExport.useMutation();
+
+  // Helper to log export to backend
+  const logExport = useCallback((exportType: string, result: { recordCount: number; fileName: string } | null) => {
+    if (!result) return;
+    logExportMutation.mutate({
+      exportType,
+      fileName: result.fileName,
+      recordCount: result.recordCount,
+      dateFilterPreset: datePreset,
+      dateFilterStart: dateParams.startDate,
+      dateFilterEnd: dateParams.endDate,
+    });
+  }, [logExportMutation, datePreset, dateParams]);
+
   // CSV Export handlers
   const handleExportKPIs = useCallback(() => {
     if (!kpis) return;
-    downloadCSV([{
+    const result = downloadCSV([{
       toplam_kullanici: kpis.totalUsers,
       bu_ay_yeni_kayit: kpis.thisMonthNewUsers,
       gecen_ay_yeni_kayit: kpis.lastMonthNewUsers,
@@ -371,11 +389,12 @@ export function AnalyticsDashboard() {
       ogrenci_sayisi: 'Öğrenci Sayısı',
       mentor_sayisi: 'Mentor Sayısı',
     });
-  }, [kpis]);
+    logExport('kpi', result);
+  }, [kpis, logExport]);
 
   const handleExportDailyRegistrations = useCallback(() => {
     if (!dailyRegs) return;
-    downloadCSV(dailyRegs.map((r: { date: string; count: number; role: string }) => ({
+    const result = downloadCSV(dailyRegs.map((r: { date: string; count: number; role: string }) => ({
       tarih: r.date,
       rol: r.role,
       kayit_sayisi: r.count,
@@ -384,11 +403,12 @@ export function AnalyticsDashboard() {
       rol: 'Rol',
       kayit_sayisi: 'Kayıt Sayısı',
     });
-  }, [dailyRegs]);
+    logExport('daily_registrations', result);
+  }, [dailyRegs, logExport]);
 
   const handleExportMonthlyRevenue = useCallback(() => {
     if (!monthlyRevenue) return;
-    downloadCSV(monthlyRevenue.map((r: { month: string; totalRevenue: number; count: number; completedCount: number }) => ({
+    const result = downloadCSV(monthlyRevenue.map((r: { month: string; totalRevenue: number; count: number; completedCount: number }) => ({
       ay: r.month,
       toplam_gelir_tl: (Number(r.totalRevenue) / 100).toFixed(2),
       satis_sayisi: r.count,
@@ -399,11 +419,12 @@ export function AnalyticsDashboard() {
       satis_sayisi: 'Satış Sayısı',
       tamamlanan_satis: 'Tamamlanan Satış',
     });
-  }, [monthlyRevenue]);
+    logExport('monthly_revenue', result);
+  }, [monthlyRevenue, logExport]);
 
   const handleExportDailyRevenue = useCallback(() => {
     if (!dailyRevenue) return;
-    downloadCSV(dailyRevenue.map((r: { date: string; totalRevenue: number; count: number }) => ({
+    const result = downloadCSV(dailyRevenue.map((r: { date: string; totalRevenue: number; count: number }) => ({
       tarih: r.date,
       gelir_tl: (Number(r.totalRevenue) / 100).toFixed(2),
       satis_sayisi: r.count,
@@ -412,11 +433,12 @@ export function AnalyticsDashboard() {
       gelir_tl: 'Gelir (₺)',
       satis_sayisi: 'Satış Sayısı',
     });
-  }, [dailyRevenue]);
+    logExport('daily_revenue', result);
+  }, [dailyRevenue, logExport]);
 
   const handleExportReportStats = useCallback(() => {
     if (!reportStats) return;
-    downloadCSV(reportStats.map((r: { month: string; total: number; approved: number; pending: number }) => ({
+    const result = downloadCSV(reportStats.map((r: { month: string; total: number; approved: number; pending: number }) => ({
       ay: r.month,
       toplam: r.total,
       onaylanan: r.approved,
@@ -427,11 +449,12 @@ export function AnalyticsDashboard() {
       onaylanan: 'Onaylanan',
       bekleyen: 'Bekleyen',
     });
-  }, [reportStats]);
+    logExport('report_stats', result);
+  }, [reportStats, logExport]);
 
   const handleExportUserActivity = useCallback(() => {
     if (!userActivity) return;
-    downloadCSV([{
+    const result = downloadCSV([{
       toplam: userActivity.total,
       bugun_aktif: userActivity.activeToday,
       hafta_aktif: userActivity.activeWeek,
@@ -464,11 +487,12 @@ export function AnalyticsDashboard() {
       premium_paket: 'Premium Paket',
       okul_paketi: 'Okul Paketi',
     });
-  }, [userActivity]);
+    logExport('user_activity', result);
+  }, [userActivity, logExport]);
 
   const handleExportPackageDistribution = useCallback(() => {
     if (!packageDist) return;
-    downloadCSV(packageDist.map((r: { productId: string; count: number; totalRevenue: number }) => ({
+    const result = downloadCSV(packageDist.map((r: { productId: string; count: number; totalRevenue: number }) => ({
       urun_id: r.productId,
       satis_sayisi: r.count,
       toplam_gelir_tl: (Number(r.totalRevenue) / 100).toFixed(2),
@@ -477,7 +501,8 @@ export function AnalyticsDashboard() {
       satis_sayisi: 'Satış Sayısı',
       toplam_gelir_tl: 'Toplam Gelir (₺)',
     });
-  }, [packageDist]);
+    logExport('package_distribution', result);
+  }, [packageDist, logExport]);
 
   const handleExportAll = useCallback(() => {
     handleExportKPIs();
@@ -487,7 +512,16 @@ export function AnalyticsDashboard() {
     handleExportReportStats();
     handleExportUserActivity();
     handleExportPackageDistribution();
-  }, [handleExportKPIs, handleExportDailyRegistrations, handleExportMonthlyRevenue, handleExportDailyRevenue, handleExportReportStats, handleExportUserActivity, handleExportPackageDistribution]);
+    // Log the bulk export separately
+    logExportMutation.mutate({
+      exportType: 'all',
+      fileName: `toplu_export_${format(new Date(), 'yyyy-MM-dd')}.csv`,
+      recordCount: 7,
+      dateFilterPreset: datePreset,
+      dateFilterStart: dateParams.startDate,
+      dateFilterEnd: dateParams.endDate,
+    });
+  }, [handleExportKPIs, handleExportDailyRegistrations, handleExportMonthlyRevenue, handleExportDailyRevenue, handleExportReportStats, handleExportUserActivity, handleExportPackageDistribution, logExportMutation, datePreset, dateParams]);
 
   // Process daily registrations for chart
   const registrationChartData = useMemo(() => {

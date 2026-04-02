@@ -13,7 +13,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { trpc } from '@/lib/trpc';
-import { Loader2, Users, FileQuestion, Layers, Plus, TrendingUp, Zap, MessageSquare, Eye, Settings, CreditCard, BarChart3 } from 'lucide-react';
+import { Loader2, Users, FileQuestion, Layers, Plus, TrendingUp, Zap, MessageSquare, Eye, Settings, CreditCard, BarChart3, FileDown } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -33,6 +33,7 @@ import { PaymentManagement } from '@/components/admin/PaymentManagement';
 import { SchoolManagement } from '@/components/admin/SchoolManagement';
 import { PromotionCodeManagement } from '@/components/admin/PromotionCodeManagement';
 import { ActivityLogViewer } from '@/components/admin/ActivityLogViewer';
+import { ExportHistory } from '@/components/admin/ExportHistory';
 
 export default function AdminDashboard() {
   const { user } = useAuth();
@@ -188,6 +189,10 @@ export default function AdminDashboard() {
               <Eye className="h-4 w-4 mr-2" />
               Aktivite Logları
             </TabsTrigger>
+            <TabsTrigger value="export-history">
+              <FileDown className="h-4 w-4 mr-2" />
+              Rapor Geçmişi
+            </TabsTrigger>
             <TabsTrigger value="pilot-feedback">
               <MessageSquare className="h-4 w-4 mr-2" />
               Pilot Geri Bildirim
@@ -246,6 +251,11 @@ export default function AdminDashboard() {
           {/* Activity Logs Tab */}
           <TabsContent value="activity-logs">
             <ActivityLogViewer />
+          </TabsContent>
+
+          {/* Export History Tab */}
+          <TabsContent value="export-history">
+            <ExportHistory />
           </TabsContent>
 
           {/* Pilot Feedback Tab */}
