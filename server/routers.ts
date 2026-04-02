@@ -1111,26 +1111,51 @@ export const appRouter = router({
     // ANALYTICS PROCEDURES
     // ============================================
     
-    getDashboardKPIs: adminProcedure.query(async () => {
-      return await db.getDashboardKPIs();
-    }),
+    getDashboardKPIs: adminProcedure
+      .input(z.object({
+        startDate: z.string().optional(),
+        endDate: z.string().optional(),
+      }).optional())
+      .query(async ({ input }) => {
+        const start = input?.startDate ? new Date(input.startDate) : undefined;
+        const end = input?.endDate ? new Date(input.endDate) : undefined;
+        return await db.getDashboardKPIs(start, end);
+      }),
     
     getDailyRegistrations: adminProcedure
-      .input(z.object({ days: z.number().optional().default(30) }))
+      .input(z.object({
+        days: z.number().optional().default(30),
+        startDate: z.string().optional(),
+        endDate: z.string().optional(),
+      }))
       .query(async ({ input }) => {
-        return await db.getDailyRegistrations(input.days);
+        const start = input.startDate ? new Date(input.startDate) : undefined;
+        const end = input.endDate ? new Date(input.endDate) : undefined;
+        return await db.getDailyRegistrations(input.days, start, end);
       }),
     
     getMonthlyRevenue: adminProcedure
-      .input(z.object({ months: z.number().optional().default(12) }))
+      .input(z.object({
+        months: z.number().optional().default(12),
+        startDate: z.string().optional(),
+        endDate: z.string().optional(),
+      }))
       .query(async ({ input }) => {
-        return await db.getMonthlyRevenue(input.months);
+        const start = input.startDate ? new Date(input.startDate) : undefined;
+        const end = input.endDate ? new Date(input.endDate) : undefined;
+        return await db.getMonthlyRevenue(input.months, start, end);
       }),
     
     getDailyRevenue: adminProcedure
-      .input(z.object({ days: z.number().optional().default(30) }))
+      .input(z.object({
+        days: z.number().optional().default(30),
+        startDate: z.string().optional(),
+        endDate: z.string().optional(),
+      }))
       .query(async ({ input }) => {
-        return await db.getDailyRevenue(input.days);
+        const start = input.startDate ? new Date(input.startDate) : undefined;
+        const end = input.endDate ? new Date(input.endDate) : undefined;
+        return await db.getDailyRevenue(input.days, start, end);
       }),
     
     getStageCompletionStats: adminProcedure.query(async () => {
@@ -1142,14 +1167,27 @@ export const appRouter = router({
     }),
     
     getReportGenerationStats: adminProcedure
-      .input(z.object({ months: z.number().optional().default(6) }))
+      .input(z.object({
+        months: z.number().optional().default(6),
+        startDate: z.string().optional(),
+        endDate: z.string().optional(),
+      }))
       .query(async ({ input }) => {
-        return await db.getReportGenerationStats(input.months);
+        const start = input.startDate ? new Date(input.startDate) : undefined;
+        const end = input.endDate ? new Date(input.endDate) : undefined;
+        return await db.getReportGenerationStats(input.months, start, end);
       }),
     
-    getPackageDistribution: adminProcedure.query(async () => {
-      return await db.getPackageDistribution();
-    }),
+    getPackageDistribution: adminProcedure
+      .input(z.object({
+        startDate: z.string().optional(),
+        endDate: z.string().optional(),
+      }).optional())
+      .query(async ({ input }) => {
+        const start = input?.startDate ? new Date(input.startDate) : undefined;
+        const end = input?.endDate ? new Date(input.endDate) : undefined;
+        return await db.getPackageDistribution(start, end);
+      }),
   }),
 
   // Mentor procedures

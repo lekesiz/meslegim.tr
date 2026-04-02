@@ -1,7 +1,10 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { trpc } from '@/lib/trpc';
-import { Loader2, Users, TrendingUp, TrendingDown, DollarSign, BarChart3, Activity, Target, ArrowUpRight, ArrowDownRight, FileText, Award, UserCheck } from 'lucide-react';
+import { Loader2, Users, TrendingUp, DollarSign, BarChart3, Activity, Target, ArrowUpRight, ArrowDownRight, FileText, Award, UserCheck, Download, CalendarIcon, Filter } from 'lucide-react';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -16,7 +19,10 @@ import {
   Filler,
 } from 'chart.js';
 import { Bar, Doughnut, Line } from 'react-chartjs-2';
-import { useMemo } from 'react';
+import { useMemo, useState, useCallback } from 'react';
+import { format } from 'date-fns';
+import { tr } from 'date-fns/locale';
+import type { DateRange } from 'react-day-picker';
 
 // Register Chart.js components
 ChartJS.register(
@@ -61,6 +67,82 @@ function formatDate(dateStr: string): string {
   return `${d.getDate()} ${MONTHS_TR[String(d.getMonth() + 1).padStart(2, '0')] || ''}`;
 }
 
+// Date range presets
+type DatePreset = 'today' | 'last7' | 'last30' | 'last90' | 'all' | 'custom';
+
+function getDateRange(preset: DatePreset): { startDate?: string; endDate?: string } {
+  if (preset === 'all') return {};
+  
+  const now = new Date();
+  const end = now.toISOString();
+  
+  switch (preset) {
+    case 'today': {
+      const start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      return { startDate: start.toISOString(), endDate: end };
+    }
+    case 'last7': {
+      const start = new Date(now);
+      start.setDate(start.getDate() - 7);
+      return { startDate: start.toISOString(), endDate: end };
+    }
+    case 'last30': {
+      const start = new Date(now);
+      start.setDate(start.getDate() - 30);
+      return { startDate: start.toISOString(), endDate: end };
+    }
+    case 'last90': {
+      const start = new Date(now);
+      start.setDate(start.getDate() - 90);
+      return { startDate: start.toISOString(), endDate: end };
+    }
+    default:
+      return {};
+  }
+}
+
+const PRESET_LABELS: Record<DatePreset, string> = {
+  today: 'Bugün',
+  last7: 'Son 7 Gün',
+  last30: 'Son 30 Gün',
+  last90: 'Son 3 Ay',
+  all: 'Tüm Zamanlar',
+  custom: 'Özel Aralık',
+};
+
+// CSV Export utility
+function downloadCSV(data: Record<string, unknown>[], filename: string, headers?: Record<string, string>) {
+  if (!data || data.length === 0) return;
+  
+  const keys = Object.keys(data[0]);
+  const headerRow = keys.map(k => headers?.[k] || k).join(',');
+  const rows = data.map(row => 
+    keys.map(k => {
+      const val = row[k];
+      if (val === null || val === undefined) return '';
+      const str = String(val);
+      // Escape commas and quotes
+      if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+        return `"${str.replace(/"/g, '""')}"`;
+      }
+      return str;
+    }).join(',')
+  );
+  
+  // Add BOM for Turkish characters in Excel
+  const bom = '\uFEFF';
+  const csv = bom + [headerRow, ...rows].join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `${filename}_${format(new Date(), 'yyyy-MM-dd')}.csv`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
 // KPI Card with trend indicator
 function KPICard({ title, value, subtitle, trend, trendLabel, icon: Icon, color = 'blue' }: {
   title: string;
@@ -68,7 +150,7 @@ function KPICard({ title, value, subtitle, trend, trendLabel, icon: Icon, color 
   subtitle?: string;
   trend?: number;
   trendLabel?: string;
-  icon: any;
+  icon: React.ComponentType<{ className?: string }>;
   color?: 'blue' | 'green' | 'purple' | 'orange' | 'red';
 }) {
   const colorMap = {
@@ -105,14 +187,307 @@ function KPICard({ title, value, subtitle, trend, trendLabel, icon: Icon, color 
   );
 }
 
+// Date Range Filter Component
+function DateRangeFilter({ 
+  preset, 
+  onPresetChange, 
+  customRange, 
+  onCustomRangeChange 
+}: {
+  preset: DatePreset;
+  onPresetChange: (preset: DatePreset) => void;
+  customRange: DateRange | undefined;
+  onCustomRangeChange: (range: DateRange | undefined) => void;
+}) {
+  const [calendarOpen, setCalendarOpen] = useState(false);
+
+  return (
+    <div className="flex flex-wrap items-center gap-3">
+      <div className="flex items-center gap-2">
+        <Filter className="h-4 w-4 text-muted-foreground" />
+        <span className="text-sm font-medium text-muted-foreground">Tarih Filtresi:</span>
+      </div>
+      
+      <Select value={preset} onValueChange={(val) => onPresetChange(val as DatePreset)}>
+        <SelectTrigger className="w-[180px] h-9">
+          <SelectValue placeholder="Tarih aralığı seçin" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="today">Bugün</SelectItem>
+          <SelectItem value="last7">Son 7 Gün</SelectItem>
+          <SelectItem value="last30">Son 30 Gün</SelectItem>
+          <SelectItem value="last90">Son 3 Ay</SelectItem>
+          <SelectItem value="all">Tüm Zamanlar</SelectItem>
+          <SelectItem value="custom">Özel Aralık</SelectItem>
+        </SelectContent>
+      </Select>
+
+      {preset === 'custom' && (
+        <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
+          <PopoverTrigger asChild>
+            <Button variant="outline" size="sm" className="h-9 gap-2">
+              <CalendarIcon className="h-4 w-4" />
+              {customRange?.from ? (
+                customRange.to ? (
+                  <span>
+                    {format(customRange.from, 'd MMM', { locale: tr })} - {format(customRange.to, 'd MMM yyyy', { locale: tr })}
+                  </span>
+                ) : (
+                  <span>{format(customRange.from, 'd MMM yyyy', { locale: tr })}</span>
+                )
+              ) : (
+                <span>Tarih seçin</span>
+              )}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Calendar
+              mode="range"
+              selected={customRange}
+              onSelect={(range) => {
+                onCustomRangeChange(range);
+                if (range?.from && range?.to) {
+                  setCalendarOpen(false);
+                }
+              }}
+              locale={tr}
+              numberOfMonths={2}
+            />
+          </PopoverContent>
+        </Popover>
+      )}
+
+      {preset !== 'all' && (
+        <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded">
+          {preset === 'custom' && customRange?.from && customRange?.to
+            ? `${format(customRange.from, 'd MMM yyyy', { locale: tr })} - ${format(customRange.to, 'd MMM yyyy', { locale: tr })}`
+            : PRESET_LABELS[preset]
+          }
+        </span>
+      )}
+    </div>
+  );
+}
+
+// CSV Export Button Component
+function ExportButton({ onClick, label, disabled }: { onClick: () => void; label: string; disabled?: boolean }) {
+  return (
+    <Button 
+      variant="outline" 
+      size="sm" 
+      onClick={onClick} 
+      disabled={disabled}
+      className="h-8 gap-1.5 text-xs"
+    >
+      <Download className="h-3.5 w-3.5" />
+      {label}
+    </Button>
+  );
+}
+
 export function AnalyticsDashboard() {
-  const { data: kpis, isLoading: kpisLoading } = trpc.admin.getDashboardKPIs.useQuery();
-  const { data: dailyRegs } = trpc.admin.getDailyRegistrations.useQuery({ days: 30 });
-  const { data: monthlyRevenue } = trpc.admin.getMonthlyRevenue.useQuery({ months: 12 });
-  const { data: dailyRevenue } = trpc.admin.getDailyRevenue.useQuery({ days: 30 });
+  // Date filter state
+  const [datePreset, setDatePreset] = useState<DatePreset>('all');
+  const [customRange, setCustomRange] = useState<DateRange | undefined>(undefined);
+
+  // Compute date range based on preset or custom
+  const dateParams = useMemo(() => {
+    if (datePreset === 'custom' && customRange?.from) {
+      const startDate = customRange.from.toISOString();
+      const endDate = customRange.to ? customRange.to.toISOString() : new Date().toISOString();
+      return { startDate, endDate };
+    }
+    return getDateRange(datePreset);
+  }, [datePreset, customRange]);
+
+  // Queries with date filter
+  const { data: kpis, isLoading: kpisLoading } = trpc.admin.getDashboardKPIs.useQuery(
+    dateParams.startDate || dateParams.endDate 
+      ? { startDate: dateParams.startDate, endDate: dateParams.endDate }
+      : undefined
+  );
+  const { data: dailyRegs } = trpc.admin.getDailyRegistrations.useQuery({ 
+    days: 30,
+    ...(dateParams.startDate ? { startDate: dateParams.startDate } : {}),
+    ...(dateParams.endDate ? { endDate: dateParams.endDate } : {}),
+  });
+  const { data: monthlyRevenue } = trpc.admin.getMonthlyRevenue.useQuery({ 
+    months: 12,
+    ...(dateParams.startDate ? { startDate: dateParams.startDate } : {}),
+    ...(dateParams.endDate ? { endDate: dateParams.endDate } : {}),
+  });
+  const { data: dailyRevenue } = trpc.admin.getDailyRevenue.useQuery({ 
+    days: 30,
+    ...(dateParams.startDate ? { startDate: dateParams.startDate } : {}),
+    ...(dateParams.endDate ? { endDate: dateParams.endDate } : {}),
+  });
   const { data: userActivity } = trpc.admin.getUserActivitySummary.useQuery();
-  const { data: reportStats } = trpc.admin.getReportGenerationStats.useQuery({ months: 6 });
-  const { data: packageDist } = trpc.admin.getPackageDistribution.useQuery();
+  const { data: reportStats } = trpc.admin.getReportGenerationStats.useQuery({ 
+    months: 6,
+    ...(dateParams.startDate ? { startDate: dateParams.startDate } : {}),
+    ...(dateParams.endDate ? { endDate: dateParams.endDate } : {}),
+  });
+  const { data: packageDist } = trpc.admin.getPackageDistribution.useQuery(
+    dateParams.startDate || dateParams.endDate 
+      ? { startDate: dateParams.startDate, endDate: dateParams.endDate }
+      : undefined
+  );
+
+  // CSV Export handlers
+  const handleExportKPIs = useCallback(() => {
+    if (!kpis) return;
+    downloadCSV([{
+      toplam_kullanici: kpis.totalUsers,
+      bu_ay_yeni_kayit: kpis.thisMonthNewUsers,
+      gecen_ay_yeni_kayit: kpis.lastMonthNewUsers,
+      kullanici_buyume_yuzde: kpis.userGrowthPercent,
+      toplam_gelir_kurus: kpis.totalRevenue,
+      bu_ay_gelir_kurus: kpis.thisMonthRevenue,
+      gecen_ay_gelir_kurus: kpis.lastMonthRevenue,
+      gelir_buyume_yuzde: kpis.revenueGrowthPercent,
+      tamamlanan_etap: kpis.totalCompletedStages,
+      toplam_rapor: kpis.totalReports,
+      bekleyen_rapor: kpis.pendingReports,
+      aktif_kullanici_7gun: kpis.activeUsersWeek,
+      donusum_orani: kpis.conversionRate,
+      toplam_satis: kpis.totalPurchases,
+      ogrenci_sayisi: kpis.students,
+      mentor_sayisi: kpis.mentors,
+    }], 'kpi_ozet', {
+      toplam_kullanici: 'Toplam Kullanıcı',
+      bu_ay_yeni_kayit: 'Bu Ay Yeni Kayıt',
+      gecen_ay_yeni_kayit: 'Geçen Ay Yeni Kayıt',
+      kullanici_buyume_yuzde: 'Kullanıcı Büyüme %',
+      toplam_gelir_kurus: 'Toplam Gelir (kuruş)',
+      bu_ay_gelir_kurus: 'Bu Ay Gelir (kuruş)',
+      gecen_ay_gelir_kurus: 'Geçen Ay Gelir (kuruş)',
+      gelir_buyume_yuzde: 'Gelir Büyüme %',
+      tamamlanan_etap: 'Tamamlanan Etap',
+      toplam_rapor: 'Toplam Rapor',
+      bekleyen_rapor: 'Bekleyen Rapor',
+      aktif_kullanici_7gun: 'Aktif Kullanıcı (7 gün)',
+      donusum_orani: 'Dönüşüm Oranı %',
+      toplam_satis: 'Toplam Satış',
+      ogrenci_sayisi: 'Öğrenci Sayısı',
+      mentor_sayisi: 'Mentor Sayısı',
+    });
+  }, [kpis]);
+
+  const handleExportDailyRegistrations = useCallback(() => {
+    if (!dailyRegs) return;
+    downloadCSV(dailyRegs.map((r: { date: string; count: number; role: string }) => ({
+      tarih: r.date,
+      rol: r.role,
+      kayit_sayisi: r.count,
+    })), 'gunluk_kayitlar', {
+      tarih: 'Tarih',
+      rol: 'Rol',
+      kayit_sayisi: 'Kayıt Sayısı',
+    });
+  }, [dailyRegs]);
+
+  const handleExportMonthlyRevenue = useCallback(() => {
+    if (!monthlyRevenue) return;
+    downloadCSV(monthlyRevenue.map((r: { month: string; totalRevenue: number; count: number; completedCount: number }) => ({
+      ay: r.month,
+      toplam_gelir_tl: (Number(r.totalRevenue) / 100).toFixed(2),
+      satis_sayisi: r.count,
+      tamamlanan_satis: r.completedCount,
+    })), 'aylik_gelir', {
+      ay: 'Ay',
+      toplam_gelir_tl: 'Toplam Gelir (₺)',
+      satis_sayisi: 'Satış Sayısı',
+      tamamlanan_satis: 'Tamamlanan Satış',
+    });
+  }, [monthlyRevenue]);
+
+  const handleExportDailyRevenue = useCallback(() => {
+    if (!dailyRevenue) return;
+    downloadCSV(dailyRevenue.map((r: { date: string; totalRevenue: number; count: number }) => ({
+      tarih: r.date,
+      gelir_tl: (Number(r.totalRevenue) / 100).toFixed(2),
+      satis_sayisi: r.count,
+    })), 'gunluk_gelir', {
+      tarih: 'Tarih',
+      gelir_tl: 'Gelir (₺)',
+      satis_sayisi: 'Satış Sayısı',
+    });
+  }, [dailyRevenue]);
+
+  const handleExportReportStats = useCallback(() => {
+    if (!reportStats) return;
+    downloadCSV(reportStats.map((r: { month: string; total: number; approved: number; pending: number }) => ({
+      ay: r.month,
+      toplam: r.total,
+      onaylanan: r.approved,
+      bekleyen: r.pending,
+    })), 'rapor_istatistikleri', {
+      ay: 'Ay',
+      toplam: 'Toplam',
+      onaylanan: 'Onaylanan',
+      bekleyen: 'Bekleyen',
+    });
+  }, [reportStats]);
+
+  const handleExportUserActivity = useCallback(() => {
+    if (!userActivity) return;
+    downloadCSV([{
+      toplam: userActivity.total,
+      bugun_aktif: userActivity.activeToday,
+      hafta_aktif: userActivity.activeWeek,
+      ay_aktif: userActivity.activeMonth,
+      ogrenci: userActivity.byRole.student,
+      mentor: userActivity.byRole.mentor,
+      admin: userActivity.byRole.admin,
+      okul_yoneticisi: userActivity.byRole.school_admin,
+      aktif_durum: userActivity.byStatus.active,
+      beklemede_durum: userActivity.byStatus.pending,
+      inaktif_durum: userActivity.byStatus.inactive,
+      ucretsiz_paket: userActivity.byPackage.free,
+      temel_paket: userActivity.byPackage.basic,
+      premium_paket: userActivity.byPackage.premium,
+      okul_paketi: userActivity.byPackage.school,
+    }], 'kullanici_aktivite', {
+      toplam: 'Toplam',
+      bugun_aktif: 'Bugün Aktif',
+      hafta_aktif: 'Bu Hafta Aktif',
+      ay_aktif: 'Bu Ay Aktif',
+      ogrenci: 'Öğrenci',
+      mentor: 'Mentor',
+      admin: 'Admin',
+      okul_yoneticisi: 'Okul Yöneticisi',
+      aktif_durum: 'Aktif',
+      beklemede_durum: 'Beklemede',
+      inaktif_durum: 'İnaktif',
+      ucretsiz_paket: 'Ücretsiz Paket',
+      temel_paket: 'Temel Paket',
+      premium_paket: 'Premium Paket',
+      okul_paketi: 'Okul Paketi',
+    });
+  }, [userActivity]);
+
+  const handleExportPackageDistribution = useCallback(() => {
+    if (!packageDist) return;
+    downloadCSV(packageDist.map((r: { productId: string; count: number; totalRevenue: number }) => ({
+      urun_id: r.productId,
+      satis_sayisi: r.count,
+      toplam_gelir_tl: (Number(r.totalRevenue) / 100).toFixed(2),
+    })), 'paket_dagilimi', {
+      urun_id: 'Ürün ID',
+      satis_sayisi: 'Satış Sayısı',
+      toplam_gelir_tl: 'Toplam Gelir (₺)',
+    });
+  }, [packageDist]);
+
+  const handleExportAll = useCallback(() => {
+    handleExportKPIs();
+    handleExportDailyRegistrations();
+    handleExportMonthlyRevenue();
+    handleExportDailyRevenue();
+    handleExportReportStats();
+    handleExportUserActivity();
+    handleExportPackageDistribution();
+  }, [handleExportKPIs, handleExportDailyRegistrations, handleExportMonthlyRevenue, handleExportDailyRevenue, handleExportReportStats, handleExportUserActivity, handleExportPackageDistribution]);
 
   // Process daily registrations for chart
   const registrationChartData = useMemo(() => {
@@ -120,7 +495,7 @@ export function AnalyticsDashboard() {
     
     // Group by date
     const dateMap = new Map<string, { student: number; mentor: number; other: number }>();
-    dailyRegs.forEach((r: any) => {
+    dailyRegs.forEach((r: { date: string; count: number; role: string }) => {
       const existing = dateMap.get(r.date) || { student: 0, mentor: 0, other: 0 };
       if (r.role === 'student') existing.student += Number(r.count);
       else if (r.role === 'mentor') existing.mentor += Number(r.count);
@@ -155,11 +530,11 @@ export function AnalyticsDashboard() {
     if (!monthlyRevenue) return null;
     
     return {
-      labels: monthlyRevenue.map((r: any) => formatMonth(r.month)),
+      labels: monthlyRevenue.map((r: { month: string }) => formatMonth(r.month)),
       datasets: [
         {
           label: 'Gelir (₺)',
-          data: monthlyRevenue.map((r: any) => Number(r.totalRevenue) / 100),
+          data: monthlyRevenue.map((r: { totalRevenue: number }) => Number(r.totalRevenue) / 100),
           backgroundColor: 'rgba(34, 197, 94, 0.2)',
           borderColor: 'rgba(34, 197, 94, 1)',
           borderWidth: 2,
@@ -175,11 +550,11 @@ export function AnalyticsDashboard() {
     if (!dailyRevenue) return null;
     
     return {
-      labels: dailyRevenue.map((r: any) => formatDate(r.date)),
+      labels: dailyRevenue.map((r: { date: string }) => formatDate(r.date)),
       datasets: [
         {
           label: 'Günlük Gelir (₺)',
-          data: dailyRevenue.map((r: any) => Number(r.totalRevenue) / 100),
+          data: dailyRevenue.map((r: { totalRevenue: number }) => Number(r.totalRevenue) / 100),
           backgroundColor: 'rgba(59, 130, 246, 0.7)',
           borderColor: 'rgba(59, 130, 246, 1)',
           borderWidth: 1,
@@ -241,16 +616,16 @@ export function AnalyticsDashboard() {
     if (!reportStats) return null;
     
     return {
-      labels: reportStats.map((r: any) => formatMonth(r.month)),
+      labels: reportStats.map((r: { month: string }) => formatMonth(r.month)),
       datasets: [
         {
           label: 'Onaylanan',
-          data: reportStats.map((r: any) => Number(r.approved)),
+          data: reportStats.map((r: { approved: number }) => Number(r.approved)),
           backgroundColor: 'rgba(34, 197, 94, 0.7)',
         },
         {
           label: 'Bekleyen',
-          data: reportStats.map((r: any) => Number(r.pending)),
+          data: reportStats.map((r: { pending: number }) => Number(r.pending)),
           backgroundColor: 'rgba(245, 158, 11, 0.7)',
         },
       ],
@@ -328,9 +703,37 @@ export function AnalyticsDashboard() {
 
   return (
     <div className="space-y-6">
+      {/* Date Filter & Export Controls */}
+      <Card>
+        <CardContent className="pt-6">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <DateRangeFilter
+              preset={datePreset}
+              onPresetChange={setDatePreset}
+              customRange={customRange}
+              onCustomRangeChange={setCustomRange}
+            />
+            <div className="flex items-center gap-2">
+              <Button 
+                variant="default" 
+                size="sm" 
+                onClick={handleExportAll}
+                className="h-9 gap-2"
+              >
+                <Download className="h-4 w-4" />
+                Tümünü Dışa Aktar (CSV)
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Section: KPI Cards */}
       <div>
-        <h3 className="text-lg font-semibold mb-4">Temel Göstergeler (KPI)</h3>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold">Temel Göstergeler (KPI)</h3>
+          <ExportButton onClick={handleExportKPIs} label="KPI CSV" disabled={!kpis} />
+        </div>
         <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
           <KPICard
             title="Toplam Kullanıcı"
@@ -421,11 +824,16 @@ export function AnalyticsDashboard() {
         {/* Monthly Revenue */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5 text-green-600" />
-              Aylık Gelir Trendi
-            </CardTitle>
-            <CardDescription>Son 12 aylık gelir grafiği</CardDescription>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5 text-green-600" />
+                  Aylık Gelir Trendi
+                </CardTitle>
+                <CardDescription>Son 12 aylık gelir grafiği</CardDescription>
+              </div>
+              <ExportButton onClick={handleExportMonthlyRevenue} label="CSV" disabled={!monthlyRevenue} />
+            </div>
           </CardHeader>
           <CardContent>
             <div className="h-[280px]">
@@ -443,11 +851,16 @@ export function AnalyticsDashboard() {
         {/* Daily Revenue */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <DollarSign className="h-5 w-5 text-blue-600" />
-              Günlük Gelir
-            </CardTitle>
-            <CardDescription>Son 30 günlük gelir dağılımı</CardDescription>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <DollarSign className="h-5 w-5 text-blue-600" />
+                  Günlük Gelir
+                </CardTitle>
+                <CardDescription>Son 30 günlük gelir dağılımı</CardDescription>
+              </div>
+              <ExportButton onClick={handleExportDailyRevenue} label="CSV" disabled={!dailyRevenue} />
+            </div>
           </CardHeader>
           <CardContent>
             <div className="h-[280px]">
@@ -468,11 +881,16 @@ export function AnalyticsDashboard() {
         {/* Daily Registrations */}
         <Card className="lg:col-span-2">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Users className="h-5 w-5 text-blue-600" />
-              Günlük Kayıtlar
-            </CardTitle>
-            <CardDescription>Son 30 günlük yeni kullanıcı kayıtları</CardDescription>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <Users className="h-5 w-5 text-blue-600" />
+                  Günlük Kayıtlar
+                </CardTitle>
+                <CardDescription>Son 30 günlük yeni kullanıcı kayıtları</CardDescription>
+              </div>
+              <ExportButton onClick={handleExportDailyRegistrations} label="CSV" disabled={!dailyRegs} />
+            </div>
           </CardHeader>
           <CardContent>
             <div className="h-[280px]">
@@ -515,11 +933,16 @@ export function AnalyticsDashboard() {
         {/* Package Distribution */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Award className="h-5 w-5 text-blue-600" />
-              Paket Dağılımı
-            </CardTitle>
-            <CardDescription>Kullanıcıların paket tercihleri</CardDescription>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <Award className="h-5 w-5 text-blue-600" />
+                  Paket Dağılımı
+                </CardTitle>
+                <CardDescription>Kullanıcıların paket tercihleri</CardDescription>
+              </div>
+              <ExportButton onClick={handleExportPackageDistribution} label="CSV" disabled={!packageDist} />
+            </div>
           </CardHeader>
           <CardContent>
             <div className="h-[250px]">
@@ -559,11 +982,16 @@ export function AnalyticsDashboard() {
         {/* Report Generation Stats */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5 text-orange-600" />
-              Rapor Üretimi
-            </CardTitle>
-            <CardDescription>Aylık rapor oluşturma istatistikleri</CardDescription>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <FileText className="h-5 w-5 text-orange-600" />
+                  Rapor Üretimi
+                </CardTitle>
+                <CardDescription>Aylık rapor oluşturma istatistikleri</CardDescription>
+              </div>
+              <ExportButton onClick={handleExportReportStats} label="CSV" disabled={!reportStats} />
+            </div>
           </CardHeader>
           <CardContent>
             <div className="h-[250px]">
@@ -583,11 +1011,16 @@ export function AnalyticsDashboard() {
       {userActivity && (
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <BarChart3 className="h-5 w-5 text-indigo-600" />
-              Kullanıcı Aktivite Özeti
-            </CardTitle>
-            <CardDescription>Platform kullanım metrikleri</CardDescription>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <BarChart3 className="h-5 w-5 text-indigo-600" />
+                  Kullanıcı Aktivite Özeti
+                </CardTitle>
+                <CardDescription>Platform kullanım metrikleri</CardDescription>
+              </div>
+              <ExportButton onClick={handleExportUserActivity} label="CSV" disabled={!userActivity} />
+            </div>
           </CardHeader>
           <CardContent>
             <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
