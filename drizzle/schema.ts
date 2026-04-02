@@ -582,3 +582,18 @@ export const kpiAnomalies = mysqlTable("kpi_anomalies", {
 }));
 export type KpiAnomaly = typeof kpiAnomalies.$inferSelect;
 export type InsertKpiAnomaly = typeof kpiAnomalies.$inferInsert;
+
+/**
+ * Admin Widget Preferences - Dashboard widget düzeni ve görünürlük tercihleri
+ */
+export const adminWidgetPreferences = mysqlTable("admin_widget_preferences", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(), // Admin kullanıcı ID
+  widgetLayout: text("widgetLayout").notNull(), // JSON - widget sırası ve görünürlük ayarları
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  userIdIdx: index("awp_user_id_idx").on(table.userId),
+}));
+export type AdminWidgetPreference = typeof adminWidgetPreferences.$inferSelect;
+export type InsertAdminWidgetPreference = typeof adminWidgetPreferences.$inferInsert;

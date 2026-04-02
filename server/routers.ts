@@ -1113,6 +1113,44 @@ export const appRouter = router({
       return await runDailyAnomalyCheck();
     }),
 
+    // === Kullanıcı Yolculuk Haritası ===
+    getUserJourneyList: adminProcedure
+      .input(z.object({
+        search: z.string().optional(),
+        limit: z.number().min(1).max(100).optional(),
+        offset: z.number().min(0).optional(),
+      }).optional())
+      .query(async ({ input }) => {
+        return await db.getUserJourneyList(input || {});
+      }),
+
+    getUserJourneyMap: adminProcedure
+      .input(z.object({ userId: z.number() }))
+      .query(async ({ input }) => {
+        const journey = await db.getUserJourneyMap(input.userId);
+        if (!journey) {
+          throw new TRPCError({ code: 'NOT_FOUND', message: 'Kullanıcı bulunamadı' });
+        }
+        return journey;
+      }),
+
+    // === Widget Tercihleri ===
+    getWidgetPreferences: adminProcedure.query(async ({ ctx }) => {
+      return await db.getWidgetPreferences(ctx.user.id);
+    }),
+
+    saveWidgetPreferences: adminProcedure
+      .input(z.array(z.object({
+        id: z.string(),
+        label: z.string(),
+        visible: z.boolean(),
+        order: z.number(),
+      })))
+      .mutation(async ({ ctx, input }) => {
+        await db.saveWidgetPreferences(ctx.user.id, input);
+        return { success: true };
+      }),
+
     // === Zamanlanmış Raporlama ===
     getScheduledReportSettings: adminProcedure.query(async () => {
       const weeklyEnabled = await db.getPlatformSetting('scheduled_report_weekly');

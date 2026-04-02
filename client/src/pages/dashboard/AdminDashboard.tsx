@@ -38,6 +38,7 @@ import ScheduledReports from '@/components/admin/ScheduledReports';
 import { AdminActivityFeed } from '@/components/admin/AdminActivityFeed';
 import ActiveUsersWidget from '@/components/admin/ActiveUsersWidget';
 import AnomalyHistory from '@/components/admin/AnomalyHistory';
+import UserJourneyMap from '@/components/admin/UserJourneyMap';
 
 export default function AdminDashboard() {
   const { user } = useAuth();
@@ -201,6 +202,10 @@ export default function AdminDashboard() {
               <MessageSquare className="h-4 w-4 mr-2" />
               Pilot Geri Bildirim
             </TabsTrigger>
+            <TabsTrigger value="user-journey">
+              <TrendingUp className="h-4 w-4 mr-2" />
+              Yolculuk Haritası
+            </TabsTrigger>
             <TabsTrigger value="anomaly-history">
               <AlertTriangle className="h-4 w-4 mr-1" /> Anomali Takibi
             </TabsTrigger>
@@ -282,7 +287,12 @@ export default function AdminDashboard() {
             <PilotFeedbackPanel />
           </TabsContent>
 
-          {/* Scheduled Reports Tab */}
+          {/* User Journey Map Tab */}
+          <TabsContent value="user-journey">
+            <UserJourneyMap />
+          </TabsContent>
+
+          {/* Anomaly History Tab */}
           <TabsContent value="anomaly-history">
             <AnomalyHistory />
           </TabsContent>
