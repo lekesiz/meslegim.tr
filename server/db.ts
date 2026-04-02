@@ -2436,3 +2436,289 @@ export async function getMentorPerformanceStats(mentorId: number) {
     approvedReports,
   };
 }
+
+
+// ============================================
+// ANALYTICS - Kapsamlı analitik sorgu fonksiyonları
+// ============================================
+
+/**
+ * Günlük kayıt sayılarını döndürür (son 30 gün)
+ */
+export async function getDailyRegistrations(days: number = 30) {
+  const db = await getDb();
+  if (!db) return [];
+  const startDate = new Date();
+  startDate.setDate(startDate.getDate() - days);
+  
+  // TiDB only_full_group_by uyumlu: raw SQL kullan
+  const result = await db.execute(
+    sql`SELECT DATE(createdAt) as date_val, COUNT(*) as count_val, role 
+        FROM users 
+        WHERE createdAt >= ${startDate} 
+        GROUP BY date_val, role 
+        ORDER BY date_val`
+  );
+  
+  const rows = Array.isArray(result) ? (result as any)[0] : result;
+  return (rows || []).map((r: any) => ({
+    date: r.date_val ? new Date(r.date_val).toISOString().split('T')[0] : '',
+    count: Number(r.count_val || 0),
+    role: r.role as string,
+  }));
+}
+
+/**
+ * Aylık gelir istatistiklerini döndürür (son 12 ay)
+ */
+export async function getMonthlyRevenue(months: number = 12) {
+  const db = await getDb();
+  if (!db) return [];
+  const startDate = new Date();
+  startDate.setMonth(startDate.getMonth() - months);
+  
+  // TiDB only_full_group_by uyumlu: raw SQL kullan
+  const result = await db.execute(
+    sql`SELECT DATE_FORMAT(createdAt, '%Y-%m') as month_val, 
+        COALESCE(SUM(amountInCents), 0) as total_revenue, 
+        COUNT(*) as count_val,
+        SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) as completed_count
+        FROM purchases 
+        WHERE createdAt >= ${startDate} 
+        GROUP BY month_val 
+        ORDER BY month_val`
+  );
+  
+  const rows = Array.isArray(result) ? (result as any)[0] : result;
+  return (rows || []).map((r: any) => ({
+    month: r.month_val as string,
+    totalRevenue: Number(r.total_revenue || 0),
+    count: Number(r.count_val || 0),
+    completedCount: Number(r.completed_count || 0),
+  }));
+}
+
+/**
+ * Günlük gelir istatistiklerini döndürür (son 30 gün)
+ */
+export async function getDailyRevenue(days: number = 30) {
+  const db = await getDb();
+  if (!db) return [];
+  const startDate = new Date();
+  startDate.setDate(startDate.getDate() - days);
+  
+  // TiDB only_full_group_by uyumlu: raw SQL kullan
+  const result = await db.execute(
+    sql`SELECT DATE(createdAt) as date_val, 
+        COALESCE(SUM(amountInCents), 0) as total_revenue, 
+        COUNT(*) as count_val
+        FROM purchases 
+        WHERE createdAt >= ${startDate} AND status = 'completed'
+        GROUP BY date_val 
+        ORDER BY date_val`
+  );
+  
+  const rows = Array.isArray(result) ? (result as any)[0] : result;
+  return (rows || []).map((r: any) => ({
+    date: r.date_val ? new Date(r.date_val).toISOString().split('T')[0] : '',
+    totalRevenue: Number(r.total_revenue || 0),
+    count: Number(r.count_val || 0),
+  }));
+}
+
+/**
+ * Etap tamamlama istatistiklerini döndürür
+ */
+export async function getStageCompletionStats() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const result = await db.select({
+    stageId: userStages.stageId,
+    status: userStages.status,
+    count: sql<number>`COUNT(*)`.as('count'),
+  })
+  .from(userStages)
+  .groupBy(userStages.stageId, userStages.status);
+  
+  return result;
+}
+
+/**
+ * Kullanıcı aktivite özeti (son giriş bazlı)
+ */
+export async function getUserActivitySummary() {
+  const db = await getDb();
+  if (!db) return { total: 0, activeToday: 0, activeWeek: 0, activeMonth: 0, byRole: { student: 0, mentor: 0, admin: 0, school_admin: 0 }, byStatus: { active: 0, pending: 0, inactive: 0 }, byPackage: { free: 0, basic: 0, premium: 0, school: 0 } };
+  
+  const now = new Date();
+  const day1 = new Date(now); day1.setDate(day1.getDate() - 1);
+  const day7 = new Date(now); day7.setDate(day7.getDate() - 7);
+  const day30 = new Date(now); day30.setDate(day30.getDate() - 30);
+  
+  const allUsers = await db.select({
+    role: users.role,
+    lastSignedIn: users.lastSignedIn,
+    status: users.status,
+    purchasedPackage: users.purchasedPackage,
+  }).from(users);
+  
+  return {
+    total: allUsers.length,
+    activeToday: allUsers.filter(u => u.lastSignedIn >= day1).length,
+    activeWeek: allUsers.filter(u => u.lastSignedIn >= day7).length,
+    activeMonth: allUsers.filter(u => u.lastSignedIn >= day30).length,
+    byRole: {
+      student: allUsers.filter(u => u.role === 'student').length,
+      mentor: allUsers.filter(u => u.role === 'mentor').length,
+      admin: allUsers.filter(u => u.role === 'admin').length,
+      school_admin: allUsers.filter(u => u.role === 'school_admin').length,
+    },
+    byStatus: {
+      active: allUsers.filter(u => u.status === 'active').length,
+      pending: allUsers.filter(u => u.status === 'pending').length,
+      inactive: allUsers.filter(u => u.status === 'inactive').length,
+    },
+    byPackage: {
+      free: allUsers.filter(u => !u.purchasedPackage || u.purchasedPackage === 'free').length,
+      basic: allUsers.filter(u => u.purchasedPackage === 'basic').length,
+      premium: allUsers.filter(u => u.purchasedPackage === 'premium').length,
+      school: allUsers.filter(u => u.purchasedPackage === 'school').length,
+    },
+  };
+}
+
+/**
+ * Rapor oluşturma istatistikleri (aylık)
+ */
+export async function getReportGenerationStats(months: number = 6) {
+  const db = await getDb();
+  if (!db) return [];
+  const startDate = new Date();
+  startDate.setMonth(startDate.getMonth() - months);
+  
+  // TiDB only_full_group_by uyumlu: raw SQL kullan
+  const result = await db.execute(
+    sql`SELECT DATE_FORMAT(createdAt, '%Y-%m') as month_val, 
+        COUNT(*) as total_val,
+        SUM(CASE WHEN status = 'approved' THEN 1 ELSE 0 END) as approved_val,
+        SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending_val
+        FROM reports 
+        WHERE createdAt >= ${startDate} 
+        GROUP BY month_val 
+        ORDER BY month_val`
+  );
+  
+  const rows = Array.isArray(result) ? (result as any)[0] : result;
+  return (rows || []).map((r: any) => ({
+    month: r.month_val as string,
+    total: Number(r.total_val || 0),
+    approved: Number(r.approved_val || 0),
+    pending: Number(r.pending_val || 0),
+  }));
+}
+
+/**
+ * Paket dağılımı ve gelir analizi
+ */
+export async function getPackageDistribution() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const result = await db.select({
+    productId: purchases.productId,
+    count: sql<number>`COUNT(*)`.as('count'),
+    totalRevenue: sql<number>`COALESCE(SUM(${purchases.amountInCents}), 0)`.as('totalRevenue'),
+  })
+  .from(purchases)
+  .where(eq(purchases.status, 'completed'))
+  .groupBy(purchases.productId);
+  
+  return result;
+}
+
+/**
+ * Kapsamlı dashboard KPI'ları
+ */
+export async function getDashboardKPIs() {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const now = new Date();
+  const thisMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  
+  // Toplam kullanıcılar
+  const allUsers = await db.select({ 
+    id: users.id, 
+    role: users.role, 
+    status: users.status,
+    createdAt: users.createdAt,
+    lastSignedIn: users.lastSignedIn,
+    purchasedPackage: users.purchasedPackage,
+  }).from(users);
+  
+  const thisMonthUsers = allUsers.filter(u => u.createdAt >= thisMonth);
+  const lastMonthUsers = allUsers.filter(u => u.createdAt >= lastMonth && u.createdAt < thisMonth);
+  
+  // Gelir
+  const allPurchases = await db.select({
+    amountInCents: purchases.amountInCents,
+    status: purchases.status,
+    createdAt: purchases.createdAt,
+  }).from(purchases);
+  
+  const completedPurchases = allPurchases.filter(p => p.status === 'completed');
+  const thisMonthRevenue = completedPurchases
+    .filter(p => p.createdAt && p.createdAt >= thisMonth)
+    .reduce((sum, p) => sum + (p.amountInCents || 0), 0);
+  const lastMonthRevenue = completedPurchases
+    .filter(p => p.createdAt && p.createdAt >= lastMonth && p.createdAt < thisMonth)
+    .reduce((sum, p) => sum + (p.amountInCents || 0), 0);
+  
+  // Tamamlanan etaplar
+  const completedStages = await db.select({ count: sql<number>`COUNT(*)`.as('count') })
+    .from(userStages)
+    .where(eq(userStages.status, 'completed'));
+  
+  // Raporlar
+  const allReports = await db.select({ 
+    status: reports.status,
+    createdAt: reports.createdAt,
+  }).from(reports);
+  
+  const thisMonthReports = allReports.filter(r => r.createdAt >= thisMonth);
+  
+  // Aktif kullanıcılar (son 7 gün)
+  const day7 = new Date(now); day7.setDate(day7.getDate() - 7);
+  const activeUsers = allUsers.filter(u => u.lastSignedIn >= day7);
+  
+  // Dönüşüm oranı
+  const students = allUsers.filter(u => u.role === 'student');
+  const paidStudents = students.filter(u => u.purchasedPackage && u.purchasedPackage !== 'free');
+  const conversionRate = students.length > 0 ? Math.round((paidStudents.length / students.length) * 100) : 0;
+  
+  return {
+    totalUsers: allUsers.length,
+    thisMonthNewUsers: thisMonthUsers.length,
+    lastMonthNewUsers: lastMonthUsers.length,
+    userGrowthPercent: lastMonthUsers.length > 0 
+      ? Math.round(((thisMonthUsers.length - lastMonthUsers.length) / lastMonthUsers.length) * 100) 
+      : thisMonthUsers.length > 0 ? 100 : 0,
+    totalRevenue: completedPurchases.reduce((sum, p) => sum + (p.amountInCents || 0), 0),
+    thisMonthRevenue,
+    lastMonthRevenue,
+    revenueGrowthPercent: lastMonthRevenue > 0 
+      ? Math.round(((thisMonthRevenue - lastMonthRevenue) / lastMonthRevenue) * 100) 
+      : thisMonthRevenue > 0 ? 100 : 0,
+    totalCompletedStages: completedStages[0]?.count || 0,
+    totalReports: allReports.length,
+    thisMonthReports: thisMonthReports.length,
+    pendingReports: allReports.filter(r => r.status === 'pending').length,
+    activeUsersWeek: activeUsers.length,
+    conversionRate,
+    totalPurchases: completedPurchases.length,
+    students: students.length,
+    mentors: allUsers.filter(u => u.role === 'mentor').length,
+  };
+}

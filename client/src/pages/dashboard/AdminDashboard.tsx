@@ -13,7 +13,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { trpc } from '@/lib/trpc';
-import { Loader2, Users, FileQuestion, Layers, Plus, TrendingUp, Zap, MessageSquare, Eye, Settings, CreditCard } from 'lucide-react';
+import { Loader2, Users, FileQuestion, Layers, Plus, TrendingUp, Zap, MessageSquare, Eye, Settings, CreditCard, BarChart3 } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -28,6 +28,7 @@ import { AdminFeedbackSummary } from '@/components/AdminFeedbackSummary';
 import { UserManagement } from '@/components/UserManagement';
 import { PlatformSettings } from '@/components/PlatformSettings';
 import { PilotFeedbackPanel } from '@/components/admin/PilotFeedbackPanel';
+import { AnalyticsDashboard } from '@/components/AnalyticsDashboard';
 import { PaymentManagement } from '@/components/admin/PaymentManagement';
 import { SchoolManagement } from '@/components/admin/SchoolManagement';
 import { PromotionCodeManagement } from '@/components/admin/PromotionCodeManagement';
@@ -130,8 +131,12 @@ export default function AdminDashboard() {
         </div>
 
         {/* Tabs */}
-        <Tabs defaultValue="analytics" className="space-y-4">
+        <Tabs defaultValue="dashboard-analytics" className="space-y-4">
           <TabsList className="flex flex-wrap h-auto gap-1 p-1">
+            <TabsTrigger value="dashboard-analytics">
+              <BarChart3 className="h-4 w-4 mr-2" />
+              Analitik Panel
+            </TabsTrigger>
             <TabsTrigger value="analytics">
               <TrendingUp className="h-4 w-4 mr-2" />
               İlerleme Analizi
@@ -193,7 +198,12 @@ export default function AdminDashboard() {
             </TabsTrigger>
           </TabsList>
 
-          {/* Analytics Tab */}
+          {/* Dashboard Analytics Tab */}
+          <TabsContent value="dashboard-analytics">
+            <AnalyticsDashboard />
+          </TabsContent>
+
+          {/* Progress Analytics Tab */}
           <TabsContent value="analytics">
             <ProgressAnalytics />
           </TabsContent>

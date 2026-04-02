@@ -1477,8 +1477,8 @@ Platform **minimum seviyede sağlıklı** çalışıyor. Tüm temel özellikler 
 - [x] Stripe mağaza adı düzeltme (statement_descriptor: MESLEGIM.TR)
 - [x] Gizlilik politikası (KVKK)
 - [x] Kullanım koşulları
-- [ ] SSS sayfası
-- [ ] İletişim sayfası
+- [x] SSS sayfası
+- [x] İletişim sayfası
 
 ## Oturum 4 - KVKK, Şifre Sıfırlama, Stripe (2 Nisan 2026)
 
@@ -1497,3 +1497,13 @@ Platform **minimum seviyede sağlıklı** çalışıyor. Tüm temel özellikler 
 - [ ] Stripe mağaza adını düzelt (Settings > Payment)
 - [x] Route'ları App.tsx'e ekle (/sss, /iletisim)
 - [x] Navbar ve footer'a SSS ve İletişim linkleri ekle
+
+## Oturum 6 - Admin Analitik Dashboard (2 Nisan 2026)
+
+- [x] Backend: Analitik veri sorgu fonksiyonları (db.ts) - 8 fonksiyon eklendi
+- [x] Backend: tRPC analitik prosedürleri (routers.ts) - 8 prosedür eklendi
+- [x] Frontend: KPI kartları (toplam kullanıcı, aktif kullanıcı, gelir, tamamlanan değerlendirme)
+- [x] Frontend: Kullanıcı aktivitesi grafikleri (günlük kayıt, rol dağılımı)
+- [x] Frontend: Ödeme istatistikleri (günlük/aylık gelir grafiği, paket dağılımı)
+- [x] Frontend: Platform kullanım metrikleri (etap tamamlama, rapor oluşturma)
+- [x] Frontend: Analitik tab'ını admin dashboard'a entegre et (varsayılan tab)
