@@ -1106,6 +1106,50 @@ export const appRouter = router({
         totalRevenue: Number(stats?.totalRevenue || 0),
       };
     }),
+
+    // ============================================
+    // ANALYTICS PROCEDURES
+    // ============================================
+    
+    getDashboardKPIs: adminProcedure.query(async () => {
+      return await db.getDashboardKPIs();
+    }),
+    
+    getDailyRegistrations: adminProcedure
+      .input(z.object({ days: z.number().optional().default(30) }))
+      .query(async ({ input }) => {
+        return await db.getDailyRegistrations(input.days);
+      }),
+    
+    getMonthlyRevenue: adminProcedure
+      .input(z.object({ months: z.number().optional().default(12) }))
+      .query(async ({ input }) => {
+        return await db.getMonthlyRevenue(input.months);
+      }),
+    
+    getDailyRevenue: adminProcedure
+      .input(z.object({ days: z.number().optional().default(30) }))
+      .query(async ({ input }) => {
+        return await db.getDailyRevenue(input.days);
+      }),
+    
+    getStageCompletionStats: adminProcedure.query(async () => {
+      return await db.getStageCompletionStats();
+    }),
+    
+    getUserActivitySummary: adminProcedure.query(async () => {
+      return await db.getUserActivitySummary();
+    }),
+    
+    getReportGenerationStats: adminProcedure
+      .input(z.object({ months: z.number().optional().default(6) }))
+      .query(async ({ input }) => {
+        return await db.getReportGenerationStats(input.months);
+      }),
+    
+    getPackageDistribution: adminProcedure.query(async () => {
+      return await db.getPackageDistribution();
+    }),
   }),
 
   // Mentor procedures
