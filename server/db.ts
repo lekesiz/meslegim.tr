@@ -2445,17 +2445,17 @@ export async function getMentorPerformanceStats(mentorId: number) {
 /**
  * Günlük kayıt sayılarını döndürür (son 30 gün)
  */
-export async function getDailyRegistrations(days: number = 30) {
+export async function getDailyRegistrations(days: number = 30, customStart?: Date, customEnd?: Date) {
   const db = await getDb();
   if (!db) return [];
-  const startDate = new Date();
-  startDate.setDate(startDate.getDate() - days);
+  const startDate = customStart || new Date(Date.now() - days * 86400000);
+  const endDate = customEnd || new Date();
   
   // TiDB only_full_group_by uyumlu: raw SQL kullan
   const result = await db.execute(
     sql`SELECT DATE(createdAt) as date_val, COUNT(*) as count_val, role 
         FROM users 
-        WHERE createdAt >= ${startDate} 
+        WHERE createdAt >= ${startDate} AND createdAt <= ${endDate}
         GROUP BY date_val, role 
         ORDER BY date_val`
   );
@@ -2471,11 +2471,11 @@ export async function getDailyRegistrations(days: number = 30) {
 /**
  * Aylık gelir istatistiklerini döndürür (son 12 ay)
  */
-export async function getMonthlyRevenue(months: number = 12) {
+export async function getMonthlyRevenue(months: number = 12, customStart?: Date, customEnd?: Date) {
   const db = await getDb();
   if (!db) return [];
-  const startDate = new Date();
-  startDate.setMonth(startDate.getMonth() - months);
+  const startDate = customStart || (() => { const d = new Date(); d.setMonth(d.getMonth() - months); return d; })();
+  const endDate = customEnd || new Date();
   
   // TiDB only_full_group_by uyumlu: raw SQL kullan
   const result = await db.execute(
@@ -2484,7 +2484,7 @@ export async function getMonthlyRevenue(months: number = 12) {
         COUNT(*) as count_val,
         SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) as completed_count
         FROM purchases 
-        WHERE createdAt >= ${startDate} 
+        WHERE createdAt >= ${startDate} AND createdAt <= ${endDate}
         GROUP BY month_val 
         ORDER BY month_val`
   );
@@ -2501,11 +2501,11 @@ export async function getMonthlyRevenue(months: number = 12) {
 /**
  * Günlük gelir istatistiklerini döndürür (son 30 gün)
  */
-export async function getDailyRevenue(days: number = 30) {
+export async function getDailyRevenue(days: number = 30, customStart?: Date, customEnd?: Date) {
   const db = await getDb();
   if (!db) return [];
-  const startDate = new Date();
-  startDate.setDate(startDate.getDate() - days);
+  const startDate = customStart || new Date(Date.now() - days * 86400000);
+  const endDate = customEnd || new Date();
   
   // TiDB only_full_group_by uyumlu: raw SQL kullan
   const result = await db.execute(
@@ -2513,7 +2513,7 @@ export async function getDailyRevenue(days: number = 30) {
         COALESCE(SUM(amountInCents), 0) as total_revenue, 
         COUNT(*) as count_val
         FROM purchases 
-        WHERE createdAt >= ${startDate} AND status = 'completed'
+        WHERE createdAt >= ${startDate} AND createdAt <= ${endDate} AND status = 'completed'
         GROUP BY date_val 
         ORDER BY date_val`
   );
@@ -2591,11 +2591,11 @@ export async function getUserActivitySummary() {
 /**
  * Rapor oluşturma istatistikleri (aylık)
  */
-export async function getReportGenerationStats(months: number = 6) {
+export async function getReportGenerationStats(months: number = 6, customStart?: Date, customEnd?: Date) {
   const db = await getDb();
   if (!db) return [];
-  const startDate = new Date();
-  startDate.setMonth(startDate.getMonth() - months);
+  const startDate = customStart || (() => { const d = new Date(); d.setMonth(d.getMonth() - months); return d; })();
+  const endDate = customEnd || new Date();
   
   // TiDB only_full_group_by uyumlu: raw SQL kullan
   const result = await db.execute(
@@ -2604,7 +2604,7 @@ export async function getReportGenerationStats(months: number = 6) {
         SUM(CASE WHEN status = 'approved' THEN 1 ELSE 0 END) as approved_val,
         SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending_val
         FROM reports 
-        WHERE createdAt >= ${startDate} 
+        WHERE createdAt >= ${startDate} AND createdAt <= ${endDate}
         GROUP BY month_val 
         ORDER BY month_val`
   );
@@ -2621,9 +2621,13 @@ export async function getReportGenerationStats(months: number = 6) {
 /**
  * Paket dağılımı ve gelir analizi
  */
-export async function getPackageDistribution() {
+export async function getPackageDistribution(customStart?: Date, customEnd?: Date) {
   const db = await getDb();
   if (!db) return [];
+  
+  const conditions = [eq(purchases.status, 'completed')];
+  if (customStart) conditions.push(gte(purchases.createdAt, customStart));
+  if (customEnd) conditions.push(lte(purchases.createdAt, customEnd));
   
   const result = await db.select({
     productId: purchases.productId,
@@ -2631,7 +2635,7 @@ export async function getPackageDistribution() {
     totalRevenue: sql<number>`COALESCE(SUM(${purchases.amountInCents}), 0)`.as('totalRevenue'),
   })
   .from(purchases)
-  .where(eq(purchases.status, 'completed'))
+  .where(and(...conditions))
   .groupBy(purchases.productId);
   
   return result;
@@ -2640,11 +2644,11 @@ export async function getPackageDistribution() {
 /**
  * Kapsamlı dashboard KPI'ları
  */
-export async function getDashboardKPIs() {
+export async function getDashboardKPIs(customStart?: Date, customEnd?: Date) {
   const db = await getDb();
   if (!db) return null;
   
-  const now = new Date();
+  const now = customEnd || new Date();
   const thisMonth = new Date(now.getFullYear(), now.getMonth(), 1);
   const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
   
