@@ -1,6 +1,6 @@
 import { eq, and, or, desc, inArray, gte, lte } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, stages, questions, answers, userStages, reports, mentorNotes, messages, feedbacks, certificates, platformSettings, stageUnlockLogs, notifications, pilotFeedbacks, purchases, schools, schoolMentors, promotionCodes, promotionCodeUsages, activityLogs, csvExportLogs } from "../drizzle/schema";
+import { InsertUser, users, stages, questions, answers, userStages, reports, mentorNotes, messages, feedbacks, certificates, platformSettings, stageUnlockLogs, notifications, pilotFeedbacks, purchases, schools, schoolMentors, promotionCodes, promotionCodeUsages, activityLogs, csvExportLogs, kpiAnomalies } from "../drizzle/schema";
 import { ENV } from './_core/env';
 import { sql } from 'drizzle-orm';
 
@@ -3242,4 +3242,275 @@ export async function getUserSegmentation(
     premiumRate: Number(row.premiumRate) || 0,
     avgDaysOnPlatform: Number(row.avgDaysOnPlatform) || 0,
   }));
+}
+
+
+// ============================================================
+// Active Users & KPI Anomaly Detection
+// ============================================================
+
+/**
+ * Son N dakika içinde aktif olan kullanıcı sayısını döndürür
+ * activity_logs tablosundaki kayıtlara göre hesaplanır
+ */
+export async function getActiveUserCount(minutesAgo: number = 30): Promise<number> {
+  const db = await getDb();
+  if (!db) return 0;
+  
+  const result = await db.execute(sql`
+    SELECT COUNT(DISTINCT userId) as activeCount
+    FROM activity_logs
+    WHERE createdAt >= DATE_SUB(NOW(), INTERVAL ${minutesAgo} MINUTE)
+    AND userId IS NOT NULL
+  `);
+  
+  const rows = result[0] as unknown as Array<{ activeCount: number }>;
+  return Number(rows[0]?.activeCount) || 0;
+}
+
+/**
+ * Son 24 saat içindeki saatlik aktif kullanıcı trendini döndürür
+ */
+export async function getHourlyActiveUserTrend(): Promise<Array<{ hour: string; activeUsers: number }>> {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const result = await db.execute(sql`
+    SELECT 
+      DATE_FORMAT(createdAt, '%Y-%m-%d %H:00') as hour,
+      COUNT(DISTINCT userId) as activeUsers
+    FROM activity_logs
+    WHERE createdAt >= DATE_SUB(NOW(), INTERVAL 24 HOUR)
+    AND userId IS NOT NULL
+    GROUP BY DATE_FORMAT(createdAt, '%Y-%m-%d %H:00')
+    ORDER BY hour ASC
+  `);
+  
+  const rows = result[0] as unknown as Array<{ hour: string; activeUsers: number }>;
+  return rows.map(r => ({
+    hour: String(r.hour),
+    activeUsers: Number(r.activeUsers) || 0,
+  }));
+}
+
+/**
+ * Günlük KPI değerlerini hesaplar (anomali tespiti için)
+ */
+export async function getDailyKPIValues(date: string): Promise<{
+  dailyRegistrations: number;
+  testCompletionRate: number;
+  premiumConversion: number;
+}> {
+  const db = await getDb();
+  if (!db) return { dailyRegistrations: 0, testCompletionRate: 0, premiumConversion: 0 };
+  
+  // Günlük kayıt sayısı
+  const regResult = await db.execute(sql`
+    SELECT COUNT(*) as cnt FROM users
+    WHERE DATE(createdAt) = ${date}
+  `);
+  const dailyRegistrations = Number((regResult[0] as any)[0]?.cnt) || 0;
+  
+  // Test tamamlama oranı (o gün tamamlanan / o gün başlatılan)
+  const completionResult = await db.execute(sql`
+    SELECT 
+      COUNT(CASE WHEN status = 'completed' THEN 1 END) as completed,
+      COUNT(*) as total
+    FROM user_stages
+    WHERE DATE(updatedAt) = ${date}
+  `);
+  const compRow = (completionResult[0] as any)[0];
+  const testCompletionRate = compRow?.total > 0 
+    ? Math.round((Number(compRow.completed) / Number(compRow.total)) * 100) 
+    : 0;
+  
+  // Premium dönüşüm oranı (o gün satın alan / toplam aktif kullanıcı)
+  const premiumResult = await db.execute(sql`
+    SELECT COUNT(DISTINCT userId) as premiumCount FROM purchases
+    WHERE DATE(createdAt) = ${date} AND status = 'completed'
+  `);
+  const totalActiveResult = await db.execute(sql`
+    SELECT COUNT(*) as cnt FROM users WHERE status = 'active'
+  `);
+  const premiumCount = Number((premiumResult[0] as any)[0]?.premiumCount) || 0;
+  const totalActive = Number((totalActiveResult[0] as any)[0]?.cnt) || 1;
+  const premiumConversion = Math.round((premiumCount / totalActive) * 10000); // x100 hassasiyet
+  
+  return { dailyRegistrations, testCompletionRate, premiumConversion };
+}
+
+/**
+ * Son 7 günlük KPI ortalamalarını hesaplar
+ */
+export async function get7DayKPIAverage(beforeDate: string): Promise<{
+  avgRegistrations: number;
+  avgTestCompletionRate: number;
+  avgPremiumConversion: number;
+}> {
+  const db = await getDb();
+  if (!db) return { avgRegistrations: 0, avgTestCompletionRate: 0, avgPremiumConversion: 0 };
+  
+  // Son 7 gün kayıt ortalaması
+  const regResult = await db.execute(sql`
+    SELECT ROUND(AVG(daily_count)) as avgCount FROM (
+      SELECT DATE(createdAt) as d, COUNT(*) as daily_count FROM users
+      WHERE DATE(createdAt) >= DATE_SUB(${beforeDate}, INTERVAL 7 DAY)
+      AND DATE(createdAt) < ${beforeDate}
+      GROUP BY DATE(createdAt)
+    ) sub
+  `);
+  const avgRegistrations = Number((regResult[0] as any)[0]?.avgCount) || 0;
+  
+  // Son 7 gün test tamamlama oranı ortalaması
+  const completionResult = await db.execute(sql`
+    SELECT ROUND(AVG(rate)) as avgRate FROM (
+      SELECT DATE(updatedAt) as d,
+        ROUND(COUNT(CASE WHEN status = 'completed' THEN 1 END) / NULLIF(COUNT(*), 0) * 100) as rate
+      FROM user_stages
+      WHERE DATE(updatedAt) >= DATE_SUB(${beforeDate}, INTERVAL 7 DAY)
+      AND DATE(updatedAt) < ${beforeDate}
+      GROUP BY DATE(updatedAt)
+    ) sub
+  `);
+  const avgTestCompletionRate = Number((completionResult[0] as any)[0]?.avgRate) || 0;
+  
+  // Son 7 gün premium dönüşüm ortalaması
+  const premiumResult = await db.execute(sql`
+    SELECT ROUND(AVG(rate)) as avgRate FROM (
+      SELECT DATE(p.createdAt) as d,
+        ROUND(COUNT(DISTINCT p.userId) / NULLIF((SELECT COUNT(*) FROM users WHERE status = 'active'), 0) * 10000) as rate
+      FROM purchases p
+      WHERE DATE(p.createdAt) >= DATE_SUB(${beforeDate}, INTERVAL 7 DAY)
+      AND DATE(p.createdAt) < ${beforeDate}
+      AND p.status = 'completed'
+      GROUP BY DATE(p.createdAt)
+    ) sub
+  `);
+  const avgPremiumConversion = Number((premiumResult[0] as any)[0]?.avgRate) || 0;
+  
+  return { avgRegistrations, avgTestCompletionRate, avgPremiumConversion };
+}
+
+/**
+ * KPI anomalisi kaydet
+ */
+export async function createKpiAnomaly(data: {
+  date: Date;
+  kpiName: string;
+  kpiLabel: string;
+  currentValue: number;
+  avgValue: number;
+  deviationPercent: number;
+  direction: 'up' | 'down';
+  severity: 'warning' | 'critical';
+  alertSent: boolean;
+}): Promise<number> {
+  const db = await getDb();
+  if (!db) return 0;
+  
+  const result = await db.insert(kpiAnomalies).values(data);
+  return (result[0] as any).insertId;
+}
+
+/**
+ * Anomali geçmişini getir (sayfalı)
+ */
+export async function getKpiAnomalies(options: {
+  page?: number;
+  limit?: number;
+  severity?: string;
+  acknowledged?: boolean;
+}): Promise<{ items: any[]; total: number }> {
+  const db = await getDb();
+  if (!db) return { items: [], total: 0 };
+  
+  const page = options.page || 1;
+  const limit = options.limit || 20;
+  const offset = (page - 1) * limit;
+  
+  let whereClause = sql`1=1`;
+  if (options.severity) {
+    whereClause = sql`${whereClause} AND severity = ${options.severity}`;
+  }
+  if (options.acknowledged !== undefined) {
+    whereClause = sql`${whereClause} AND acknowledged = ${options.acknowledged ? 1 : 0}`;
+  }
+  
+  const countResult = await db.execute(sql`
+    SELECT COUNT(*) as total FROM kpi_anomalies WHERE ${whereClause}
+  `);
+  const total = Number((countResult[0] as any)[0]?.total) || 0;
+  
+  const items = await db.execute(sql`
+    SELECT * FROM kpi_anomalies 
+    WHERE ${whereClause}
+    ORDER BY createdAt DESC
+    LIMIT ${limit} OFFSET ${offset}
+  `);
+  
+  return { items: ((items[0] as unknown) as any[]) || [], total };
+}
+
+/**
+ * Anomaliyi onayla
+ */
+export async function acknowledgeAnomaly(anomalyId: number, userId: number, notes?: string): Promise<void> {
+  const db = await getDb();
+  if (!db) return;
+  
+  await db.update(kpiAnomalies).set({
+    acknowledged: true,
+    acknowledgedBy: userId,
+    acknowledgedAt: new Date(),
+    notes: notes || null,
+  }).where(eq(kpiAnomalies.id, anomalyId));
+}
+
+/**
+ * Onaylanmamış anomali sayısını getir
+ */
+export async function getUnacknowledgedAnomalyCount(): Promise<number> {
+  const db = await getDb();
+  if (!db) return 0;
+  
+  const result = await db.execute(sql`
+    SELECT COUNT(*) as cnt FROM kpi_anomalies WHERE acknowledged = 0
+  `);
+  return Number((result[0] as any)[0]?.cnt) || 0;
+}
+
+/**
+ * Anomali özet istatistikleri
+ */
+export async function getAnomalySummary(): Promise<{
+  totalAnomalies: number;
+  unacknowledged: number;
+  criticalCount: number;
+  warningCount: number;
+  todayCount: number;
+  thisWeekCount: number;
+}> {
+  const db = await getDb();
+  if (!db) return { totalAnomalies: 0, unacknowledged: 0, criticalCount: 0, warningCount: 0, todayCount: 0, thisWeekCount: 0 };
+  
+  const result = await db.execute(sql`
+    SELECT 
+      COUNT(*) as totalAnomalies,
+      SUM(CASE WHEN acknowledged = 0 THEN 1 ELSE 0 END) as unacknowledged,
+      SUM(CASE WHEN severity = 'critical' THEN 1 ELSE 0 END) as criticalCount,
+      SUM(CASE WHEN severity = 'warning' THEN 1 ELSE 0 END) as warningCount,
+      SUM(CASE WHEN DATE(createdAt) = CURDATE() THEN 1 ELSE 0 END) as todayCount,
+      SUM(CASE WHEN createdAt >= DATE_SUB(NOW(), INTERVAL 7 DAY) THEN 1 ELSE 0 END) as thisWeekCount
+    FROM kpi_anomalies
+  `);
+  
+  const row = (result[0] as any)[0];
+  return {
+    totalAnomalies: Number(row?.totalAnomalies) || 0,
+    unacknowledged: Number(row?.unacknowledged) || 0,
+    criticalCount: Number(row?.criticalCount) || 0,
+    warningCount: Number(row?.warningCount) || 0,
+    todayCount: Number(row?.todayCount) || 0,
+    thisWeekCount: Number(row?.thisWeekCount) || 0,
+  };
 }

@@ -1610,3 +1610,24 @@ Platform **minimum seviyede sağlıklı** çalışıyor. Tüm temel özellikler 
 - [x] Vitest testleri yaz ve çalıştır (segmentation-pdf.test.ts: 16 test, toplam 321/321)
 - [x] GitHub'a push et (159ad07)
 - [x] Checkpoint kaydet
+
+## Oturum 14 - Gerçek Zamanlı Monitoring ve Anomali Tespiti
+
+### Gerçek Zamanlı Aktif Kullanıcı Widget
+- [x] Backend: Aktif kullanıcı sayısı fonksiyonu (son 30dk activity_logs'tan)
+- [x] Backend: Saatlik aktif kullanıcı trendi fonksiyonu (son 24 saat)
+- [x] Backend: getActiveUsers ve getActiveUserTrend prosedürleri
+- [x] Frontend: Aktif kullanıcı widget (canlı sayaç + mini trend grafiği, 30sn polling)
+
+### KPI Anomali Tespiti ve Alert Sistemi
+- [x] Veritabanı: kpi_anomalies tablosu oluştur
+- [x] Backend: Günlük KPI hesaplama ve 7 günlük ortalama ile karşılaştırma fonksiyonu
+- [x] Backend: %30 sapma tespiti ve email alert gönderimi (anomalyDetection.ts)
+- [x] Backend: Cron job ile günlük anomali kontrolü (her gün 07:00)
+- [x] Frontend: Anomali geçmişi tablosu ve dashboard entegrasyonu (AnomalyHistory tab)
+
+### Doğrulama ve Deploy
+- [ ] TypeScript doğrulama (0 hata)
+- [ ] Vitest testleri yaz ve çalıştır
+- [ ] GitHub'a push et
+- [ ] Checkpoint kaydet

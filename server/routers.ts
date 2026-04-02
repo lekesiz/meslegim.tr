@@ -1069,6 +1069,50 @@ export const appRouter = router({
         return await db.getUserSegmentation(input.segmentBy, input.startDate, input.endDate);
       }),
 
+    // === Gerçek Zamanlı Aktif Kullanıcılar ===
+    getActiveUserCount: adminProcedure.query(async () => {
+      return {
+        activeNow: await db.getActiveUserCount(30),
+        active1h: await db.getActiveUserCount(60),
+        active24h: await db.getActiveUserCount(1440),
+      };
+    }),
+
+    getHourlyActiveUserTrend: adminProcedure.query(async () => {
+      return await db.getHourlyActiveUserTrend();
+    }),
+
+    // === KPI Anomali Tespiti ===
+    getKpiAnomalies: adminProcedure
+      .input(z.object({
+        page: z.number().optional(),
+        limit: z.number().optional(),
+        severity: z.string().optional(),
+        acknowledged: z.boolean().optional(),
+      }).optional())
+      .query(async ({ input }) => {
+        return await db.getKpiAnomalies(input || {});
+      }),
+
+    getAnomalySummary: adminProcedure.query(async () => {
+      return await db.getAnomalySummary();
+    }),
+
+    acknowledgeAnomaly: adminProcedure
+      .input(z.object({
+        anomalyId: z.number(),
+        notes: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        await db.acknowledgeAnomaly(input.anomalyId, ctx.user.id, input.notes);
+        return { success: true };
+      }),
+
+    runAnomalyCheck: adminProcedure.mutation(async () => {
+      const { runDailyAnomalyCheck } = await import('./services/anomalyDetection');
+      return await runDailyAnomalyCheck();
+    }),
+
     // === Zamanlanmış Raporlama ===
     getScheduledReportSettings: adminProcedure.query(async () => {
       const weeklyEnabled = await db.getPlatformSetting('scheduled_report_weekly');
