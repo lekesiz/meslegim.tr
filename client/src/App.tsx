@@ -38,6 +38,7 @@ const SchoolAdminDashboard = lazy(() => import("./pages/dashboard/SchoolAdminDas
 const PaymentHistory = lazy(() => import("./pages/student/PaymentHistory"));
 const SSS = lazy(() => import("./pages/SSS"));
 const Iletisim = lazy(() => import("./pages/Iletisim"));
+const BulkEmailCampaigns = lazy(() => import("./pages/admin/BulkEmailCampaigns"));
 
 function PageLoader() {
   return (
@@ -72,6 +73,7 @@ function Router() {
         
         {/* Legacy routes for backward compatibility */}
         <Route path="/dashboard/admin" component={AdminDashboard} />
+        <Route path="/dashboard/admin/email-campaigns" component={BulkEmailCampaigns} />
         <Route path="/dashboard/school-admin" component={SchoolAdminDashboard} />
         <Route path="/dashboard/mentor" component={MentorDashboard} />
         <Route path="/dashboard/mentor/reports" component={MentorReportApproval} />

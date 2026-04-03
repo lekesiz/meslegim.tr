@@ -176,6 +176,13 @@
       "when": 1775169496608,
       "tag": "0024_acoustic_starhawk",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "5",
+      "when": 1775175397242,
+      "tag": "0025_oval_gunslinger",
+      "breakpoints": true
     }
   ]
 }

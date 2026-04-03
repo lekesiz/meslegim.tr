@@ -597,3 +597,47 @@ export const adminWidgetPreferences = mysqlTable("admin_widget_preferences", {
 }));
 export type AdminWidgetPreference = typeof adminWidgetPreferences.$inferSelect;
 export type InsertAdminWidgetPreference = typeof adminWidgetPreferences.$inferInsert;
+
+
+/**
+ * Inactivity Notifications - Hareketsiz kullanıcılara gönderilen otomatik bildirimler
+ */
+export const inactivityNotifications = mysqlTable("inactivity_notifications", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  emailSentAt: timestamp("emailSentAt").defaultNow().notNull(),
+  inactiveDays: int("inactiveDays").notNull(),
+  emailType: varchar("emailType", { length: 50 }).default("reminder").notNull(), // reminder, warning, final
+  success: boolean("success").default(true).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+  userIdIdx: index("in_user_id_idx").on(table.userId),
+  emailSentAtIdx: index("in_email_sent_idx").on(table.emailSentAt),
+}));
+export type InactivityNotification = typeof inactivityNotifications.$inferSelect;
+export type InsertInactivityNotification = typeof inactivityNotifications.$inferInsert;
+
+/**
+ * Bulk Email Campaigns - Admin toplu email kampanyaları
+ */
+export const bulkEmailCampaigns = mysqlTable("bulk_email_campaigns", {
+  id: int("id").autoincrement().primaryKey(),
+  adminId: int("adminId").notNull(),
+  subject: varchar("subject", { length: 500 }).notNull(),
+  htmlContent: text("htmlContent").notNull(),
+  segment: varchar("segment", { length: 100 }).notNull(), // active, trial, inactive, all, premium, free
+  recipientCount: int("recipientCount").default(0).notNull(),
+  sentCount: int("sentCount").default(0).notNull(),
+  failedCount: int("failedCount").default(0).notNull(),
+  status: mysqlEnum("campaignStatus", ["draft", "sending", "completed", "failed"]).default("draft").notNull(),
+  sentAt: timestamp("sentAt"),
+  completedAt: timestamp("completedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  adminIdIdx: index("bec_admin_id_idx").on(table.adminId),
+  statusIdx: index("bec_status_idx").on(table.status),
+  segmentIdx: index("bec_segment_idx").on(table.segment),
+}));
+export type BulkEmailCampaign = typeof bulkEmailCampaigns.$inferSelect;
+export type InsertBulkEmailCampaign = typeof bulkEmailCampaigns.$inferInsert;

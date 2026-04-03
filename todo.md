@@ -1655,3 +1655,29 @@ Platform **minimum seviyede sağlıklı** çalışıyor. Tüm temel özellikler 
 - [x] Vitest testleri yaz ve çalıştır (24 dosya, 354 test, hepsi geçti)
 - [x] GitHub'a push et (a21d71d)
 - [x] Checkpoint kaydet
+
+## Session 16 — CI/CD, Hareketsizlik Uyarıları, Toplu Email
+
+### CI/CD Pipeline Kontrolü
+- [x] GitHub Actions CI/CD pipeline durumunu kontrol et (CD geçti, CI başarısız)
+- [x] Resend lazy initialization düzeltmesi (CI'da RESEND_API_KEY yokken crash oluyordu)
+- [x] ci.yml: Unit Tests'e env vars eklendi, E2E continue-on-error, Security audit level=critical
+
+### Otomatik Hareketsizlik Uyarıları (Cron Job)
+- [x] Backend: 7+ gün hareketsiz öğrencileri tespit eden fonksiyon (getInactiveStudents)
+- [x] Backend: Hareketsizlik email şablonu (getInactivityReminderEmailTemplate)
+- [x] Backend: sendInactivityReminders admin prosedürü + getInactivityNotificationHistory
+- [x] Backend: inactivity_notifications tablosu (tekrar gönderimi önlemek için)
+
+### Admin Toplu Email Gönderimi
+- [x] Backend: Kullanıcı segmentleri (aktif, trial, inaktif) sorgulama (getSegmentCounts, getUsersBySegment)
+- [x] Backend: Toplu email gönderim prosédürü (sendBulkCampaignEmail)
+- [x] Frontend: Admin paneline toplu email gönderim sayfası (BulkEmailCampaigns)
+- [x] Frontend: Segment seçimi, email şablonu düzenleme, önizleme
+- [x] Backend: bulk_email_campaigns tablosu (kampanya takibi)
+
+### Doğrulama ve Deploy
+- [x] TypeScript doğrulama (0 hata)
+- [x] Vitest testleri yaz ve çalıştır (25 dosya, 365 test, hepsi geçti)
+- [ ] GitHub'a push et
+- [ ] Checkpoint kaydet
