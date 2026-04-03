@@ -1,6 +1,6 @@
 import { eq, and, or, desc, inArray, gte, lte } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, stages, questions, answers, userStages, reports, mentorNotes, messages, feedbacks, certificates, platformSettings, stageUnlockLogs, notifications, pilotFeedbacks, purchases, schools, schoolMentors, promotionCodes, promotionCodeUsages, activityLogs, csvExportLogs, kpiAnomalies, adminWidgetPreferences, inactivityNotifications, bulkEmailCampaigns } from "../drizzle/schema";
+import { InsertUser, users, stages, questions, answers, userStages, reports, mentorNotes, messages, feedbacks, certificates, platformSettings, stageUnlockLogs, notifications, pilotFeedbacks, purchases, schools, schoolMentors, promotionCodes, promotionCodeUsages, activityLogs, csvExportLogs, kpiAnomalies, adminWidgetPreferences, inactivityNotifications, bulkEmailCampaigns, emailTrackingEvents } from "../drizzle/schema";
 import { ENV } from './_core/env';
 import { sql } from 'drizzle-orm';
 
@@ -4026,4 +4026,119 @@ export async function getBulkEmailCampaigns(limit: number = 20, offset: number =
     campaigns: (rows as unknown as any[])[0] || [],
     total: Number(total),
   };
+}
+
+// ==================== Email Tracking ====================
+
+import crypto from 'crypto';
+
+/**
+ * Tracking ID oluştur (campaign_id + email hash)
+ */
+export function generateTrackingId(campaignId: number, email: string, eventType: 'open' | 'click', linkUrl?: string): string {
+  const data = `${campaignId}:${email}:${eventType}:${linkUrl || ''}`;
+  return crypto.createHash('sha256').update(data).digest('hex').substring(0, 32);
+}
+
+/**
+ * Email açılma olayı kaydet
+ */
+export async function recordEmailOpen(trackingId: string, campaignId: number, email: string, userAgent?: string, ipAddress?: string) {
+  const db = await getDb();
+  if (!db) return;
+
+  // Aynı tracking ID ile daha önce kayıt varsa tekrar kaydetme (deduplicate)
+  const existing = await db.execute(sql`
+    SELECT id FROM email_tracking_events 
+    WHERE trackingId = ${trackingId} AND eventType = 'open'
+    LIMIT 1
+  `);
+  if (((existing as unknown as any[])[0] || []).length > 0) return;
+
+  await db.execute(sql`
+    INSERT INTO email_tracking_events (campaignId, recipientEmail, trackingId, eventType, userAgent, ipAddress)
+    VALUES (${campaignId}, ${email}, ${trackingId}, 'open', ${userAgent || null}, ${ipAddress || null})
+  `);
+}
+
+/**
+ * Email tıklanma olayı kaydet
+ */
+export async function recordEmailClick(trackingId: string, campaignId: number, email: string, linkUrl: string, userAgent?: string, ipAddress?: string) {
+  const db = await getDb();
+  if (!db) return;
+
+  await db.execute(sql`
+    INSERT INTO email_tracking_events (campaignId, recipientEmail, trackingId, eventType, linkUrl, userAgent, ipAddress)
+    VALUES (${campaignId}, ${email}, ${trackingId}, 'click', ${linkUrl}, ${userAgent || null}, ${ipAddress || null})
+  `);
+}
+
+/**
+ * Kampanya metrikleri getir (açılma ve tıklanma oranları)
+ */
+export async function getCampaignMetrics(campaignId: number) {
+  const db = await getDb();
+  if (!db) return { opens: 0, uniqueOpens: 0, clicks: 0, uniqueClicks: 0, openRate: 0, clickRate: 0 };
+
+  const metricsResult = await db.execute(sql`
+    SELECT
+      SUM(CASE WHEN eventType = 'open' THEN 1 ELSE 0 END) as totalOpens,
+      COUNT(DISTINCT CASE WHEN eventType = 'open' THEN recipientEmail END) as uniqueOpens,
+      SUM(CASE WHEN eventType = 'click' THEN 1 ELSE 0 END) as totalClicks,
+      COUNT(DISTINCT CASE WHEN eventType = 'click' THEN recipientEmail END) as uniqueClicks
+    FROM email_tracking_events
+    WHERE campaignId = ${campaignId}
+  `);
+
+  const metrics = (metricsResult as unknown as any[])[0]?.[0] || {};
+
+  // Kampanya alıcı sayısını al
+  const campaignResult = await db.execute(sql`
+    SELECT recipientCount FROM bulk_email_campaigns WHERE id = ${campaignId}
+  `);
+  const recipientCount = (campaignResult as unknown as any[])[0]?.[0]?.recipientCount || 0;
+
+  const uniqueOpens = Number(metrics.uniqueOpens || 0);
+  const uniqueClicks = Number(metrics.uniqueClicks || 0);
+
+  return {
+    opens: Number(metrics.totalOpens || 0),
+    uniqueOpens,
+    clicks: Number(metrics.totalClicks || 0),
+    uniqueClicks,
+    openRate: recipientCount > 0 ? Math.round((uniqueOpens / recipientCount) * 10000) / 100 : 0,
+    clickRate: recipientCount > 0 ? Math.round((uniqueClicks / recipientCount) * 10000) / 100 : 0,
+  };
+}
+
+/**
+ * Tüm kampanyaların metriklerini toplu getir
+ */
+export async function getAllCampaignMetrics() {
+  const db = await getDb();
+  if (!db) return [];
+
+  const rows = await db.execute(sql`
+    SELECT 
+      e.campaignId,
+      SUM(CASE WHEN e.eventType = 'open' THEN 1 ELSE 0 END) as totalOpens,
+      COUNT(DISTINCT CASE WHEN e.eventType = 'open' THEN e.recipientEmail END) as uniqueOpens,
+      SUM(CASE WHEN e.eventType = 'click' THEN 1 ELSE 0 END) as totalClicks,
+      COUNT(DISTINCT CASE WHEN e.eventType = 'click' THEN e.recipientEmail END) as uniqueClicks,
+      c.recipientCount
+    FROM email_tracking_events e
+    LEFT JOIN bulk_email_campaigns c ON e.campaignId = c.id
+    GROUP BY e.campaignId, c.recipientCount
+  `);
+
+  return ((rows as unknown as any[])[0] || []).map((row: any) => ({
+    campaignId: row.campaignId,
+    opens: Number(row.totalOpens || 0),
+    uniqueOpens: Number(row.uniqueOpens || 0),
+    clicks: Number(row.totalClicks || 0),
+    uniqueClicks: Number(row.uniqueClicks || 0),
+    openRate: row.recipientCount > 0 ? Math.round((Number(row.uniqueOpens || 0) / row.recipientCount) * 10000) / 100 : 0,
+    clickRate: row.recipientCount > 0 ? Math.round((Number(row.uniqueClicks || 0) / row.recipientCount) * 10000) / 100 : 0,
+  }));
 }

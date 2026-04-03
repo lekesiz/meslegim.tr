@@ -1,8 +1,8 @@
 import cron from 'node-cron';
-import { getDb, getPlatformSettingNumber } from '../db';
+import { getDb, getPlatformSettingNumber, getInactiveStudents, logInactivityNotification } from '../db';
 import { userStages, stages, users } from '../../drizzle/schema';
 import { eq, and, lt, gt, between } from 'drizzle-orm';
-import { sendEmail } from '../_core/resend-email';
+import { sendEmail, getInactivityReminderEmailTemplate } from '../_core/resend-email';
 import { getNewStageActivatedEmailTemplate, getStageReminderEmailTemplate } from './emailService';
 import { startReminderService } from './reminderService';
 import { sendScheduledKPIReport } from './scheduledReports';
@@ -208,6 +208,60 @@ export async function sendStageReminderEmails() {
 }
 
 /**
+ * Send daily inactivity reminder emails to students inactive for 7+ days
+ * Called automatically by cron job at 07:00 every day
+ */
+export async function sendDailyInactivityReminders() {
+  try {
+    const inactiveDays = await getPlatformSettingNumber('inactivity_reminder_days', 7);
+    if (inactiveDays <= 0) {
+      console.log('[Cron] Inactivity reminders disabled (inactivity_reminder_days = 0)');
+      return { total: 0, sentCount: 0, failCount: 0 };
+    }
+
+    const inactiveStudents = await getInactiveStudents(inactiveDays);
+    console.log(`[Cron] Found ${inactiveStudents.length} inactive students (${inactiveDays}+ days)`);
+
+    let sentCount = 0;
+    let failCount = 0;
+    const baseUrl = process.env.VITE_APP_URL || 'https://meslegim.tr';
+
+    for (const student of inactiveStudents) {
+      try {
+        const html = getInactivityReminderEmailTemplate(
+          student.name || 'De\u011ferli \u00d6\u011frenci',
+          Number(student.daysSinceLastActivity),
+          `${baseUrl}/dashboard`
+        );
+        const success = await sendEmail({
+          to: student.email,
+          subject: `Merhaba ${student.name || ''}, seni \u00f6zledik!`,
+          html,
+        });
+        await logInactivityNotification(student.id, Number(student.daysSinceLastActivity), success);
+        if (success) sentCount++;
+        else failCount++;
+      } catch (e) {
+        console.error(`[Cron] Inactivity reminder failed for user ${student.id}:`, e);
+        await logInactivityNotification(student.id, Number(student.daysSinceLastActivity), false);
+        failCount++;
+      }
+    }
+
+    console.log(`[Cron] Inactivity reminders complete: ${sentCount} sent, ${failCount} failed out of ${inactiveStudents.length}`);
+    return { total: inactiveStudents.length, sentCount, failCount };
+  } catch (error: any) {
+    const msg = error?.message || String(error);
+    if (msg.includes('ECONNRESET') || msg.includes('ETIMEDOUT')) {
+      console.warn('[Cron] DB ba\u011flant\u0131 hatas\u0131 (sendDailyInactivityReminders), sonraki d\u00f6ng\u00fcde tekrar denenecek');
+    } else {
+      console.error('[Cron] sendDailyInactivityReminders hatas\u0131:', msg);
+    }
+    return { total: 0, sentCount: 0, failCount: 0 };
+  }
+}
+
+/**
  * Initialize cron jobs
  * Stage activation: daily at 00:00 (midnight)
  * Reminder emails: daily at 09:00 (morning)
@@ -243,7 +297,13 @@ export function initializeCronJobs() {
     await runDailyAnomalyCheck();
   });
 
-  console.log('[Cron] Cron jobs initialized (activation at 00:00, reminders at 09:00, anomaly check at 07:00, weekly report Mon 08:00, monthly report 1st 08:00)');
+  // Daily inactivity reminder: every day at 07:00 (TR time)
+  cron.schedule('0 7 * * *', async () => {
+    console.log('[Cron] Running daily inactivity reminder emails...');
+    await sendDailyInactivityReminders();
+  });
+
+  console.log('[Cron] Cron jobs initialized (activation at 00:00, reminders at 09:00, anomaly check at 07:00, inactivity reminders at 07:00, weekly report Mon 08:00, monthly report 1st 08:00)');
 
   // Run activation once on startup
   setTimeout(() => {
