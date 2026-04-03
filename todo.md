@@ -1679,5 +1679,5 @@ Platform **minimum seviyede sağlıklı** çalışıyor. Tüm temel özellikler 
 ### Doğrulama ve Deploy
 - [x] TypeScript doğrulama (0 hata)
 - [x] Vitest testleri yaz ve çalıştır (25 dosya, 365 test, hepsi geçti)
-- [ ] GitHub'a push et
-- [ ] Checkpoint kaydet
+- [x] GitHub'a push et (4b6e85d)
+- [x] Checkpoint kaydet
