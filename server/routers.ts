@@ -1508,6 +1508,125 @@ export const appRouter = router({
         const end = input?.endDate ? new Date(input.endDate) : undefined;
         return await db.getStageCompletionTrend(input?.weeks ?? 12, start, end);
       }),
+
+    // ==================== Hareketsizlik Uyarıları ====================
+    getInactiveStudents: adminProcedure
+      .input(z.object({ inactiveDays: z.number().min(1).max(365).optional() }).optional())
+      .query(async ({ input }) => {
+        return await db.getInactiveStudents(input?.inactiveDays || 7);
+      }),
+
+    sendInactivityReminders: adminProcedure
+      .input(z.object({ inactiveDays: z.number().min(1).max(365).optional() }).optional())
+      .mutation(async ({ input, ctx }) => {
+        const { getInactivityReminderEmailTemplate } = await import('./_core/resend-email');
+        const inactiveStudents = await db.getInactiveStudents(input?.inactiveDays || 7);
+        let sentCount = 0;
+        let failCount = 0;
+        const baseUrl = getBaseUrl(ctx.req);
+
+        for (const student of inactiveStudents) {
+          try {
+            const html = getInactivityReminderEmailTemplate(
+              student.name || 'Değerli Öğrenci',
+              Number(student.daysSinceLastActivity),
+              `${baseUrl}/dashboard`
+            );
+            const success = await sendEmail({
+              to: student.email,
+              subject: `Merhaba ${student.name || ''}, seni özledik!`,
+              html,
+            });
+            await db.logInactivityNotification(student.id, Number(student.daysSinceLastActivity), success);
+            if (success) sentCount++;
+            else failCount++;
+          } catch (e) {
+            console.error(`[InactivityReminder] Failed for user ${student.id}:`, e);
+            await db.logInactivityNotification(student.id, Number(student.daysSinceLastActivity), false);
+            failCount++;
+          }
+        }
+
+        return { total: inactiveStudents.length, sentCount, failCount };
+      }),
+
+    getInactivityNotificationHistory: adminProcedure
+      .input(z.object({ limit: z.number().optional(), offset: z.number().optional() }).optional())
+      .query(async ({ input }) => {
+        return await db.getInactivityNotificationHistory(input?.limit || 50, input?.offset || 0);
+      }),
+
+    // ==================== Toplu Email Kampanyaları ====================
+    getSegmentCounts: adminProcedure.query(async () => {
+      return await db.getSegmentCounts();
+    }),
+
+    getUsersBySegment: adminProcedure
+      .input(z.object({ segment: z.string() }))
+      .query(async ({ input }) => {
+        const users = await db.getUsersBySegment(input.segment);
+        return { users, count: users.length };
+      }),
+
+    sendBulkCampaignEmail: adminProcedure
+      .input(z.object({
+        subject: z.string().min(1).max(500),
+        htmlContent: z.string().min(1),
+        segment: z.string(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const { getBulkCampaignEmailTemplate } = await import('./_core/resend-email');
+        const recipients = await db.getUsersBySegment(input.segment);
+        if (recipients.length === 0) {
+          throw new TRPCError({ code: 'BAD_REQUEST', message: 'Seçilen segmentte kullanıcı bulunamadı' });
+        }
+
+        const campaignId = await db.createBulkEmailCampaign(
+          ctx.user.id, input.subject, input.htmlContent, input.segment, recipients.length
+        );
+        if (!campaignId) {
+          throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Kampanya oluşturulamadı' });
+        }
+
+        let sentCount = 0;
+        let failedCount = 0;
+        const wrappedHtml = getBulkCampaignEmailTemplate(input.htmlContent);
+
+        for (const recipient of recipients) {
+          try {
+            const personalizedHtml = wrappedHtml.replace(/\{\{name\}\}/g, recipient.name || 'Değerli Kullanıcı');
+            const success = await sendEmail({
+              to: recipient.email,
+              subject: input.subject.replace(/\{\{name\}\}/g, recipient.name || 'Değerli Kullanıcı'),
+              html: personalizedHtml,
+            });
+            if (success) sentCount++;
+            else failedCount++;
+          } catch (e) {
+            console.error(`[BulkEmail] Failed for ${recipient.email}:`, e);
+            failedCount++;
+          }
+        }
+
+        const status = failedCount === recipients.length ? 'failed' : 'completed';
+        await db.updateCampaignStatus(campaignId, sentCount, failedCount, status);
+
+        await db.logActivity({
+          userId: ctx.user.id,
+          action: 'bulk_email.send',
+          entityType: 'campaign',
+          entityId: campaignId,
+          details: { segment: input.segment, sentCount, failedCount },
+        });
+
+        return { campaignId, total: recipients.length, sentCount, failedCount, status };
+      }),
+
+    getBulkEmailCampaigns: adminProcedure
+      .input(z.object({ limit: z.number().optional(), offset: z.number().optional() }).optional())
+      .query(async ({ input }) => {
+        return await db.getBulkEmailCampaigns(input?.limit || 20, input?.offset || 0);
+      }),
   }),
 
   // Mentor procedures

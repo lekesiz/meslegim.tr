@@ -1,6 +1,6 @@
 import { eq, and, or, desc, inArray, gte, lte } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, stages, questions, answers, userStages, reports, mentorNotes, messages, feedbacks, certificates, platformSettings, stageUnlockLogs, notifications, pilotFeedbacks, purchases, schools, schoolMentors, promotionCodes, promotionCodeUsages, activityLogs, csvExportLogs, kpiAnomalies, adminWidgetPreferences } from "../drizzle/schema";
+import { InsertUser, users, stages, questions, answers, userStages, reports, mentorNotes, messages, feedbacks, certificates, platformSettings, stageUnlockLogs, notifications, pilotFeedbacks, purchases, schools, schoolMentors, promotionCodes, promotionCodeUsages, activityLogs, csvExportLogs, kpiAnomalies, adminWidgetPreferences, inactivityNotifications, bulkEmailCampaigns } from "../drizzle/schema";
 import { ENV } from './_core/env';
 import { sql } from 'drizzle-orm';
 
@@ -3810,4 +3810,220 @@ export async function saveWidgetPreferences(userId: number, layout: WidgetConfig
       INSERT INTO admin_widget_preferences (userId, widgetLayout) VALUES (${userId}, ${layoutJson})
     `);
   }
+}
+
+
+// ==================== Hareketsizlik Uyarıları ====================
+
+/**
+ * 7+ gün hareketsiz öğrencileri tespit et
+ * Son 24 saat içinde zaten bildirim gönderilmemiş olanları döndür
+ */
+export async function getInactiveStudents(inactiveDays: number = 7) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const rows = await db.execute(sql`
+    SELECT u.id, u.name, u.email, u.lastSignedIn,
+           DATEDIFF(NOW(), u.lastSignedIn) as daysSinceLastActivity
+    FROM users u
+    WHERE u.role = 'student'
+      AND u.status = 'active'
+      AND u.email IS NOT NULL
+      AND u.lastSignedIn < DATE_SUB(NOW(), INTERVAL ${inactiveDays} DAY)
+      AND u.id NOT IN (
+        SELECT n.userId FROM inactivity_notifications n
+        WHERE n.emailSentAt > DATE_SUB(NOW(), INTERVAL 7 DAY)
+          AND n.success = 1
+      )
+    ORDER BY u.lastSignedIn ASC
+    LIMIT 100
+  `);
+
+  return (rows as unknown as any[])[0] || [];
+}
+
+/**
+ * Hareketsizlik bildirimi kaydı oluştur
+ */
+export async function logInactivityNotification(userId: number, inactiveDays: number, success: boolean, emailType: string = 'reminder') {
+  const db = await getDb();
+  if (!db) return;
+
+  await db.execute(sql`
+    INSERT INTO inactivity_notifications (userId, inactiveDays, emailType, success)
+    VALUES (${userId}, ${inactiveDays}, ${emailType}, ${success})
+  `);
+}
+
+/**
+ * Hareketsizlik bildirim geçmişini getir (admin için)
+ */
+export async function getInactivityNotificationHistory(limit: number = 50, offset: number = 0) {
+  const db = await getDb();
+  if (!db) return { notifications: [], total: 0 };
+
+  const countResult = await db.execute(sql`
+    SELECT COUNT(*) as total FROM inactivity_notifications
+  `);
+  const total = ((countResult as unknown as any[])[0]?.[0]?.total) || 0;
+
+  const rows = await db.execute(sql`
+    SELECT n.*, u.name as userName, u.email as userEmail
+    FROM inactivity_notifications n
+    LEFT JOIN users u ON n.userId = u.id
+    ORDER BY n.createdAt DESC
+    LIMIT ${limit} OFFSET ${offset}
+  `);
+
+  return {
+    notifications: (rows as unknown as any[])[0] || [],
+    total: Number(total),
+  };
+}
+
+// ==================== Toplu Email Kampanyaları ====================
+
+/**
+ * Segment bazlı kullanıcı listesi getir
+ */
+export async function getUsersBySegment(segment: string) {
+  const db = await getDb();
+  if (!db) return [];
+
+  let query;
+  switch (segment) {
+    case 'active':
+      query = sql`
+        SELECT id, name, email FROM users
+        WHERE status = 'active' AND email IS NOT NULL
+          AND lastSignedIn > DATE_SUB(NOW(), INTERVAL 7 DAY)
+      `;
+      break;
+    case 'inactive':
+      query = sql`
+        SELECT id, name, email FROM users
+        WHERE status = 'active' AND email IS NOT NULL
+          AND lastSignedIn < DATE_SUB(NOW(), INTERVAL 30 DAY)
+      `;
+      break;
+    case 'trial':
+      query = sql`
+        SELECT id, name, email FROM users
+        WHERE status = 'active' AND email IS NOT NULL
+          AND (purchasedPackage IS NULL OR purchasedPackage = '')
+      `;
+      break;
+    case 'premium':
+      query = sql`
+        SELECT id, name, email FROM users
+        WHERE status = 'active' AND email IS NOT NULL
+          AND purchasedPackage IS NOT NULL AND purchasedPackage != ''
+      `;
+      break;
+    case 'pending':
+      query = sql`
+        SELECT id, name, email FROM users
+        WHERE status = 'pending' AND email IS NOT NULL
+      `;
+      break;
+    case 'all':
+    default:
+      query = sql`
+        SELECT id, name, email FROM users
+        WHERE email IS NOT NULL AND status IN ('active', 'pending')
+      `;
+      break;
+  }
+
+  const rows = await db.execute(query);
+  return (rows as unknown as any[])[0] || [];
+}
+
+/**
+ * Segment bazlı kullanıcı sayısını getir
+ */
+export async function getSegmentCounts() {
+  const db = await getDb();
+  if (!db) return {};
+
+  const rows = await db.execute(sql`
+    SELECT
+      COUNT(*) as total,
+      SUM(CASE WHEN status = 'active' AND lastSignedIn > DATE_SUB(NOW(), INTERVAL 7 DAY) THEN 1 ELSE 0 END) as active,
+      SUM(CASE WHEN status = 'active' AND lastSignedIn < DATE_SUB(NOW(), INTERVAL 30 DAY) THEN 1 ELSE 0 END) as inactive,
+      SUM(CASE WHEN status = 'active' AND (purchasedPackage IS NULL OR purchasedPackage = '') THEN 1 ELSE 0 END) as trial,
+      SUM(CASE WHEN status = 'active' AND purchasedPackage IS NOT NULL AND purchasedPackage != '' THEN 1 ELSE 0 END) as premium,
+      SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending
+    FROM users
+    WHERE email IS NOT NULL
+  `);
+
+  const data = (rows as unknown as any[])[0]?.[0] || {};
+  return {
+    total: Number(data.total || 0),
+    active: Number(data.active || 0),
+    inactive: Number(data.inactive || 0),
+    trial: Number(data.trial || 0),
+    premium: Number(data.premium || 0),
+    pending: Number(data.pending || 0),
+  };
+}
+
+/**
+ * Toplu email kampanyası oluştur
+ */
+export async function createBulkEmailCampaign(adminId: number, subject: string, htmlContent: string, segment: string, recipientCount: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const result = await db.execute(sql`
+    INSERT INTO bulk_email_campaigns (adminId, subject, htmlContent, segment, recipientCount, campaignStatus)
+    VALUES (${adminId}, ${subject}, ${htmlContent}, ${segment}, ${recipientCount}, 'sending')
+  `);
+
+  const insertId = (result as unknown as any[])[0]?.insertId;
+  return insertId ? Number(insertId) : null;
+}
+
+/**
+ * Kampanya durumunu güncelle
+ */
+export async function updateCampaignStatus(campaignId: number, sentCount: number, failedCount: number, status: string) {
+  const db = await getDb();
+  if (!db) return;
+
+  await db.execute(sql`
+    UPDATE bulk_email_campaigns
+    SET sentCount = ${sentCount}, failedCount = ${failedCount}, campaignStatus = ${status},
+        completedAt = ${status === 'completed' || status === 'failed' ? sql`NOW()` : sql`NULL`},
+        sentAt = COALESCE(sentAt, NOW())
+    WHERE id = ${campaignId}
+  `);
+}
+
+/**
+ * Kampanya listesini getir (admin için)
+ */
+export async function getBulkEmailCampaigns(limit: number = 20, offset: number = 0) {
+  const db = await getDb();
+  if (!db) return { campaigns: [], total: 0 };
+
+  const countResult = await db.execute(sql`
+    SELECT COUNT(*) as total FROM bulk_email_campaigns
+  `);
+  const total = ((countResult as unknown as any[])[0]?.[0]?.total) || 0;
+
+  const rows = await db.execute(sql`
+    SELECT c.*, u.name as adminName
+    FROM bulk_email_campaigns c
+    LEFT JOIN users u ON c.adminId = u.id
+    ORDER BY c.createdAt DESC
+    LIMIT ${limit} OFFSET ${offset}
+  `);
+
+  return {
+    campaigns: (rows as unknown as any[])[0] || [],
+    total: Number(total),
+  };
 }

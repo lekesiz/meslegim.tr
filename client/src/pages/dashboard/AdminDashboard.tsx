@@ -39,6 +39,7 @@ import { AdminActivityFeed } from '@/components/admin/AdminActivityFeed';
 import ActiveUsersWidget from '@/components/admin/ActiveUsersWidget';
 import AnomalyHistory from '@/components/admin/AnomalyHistory';
 import UserJourneyMap from '@/components/admin/UserJourneyMap';
+import BulkEmailCampaigns from '@/pages/admin/BulkEmailCampaigns';
 
 export default function AdminDashboard() {
   const { user } = useAuth();
@@ -213,6 +214,10 @@ export default function AdminDashboard() {
               <Mail className="h-4 w-4 mr-2" />
               Otomatik Raporlama
             </TabsTrigger>
+            <TabsTrigger value="email-campaigns">
+              <Mail className="h-4 w-4 mr-2" />
+              Email Kampanyaları
+            </TabsTrigger>
             <TabsTrigger value="platform-settings">
               <Settings className="h-4 w-4 mr-2" />
               Platform Ayarları
@@ -299,6 +304,10 @@ export default function AdminDashboard() {
 
           <TabsContent value="scheduled-reports">
             <ScheduledReports />
+          </TabsContent>
+
+          <TabsContent value="email-campaigns">
+            <BulkEmailCampaigns />
           </TabsContent>
 
           {/* Platform Settings Tab */}

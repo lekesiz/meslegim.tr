@@ -1,6 +1,12 @@
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+let _resend: Resend | null = null;
+function getResend(): Resend {
+  if (!_resend) {
+    _resend = new Resend(process.env.RESEND_API_KEY || 'dummy_key_for_init');
+  }
+  return _resend;
+}
 
 export interface EmailOptions {
   to: string;
@@ -10,7 +16,7 @@ export interface EmailOptions {
 
 export async function sendEmail(options: EmailOptions): Promise<boolean> {
   try {
-    const { data, error } = await resend.emails.send({
+    const { data, error } = await getResend().emails.send({
       from: 'Meslegim.tr <noreply@meslegim.tr>',
       to: options.to,
       subject: options.subject,
@@ -335,6 +341,91 @@ export function getCertificateReadyEmailTemplate(name: string, certificateUrl: s
           <div class="footer">
             <p>Bu e-posta Meslegim.tr tarafından otomatik olarak gönderilmiştir.</p>
             <p>© 2026 Meslegim.tr - Tüm hakları saklıdır.</p>
+          </div>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+}
+
+
+export function getInactivityReminderEmailTemplate(name: string, daysInactive: number, dashboardUrl: string): string {
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); color: white; padding: 30px 20px; text-align: center; border-radius: 8px 8px 0 0; }
+        .logo { width: 60px; height: 60px; margin: 0 auto 15px; }
+        .content { padding: 30px; background: #f9fafb; border-radius: 0 0 8px 8px; }
+        .button { display: inline-block; padding: 14px 28px; background: #6366f1; color: white; text-decoration: none; border-radius: 8px; margin: 20px 0; font-weight: bold; font-size: 16px; }
+        .highlight { background: #eef2ff; border-left: 4px solid #6366f1; padding: 15px; margin: 20px 0; border-radius: 4px; }
+        .footer { text-align: center; margin-top: 20px; color: #6b7280; font-size: 14px; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310419663028218705/cDCfxYGTnZmArwPn.png" alt="Meslegim.tr Logo" class="logo" />
+          <h1 style="margin: 0;">Seni \u00d6zledik!</h1>
+        </div>
+        <div class="content">
+          <h2>Merhaba ${name},</h2>
+          <p>Seni \u00f6zledik! <strong>${daysInactive} g\u00fcnd\u00fcr</strong> platformumuza u\u011framad\u0131\u011f\u0131n\u0131 fark ettik.</p>
+          <div class="highlight">
+            <p><strong>Kald\u0131\u011f\u0131n yerden devam et!</strong></p>
+            <p>Kariyer de\u011ferlendirme s\u00fcrecin seni bekliyor. Her etap, gelece\u011fin i\u00e7in \u00f6nemli bir ad\u0131m.</p>
+          </div>
+          <p>Platformumuzda seni bekleyen \u00f6zellikler:</p>
+          <ul>
+            <li>AI destekli ki\u015fisel kariyer analizi</li>
+            <li>9 a\u015famal\u0131 kapsaml\u0131 de\u011ferlendirme</li>
+            <li>Ki\u015fiselle\u015ftirilmi\u015f kariyer \u00f6nerileri</li>
+          </ul>
+          <p style="text-align: center;">
+            <a href="${dashboardUrl}" class="button">Devam Et</a>
+          </p>
+          <div class="footer">
+            <p>Bu e-posta Meslegim.tr taraf\u0131ndan otomatik olarak g\u00f6nderilmi\u015ftir.</p>
+            <p>\u00a9 2026 Meslegim.tr - T\u00fcm haklar\u0131 sakl\u0131d\u0131r.</p>
+          </div>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+}
+
+export function getBulkCampaignEmailTemplate(content: string): string {
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); color: white; padding: 30px 20px; text-align: center; border-radius: 8px 8px 0 0; }
+        .logo { width: 60px; height: 60px; margin: 0 auto 15px; }
+        .content { padding: 30px; background: #f9fafb; border-radius: 0 0 8px 8px; }
+        .footer { text-align: center; margin-top: 20px; color: #6b7280; font-size: 14px; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310419663028218705/cDCfxYGTnZmArwPn.png" alt="Meslegim.tr Logo" class="logo" />
+          <h1 style="margin: 0;">Meslegim.tr</h1>
+        </div>
+        <div class="content">
+          ${content}
+          <div class="footer">
+            <p>Bu e-posta Meslegim.tr taraf\u0131ndan g\u00f6nderilmi\u015ftir.</p>
+            <p>\u00a9 2026 Meslegim.tr - T\u00fcm haklar\u0131 sakl\u0131d\u0131r.</p>
           </div>
         </div>
       </div>

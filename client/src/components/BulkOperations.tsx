@@ -16,7 +16,7 @@ export function BulkOperations() {
   
   const sendBulkEmail = trpc.admin.sendBulkEmail.useMutation({
     onSuccess: (data) => {
-      toast.success(`Email gönderimi tamamlandı! ${data.successCount} başarılı, ${data.failCount} başarısız`);
+      toast.success(`Email gönderimi tamamlandı! ${data.successCount} başarılı, ${data.failCount} başarısız`, { duration: 5000 });
       setEmailSubject('');
       setEmailMessage('');
     },

@@ -1,0 +1,27 @@
+CI/CD Pipeline Status (Session 16 Check):
+
+Session 15 commit (a21d71d):
+- CD (Deployment) #6: PASSED (44s) ✅
+- CI #6: FAILED (3m 18s) ❌
+
+CI #6 Job Details:
+- Lint & Type Check: PASSED ✅ (43s)
+- Unit Tests: FAILED ❌ (25s)
+- Build Verification: SKIPPED (depends on Lint & Type Check)
+- E2E Tests: FAILED ❌ (3m 14s)
+- Security Audit: FAILED ❌ (12s)
+
+ROOT CAUSE (All failures):
+All test failures are caused by the same issue:
+"Missing API key. Pass it to the constructor `new Resend("re_123")`"
+at server/_core/resend-email.ts:3:16
+at server/routers.ts:12:32
+
+The Resend email client is initialized at module import time in resend-email.ts,
+which requires the RESEND_API_KEY environment variable.
+In CI, this env var is not set, causing all tests to fail.
+
+FIX: Need to either:
+1. Add RESEND_API_KEY to CI secrets, OR
+2. Make Resend initialization lazy (only when actually sending emails), OR
+3. Mock the Resend module in test setup
