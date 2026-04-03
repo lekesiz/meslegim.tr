@@ -1681,3 +1681,28 @@ Platform **minimum seviyede sağlıklı** çalışıyor. Tüm temel özellikler 
 - [x] Vitest testleri yaz ve çalıştır (25 dosya, 365 test, hepsi geçti)
 - [x] GitHub'a push et (4b6e85d)
 - [x] Checkpoint kaydet
+
+## Session 17 — Cron Job, Email Tracking, Kampanya Metrikleri
+
+### Zamanlanmış Cron Job (Günlük 07:00)
+- [x] node-cron entegrasyonu (server başlangıcında cron job başlat)
+- [x] Günlük 07:00'da otomatik hareketsizlik uyarısı gönderimi (sendDailyInactivityReminders)
+- [x] Cron job çalışma logları (son çalışma zamanı, gönderilen email sayısı, platform_settings ile konfigüre edilebilir)
+
+### Email Açılma/Tıklanma Takibi
+- [x] Veritabanı: email_tracking_events tablosu (campaign_id, event_type, email, timestamp, userAgent, ipAddress)
+- [x] Backend: Pixel tracking endpoint (/api/track/open/:trackingId) - 1x1 şeffaf GIF pixel
+- [x] Backend: Link redirect endpoint (/api/track/click/:trackingId) - UTM parametreli yönlendirme
+- [x] Email şablonlarına tracking pixel ve UTM linkler otomatik enjekte (sendBulkCampaignEmail)
+- [x] Backend: encodeTrackingData/parseTrackingData (base64url encoding)
+
+### Kampanya Performans Metrikleri
+- [x] Backend: getCampaignMetrics + getAllCampaignMetrics prosédürleri (açılma oranı %, tıklanma oranı %)
+- [x] Frontend: BulkEmailCampaigns kampanya geçmişine performans metrikleri eklendi
+- [x] Her kampanya için açılma oranı (Eye icon) ve tıklanma oranı (MousePointerClick icon) gösterimi
+
+### Doğrulama ve Deploy
+- [x] TypeScript doğrulama (0 hata)
+- [x] Vitest testleri yaz ve çalıştır (26 dosya, 385 test, hepsi geçti)
+- [ ] GitHub'a push et
+- [ ] Checkpoint kaydet

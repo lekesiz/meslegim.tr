@@ -1576,29 +1576,47 @@ export const appRouter = router({
       }))
       .mutation(async ({ input, ctx }) => {
         const { getBulkCampaignEmailTemplate } = await import('./_core/resend-email');
+        const { getTrackingPixelUrl, getTrackedLinkUrl } = await import('./emailTracking');
         const recipients = await db.getUsersBySegment(input.segment);
         if (recipients.length === 0) {
-          throw new TRPCError({ code: 'BAD_REQUEST', message: 'Seçilen segmentte kullanıcı bulunamadı' });
+          throw new TRPCError({ code: 'BAD_REQUEST', message: 'Se\u00e7ilen segmentte kullan\u0131c\u0131 bulunamad\u0131' });
         }
 
         const campaignId = await db.createBulkEmailCampaign(
           ctx.user.id, input.subject, input.htmlContent, input.segment, recipients.length
         );
         if (!campaignId) {
-          throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Kampanya oluşturulamadı' });
+          throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Kampanya olu\u015fturulamad\u0131' });
         }
 
+        const baseUrl = getBaseUrl(ctx.req);
         let sentCount = 0;
         let failedCount = 0;
-        const wrappedHtml = getBulkCampaignEmailTemplate(input.htmlContent);
 
         for (const recipient of recipients) {
           try {
-            const personalizedHtml = wrappedHtml.replace(/\{\{name\}\}/g, recipient.name || 'Değerli Kullanıcı');
+            let personalizedContent = input.htmlContent.replace(/\{\{name\}\}/g, recipient.name || 'De\u011ferli Kullan\u0131c\u0131');
+            
+            // Replace links with tracked versions
+            personalizedContent = personalizedContent.replace(
+              /href="(https?:\/\/[^"]+)"/g,
+              (match: string, url: string) => {
+                const trackedUrl = getTrackedLinkUrl(baseUrl, campaignId, recipient.email, url);
+                return `href="${trackedUrl}"`;
+              }
+            );
+
+            const wrappedHtml = getBulkCampaignEmailTemplate(personalizedContent);
+            
+            // Add tracking pixel before closing </body> tag
+            const pixelUrl = getTrackingPixelUrl(baseUrl, campaignId, recipient.email);
+            const trackingPixel = `<img src="${pixelUrl}" width="1" height="1" style="display:none;" alt="" />`;
+            const finalHtml = wrappedHtml.replace('</body>', `${trackingPixel}</body>`);
+
             const success = await sendEmail({
               to: recipient.email,
-              subject: input.subject.replace(/\{\{name\}\}/g, recipient.name || 'Değerli Kullanıcı'),
-              html: personalizedHtml,
+              subject: input.subject.replace(/\{\{name\}\}/g, recipient.name || 'De\u011ferli Kullan\u0131c\u0131'),
+              html: finalHtml,
             });
             if (success) sentCount++;
             else failedCount++;
@@ -1626,6 +1644,17 @@ export const appRouter = router({
       .input(z.object({ limit: z.number().optional(), offset: z.number().optional() }).optional())
       .query(async ({ input }) => {
         return await db.getBulkEmailCampaigns(input?.limit || 20, input?.offset || 0);
+      }),
+
+    getCampaignMetrics: adminProcedure
+      .input(z.object({ campaignId: z.number() }))
+      .query(async ({ input }) => {
+        return await db.getCampaignMetrics(input.campaignId);
+      }),
+
+    getAllCampaignMetrics: adminProcedure
+      .query(async () => {
+        return await db.getAllCampaignMetrics();
       }),
   }),
 

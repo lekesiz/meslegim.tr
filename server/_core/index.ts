@@ -9,6 +9,7 @@ import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 import { initializeCronJobs } from "../services/cronJobs";
 import { registerStripeWebhook } from "../stripeWebhook";
+import { registerEmailTrackingRoutes } from "../emailTracking";
 import helmet from "helmet";
 import cors from "cors";
 import { rateLimit } from "express-rate-limit";
@@ -110,6 +111,9 @@ async function startServer() {
 
   // Stripe webhook MUST be registered BEFORE body parsers (needs raw body)
   registerStripeWebhook(app);
+
+  // Email tracking routes (pixel + click redirect) - before body parsers for performance
+  registerEmailTrackingRoutes(app);
 
   // Configure body parser with larger size limit for file uploads
   app.use(express.json({ limit: "50mb" }));

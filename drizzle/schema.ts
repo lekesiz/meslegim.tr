@@ -641,3 +641,25 @@ export const bulkEmailCampaigns = mysqlTable("bulk_email_campaigns", {
 }));
 export type BulkEmailCampaign = typeof bulkEmailCampaigns.$inferSelect;
 export type InsertBulkEmailCampaign = typeof bulkEmailCampaigns.$inferInsert;
+
+/**
+ * Email tracking events - tracks opens and clicks for campaign emails
+ */
+export const emailTrackingEvents = mysqlTable("email_tracking_events", {
+  id: int("id").autoincrement().primaryKey(),
+  campaignId: int("campaignId").notNull(),
+  recipientEmail: varchar("recipientEmail", { length: 320 }).notNull(),
+  trackingId: varchar("trackingId", { length: 64 }).notNull().unique(), // hash(campaignId + email)
+  eventType: mysqlEnum("eventType", ["open", "click"]).notNull(),
+  linkUrl: text("linkUrl"), // original URL for click events
+  userAgent: text("userAgent"),
+  ipAddress: varchar("ipAddress", { length: 45 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+  campaignIdIdx: index("ete_campaign_id_idx").on(table.campaignId),
+  trackingIdIdx: index("ete_tracking_id_idx").on(table.trackingId),
+  eventTypeIdx: index("ete_event_type_idx").on(table.eventType),
+  recipientIdx: index("ete_recipient_idx").on(table.recipientEmail),
+}));
+export type EmailTrackingEvent = typeof emailTrackingEvents.$inferSelect;
+export type InsertEmailTrackingEvent = typeof emailTrackingEvents.$inferInsert;
