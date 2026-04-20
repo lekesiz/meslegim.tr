@@ -1,7 +1,13 @@
 import { Resend } from 'resend';
 
-// Resend API configuration
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Resend API configuration - lazy initialization to avoid CI failures
+let _resend: Resend | null = null;
+function getResend(): Resend {
+  if (!_resend) {
+    _resend = new Resend(process.env.RESEND_API_KEY || 'dummy_key_for_init');
+  }
+  return _resend;
+}
 
 // Email from address - use verified domain or fallback to Resend test
 const FROM_EMAIL = process.env.EMAIL_FROM || 'Meslegim.tr <bilgi@meslegim.tr>';
@@ -17,7 +23,7 @@ interface EmailTemplate {
  */
 export async function sendEmail(options: EmailTemplate): Promise<boolean> {
   try {
-    const { data, error } = await resend.emails.send({
+    const { data, error } = await getResend().emails.send({
       from: FROM_EMAIL,
       to: [options.to],
       subject: options.subject,
