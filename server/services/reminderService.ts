@@ -8,6 +8,7 @@ import { getDb } from '../db';
 import { userStages, users, stages, scheduledReminders } from '../../drizzle/schema';
 import { eq, and, ne, lte, isNull, sql } from 'drizzle-orm';
 import { notify } from './notificationService';
+import logger from '../utils/logger';
 
 const REMINDER_INTERVAL_MS = 60 * 60 * 1000; // Check every hour
 const STAGE_INACTIVE_DAYS = 3; // Send reminder after 3 days of inactivity
@@ -122,14 +123,14 @@ export async function checkAndCreateReminders() {
   } catch (err: any) {
     const errMsg = err?.message || String(err);
     if (errMsg.includes('ECONNRESET') || errMsg.includes('PROTOCOL_CONNECTION_LOST') || errMsg.includes('ETIMEDOUT')) {
-      console.warn('[ReminderService] DB ba\u011flant\u0131 hatas\u0131, sonraki d\u00f6ng\u00fcde tekrar denenecek');
+      logger.warn('[ReminderService] DB ba\u011flant\u0131 hatas\u0131, sonraki d\u00f6ng\u00fcde tekrar denenecek');
     } else {
-      console.error('[ReminderService] Beklenmeyen hata:', errMsg);
+      logger.error('[ReminderService] Beklenmeyen hata:', errMsg);
     }
   }
 
   if (created > 0) {
-    console.log(`[ReminderService] Created ${created} stage reminders`);
+    logger.info(`[ReminderService] Created ${created} stage reminders`);
   }
 
   return { created };
@@ -140,11 +141,11 @@ export async function checkAndCreateReminders() {
  */
 export function startReminderService() {
   if (reminderTimer) {
-    console.log('[ReminderService] Already running');
+    logger.info('[ReminderService] Already running');
     return;
   }
 
-  console.log(`[ReminderService] Starting (check every ${REMINDER_INTERVAL_MS / 1000 / 60} minutes)`);
+  logger.info(`[ReminderService] Starting (check every ${REMINDER_INTERVAL_MS / 1000 / 60} minutes)`);
 
   // Initial check after 5 minutes (let server warm up)
   setTimeout(() => {
@@ -164,6 +165,6 @@ export function stopReminderService() {
   if (reminderTimer) {
     clearInterval(reminderTimer);
     reminderTimer = null;
-    console.log('[ReminderService] Stopped');
+    logger.info('[ReminderService] Stopped');
   }
 }

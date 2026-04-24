@@ -1,5 +1,6 @@
 import { Express, Request, Response } from 'express';
 import { recordEmailOpen, recordEmailClick } from './db';
+import logger from './utils/logger';
 
 // 1x1 transparent GIF pixel (43 bytes)
 const TRANSPARENT_PIXEL = Buffer.from(
@@ -71,10 +72,10 @@ export function registerEmailTrackingRoutes(app: Express) {
           data.email,
           userAgent,
           ipAddress
-        ).catch(err => console.error('[EmailTracking] Open record error:', err));
+        ).catch(err => logger.error('[EmailTracking] Open record error:', err));
       }
     } catch (err) {
-      console.error('[EmailTracking] Open tracking error:', err);
+      logger.error('[EmailTracking] Open tracking error:', err);
     }
 
     // Always return the pixel regardless of tracking success
@@ -104,7 +105,7 @@ export function registerEmailTrackingRoutes(app: Express) {
           data.linkUrl,
           userAgent,
           ipAddress
-        ).catch(err => console.error('[EmailTracking] Click record error:', err));
+        ).catch(err => logger.error('[EmailTracking] Click record error:', err));
 
         // Add UTM parameters to the original URL
         const url = new URL(data.linkUrl);
@@ -115,12 +116,12 @@ export function registerEmailTrackingRoutes(app: Express) {
         return res.redirect(302, url.toString());
       }
     } catch (err) {
-      console.error('[EmailTracking] Click tracking error:', err);
+      logger.error('[EmailTracking] Click tracking error:', err);
     }
 
     // Fallback redirect to homepage
     res.redirect(302, '/');
   });
 
-  console.log('[EmailTracking] Tracking routes registered (/api/track/open/:id, /api/track/click/:id)');
+  logger.info('[EmailTracking] Tracking routes registered (/api/track/open/:id, /api/track/click/:id)');
 }

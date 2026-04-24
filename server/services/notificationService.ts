@@ -7,6 +7,7 @@ import { getDb } from '../db';
 import { pushSubscriptions, emailPreferences, notifications, scheduledReminders, users, stages as stagesTable } from '../../drizzle/schema';
 import { eq, and, lte, sql } from 'drizzle-orm';
 import { sendEmail } from '../_core/resend-email';
+import logger from '../utils/logger';
 
 // VAPID configuration
 const VAPID_PUBLIC_KEY = process.env.VAPID_PUBLIC_KEY || '';
@@ -96,7 +97,7 @@ export async function sendPushNotification(userId: number, payload: {
   tag?: string;
 }) {
   if (!VAPID_PUBLIC_KEY || !VAPID_PRIVATE_KEY) {
-    console.warn('VAPID keys not configured, skipping push notification');
+    logger.warn('VAPID keys not configured, skipping push notification');
     return { sent: 0, failed: 0 };
   }
 
@@ -130,7 +131,7 @@ export async function sendPushNotification(userId: number, payload: {
         const db = await getDb();
         if (db) await db.delete(pushSubscriptions).where(eq(pushSubscriptions.id, sub.id));
       }
-      console.error(`Push notification failed for sub ${sub.id}:`, error.message);
+      logger.error(`Push notification failed for sub ${sub.id}:`, error.message);
     }
   }
 
@@ -184,7 +185,7 @@ export async function notify(options: NotifyOptions) {
     });
     results.inApp = true;
   } catch (err) {
-    console.error('In-app notification failed:', err);
+    logger.error('In-app notification failed:', err);
   }
 
   // 2. E-posta bildirimi (kullanıcı tercihine göre)
@@ -205,7 +206,7 @@ export async function notify(options: NotifyOptions) {
         }
       }
     } catch (err) {
-      console.error('Email notification failed:', err);
+      logger.error('Email notification failed:', err);
     }
   }
 
@@ -219,7 +220,7 @@ export async function notify(options: NotifyOptions) {
         tag: options.pushPayload.tag,
       });
     } catch (err) {
-      console.error('Push notification failed:', err);
+      logger.error('Push notification failed:', err);
     }
   }
 
@@ -421,7 +422,7 @@ export async function processPendingReminders() {
       await db.update(scheduledReminders).set({ sent: true }).where(eq(scheduledReminders.id, reminder.id));
       processed++;
     } catch (err) {
-      console.error(`Failed to process reminder ${reminder.id}:`, err);
+      logger.error(`Failed to process reminder ${reminder.id}:`, err);
     }
   }
 

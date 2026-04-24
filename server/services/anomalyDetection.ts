@@ -1,5 +1,6 @@
 import { getDailyKPIValues, get7DayKPIAverage, createKpiAnomaly, getAdminEmails } from '../db';
 import { sendEmail } from '../_core/resend-email';
+import logger from '../utils/logger';
 
 interface KPICheck {
   name: string;
@@ -25,7 +26,7 @@ export async function runDailyAnomalyCheck(): Promise<{
     yesterday.setDate(yesterday.getDate() - 1);
     const dateStr = yesterday.toISOString().split('T')[0];
     
-    console.log(`[AnomalyDetection] Running daily check for ${dateStr}`);
+    logger.info(`[AnomalyDetection] Running daily check for ${dateStr}`);
     
     // Günlük KPI değerlerini al
     const dailyKPIs = await getDailyKPIValues(dateStr);
@@ -103,7 +104,7 @@ export async function runDailyAnomalyCheck(): Promise<{
           avgValue: kpi.avgValue,
         });
         
-        console.log(`[AnomalyDetection] ${severity.toUpperCase()} anomaly: ${kpi.label} - ${direction === 'up' ? '↑' : '↓'} ${Math.round(deviation)}% deviation`);
+        logger.info(`[AnomalyDetection] ${severity.toUpperCase()} anomaly: ${kpi.label} - ${direction === 'up' ? '↑' : '↓'} ${Math.round(deviation)}% deviation`);
       }
     }
     
@@ -113,11 +114,11 @@ export async function runDailyAnomalyCheck(): Promise<{
       if (sent) alertsSent = 1;
     }
     
-    console.log(`[AnomalyDetection] Check complete: ${anomaliesFound} anomalies found, ${alertsSent} alerts sent`);
+    logger.info(`[AnomalyDetection] Check complete: ${anomaliesFound} anomalies found, ${alertsSent} alerts sent`);
     
     return { anomaliesFound, alertsSent };
   } catch (error) {
-    console.error('[AnomalyDetection] Error during daily check:', error);
+    logger.error('[AnomalyDetection] Error during daily check:', error);
     return { anomaliesFound: 0, alertsSent: 0 };
   }
 }
@@ -139,7 +140,7 @@ async function sendAnomalyAlert(
   try {
     const adminEmails = await getAdminEmails();
     if (adminEmails.length === 0) {
-      console.warn('[AnomalyDetection] No admin emails found for alert');
+      logger.warn('[AnomalyDetection] No admin emails found for alert');
       return false;
     }
     
@@ -228,7 +229,7 @@ async function sendAnomalyAlert(
     
     return true;
   } catch (error) {
-    console.error('[AnomalyDetection] Failed to send alert email:', error);
+    logger.error('[AnomalyDetection] Failed to send alert email:', error);
     return false;
   }
 }

@@ -4,6 +4,7 @@ import QRCode from "qrcode";
 import path from "path";
 import https from "https";
 import http from "http";
+import logger from './utils/logger';
 
 interface CertificateData {
   studentName: string;
@@ -67,7 +68,7 @@ export async function generateCertificatePDF(data: CertificateData): Promise<{ u
       downloadToBuffer(LOGO_URL),
     ]);
   } catch (err) {
-    console.error("Failed to download fonts/logo:", err);
+    logger.error("Failed to download fonts/logo:", err);
   }
 
   return new Promise((resolve, reject) => {
@@ -396,7 +397,7 @@ export async function generateCertificatePDF(data: CertificateData): Promise<{ u
         doc.end();
       })
       .catch((error) => {
-        console.error("QR code generation failed:", error);
+        logger.error("QR code generation failed:", error);
 
         // Bottom decorative line (without QR)
         const botLineY = H - 50;

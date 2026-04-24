@@ -1,5 +1,6 @@
 import { getDashboardKPIs, getAdminEmails, getPlatformSetting, setPlatformSetting } from '../db';
 import { sendEmail } from '../_core/resend-email';
+import logger from '../utils/logger';
 
 /**
  * KPI Rapor Email Şablonu
@@ -124,21 +125,21 @@ export async function sendScheduledKPIReport(period: 'weekly' | 'monthly'): Prom
     // Raporlama aktif mi kontrol et
     const enabled = await getPlatformSetting(`scheduled_report_${period}`);
     if (enabled === 'false') {
-      console.log(`[ScheduledReport] ${period} report is disabled`);
+      logger.info(`[ScheduledReport] ${period} report is disabled`);
       return false;
     }
 
     // KPI verilerini çek
     const kpis = await getDashboardKPIs();
     if (!kpis) {
-      console.error('[ScheduledReport] Failed to get KPI data');
+      logger.error('[ScheduledReport] Failed to get KPI data');
       return false;
     }
 
     // Admin email listesini al
     const adminEmails = await getAdminEmails();
     if (adminEmails.length === 0) {
-      console.warn('[ScheduledReport] No admin emails found');
+      logger.warn('[ScheduledReport] No admin emails found');
       return false;
     }
 
@@ -157,7 +158,7 @@ export async function sendScheduledKPIReport(period: 'weekly' | 'monthly'): Prom
         });
         if (sent) successCount++;
       } catch (err) {
-        console.warn(`[ScheduledReport] Failed to send to ${email}:`, err);
+        logger.warn(`[ScheduledReport] Failed to send to ${email}:`, err);
       }
     }
 
@@ -168,10 +169,10 @@ export async function sendScheduledKPIReport(period: 'weekly' | 'monthly'): Prom
       `Son ${periodLabel.toLowerCase()} rapor gönderim tarihi`
     );
 
-    console.log(`[ScheduledReport] ${periodLabel} report sent to ${successCount}/${adminEmails.length} admins`);
+    logger.info(`[ScheduledReport] ${periodLabel} report sent to ${successCount}/${adminEmails.length} admins`);
     return successCount > 0;
   } catch (error: any) {
-    console.error('[ScheduledReport] Error:', error?.message || error);
+    logger.error('[ScheduledReport] Error:', error?.message || error);
     return false;
   }
 }
@@ -193,7 +194,7 @@ export async function sendManualKPIReport(adminEmail: string): Promise<boolean> 
       html,
     });
   } catch (error: any) {
-    console.error('[ScheduledReport] Manual report error:', error?.message || error);
+    logger.error('[ScheduledReport] Manual report error:', error?.message || error);
     return false;
   }
 }

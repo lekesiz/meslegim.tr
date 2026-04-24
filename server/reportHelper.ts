@@ -4,6 +4,7 @@ import * as db from './db';
 import { performFullAnalysis } from './services/riasecAnalyzer';
 import { performValuesAnalysis, getValuesContext } from './services/valuesAnalyzer';
 import { performRiskAnalysis, getRiskContext } from './services/riskAnalyzer';
+import logger from './utils/logger';
 
 /**
  * Etap adından değerler testi olup olmadığını belirle
@@ -22,25 +23,25 @@ function isRiskStage(stageName: string): boolean {
 }
 
 export async function generateStageReportAsync(userId: number, stageId: number) {
-  // console.log(`[ReportGen] Starting report generation for user ${userId}, stage ${stageId}`);
+  // logger.info(`[ReportGen] Starting report generation for user ${userId}, stage ${stageId}`);
   try {
     // Get user info
-    // console.log(`[ReportGen] Fetching user ${userId}...`);
+    // logger.info(`[ReportGen] Fetching user ${userId}...`);
     const user = await db.getUserById(userId);
     if (!user) {
-      console.error(`[ReportGen] User ${userId} not found!`);
+      logger.error(`[ReportGen] User ${userId} not found!`);
       throw new Error('User not found');
     }
-    // console.log(`[ReportGen] User found: ${user.name || user.email}`);
+    // logger.info(`[ReportGen] User found: ${user.name || user.email}`);
 
     // Get stage with answers
-    // console.log(`[ReportGen] Fetching stage data for stage ${stageId}...`);
+    // logger.info(`[ReportGen] Fetching stage data for stage ${stageId}...`);
     const stageData = await db.getStageWithAnswers(userId, stageId);
     if (!stageData) {
-      console.error(`[ReportGen] Stage data not found for user ${userId}, stage ${stageId}!`);
+      logger.error(`[ReportGen] Stage data not found for user ${userId}, stage ${stageId}!`);
       throw new Error('Stage data not found');
     }
-    // console.log(`[ReportGen] Stage data found: ${stageData.stage.name}, ${stageData.questions.length} questions, ${stageData.answers.length} answers`);
+    // logger.info(`[ReportGen] Stage data found: ${stageData.stage.name}, ${stageData.questions.length} questions, ${stageData.answers.length} answers`);
 
     const { stage, questions, answers } = stageData;
 
@@ -52,28 +53,28 @@ export async function generateStageReportAsync(userId: number, stageId: number) 
         answer: answer?.answer || 'Cevaplanmadı',
       };
     });
-    // console.log(`[ReportGen] Formatted ${formattedAnswers.length} answers for LLM`);
+    // logger.info(`[ReportGen] Formatted ${formattedAnswers.length} answers for LLM`);
 
     let analysisContext = '';
 
     // Determine analysis type based on stage name
     if (isRiskStage(stage.name)) {
       // Kariyer Risk Analizi
-      // console.log(`[ReportGen] Performing Risk analysis (Kariyer Risk Analizi)...`);
+      // logger.info(`[ReportGen] Performing Risk analysis (Kariyer Risk Analizi)...`);
       const riskAnalysis = performRiskAnalysis(formattedAnswers);
-      // console.log(`[ReportGen] Risk type: ${riskAnalysis.riskType}, score: ${riskAnalysis.overallScore}/100`);
+      // logger.info(`[ReportGen] Risk type: ${riskAnalysis.riskType}, score: ${riskAnalysis.overallScore}/100`);
       analysisContext = getRiskContext(riskAnalysis);
     } else if (isValuesStage(stage.name)) {
       // Kariyer Değerleri Envanteri analizi
-      // console.log(`[ReportGen] Performing Values analysis (Kariyer Değerleri Envanteri)...`);
+      // logger.info(`[ReportGen] Performing Values analysis (Kariyer Değerleri Envanteri)...`);
       const valuesAnalysis = performValuesAnalysis(formattedAnswers);
-      // console.log(`[ReportGen] Values top 3: ${valuesAnalysis.topValues.map(v => v.name).join(', ')}`);
+      // logger.info(`[ReportGen] Values top 3: ${valuesAnalysis.topValues.map(v => v.name).join(', ')}`);
       analysisContext = getValuesContext(valuesAnalysis);
     } else {
       // Standart RIASEC analizi
-      // console.log(`[ReportGen] Performing RIASEC analysis...`);
+      // logger.info(`[ReportGen] Performing RIASEC analysis...`);
       const riasecAnalysis = performFullAnalysis(formattedAnswers);
-      // console.log(`[ReportGen] RIASEC top 3: ${riasecAnalysis.riasecTop3.join(', ')}`);
+      // logger.info(`[ReportGen] RIASEC top 3: ${riasecAnalysis.riasecTop3.join(', ')}`);
 
       analysisContext = `\n\n## RIASEC Analiz Sonuçları (Otomatik Hesaplanmış)
 R (Gerçekçi): ${riasecAnalysis.riasec.R}/100
@@ -99,7 +100,7 @@ Lütfen bu RIASEC ve Big Five skorlarını raporda değerlendir ve kariyer öner
     }
 
     // Generate report content with analysis context
-    // console.log(`[ReportGen] Calling LLM to generate report...`);
+    // logger.info(`[ReportGen] Calling LLM to generate report...`);
     const reportContent = await generateStageReport(
       user.name || user.email || 'Öğrenci',
       stage.name,
@@ -109,7 +110,7 @@ Lütfen bu RIASEC ve Big Five skorlarını raporda değerlendir ve kariyer öner
         answer: a.answer + (i === formattedAnswers.length - 1 ? analysisContext : ''),
       }))
     );
-    // console.log(`[ReportGen] LLM report generated, length: ${reportContent.length} chars`);
+    // logger.info(`[ReportGen] LLM report generated, length: ${reportContent.length} chars`);
 
     // Convert markdown to PDF and upload to S3 (optional - if fails, still save report)
     let fileUrl: string | undefined;
@@ -117,13 +118,13 @@ Lütfen bu RIASEC ve Big Five skorlarını raporda değerlendir ve kariyer öner
     
     try {
       const fileName = `stage-${stageId}-user-${userId}-${Date.now()}`;
-      // console.log(`[ReportGen] Generating PDF: ${fileName}...`);
+      // logger.info(`[ReportGen] Generating PDF: ${fileName}...`);
       const result = await convertMarkdownToPDF(reportContent, fileName);
       fileUrl = result.fileUrl;
       fileKey = result.fileKey;
-      // console.log(`[ReportGen] PDF generated successfully for user ${userId}, stage ${stageId}: ${fileUrl}`);
+      // logger.info(`[ReportGen] PDF generated successfully for user ${userId}, stage ${stageId}: ${fileUrl}`);
     } catch (pdfError) {
-      console.error('[ReportGen] PDF generation failed, saving report without PDF:', pdfError);
+      logger.error('[ReportGen] PDF generation failed, saving report without PDF:', pdfError);
       // Continue without PDF - report content is still valuable
     }
     
@@ -132,7 +133,7 @@ Lütfen bu RIASEC ve Big Five skorlarını raporda değerlendir ve kariyer öner
     const summary = summaryMatch ? summaryMatch[1].trim().substring(0, 300) : reportContent.substring(0, 300).trim();
     
     // Save report to database (with or without PDF)
-    // console.log(`[ReportGen] Saving report to database...`);
+    // logger.info(`[ReportGen] Saving report to database...`);
     await db.createReport({
       userId,
       stageId,
@@ -144,9 +145,9 @@ Lütfen bu RIASEC ve Big Five skorlarını raporda değerlendir ve kariyer öner
       fileKey: fileKey || null,
     });
 
-    // console.log(`[ReportGen] ✅ Report successfully generated and saved for user ${userId}, stage ${stageId}`);
+    // logger.info(`[ReportGen] ✅ Report successfully generated and saved for user ${userId}, stage ${stageId}`);
   } catch (error) {
-    console.error(`[ReportGen] ❌ Error generating stage report for user ${userId}, stage ${stageId}:`, error);
+    logger.error(`[ReportGen] ❌ Error generating stage report for user ${userId}, stage ${stageId}:`, error);
     throw error;
   }
 }

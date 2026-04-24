@@ -5,6 +5,7 @@ import { promisify } from 'util';
 import { writeFile, unlink, readFile } from 'fs/promises';
 import path from 'path';
 import { randomBytes } from 'crypto';
+import logger from '../utils/logger';
 
 const execAsync = promisify(exec);
 
@@ -289,7 +290,7 @@ export async function generateAnalyticsPDF(options: AnalyticsPdfOptions): Promis
       await unlink(htmlPath);
       await unlink(pdfPath);
     } catch {}
-    console.error('Analytics PDF generation error:', error);
+    logger.error('Analytics PDF generation error:', error);
     throw new Error('Analitik PDF raporu oluşturulamadı. Lütfen tekrar deneyin.');
   }
 }

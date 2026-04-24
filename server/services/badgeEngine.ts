@@ -7,6 +7,7 @@
 import { getDb } from "../db";
 import { badges, userBadges, userStages, reports, certificates, pilotFeedbacks, users } from "../../drizzle/schema";
 import { eq, and, count, sql, desc } from "drizzle-orm";
+import logger from '../utils/logger';
 
 export interface BadgeCheckResult {
   newBadges: Array<{
@@ -312,7 +313,7 @@ export async function checkAndAwardBadges(userId: number): Promise<BadgeCheckRes
         });
       }
     } catch (err) {
-      console.error('Badge notification failed:', err);
+      logger.error('Badge notification failed:', err);
     }
   }
 

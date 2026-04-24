@@ -1,4 +1,5 @@
 import { Resend } from 'resend';
+import logger from '../utils/logger';
 
 // Resend API configuration - lazy initialization to avoid CI failures
 let _resend: Resend | null = null;
@@ -31,14 +32,14 @@ export async function sendEmail(options: EmailTemplate): Promise<boolean> {
     });
 
     if (error) {
-      console.error('[Email] Resend error:', error);
+      logger.error('[Email] Resend error:', error);
       return false;
     }
 
-    console.log(`[Email] Sent to ${options.to}: ${options.subject} (id: ${data?.id})`);
+    logger.info(`[Email] Sent to ${options.to}: ${options.subject} (id: ${data?.id})`);
     return true;
   } catch (error) {
-    console.error('[Email] Failed to send:', error);
+    logger.error('[Email] Failed to send:', error);
     return false;
   }
 }

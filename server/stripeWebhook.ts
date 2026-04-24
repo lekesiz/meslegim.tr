@@ -4,6 +4,7 @@ import { getDb, notifyAdmins } from './db';
 import { users, purchases, userStages, stages } from '../drizzle/schema';
 import { eq, and, inArray } from 'drizzle-orm';
 import { PACKAGE_ACCESS } from './products';
+import logger from './utils/logger';
 
 // Singleton Stripe instance
 let stripeInstance: Stripe | null = null;
@@ -28,23 +29,23 @@ export function registerStripeWebhook(app: express.Application) {
 
     try {
       if (!webhookSecret) {
-        console.error('[Stripe Webhook] STRIPE_WEBHOOK_SECRET is not configured');
+        logger.error('[Stripe Webhook] STRIPE_WEBHOOK_SECRET is not configured');
         return res.status(500).json({ error: 'Webhook secret not configured' });
       }
 
       event = getStripe().webhooks.constructEvent(req.body, sig, webhookSecret);
     } catch (err: any) {
-      console.error(`[Stripe Webhook] Signature verification failed: ${err.message}`);
+      logger.error(`[Stripe Webhook] Signature verification failed: ${err.message}`);
       return res.status(400).json({ error: `Webhook Error: ${err.message}` });
     }
 
     // Handle test events
     if (event.id.startsWith('evt_test_')) {
-      console.log("[Webhook] Test event detected, returning verification response");
+      logger.info("[Webhook] Test event detected, returning verification response");
       return res.json({ verified: true });
     }
 
-    console.log(`[Stripe Webhook] Event received: ${event.type}`, event.id);
+    logger.info(`[Stripe Webhook] Event received: ${event.type}`, event.id);
 
     try {
       switch (event.type) {
@@ -55,20 +56,20 @@ export function registerStripeWebhook(app: express.Application) {
         }
         case 'payment_intent.succeeded': {
           const paymentIntent = event.data.object as Stripe.PaymentIntent;
-          console.log(`[Stripe Webhook] PaymentIntent succeeded: ${paymentIntent.id}`);
+          logger.info(`[Stripe Webhook] PaymentIntent succeeded: ${paymentIntent.id}`);
           break;
         }
         case 'payment_intent.payment_failed': {
           const paymentIntent = event.data.object as Stripe.PaymentIntent;
-          console.log(`[Stripe Webhook] PaymentIntent failed: ${paymentIntent.id}`);
+          logger.info(`[Stripe Webhook] PaymentIntent failed: ${paymentIntent.id}`);
           await handlePaymentFailed(paymentIntent);
           break;
         }
         default:
-          console.log(`[Stripe Webhook] Unhandled event type: ${event.type}`);
+          logger.info(`[Stripe Webhook] Unhandled event type: ${event.type}`);
       }
     } catch (err: any) {
-      console.error(`[Stripe Webhook] Error processing ${event.type}: ${err.message}`);
+      logger.error(`[Stripe Webhook] Error processing ${event.type}: ${err.message}`);
     }
 
     res.json({ received: true });
@@ -78,7 +79,7 @@ export function registerStripeWebhook(app: express.Application) {
 async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   const db = await getDb();
   if (!db) {
-    console.error('[Stripe Webhook] Database not available');
+    logger.error('[Stripe Webhook] Database not available');
     return;
   }
 
@@ -86,11 +87,11 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   const productId = session.metadata?.product_id;
 
   if (!userId || !productId) {
-    console.error('[Stripe Webhook] Missing user_id or product_id in metadata', session.id);
+    logger.error('[Stripe Webhook] Missing user_id or product_id in metadata', session.id);
     return;
   }
 
-  console.log(`[Stripe Webhook] Checkout completed for user ${userId}, product: ${productId}`);
+  logger.info(`[Stripe Webhook] Checkout completed for user ${userId}, product: ${productId}`);
 
   // Update purchase record
   await db
@@ -148,7 +149,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     }
   }
 
-  console.log(`[Stripe Webhook] Purchase completed for user ${userId}, product: ${productId}`);
+  logger.info(`[Stripe Webhook] Purchase completed for user ${userId}, product: ${productId}`);
 
   // Admin'lere satın alma bildirimi gönder
   try {
@@ -169,7 +170,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       link: '/dashboard/admin?tab=payments',
     });
   } catch (e) {
-    console.warn('Failed to notify admins about purchase:', e);
+    logger.warn('Failed to notify admins about purchase:', e);
   }
 }
 
@@ -219,7 +220,7 @@ async function unlockStagesForPackage(userId: number, packageId: string) {
           })
           .where(eq(userStages.id, lockedStage.id));
         
-        console.log(`[Stripe Webhook] Unlocked stage ${lockedStage.stageId} (order: ${lockedStage.stageOrder}) for user ${userId} via package ${packageId}`);
+        logger.info(`[Stripe Webhook] Unlocked stage ${lockedStage.stageId} (order: ${lockedStage.stageOrder}) for user ${userId} via package ${packageId}`);
         // Sadece sıradaki bir etabı aç, geri kalanı tamamlandıkça açılacak
         break;
       }
@@ -247,7 +248,7 @@ async function unlockSingleStage(userId: number, stageId: number) {
       eq(userStages.status, 'locked'),
     ));
 
-  console.log(`[Stripe Webhook] Single stage unlock: stage ${stageId} for user ${userId}`);
+  logger.info(`[Stripe Webhook] Single stage unlock: stage ${stageId} for user ${userId}`);
 }
 
 async function handlePaymentFailed(paymentIntent: Stripe.PaymentIntent) {
@@ -259,5 +260,5 @@ async function handlePaymentFailed(paymentIntent: Stripe.PaymentIntent) {
     .set({ status: 'failed' })
     .where(eq(purchases.stripePaymentIntentId, paymentIntent.id));
 
-  console.error(`[Stripe Webhook] Payment failed: ${paymentIntent.id}`);
+  logger.error(`[Stripe Webhook] Payment failed: ${paymentIntent.id}`);
 }

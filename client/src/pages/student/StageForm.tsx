@@ -49,7 +49,8 @@ export default function StageForm() {
   const [answers, setAnswers] = useState<Answer>({});
   const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
-  const initialLoadDone = useRef(false);
+  const [answersLoaded, setAnswersLoaded] = useState(false);
+  const prevAnswersRef = useRef<string>('');
 
   const { data: activeStage, isLoading } = trpc.student.getActiveStage.useQuery();
   const utils = trpc.useUtils();
@@ -87,17 +88,31 @@ export default function StageForm() {
     },
   });
 
-  // Load initial answers from server - only once
+  // Load initial answers from server - use stable fingerprint to detect changes
   useEffect(() => {
-    if (activeStage?.answers && !initialLoadDone.current) {
-      const initialAnswers: Answer = {};
-      activeStage.answers.forEach((ans: any) => {
-        initialAnswers[ans.questionId] = ans.answer;
-      });
-      setAnswers(initialAnswers);
-      initialLoadDone.current = true;
+    if (activeStage?.answers && activeStage.answers.length > 0) {
+      // Create a fingerprint of server answers to detect real changes
+      const fingerprint = activeStage.answers
+        .map((ans: any) => `${ans.questionId}:${ans.answer}`)
+        .sort()
+        .join('|');
+      
+      // Only update if server answers actually changed (prevents overwriting user edits)
+      if (fingerprint !== prevAnswersRef.current) {
+        prevAnswersRef.current = fingerprint;
+        const initialAnswers: Answer = {};
+        activeStage.answers.forEach((ans: any) => {
+          // Normalize: trim whitespace and ensure string type
+          initialAnswers[ans.questionId] = String(ans.answer || '').trim();
+        });
+        setAnswers(initialAnswers);
+        setAnswersLoaded(true);
+      }
+    } else if (activeStage && !answersLoaded) {
+      // Stage loaded but no answers yet - mark as loaded so UI renders correctly
+      setAnswersLoaded(true);
     }
-  }, [activeStage]);
+  }, [activeStage, answersLoaded]);
 
   // Save to server (called by debounce for text, immediately for selections)
   const saveToServer = useCallback(async (questionId: number, value: string) => {
@@ -178,7 +193,7 @@ export default function StageForm() {
     const options = question.options 
       ? (Array.isArray(question.options) ? question.options : JSON.parse(question.options))
       : [];
-    const currentAnswer = String(answers[question.id] || '');
+    const currentAnswer = String(answers[question.id] || '').trim();
     
     // Check if this multiple_choice question allows multiple selections
     const metadata = question.metadata 
@@ -207,7 +222,8 @@ export default function StageForm() {
                 Birden fazla seçenek işaretleyebilirsiniz
               </Badge>
               {options.map((option: string, index: number) => {
-                const isSelected = selectedOptions.includes(String(option));
+                const optionStr = String(option).trim();
+                const isSelected = selectedOptions.includes(optionStr);
                 const optionLetter = String.fromCharCode(65 + index);
                 return (
                   <label
@@ -226,9 +242,9 @@ export default function StageForm() {
                       onChange={() => {
                         let newSelected: string[];
                         if (isSelected) {
-                          newSelected = selectedOptions.filter(o => o !== String(option));
+                          newSelected = selectedOptions.filter(o => o !== optionStr);
                         } else {
-                          newSelected = [...selectedOptions, String(option)];
+                          newSelected = [...selectedOptions, optionStr];
                         }
                         handleSelectionChange(question.id, newSelected.join(','));
                       }}
@@ -255,7 +271,8 @@ export default function StageForm() {
         return (
           <div className="space-y-3">
             {options.map((option: string, index: number) => {
-              const isSelected = currentAnswer === String(option);
+              const optionStr = String(option).trim();
+              const isSelected = currentAnswer === optionStr;
               const optionLetter = String.fromCharCode(65 + index);
               return (
                 <label
@@ -271,9 +288,9 @@ export default function StageForm() {
                     type="radio"
                     id={`mc-${question.id}-${index}`}
                     name={`question-${question.id}`}
-                    value={String(option)}
+                    value={optionStr}
                     checked={isSelected}
-                    onChange={(e) => handleSelectionChange(question.id, e.target.value)}
+                    onChange={(e) => handleSelectionChange(question.id, e.target.value.trim())}
                     className="sr-only"
                   />
                   <span className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-colors ${
@@ -324,20 +341,21 @@ export default function StageForm() {
             <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
               {likertOptions.map((option: string, idx: number) => {
                 const optionKey = String(idx + 1);
-                const isSelected = currentAnswer === String(option);
+                const optionStr = String(option).trim();
+                const isSelected = currentAnswer === optionStr;
                 return (
                   <label
-                    key={option}
-                    htmlFor={`likert-${question.id}-${option}`}
+                    key={optionStr}
+                    htmlFor={`likert-${question.id}-${optionStr}`}
                     className="flex flex-col items-center cursor-pointer group"
                   >
                     <input
                       type="radio"
-                      id={`likert-${question.id}-${option}`}
+                      id={`likert-${question.id}-${optionStr}`}
                       name={`question-${question.id}`}
-                      value={String(option)}
+                      value={optionStr}
                       checked={isSelected}
-                      onChange={(e) => handleSelectionChange(question.id, e.target.value)}
+                      onChange={(e) => handleSelectionChange(question.id, e.target.value.trim())}
                       className="sr-only"
                     />
                     <div className={`w-full py-3 px-1 rounded-lg border-2 text-center transition-all ${
@@ -367,8 +385,9 @@ export default function StageForm() {
               Birden fazla seçenek işaretleyebilirsiniz - önem sırasına göre seçin
             </Badge>
             {options.map((option: string, index: number) => {
-              const isSelected = selectedRankingOptions.includes(option);
-              const selectionOrder = selectedRankingOptions.indexOf(option) + 1;
+              const optionStr = String(option).trim();
+              const isSelected = selectedRankingOptions.includes(optionStr);
+              const selectionOrder = selectedRankingOptions.indexOf(optionStr) + 1;
               return (
                 <label
                   key={index}
@@ -386,9 +405,9 @@ export default function StageForm() {
                     onChange={() => {
                       let newSelected: string[];
                       if (isSelected) {
-                        newSelected = selectedRankingOptions.filter(o => o !== option);
+                        newSelected = selectedRankingOptions.filter(o => o !== optionStr);
                       } else {
-                        newSelected = [...selectedRankingOptions, option];
+                        newSelected = [...selectedRankingOptions, optionStr];
                       }
                       handleSelectionChange(question.id, newSelected.join(','));
                     }}
