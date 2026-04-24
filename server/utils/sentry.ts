@@ -5,6 +5,7 @@
  */
 
 import * as Sentry from '@sentry/node';
+import logger from './logger';
 import { nodeProfilingIntegration } from '@sentry/profiling-node';
 import type { Express } from 'express';
 
@@ -16,7 +17,7 @@ export function initSentry(app: Express) {
   const sentryDsn = process.env.SENTRY_DSN;
   
   if (!sentryDsn) {
-    console.log('[Sentry] Skipping initialization - SENTRY_DSN not provided');
+    logger.info('[Sentry] Skipping initialization - SENTRY_DSN not provided');
     return;
   }
 
@@ -93,7 +94,7 @@ export function initSentry(app: Express) {
     },
   });
 
-  console.log('[Sentry] Initialized successfully');
+  logger.info('[Sentry] Initialized successfully');
 }
 
 /**

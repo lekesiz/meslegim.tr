@@ -15,6 +15,7 @@ import bcrypt from 'bcryptjs';
 import { sdk } from './_core/sdk';
 import { hasRole, hasAnyRole, isSuperAdmin, isAdminLevel, isSchoolAdminLevel, hasRoleLevel, getHighestRole, addRole, removeRole } from './roleHelper';
 import { sanitizeHtml, sanitizeEmail, sanitizeTcKimlik, sanitizePhone } from './utils/sanitization';
+import logger from './utils/logger';
 
 // Production'da gerçek domain'i kullan, development'ta localhost
 function getBaseUrl(req?: { headers: { origin?: string; host?: string } }): string {
@@ -281,7 +282,7 @@ export const appRouter = router({
             html: getRegistrationEmailTemplate(input.name, input.email),
           });
         } catch (error) {
-          console.error('Failed to send registration email:', error);
+          logger.error('Failed to send registration email:', error);
           // Don't fail the registration if email fails
         }
         
@@ -294,7 +295,7 @@ export const appRouter = router({
             link: '/dashboard/admin?tab=students',
           });
         } catch (e) {
-          console.warn('Failed to notify admins about new registration:', e);
+          logger.warn('Failed to notify admins about new registration:', e);
         }
         
         return { success: true, userId: newUser.id };
@@ -670,7 +671,7 @@ export const appRouter = router({
               });
               successCount++;
             } catch (error) {
-              console.error(`Failed to send email to ${user.email}:`, error);
+              logger.error(`Failed to send email to ${user.email}:`, error);
               failCount++;
             }
           }
@@ -718,13 +719,13 @@ export const appRouter = router({
                   html: getApprovalEmailTemplate(student.name, loginUrl),
                 });
               } catch (error) {
-                console.error('Failed to send activation email:', error);
+                logger.error('Failed to send activation email:', error);
               }
             }
             
             successCount++;
           } catch (error) {
-            console.error(`Failed to activate student ${studentId}:`, error);
+            logger.error(`Failed to activate student ${studentId}:`, error);
             failCount++;
           }
         }
@@ -836,7 +837,7 @@ export const appRouter = router({
               html: emailHtml,
             });
           } catch (e) {
-            console.warn('[Admin] Email notification failed:', e);
+            logger.warn('[Admin] Email notification failed:', e);
           }
         }
         // Write audit log
@@ -865,7 +866,7 @@ export const appRouter = router({
             },
           });
         } catch (notifErr) {
-          console.error('Failed to create unlock notification:', notifErr);
+          logger.error('Failed to create unlock notification:', notifErr);
         }
 
         return { success: true, stageName: result.stageName };
@@ -1255,7 +1256,7 @@ export const appRouter = router({
               reason: 'requested_by_customer',
             });
           } catch (stripeErr: any) {
-            console.error('[Admin Refund] Stripe refund failed:', stripeErr);
+            logger.error('[Admin Refund] Stripe refund failed:', stripeErr);
             throw new TRPCError({ 
               code: 'INTERNAL_SERVER_ERROR', 
               message: `Stripe iade başarısız: ${stripeErr.message}` 
@@ -1284,7 +1285,7 @@ export const appRouter = router({
         }
         
         // Audit log
-        // console.log(`[Admin Refund] Purchase #${input.purchaseId} refunded by admin ${ctx.user.id}. Reason: ${input.reason || 'N/A'}`);
+        // logger.info(`[Admin Refund] Purchase #${input.purchaseId} refunded by admin ${ctx.user.id}. Reason: ${input.reason || 'N/A'}`);
         
         return { success: true, message: 'İade başarıyla gerçekleştirildi' };
       }),
@@ -1541,7 +1542,7 @@ export const appRouter = router({
             if (success) sentCount++;
             else failCount++;
           } catch (e) {
-            console.error(`[InactivityReminder] Failed for user ${student.id}:`, e);
+            logger.error(`[InactivityReminder] Failed for user ${student.id}:`, e);
             await db.logInactivityNotification(student.id, Number(student.daysSinceLastActivity), false);
             failCount++;
           }
@@ -1621,7 +1622,7 @@ export const appRouter = router({
             if (success) sentCount++;
             else failedCount++;
           } catch (e) {
-            console.error(`[BulkEmail] Failed for ${recipient.email}:`, e);
+            logger.error(`[BulkEmail] Failed for ${recipient.email}:`, e);
             failedCount++;
           }
         }
@@ -1715,7 +1716,7 @@ export const appRouter = router({
               html: getApprovalEmailTemplate(student.name, loginUrl),
             });
           } catch (error) {
-            console.error('Failed to send activation email:', error);
+            logger.error('Failed to send activation email:', error);
             // Don't fail the activation if email fails
           }
         }
@@ -1850,7 +1851,7 @@ export const appRouter = router({
               html,
             });
           } catch (error) {
-            console.error('Failed to send report email:', error);
+            logger.error('Failed to send report email:', error);
             // Don't fail the operation if email fails
           }
         }
@@ -1876,7 +1877,7 @@ export const appRouter = router({
               },
             });
           } catch (notifErr) {
-            console.error('Failed to create notification:', notifErr);
+            logger.error('Failed to create notification:', notifErr);
           }
         }
         
@@ -2098,7 +2099,7 @@ export const appRouter = router({
               html: emailHtml,
             });
           } catch (e) {
-            console.warn('[Mentor] Email notification failed:', e);
+            logger.warn('[Mentor] Email notification failed:', e);
           }
         }
 
@@ -2115,7 +2116,7 @@ export const appRouter = router({
           }
         } catch (e) {
           // Notification failure should not block the unlock operation
-          console.warn('[Mentor] Admin notification failed:', e);
+          logger.warn('[Mentor] Admin notification failed:', e);
         }
 
          // Create in-app + push notification for student
@@ -2134,7 +2135,7 @@ export const appRouter = router({
             },
           });
         } catch (notifErr) {
-          console.error('Failed to create unlock notification:', notifErr);
+          logger.error('Failed to create unlock notification:', notifErr);
         }
         return { success: true, stageName: result.stageName };
       }),
@@ -2224,7 +2225,7 @@ export const appRouter = router({
         
         // Trigger report generation (async, don't wait)
         generateStageReportAsync(userId, stageId).catch(err => {
-          console.error('Report generation failed:', err);
+          logger.error('Report generation failed:', err);
         });
         
         // Schedule next stage activation (7 days from now)
@@ -2258,7 +2259,7 @@ export const appRouter = router({
                 </div>
               `,
             }).catch(err => {
-              console.error('Failed to send mentor notification:', err);
+              logger.error('Failed to send mentor notification:', err);
             });
           }
         }
@@ -2294,7 +2295,7 @@ export const appRouter = router({
             });
           }
         } catch (notifErr) {
-          console.error('Failed to create notification:', notifErr);
+          logger.error('Failed to create notification:', notifErr);
         }
         
         // Admin'lere rapor gönderim bildirimi
@@ -2306,14 +2307,14 @@ export const appRouter = router({
             link: '/dashboard/admin?tab=reports',
           });
         } catch (e) {
-          console.warn('Failed to notify admins about report submission:', e);
+          logger.warn('Failed to notify admins about report submission:', e);
         }
 
         // Auto-check badges after stage completion
         try {
           await checkAndAwardBadges(userId);
         } catch (badgeErr) {
-          console.error('Badge check failed:', badgeErr);
+          logger.error('Badge check failed:', badgeErr);
         }
         
         return { success: true, message: 'Etap başarıyla tamamlandı!' };
@@ -2453,7 +2454,7 @@ export const appRouter = router({
             html: getCertificateReadyEmailTemplate(ctx.user.name, certificateUrl),
           });
         } catch (error) {
-          console.error('Failed to send certificate email:', error);
+          logger.error('Failed to send certificate email:', error);
           // Don't fail the operation if email fails
         }
       }
@@ -2592,7 +2593,7 @@ export const appRouter = router({
         const result = await convertMarkdownToPDF(reportContent, fileName);
         fileUrl = result.fileUrl;
       } catch (pdfError) {
-        console.error('PDF generation failed for career profile:', pdfError);
+        logger.error('PDF generation failed for career profile:', pdfError);
       }
       
       // Save as report with type 'comprehensive'
@@ -2622,7 +2623,7 @@ export const appRouter = router({
             tag: 'career-report-ready',
           },
         });
-      } catch (e) { console.error('Notification failed:', e); }
+      } catch (e) { logger.error('Notification failed:', e); }
       
       return { success: true, content: reportContent, fileUrl };
     }),
@@ -3226,7 +3227,7 @@ export const appRouter = router({
             content: `**Gönderen:** ${input.name} (${input.email})\n**Kategori:** ${categoryLabels[input.category]}\n**Konu:** ${input.subject}\n\n**Mesaj:**\n${input.message}`,
           });
         } catch (e) {
-          console.warn('[Contact] Notification failed:', e);
+          logger.warn('[Contact] Notification failed:', e);
         }
         return { success: true, message: 'Mesajınız başarıyla gönderildi. En kısa sürede size dönüş yapacağız.' };
       }),

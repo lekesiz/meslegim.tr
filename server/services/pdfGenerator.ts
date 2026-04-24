@@ -5,6 +5,7 @@ import { promisify } from "util";
 import { writeFile, unlink, readFile } from "fs/promises";
 import path from "path";
 import { randomBytes } from "crypto";
+import logger from '../utils/logger';
 
 const execAsync = promisify(exec);
 
@@ -177,7 +178,7 @@ export async function generatePDF(
       await unlink(pdfPath);
     } catch {}
 
-    console.error("PDF generation error:", error);
+    logger.error("PDF generation error:", error);
     throw new Error("PDF oluşturulamadı. Lütfen tekrar deneyin.");
   }
 }

@@ -7,6 +7,7 @@ import { getNewStageActivatedEmailTemplate, getStageReminderEmailTemplate } from
 import { startReminderService } from './reminderService';
 import { sendScheduledKPIReport } from './scheduledReports';
 import { runDailyAnomalyCheck } from './anomalyDetection';
+import logger from '../utils/logger';
 
 /**
  * Check and activate stages that should be unlocked based on configurable delay
@@ -14,12 +15,12 @@ import { runDailyAnomalyCheck } from './anomalyDetection';
 export async function checkAndActivateStages() {
   const db = await getDb();
   if (!db) {
-    console.warn('[Cron] Database not available');
+    logger.warn('[Cron] Database not available');
     return;
   }
 
   try {
-    console.log('[Cron] Stage activation check started...');
+    logger.info('[Cron] Stage activation check started...');
 
     // Find locked stages whose unlockedAt has passed
     const stagesToActivate = await db
@@ -65,7 +66,7 @@ export async function checkAndActivateStages() {
 
       const stageName = stageData[0]?.name || 'Yeni Etap';
 
-      console.log(`[Cron] Activated stage ${stageName} for user ${stage.userId}`);
+      logger.info(`[Cron] Activated stage ${stageName} for user ${stage.userId}`);
 
       // Send email + push notification
       if (stage.userEmail && stage.userName) {
@@ -90,18 +91,18 @@ export async function checkAndActivateStages() {
             },
           });
         } catch (err) {
-          console.warn(`[Cron] Notification failed for user ${stage.userId}:`, err);
+          logger.warn(`[Cron] Notification failed for user ${stage.userId}:`, err);
         }
       }
     }
 
-    console.log(`[Cron] Stage activation check complete: ${stagesToActivate.length} stages activated`);
+    logger.info(`[Cron] Stage activation check complete: ${stagesToActivate.length} stages activated`);
   } catch (error: any) {
     const msg = error?.message || String(error);
     if (msg.includes('ECONNRESET') || msg.includes('ETIMEDOUT')) {
-      console.warn('[Cron] DB ba\u011flant\u0131 hatas\u0131 (checkAndActivateStages), sonraki d\u00f6ng\u00fcde tekrar denenecek');
+      logger.warn('[Cron] DB ba\u011flant\u0131 hatas\u0131 (checkAndActivateStages), sonraki d\u00f6ng\u00fcde tekrar denenecek');
     } else {
-      console.error('[Cron] checkAndActivateStages hatas\u0131:', msg);
+      logger.error('[Cron] checkAndActivateStages hatas\u0131:', msg);
     }
   }
 }
@@ -113,7 +114,7 @@ export async function checkAndActivateStages() {
 export async function sendStageReminderEmails() {
   const db = await getDb();
   if (!db) {
-    console.warn('[Cron] Database not available for reminders');
+    logger.warn('[Cron] Database not available for reminders');
     return;
   }
 
@@ -121,7 +122,7 @@ export async function sendStageReminderEmails() {
     // Read configurable reminder lead time (default 2 days before opening)
     const reminderDaysBefore = await getPlatformSettingNumber('stage_reminder_days_before', 2);
     if (reminderDaysBefore <= 0) {
-      console.log('[Cron] Reminders disabled (stage_reminder_days_before = 0)');
+      logger.info('[Cron] Reminders disabled (stage_reminder_days_before = 0)');
       return;
     }
 
@@ -133,7 +134,7 @@ export async function sendStageReminderEmails() {
     const windowEnd = new Date(windowStart);
     windowEnd.setHours(23, 59, 59, 999);
 
-    console.log(`[Cron] Reminder check: looking for stages opening between ${windowStart.toISOString()} and ${windowEnd.toISOString()}`);
+    logger.info(`[Cron] Reminder check: looking for stages opening between ${windowStart.toISOString()} and ${windowEnd.toISOString()}`);
 
     const stagesToRemind = await db
       .select({
@@ -155,7 +156,7 @@ export async function sendStageReminderEmails() {
         )
       );
 
-    console.log(`[Cron] Found ${stagesToRemind.length} stages to send reminders for`);
+    logger.info(`[Cron] Found ${stagesToRemind.length} stages to send reminders for`);
 
     for (const item of stagesToRemind) {
       if (!item.userEmail || !item.userName || !item.unlockedAt) continue;
@@ -190,19 +191,19 @@ export async function sendStageReminderEmails() {
           },
         });
 
-        console.log(`[Cron] Reminder sent to user ${item.userId} for stage ${item.stageName}`);
+        logger.info(`[Cron] Reminder sent to user ${item.userId} for stage ${item.stageName}`);
       } catch (err) {
-        console.warn(`[Cron] Reminder failed for user ${item.userId}:`, err);
+        logger.warn(`[Cron] Reminder failed for user ${item.userId}:`, err);
       }
     }
 
-    console.log(`[Cron] Reminder emails complete: ${stagesToRemind.length} sent`);
+    logger.info(`[Cron] Reminder emails complete: ${stagesToRemind.length} sent`);
   } catch (error: any) {
     const msg = error?.message || String(error);
     if (msg.includes('ECONNRESET') || msg.includes('ETIMEDOUT')) {
-      console.warn('[Cron] DB ba\u011flant\u0131 hatas\u0131 (sendStageReminderEmails), sonraki d\u00f6ng\u00fcde tekrar denenecek');
+      logger.warn('[Cron] DB ba\u011flant\u0131 hatas\u0131 (sendStageReminderEmails), sonraki d\u00f6ng\u00fcde tekrar denenecek');
     } else {
-      console.error('[Cron] sendStageReminderEmails hatas\u0131:', msg);
+      logger.error('[Cron] sendStageReminderEmails hatas\u0131:', msg);
     }
   }
 }
@@ -215,12 +216,12 @@ export async function sendDailyInactivityReminders() {
   try {
     const inactiveDays = await getPlatformSettingNumber('inactivity_reminder_days', 7);
     if (inactiveDays <= 0) {
-      console.log('[Cron] Inactivity reminders disabled (inactivity_reminder_days = 0)');
+      logger.info('[Cron] Inactivity reminders disabled (inactivity_reminder_days = 0)');
       return { total: 0, sentCount: 0, failCount: 0 };
     }
 
     const inactiveStudents = await getInactiveStudents(inactiveDays);
-    console.log(`[Cron] Found ${inactiveStudents.length} inactive students (${inactiveDays}+ days)`);
+    logger.info(`[Cron] Found ${inactiveStudents.length} inactive students (${inactiveDays}+ days)`);
 
     let sentCount = 0;
     let failCount = 0;
@@ -242,20 +243,20 @@ export async function sendDailyInactivityReminders() {
         if (success) sentCount++;
         else failCount++;
       } catch (e) {
-        console.error(`[Cron] Inactivity reminder failed for user ${student.id}:`, e);
+        logger.error(`[Cron] Inactivity reminder failed for user ${student.id}:`, e);
         await logInactivityNotification(student.id, Number(student.daysSinceLastActivity), false);
         failCount++;
       }
     }
 
-    console.log(`[Cron] Inactivity reminders complete: ${sentCount} sent, ${failCount} failed out of ${inactiveStudents.length}`);
+    logger.info(`[Cron] Inactivity reminders complete: ${sentCount} sent, ${failCount} failed out of ${inactiveStudents.length}`);
     return { total: inactiveStudents.length, sentCount, failCount };
   } catch (error: any) {
     const msg = error?.message || String(error);
     if (msg.includes('ECONNRESET') || msg.includes('ETIMEDOUT')) {
-      console.warn('[Cron] DB ba\u011flant\u0131 hatas\u0131 (sendDailyInactivityReminders), sonraki d\u00f6ng\u00fcde tekrar denenecek');
+      logger.warn('[Cron] DB ba\u011flant\u0131 hatas\u0131 (sendDailyInactivityReminders), sonraki d\u00f6ng\u00fcde tekrar denenecek');
     } else {
-      console.error('[Cron] sendDailyInactivityReminders hatas\u0131:', msg);
+      logger.error('[Cron] sendDailyInactivityReminders hatas\u0131:', msg);
     }
     return { total: 0, sentCount: 0, failCount: 0 };
   }
@@ -269,45 +270,45 @@ export async function sendDailyInactivityReminders() {
 export function initializeCronJobs() {
   // Stage activation: every day at midnight
   cron.schedule('0 0 * * *', async () => {
-    console.log('[Cron] Running daily stage activation check...');
+    logger.info('[Cron] Running daily stage activation check...');
     await checkAndActivateStages();
   });
 
   // Reminder emails: every day at 09:00
   cron.schedule('0 9 * * *', async () => {
-    console.log('[Cron] Running daily stage reminder emails...');
+    logger.info('[Cron] Running daily stage reminder emails...');
     await sendStageReminderEmails();
   });
 
   // Weekly KPI report: every Monday at 08:00
   cron.schedule('0 8 * * 1', async () => {
-    console.log('[Cron] Sending weekly KPI report...');
+    logger.info('[Cron] Sending weekly KPI report...');
     await sendScheduledKPIReport('weekly');
   });
 
   // Monthly KPI report: 1st of each month at 08:00
   cron.schedule('0 8 1 * *', async () => {
-    console.log('[Cron] Sending monthly KPI report...');
+    logger.info('[Cron] Sending monthly KPI report...');
     await sendScheduledKPIReport('monthly');
   });
 
   // Daily KPI anomaly detection: every day at 07:00
   cron.schedule('0 7 * * *', async () => {
-    console.log('[Cron] Running daily KPI anomaly detection...');
+    logger.info('[Cron] Running daily KPI anomaly detection...');
     await runDailyAnomalyCheck();
   });
 
   // Daily inactivity reminder: every day at 07:00 (TR time)
   cron.schedule('0 7 * * *', async () => {
-    console.log('[Cron] Running daily inactivity reminder emails...');
+    logger.info('[Cron] Running daily inactivity reminder emails...');
     await sendDailyInactivityReminders();
   });
 
-  console.log('[Cron] Cron jobs initialized (activation at 00:00, reminders at 09:00, anomaly check at 07:00, inactivity reminders at 07:00, weekly report Mon 08:00, monthly report 1st 08:00)');
+  logger.info('[Cron] Cron jobs initialized (activation at 00:00, reminders at 09:00, anomaly check at 07:00, inactivity reminders at 07:00, weekly report Mon 08:00, monthly report 1st 08:00)');
 
   // Run activation once on startup
   setTimeout(() => {
-    console.log('[Cron] Running initial stage activation check...');
+    logger.info('[Cron] Running initial stage activation check...');
     checkAndActivateStages();
   }, 5000);
 

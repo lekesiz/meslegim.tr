@@ -12,7 +12,7 @@ export async function getDb() {
     try {
       _db = drizzle(process.env.DATABASE_URL);
     } catch (error) {
-      console.warn("[Database] Failed to connect:", error);
+      logger.warn("[Database] Failed to connect:", error);
       _db = null;
     }
   }
@@ -26,7 +26,7 @@ export async function upsertUser(user: InsertUser): Promise<void> {
 
   const db = await getDb();
   if (!db) {
-    console.warn("[Database] Cannot upsert user: database not available");
+    logger.warn("[Database] Cannot upsert user: database not available");
     return;
   }
 
@@ -99,7 +99,7 @@ export async function upsertUser(user: InsertUser): Promise<void> {
       set: updateSet,
     });
   } catch (error) {
-    console.error("[Database] Failed to upsert user:", error);
+    logger.error("[Database] Failed to upsert user:", error);
     throw error;
   }
 }
@@ -107,7 +107,7 @@ export async function upsertUser(user: InsertUser): Promise<void> {
 export async function getUserByOpenId(openId: string) {
   const db = await getDb();
   if (!db) {
-    console.warn("[Database] Cannot get user: database not available");
+    logger.warn("[Database] Cannot get user: database not available");
     return undefined;
   }
 
@@ -1393,7 +1393,7 @@ export async function createCertificate(studentId: number) {
       riasecProfile = analysis.riasecTop3.join('');
     }
   } catch (err) {
-    console.error('Failed to get stage/RIASEC info for certificate:', err);
+    logger.error('Failed to get stage/RIASEC info for certificate:', err);
   }
 
   // Generate PDF
@@ -2311,7 +2311,7 @@ export async function logActivity(data: { userId?: number; action: string; entit
     });
   } catch (e) {
     // Activity log hatası ana işlemi engellememeli
-    console.warn('[ActivityLog] Failed to log:', e);
+    logger.warn('[ActivityLog] Failed to log:', e);
   }
 }
 
@@ -4031,6 +4031,7 @@ export async function getBulkEmailCampaigns(limit: number = 20, offset: number =
 // ==================== Email Tracking ====================
 
 import crypto from 'crypto';
+import logger from './utils/logger';
 
 /**
  * Tracking ID oluştur (campaign_id + email hash)
