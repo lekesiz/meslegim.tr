@@ -1,6 +1,6 @@
 import { drizzle } from 'drizzle-orm/mysql2';
 import mysql from 'mysql2/promise';
-import { users } from './drizzle/schema.js';
+import { users } from '../drizzle/schema.ts';
 import { eq } from 'drizzle-orm';
 import * as dotenv from 'dotenv';
 dotenv.config();
