@@ -1,7 +1,5 @@
 import { useAuth } from '@/contexts/AuthContext';
 import DashboardLayout from '@/components/DashboardLayout';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
@@ -60,7 +58,7 @@ export default function AdminDashboard() {
     return (
       <DashboardLayout>
         <div className="flex items-center justify-center h-64">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <Loader2 className="h-8 w-8 animate-spin text-[var(--steel)]" />
         </div>
       </DashboardLayout>
     );
@@ -76,156 +74,149 @@ export default function AdminDashboard() {
       <div className="space-y-6">
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold">Admin Paneli</h1>
-          <p className="text-muted-foreground mt-2">
-            Sistem yönetimi ve kullanıcı kontrolü
+          <h1 className="text-2xl md:text-3xl font-extrabold text-[var(--navy)] tracking-tight">Sistem Yönetim Paneli (Admin)</h1>
+          <p className="text-sm text-[var(--slate-muted)] mt-1.5 font-medium">
+            Tüm platform kullanıcılarını yönetin, sistem analitiklerini inceleyin ve platform ayarlarını yapılandırın.
           </p>
         </div>
 
-        {/* Stats */}
-        <div className="grid gap-4 md:grid-cols-4">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Toplam Kullanıcı</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{users?.length || 0}</div>
-              <p className="text-xs text-muted-foreground">
-                Sistemdeki tüm kullanıcılar
-              </p>
-            </CardContent>
-          </Card>
+        {/* Stats Grid */}
+        <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
+          <div className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm transition-all duration-300 hover:shadow-md">
+            <div className="flex items-center justify-between pb-2">
+              <span className="text-xs font-bold text-[var(--slate-muted)] uppercase tracking-wider">Toplam Kullanıcı</span>
+              <Users className="h-4.5 w-4.5 text-[var(--steel)]" />
+            </div>
+            <div>
+              <p className="text-2xl font-black text-[var(--navy)]">{users?.length || 0}</p>
+              <p className="text-[10px] font-bold text-[var(--slate-light)] mt-1">Sistemdeki tüm kayıtlı hesaplar</p>
+            </div>
+          </div>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Öğrenciler</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{students.length}</div>
-              <p className="text-xs text-muted-foreground">
-                {pendingStudents.length} beklemede
-              </p>
-            </CardContent>
-          </Card>
+          <div className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm transition-all duration-300 hover:shadow-md">
+            <div className="flex items-center justify-between pb-2">
+              <span className="text-xs font-bold text-[var(--slate-muted)] uppercase tracking-wider">Toplam Öğrenci</span>
+              <Users className="h-4.5 w-4.5 text-[var(--gold-dark)]" />
+            </div>
+            <div>
+              <p className="text-2xl font-black text-[var(--navy)]">{students.length}</p>
+              <p className="text-[10px] font-bold text-[var(--gold-dark)] mt-1">{pendingStudents.length} aktifleştirme bekliyor</p>
+            </div>
+          </div>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Mentorlar</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{mentors.length}</div>
-              <p className="text-xs text-muted-foreground">
-                Aktif mentor sayısı
-              </p>
-            </CardContent>
-          </Card>
+          <div className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm transition-all duration-300 hover:shadow-md">
+            <div className="flex items-center justify-between pb-2">
+              <span className="text-xs font-bold text-[var(--slate-muted)] uppercase tracking-wider">Aktif Mentorlar</span>
+              <Users className="h-4.5 w-4.5 text-[var(--steel)]" />
+            </div>
+            <div>
+              <p className="text-2xl font-black text-[var(--navy)]">{mentors.length}</p>
+              <p className="text-[10px] font-bold text-[var(--slate-light)] mt-1">Sisteme tanımlı aktif mentorlar</p>
+            </div>
+          </div>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Adminler</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{admins.length}</div>
-              <p className="text-xs text-muted-foreground">
-                Sistem yöneticisi
-              </p>
-            </CardContent>
-          </Card>
+          <div className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm transition-all duration-300 hover:shadow-md">
+            <div className="flex items-center justify-between pb-2">
+              <span className="text-xs font-bold text-[var(--slate-muted)] uppercase tracking-wider">Yöneticiler</span>
+              <Users className="h-4.5 w-4.5 text-red-600" />
+            </div>
+            <div>
+              <p className="text-2xl font-black text-[var(--navy)]">{admins.length}</p>
+              <p className="text-[10px] font-bold text-[var(--slate-light)] mt-1">Sistem admin yetkili hesaplar</p>
+            </div>
+          </div>
         </div>
 
         {/* Tabs */}
         <Tabs defaultValue="dashboard-analytics" className="space-y-4">
-          <TabsList className="flex flex-wrap h-auto gap-1 p-1">
-            <TabsTrigger value="dashboard-analytics">
-              <BarChart3 className="h-4 w-4 mr-2" />
+          <TabsList className="flex flex-wrap h-auto gap-1 bg-slate-100/70 p-1.5 rounded-xl border border-slate-200/50">
+            <TabsTrigger value="dashboard-analytics" className="text-xs font-bold rounded-lg px-4 py-2 cursor-pointer transition-all data-[state=active]:bg-white data-[state=active]:text-[var(--navy)] data-[state=active]:shadow-sm">
+              <BarChart3 className="h-3.5 w-3.5 mr-1 text-[var(--gold-dark)]" />
               Analitik Panel
             </TabsTrigger>
-            <TabsTrigger value="analytics">
-              <TrendingUp className="h-4 w-4 mr-2" />
+            <TabsTrigger value="analytics" className="text-xs font-bold rounded-lg px-4 py-2 cursor-pointer transition-all data-[state=active]:bg-white data-[state=active]:text-[var(--navy)] data-[state=active]:shadow-sm">
+              <TrendingUp className="h-3.5 w-3.5 mr-1 text-[var(--steel)]" />
               İlerleme Analizi
             </TabsTrigger>
-            <TabsTrigger value="students">
+            <TabsTrigger value="students" className="text-xs font-bold rounded-lg px-4 py-2 cursor-pointer transition-all data-[state=active]:bg-white data-[state=active]:text-[var(--navy)] data-[state=active]:shadow-sm">
               Öğrenciler ({students.length})
             </TabsTrigger>
-            <TabsTrigger value="mentors">
+            <TabsTrigger value="mentors" className="text-xs font-bold rounded-lg px-4 py-2 cursor-pointer transition-all data-[state=active]:bg-white data-[state=active]:text-[var(--navy)] data-[state=active]:shadow-sm">
               Mentorlar ({mentors.length})
             </TabsTrigger>
-            <TabsTrigger value="reports">
+            <TabsTrigger value="reports" className="text-xs font-bold rounded-lg px-4 py-2 cursor-pointer transition-all data-[state=active]:bg-white data-[state=active]:text-[var(--navy)] data-[state=active]:shadow-sm">
               Raporlar ({reports?.length || 0})
             </TabsTrigger>
-            <TabsTrigger value="stages">
+            <TabsTrigger value="stages" className="text-xs font-bold rounded-lg px-4 py-2 cursor-pointer transition-all data-[state=active]:bg-white data-[state=active]:text-[var(--navy)] data-[state=active]:shadow-sm">
               Etaplar ({stages?.length || 0})
             </TabsTrigger>
-            <TabsTrigger value="questions">
+            <TabsTrigger value="questions" className="text-xs font-bold rounded-lg px-4 py-2 cursor-pointer transition-all data-[state=active]:bg-white data-[state=active]:text-[var(--navy)] data-[state=active]:shadow-sm">
               Sorular ({questions?.length || 0})
             </TabsTrigger>
-            <TabsTrigger value="bulk">
-              <Zap className="h-4 w-4 mr-2" />
+            <TabsTrigger value="bulk" className="text-xs font-bold rounded-lg px-4 py-2 cursor-pointer transition-all data-[state=active]:bg-white data-[state=active]:text-[var(--navy)] data-[state=active]:shadow-sm">
+              <Zap className="h-3.5 w-3.5 mr-1 text-[var(--gold-dark)]" />
               Toplu İşlemler
             </TabsTrigger>
-            <TabsTrigger value="mentor-comparison">
-              <TrendingUp className="h-4 w-4 mr-2" />
+            <TabsTrigger value="mentor-comparison" className="text-xs font-bold rounded-lg px-4 py-2 cursor-pointer transition-all data-[state=active]:bg-white data-[state=active]:text-[var(--navy)] data-[state=active]:shadow-sm">
+              <TrendingUp className="h-3.5 w-3.5 mr-1 text-[var(--steel)]" />
               Mentor Karşılaştırma
             </TabsTrigger>
-            <TabsTrigger value="feedback-summary">
-              <MessageSquare className="h-4 w-4 mr-2" />
-              Feedback Özeti
+            <TabsTrigger value="feedback-summary" className="text-xs font-bold rounded-lg px-4 py-2 cursor-pointer transition-all data-[state=active]:bg-white data-[state=active]:text-[var(--navy)] data-[state=active]:shadow-sm">
+              <MessageSquare className="h-3.5 w-3.5 mr-1 text-[var(--gold-dark)]" />
+              Geri Bildirimler
             </TabsTrigger>
-            <TabsTrigger value="user-management">
-              <Users className="h-4 w-4 mr-2" />
+            <TabsTrigger value="user-management" className="text-xs font-bold rounded-lg px-4 py-2 cursor-pointer transition-all data-[state=active]:bg-white data-[state=active]:text-[var(--navy)] data-[state=active]:shadow-sm">
+              <Users className="h-3.5 w-3.5 mr-1 text-[var(--steel)]" />
               Kullanıcı Yönetimi
             </TabsTrigger>
-            <TabsTrigger value="payments">
-              <CreditCard className="h-4 w-4 mr-2" />
-              Ödeme Yönetimi
+            <TabsTrigger value="payments" className="text-xs font-bold rounded-lg px-4 py-2 cursor-pointer transition-all data-[state=active]:bg-white data-[state=active]:text-[var(--navy)] data-[state=active]:shadow-sm">
+              <CreditCard className="h-3.5 w-3.5 mr-1 text-[var(--gold-dark)]" />
+              Ödemeler
             </TabsTrigger>
-            <TabsTrigger value="schools">
-              <Layers className="h-4 w-4 mr-2" />
-              Okul Yönetimi
+            <TabsTrigger value="schools" className="text-xs font-bold rounded-lg px-4 py-2 cursor-pointer transition-all data-[state=active]:bg-white data-[state=active]:text-[var(--navy)] data-[state=active]:shadow-sm">
+              <Layers className="h-3.5 w-3.5 mr-1 text-[var(--steel)]" />
+              Okullar
             </TabsTrigger>
-            <TabsTrigger value="promotions">
-              <Zap className="h-4 w-4 mr-2" />
-              Promosyon Kodları
+            <TabsTrigger value="promotions" className="text-xs font-bold rounded-lg px-4 py-2 cursor-pointer transition-all data-[state=active]:bg-white data-[state=active]:text-[var(--navy)] data-[state=active]:shadow-sm">
+              <Zap className="h-3.5 w-3.5 mr-1 text-[var(--gold-dark)]" />
+              Kuponlar
             </TabsTrigger>
-            <TabsTrigger value="activity-logs">
-              <Eye className="h-4 w-4 mr-2" />
-              Aktivite Logları
+            <TabsTrigger value="activity-logs" className="text-xs font-bold rounded-lg px-4 py-2 cursor-pointer transition-all data-[state=active]:bg-white data-[state=active]:text-[var(--navy)] data-[state=active]:shadow-sm">
+              <Eye className="h-3.5 w-3.5 mr-1 text-[var(--steel)]" />
+              Loglar
             </TabsTrigger>
-            <TabsTrigger value="export-history">
-              <FileDown className="h-4 w-4 mr-2" />
-              Rapor Geçmişi
+            <TabsTrigger value="export-history" className="text-xs font-bold rounded-lg px-4 py-2 cursor-pointer transition-all data-[state=active]:bg-white data-[state=active]:text-[var(--navy)] data-[state=active]:shadow-sm">
+              <FileDown className="h-3.5 w-3.5 mr-1 text-slate-500" />
+              Rapor Dışa Aktarım
             </TabsTrigger>
-            <TabsTrigger value="pilot-feedback">
-              <MessageSquare className="h-4 w-4 mr-2" />
+            <TabsTrigger value="pilot-feedback" className="text-xs font-bold rounded-lg px-4 py-2 cursor-pointer transition-all data-[state=active]:bg-white data-[state=active]:text-[var(--navy)] data-[state=active]:shadow-sm">
+              <MessageSquare className="h-3.5 w-3.5 mr-1 text-[var(--gold-dark)]" />
               Pilot Geri Bildirim
             </TabsTrigger>
-            <TabsTrigger value="user-journey">
-              <TrendingUp className="h-4 w-4 mr-2" />
-              Yolculuk Haritası
+            <TabsTrigger value="user-journey" className="text-xs font-bold rounded-lg px-4 py-2 cursor-pointer transition-all data-[state=active]:bg-white data-[state=active]:text-[var(--navy)] data-[state=active]:shadow-sm">
+              <TrendingUp className="h-3.5 w-3.5 mr-1 text-[var(--steel)]" />
+              Kullanıcı Yolculuğu
             </TabsTrigger>
-            <TabsTrigger value="anomaly-history">
-              <AlertTriangle className="h-4 w-4 mr-1" /> Anomali Takibi
+            <TabsTrigger value="anomaly-history" className="text-xs font-bold rounded-lg px-4 py-2 cursor-pointer transition-all data-[state=active]:bg-white data-[state=active]:text-[var(--navy)] data-[state=active]:shadow-sm">
+              <AlertTriangle className="h-3.5 w-3.5 mr-1 text-red-500" />
+              Anomali Takibi
             </TabsTrigger>
-            <TabsTrigger value="scheduled-reports">
-              <Mail className="h-4 w-4 mr-2" />
-              Otomatik Raporlama
+            <TabsTrigger value="scheduled-reports" className="text-xs font-bold rounded-lg px-4 py-2 cursor-pointer transition-all data-[state=active]:bg-white data-[state=active]:text-[var(--navy)] data-[state=active]:shadow-sm">
+              <Mail className="h-3.5 w-3.5 mr-1 text-[var(--gold-dark)]" />
+              Otomatik Raporlar
             </TabsTrigger>
-            <TabsTrigger value="email-campaigns">
-              <Mail className="h-4 w-4 mr-2" />
-              Email Kampanyaları
+            <TabsTrigger value="email-campaigns" className="text-xs font-bold rounded-lg px-4 py-2 cursor-pointer transition-all data-[state=active]:bg-white data-[state=active]:text-[var(--navy)] data-[state=active]:shadow-sm">
+              <Mail className="h-3.5 w-3.5 mr-1 text-[var(--steel)]" />
+              Kampanyalar
             </TabsTrigger>
-            <TabsTrigger value="platform-settings">
-              <Settings className="h-4 w-4 mr-2" />
-              Platform Ayarları
+            <TabsTrigger value="platform-settings" className="text-xs font-bold rounded-lg px-4 py-2 cursor-pointer transition-all data-[state=active]:bg-white data-[state=active]:text-[var(--navy)] data-[state=active]:shadow-sm">
+              <Settings className="h-3.5 w-3.5 mr-1 text-slate-500" />
+              Ayarlar
             </TabsTrigger>
           </TabsList>
 
           {/* Dashboard Analytics Tab */}
-          <TabsContent value="dashboard-analytics">
+          <TabsContent value="dashboard-analytics" className="mt-6">
             <div className="grid gap-6 lg:grid-cols-[1fr_380px]">
               <div className="space-y-6">
                 <ActiveUsersWidget />
@@ -238,120 +229,117 @@ export default function AdminDashboard() {
           </TabsContent>
 
           {/* Progress Analytics Tab */}
-          <TabsContent value="analytics">
+          <TabsContent value="analytics" className="mt-6">
             <ProgressAnalytics />
           </TabsContent>
 
           {/* Bulk Operations Tab */}
-          <TabsContent value="bulk">
+          <TabsContent value="bulk" className="mt-6">
             <BulkOperations />
           </TabsContent>
 
           {/* Mentor Comparison Tab */}
-          <TabsContent value="mentor-comparison">
+          <TabsContent value="mentor-comparison" className="mt-6">
             <MentorComparisonReport />
           </TabsContent>
 
           {/* Feedback Summary Tab */}
-          <TabsContent value="feedback-summary">
+          <TabsContent value="feedback-summary" className="mt-6">
             <AdminFeedbackSummary />
           </TabsContent>
 
           {/* User Management Tab */}
-          <TabsContent value="user-management">
+          <TabsContent value="user-management" className="mt-6">
             <UserManagement />
           </TabsContent>
 
           {/* Payments Tab */}
-          <TabsContent value="payments">
+          <TabsContent value="payments" className="mt-6">
             <PaymentManagement />
           </TabsContent>
 
           {/* Schools Tab */}
-          <TabsContent value="schools">
+          <TabsContent value="schools" className="mt-6">
             <SchoolManagement />
           </TabsContent>
 
           {/* Promotions Tab */}
-          <TabsContent value="promotions">
+          <TabsContent value="promotions" className="mt-6">
             <PromotionCodeManagement />
           </TabsContent>
 
           {/* Activity Logs Tab */}
-          <TabsContent value="activity-logs">
+          <TabsContent value="activity-logs" className="mt-6">
             <ActivityLogViewer />
           </TabsContent>
 
           {/* Export History Tab */}
-          <TabsContent value="export-history">
+          <TabsContent value="export-history" className="mt-6">
             <ExportHistory />
           </TabsContent>
 
           {/* Pilot Feedback Tab */}
-          <TabsContent value="pilot-feedback">
+          <TabsContent value="pilot-feedback" className="mt-6">
             <PilotFeedbackPanel />
           </TabsContent>
 
           {/* User Journey Map Tab */}
-          <TabsContent value="user-journey">
+          <TabsContent value="user-journey" className="mt-6">
             <UserJourneyMap />
           </TabsContent>
 
           {/* Anomaly History Tab */}
-          <TabsContent value="anomaly-history">
+          <TabsContent value="anomaly-history" className="mt-6">
             <AnomalyHistory />
           </TabsContent>
 
-          <TabsContent value="scheduled-reports">
+          <TabsContent value="scheduled-reports" className="mt-6">
             <ScheduledReports />
           </TabsContent>
 
-          <TabsContent value="email-campaigns">
+          <TabsContent value="email-campaigns" className="mt-6">
             <BulkEmailCampaigns />
           </TabsContent>
 
           {/* Platform Settings Tab */}
-          <TabsContent value="platform-settings">
+          <TabsContent value="platform-settings" className="mt-6">
             <PlatformSettings />
           </TabsContent>
 
           {/* Students Tab */}
-          <TabsContent value="students">
-            <Card>
-              <CardHeader>
-                <CardTitle>Öğrenci Listesi</CardTitle>
-                <CardDescription>
-                  Sistemdeki tüm öğrencileri görüntüleyin ve yönetin
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="overflow-x-auto">
+          <TabsContent value="students" className="mt-6">
+            <div className="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm">
+              <div className="pb-3 mb-4 border-b border-slate-50">
+                <h3 className="text-base font-bold text-[var(--navy)]">Öğrenci Hesap Listesi</h3>
+                <p className="text-xs text-[var(--slate-muted)] mt-1 font-medium">Sistemdeki tüm öğrencileri görüntüleyin ve yönetin</p>
+              </div>
+              <div className="overflow-x-auto rounded-xl border border-slate-100 shadow-xs">
                 <Table>
                   <TableHeader>
-                    <TableRow>
-                      <TableHead>Ad Soyad</TableHead>
-                      <TableHead>E-posta</TableHead>
-                      <TableHead>Yaş Grubu</TableHead>
-                      <TableHead>Durum</TableHead>
-                      <TableHead>Mentor</TableHead>
-                      <TableHead>İşlemler</TableHead>
+                    <TableRow className="bg-slate-50 border-b border-slate-100 text-[var(--navy)] font-bold text-xs uppercase tracking-wide">
+                      <TableHead className="px-4 py-3 text-left">Ad Soyad</TableHead>
+                      <TableHead className="px-4 py-3 text-left">E-posta</TableHead>
+                      <TableHead className="px-4 py-3 text-left">Yaş Grubu</TableHead>
+                      <TableHead className="px-4 py-3 text-left">Durum</TableHead>
+                      <TableHead className="px-4 py-3 text-left">Mentor</TableHead>
+                      <TableHead className="px-4 py-3 text-left">İşlemler</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {students.length > 0 ? (
                       students.map((student: any) => (
-                        <TableRow key={student.id}>
-                          <TableCell className="font-medium">{student.name}</TableCell>
-                          <TableCell>{student.email}</TableCell>
-                          <TableCell>{student.ageGroup || '-'}</TableCell>
-                          <TableCell>
+                        <TableRow key={student.id} className="border-b border-slate-100 last:border-0 hover:bg-slate-50/50">
+                          <TableCell className="font-bold text-sm text-[var(--navy)] px-4 py-3">{student.name}</TableCell>
+                          <TableCell className="text-sm px-4 py-3">{student.email}</TableCell>
+                          <TableCell className="text-xs font-semibold px-4 py-3">{student.ageGroup || '-'}</TableCell>
+                          <TableCell className="px-4 py-3">
                             <Badge
-                              variant={
+                              className={
                                 student.status === 'active'
-                                  ? 'default'
+                                  ? 'bg-green-50 text-green-700 border-none font-bold text-[10px]'
                                   : student.status === 'pending'
-                                  ? 'secondary'
-                                  : 'outline'
+                                  ? 'bg-amber-50 text-amber-700 border-none font-bold text-[10px]'
+                                  : 'bg-slate-100 text-slate-500 border-none font-bold text-[10px]'
                               }
                             >
                               {student.status === 'active'
@@ -361,136 +349,124 @@ export default function AdminDashboard() {
                                 : 'Pasif'}
                             </Badge>
                           </TableCell>
-                          <TableCell>
+                          <TableCell className="text-xs font-medium text-[var(--steel)] px-4 py-3">
                             {student.mentorName || (student.mentorId ? `Mentor #${student.mentorId}` : '-')}
                           </TableCell>
-                          <TableCell>
-                            <Button 
-                              variant="outline" 
-                              size="sm"
+                          <TableCell className="px-4 py-3">
+                            <button 
                               onClick={() => setEditingStudent(student)}
+                              className="border border-slate-250 text-slate-650 hover:bg-slate-50 rounded-xl font-bold px-3 py-1.5 transition-all text-xs bg-white cursor-pointer"
                             >
                               Düzenle
-                            </Button>
+                            </button>
                           </TableCell>
                         </TableRow>
                       ))
                     ) : (
                       <TableRow>
-                        <TableCell colSpan={6} className="text-center text-muted-foreground">
+                        <TableCell colSpan={6} className="text-center text-slate-400 font-medium py-8">
                           Henüz öğrenci bulunmamaktadır.
                         </TableCell>
                       </TableRow>
                     )}
                   </TableBody>
                 </Table>
-                </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </TabsContent>
 
           {/* Mentors Tab */}
-          <TabsContent value="mentors">
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle>Mentor Listesi</CardTitle>
-                    <CardDescription>
-                      Sistemdeki tüm mentorları görüntüleyin ve yönetin
-                    </CardDescription>
-                  </div>
-                  <CreateMentorDialog />
+          <TabsContent value="mentors" className="mt-6">
+            <div className="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm">
+              <div className="pb-3 mb-4 border-b border-slate-50 flex items-center justify-between gap-4">
+                <div>
+                  <h3 className="text-base font-bold text-[var(--navy)]">Mentor Hesap Listesi</h3>
+                  <p className="text-xs text-[var(--slate-muted)] mt-1 font-medium">Sistemdeki tüm mentorları görüntüleyin ve yönetin</p>
                 </div>
-              </CardHeader>
-              <CardContent>
-                <div className="overflow-x-auto">
+                <CreateMentorDialog />
+              </div>
+              <div className="overflow-x-auto rounded-xl border border-slate-100 shadow-xs">
                 <Table>
                   <TableHeader>
-                    <TableRow>
-                      <TableHead>Ad Soyad</TableHead>
-                      <TableHead>E-posta</TableHead>
-                      <TableHead>Durum</TableHead>
-                      <TableHead>İşlemler</TableHead>
+                    <TableRow className="bg-slate-50 border-b border-slate-100 text-[var(--navy)] font-bold text-xs uppercase tracking-wide">
+                      <TableHead className="px-4 py-3 text-left">Ad Soyad</TableHead>
+                      <TableHead className="px-4 py-3 text-left">E-posta</TableHead>
+                      <TableHead className="px-4 py-3 text-left">Durum</TableHead>
+                      <TableHead className="px-4 py-3 text-left">İşlemler</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {mentors.length > 0 ? (
                       mentors.map((mentor: any) => (
-                        <TableRow key={mentor.id}>
-                          <TableCell className="font-medium">{mentor.name}</TableCell>
-                          <TableCell>{mentor.email}</TableCell>
-                          <TableCell>
-                            <Badge variant="default">Aktif</Badge>
+                        <TableRow key={mentor.id} className="border-b border-slate-100 last:border-0 hover:bg-slate-50/50">
+                          <TableCell className="font-bold text-sm text-[var(--navy)] px-4 py-3">{mentor.name}</TableCell>
+                          <TableCell className="text-sm px-4 py-3">{mentor.email}</TableCell>
+                          <TableCell className="px-4 py-3">
+                            <Badge className="bg-green-50 text-green-700 border-none font-bold text-[10px]">Aktif</Badge>
                           </TableCell>
-                          <TableCell>
-                            <Button 
-                              variant="outline" 
-                              size="sm"
+                          <TableCell className="px-4 py-3">
+                            <button 
                               onClick={() => setEditingMentor(mentor)}
+                              className="border border-slate-250 text-slate-650 hover:bg-slate-50 rounded-xl font-bold px-3 py-1.5 transition-all text-xs bg-white cursor-pointer"
                             >
                               Düzenle
-                            </Button>
+                            </button>
                           </TableCell>
                         </TableRow>
                       ))
                     ) : (
                       <TableRow>
-                        <TableCell colSpan={4} className="text-center text-muted-foreground">
+                        <TableCell colSpan={4} className="text-center text-slate-400 font-medium py-8">
                           Henüz mentor bulunmamaktadır.
                         </TableCell>
                       </TableRow>
                     )}
                   </TableBody>
                 </Table>
-                </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </TabsContent>
 
           {/* Reports Tab */}
-          <TabsContent value="reports">
-            <Card>
-              <CardHeader>
-                <CardTitle>Rapor Listesi</CardTitle>
-                <CardDescription>
-                  Sistemdeki tüm raporları görüntüleyin
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="overflow-x-auto">
+          <TabsContent value="reports" className="mt-6">
+            <div className="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm">
+              <div className="pb-3 mb-4 border-b border-slate-50">
+                <h3 className="text-base font-bold text-[var(--navy)]">Tüm Raporlar</h3>
+                <p className="text-xs text-[var(--slate-muted)] mt-1 font-medium">Sistemdeki tüm onaylı veya onay bekleyen raporları görüntüleyin</p>
+              </div>
+              <div className="overflow-x-auto rounded-xl border border-slate-100 shadow-xs">
                 <Table>
                   <TableHeader>
-                    <TableRow>
-                      <TableHead>ID</TableHead>
-                      <TableHead>Öğrenci</TableHead>
-                      <TableHead>Etap</TableHead>
-                      <TableHead>Tip</TableHead>
-                      <TableHead>Durum</TableHead>
-                      <TableHead>Oluşturulma</TableHead>
-                      <TableHead>İşlem</TableHead>
+                    <TableRow className="bg-slate-50 border-b border-slate-100 text-[var(--navy)] font-bold text-xs uppercase tracking-wide">
+                      <TableHead className="px-4 py-3 text-left">ID</TableHead>
+                      <TableHead className="px-4 py-3 text-left">Öğrenci</TableHead>
+                      <TableHead className="px-4 py-3 text-left">Etap</TableHead>
+                      <TableHead className="px-4 py-3 text-left">Tip</TableHead>
+                      <TableHead className="px-4 py-3 text-left">Durum</TableHead>
+                      <TableHead className="px-4 py-3 text-left">Oluşturulma</TableHead>
+                      <TableHead className="px-4 py-3 text-left">İşlem</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {reports && reports.length > 0 ? (
                       reports.map((report: any) => (
-                        <TableRow key={report.id}>
-                          <TableCell>{report.id}</TableCell>
-                          <TableCell>{(report as any).studentName || report.userId}</TableCell>
-                          <TableCell>{(report as any).stageName || report.stageId || '-'}</TableCell>
-                          <TableCell>
-                            <Badge variant="outline">
+                        <TableRow key={report.id} className="border-b border-slate-100 last:border-0 hover:bg-slate-50/50">
+                          <TableCell className="text-xs text-slate-450 font-bold px-4 py-3">#{report.id}</TableCell>
+                          <TableCell className="font-bold text-sm text-[var(--navy)] px-4 py-3">{(report as any).studentName || report.userId}</TableCell>
+                          <TableCell className="text-sm font-medium text-[var(--steel)] px-4 py-3">{(report as any).stageName || report.stageId || '-'}</TableCell>
+                          <TableCell className="px-4 py-3">
+                            <Badge variant="outline" className="border-slate-200 text-slate-650 bg-slate-50/50 font-bold text-[10px]">
                               {report.type === 'stage' ? 'Etap' : 'Final'}
                             </Badge>
                           </TableCell>
-                          <TableCell>
+                          <TableCell className="px-4 py-3">
                             <Badge
-                              variant={
+                              className={
                                 report.status === 'approved'
-                                  ? 'default'
+                                  ? 'bg-green-50 text-green-700 border-none font-bold text-[10px]'
                                   : report.status === 'pending'
-                                  ? 'secondary'
-                                  : 'outline'
+                                  ? 'bg-amber-50 text-amber-700 border-none font-bold text-[10px]'
+                                  : 'bg-red-50 text-red-700 border-none font-bold text-[10px]'
                               }
                             >
                               {report.status === 'approved'
@@ -500,147 +476,137 @@ export default function AdminDashboard() {
                                 : 'Reddedildi'}
                             </Badge>
                           </TableCell>
-                          <TableCell>
+                          <TableCell className="text-xs text-slate-450 font-semibold px-4 py-3">
                             {new Date(report.createdAt).toLocaleDateString('tr-TR')}
                           </TableCell>
-                          <TableCell>
+                          <TableCell className="px-4 py-3">
                             {report.pdfUrl && (
-                              <Button
-                                variant="ghost"
-                                size="sm"
+                              <button
                                 onClick={() => window.open(report.pdfUrl, '_blank')}
+                                className="border border-slate-200 text-slate-650 hover:bg-slate-50 rounded-xl font-bold px-3 py-1.5 transition-all text-xs bg-white cursor-pointer flex items-center gap-1"
                               >
-                                <Eye className="h-4 w-4 mr-1" />
-                                PDF
-                              </Button>
+                                <Eye className="h-3.5 w-3.5 mr-0.5" />
+                                Görüntüle (PDF)
+                              </button>
                             )}
                           </TableCell>
                         </TableRow>
                       ))
                     ) : (
                       <TableRow>
-                        <TableCell colSpan={6} className="text-center text-muted-foreground">
+                        <TableCell colSpan={7} className="text-center text-slate-400 font-medium py-8">
                           Henüz rapor bulunmamaktadır.
                         </TableCell>
                       </TableRow>
                     )}
                   </TableBody>
                 </Table>
-                </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </TabsContent>
 
           {/* Stages Tab */}
-          <TabsContent value="stages">
-            <Card>
-              <CardHeader>
-                <CardTitle>Etap Listesi</CardTitle>
-                <CardDescription>
-                  Sistemdeki tüm etapları görüntüleyin
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="overflow-x-auto">
+          <TabsContent value="stages" className="mt-6">
+            <div className="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm">
+              <div className="pb-3 mb-4 border-b border-slate-50">
+                <h3 className="text-base font-bold text-[var(--navy)]">Platform Etap Tanımları</h3>
+                <p className="text-xs text-[var(--slate-muted)] mt-1 font-medium">Sistemde tanımlı tüm aktif aşamalar</p>
+              </div>
+              <div className="overflow-x-auto rounded-xl border border-slate-100 shadow-xs">
                 <Table>
                   <TableHeader>
-                    <TableRow>
-                      <TableHead>ID</TableHead>
-                      <TableHead>Etap Adı</TableHead>
-                      <TableHead>Yaş Grubu</TableHead>
-                      <TableHead>Sıra</TableHead>
-                      <TableHead>Açıklama</TableHead>
+                    <TableRow className="bg-slate-50 border-b border-slate-100 text-[var(--navy)] font-bold text-xs uppercase tracking-wide">
+                      <TableHead className="px-4 py-3 text-left">ID</TableHead>
+                      <TableHead className="px-4 py-3 text-left">Etap Adı</TableHead>
+                      <TableHead className="px-4 py-3 text-left">Yaş Grubu</TableHead>
+                      <TableHead className="px-4 py-3 text-left">Sıra No</TableHead>
+                      <TableHead className="px-4 py-3 text-left">Açıklama</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {stages && stages.length > 0 ? (
                       stages.map((stage: any) => (
-                        <TableRow key={stage.id}>
-                          <TableCell>{stage.id}</TableCell>
-                          <TableCell className="font-medium">{stage.name}</TableCell>
-                          <TableCell>
-                            <Badge variant="outline">{stage.ageGroup}</Badge>
+                        <TableRow key={stage.id} className="border-b border-slate-100 last:border-0 hover:bg-slate-50/50">
+                          <TableCell className="text-xs font-bold text-slate-400 px-4 py-3">#{stage.id}</TableCell>
+                          <TableCell className="font-bold text-sm text-[var(--navy)] px-4 py-3">{stage.name}</TableCell>
+                          <TableCell className="px-4 py-3">
+                            <Badge className="bg-[var(--gold)]/10 text-[var(--gold-dark)] border-none font-bold text-[10px] px-2 py-0.5">{stage.ageGroup}</Badge>
                           </TableCell>
-                          <TableCell>{stage.order}</TableCell>
-                          <TableCell className="max-w-md truncate">
+                          <TableCell className="font-extrabold text-sm px-4 py-3">{stage.order}</TableCell>
+                          <TableCell className="text-xs font-medium text-slate-500 max-w-md truncate px-4 py-3">
                             {stage.description}
                           </TableCell>
                         </TableRow>
                       ))
                     ) : (
                       <TableRow>
-                        <TableCell colSpan={5} className="text-center text-muted-foreground">
+                        <TableCell colSpan={5} className="text-center text-slate-400 font-medium py-8">
                           Henüz etap bulunmamaktadır.
                         </TableCell>
                       </TableRow>
                     )}
                   </TableBody>
                 </Table>
-                </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </TabsContent>
 
           {/* Questions Tab */}
-          <TabsContent value="questions">
-            <Card>
-              <CardHeader>
-                <CardTitle>Soru Bankası</CardTitle>
-                <CardDescription>
-                  Sistemdeki tüm soruları görüntüleyin
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="overflow-x-auto">
+          <TabsContent value="questions" className="mt-6">
+            <div className="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm">
+              <div className="pb-3 mb-4 border-b border-slate-50">
+                <h3 className="text-base font-bold text-[var(--navy)]">Soru Bankası</h3>
+                <p className="text-xs text-[var(--slate-muted)] mt-1 font-medium">Tüm etaplarda öğrencilere yöneltilen sorular</p>
+              </div>
+              <div className="overflow-x-auto rounded-xl border border-slate-100 shadow-xs">
                 <Table>
                   <TableHeader>
-                    <TableRow>
-                      <TableHead>ID</TableHead>
-                      <TableHead>Soru Metni</TableHead>
-                      <TableHead>Etap ID</TableHead>
-                      <TableHead>Tip</TableHead>
-                      <TableHead>Zorunlu</TableHead>
-                      <TableHead>Sıra</TableHead>
+                    <TableRow className="bg-slate-50 border-b border-slate-100 text-[var(--navy)] font-bold text-xs uppercase tracking-wide">
+                      <TableHead className="px-4 py-3 text-left">ID</TableHead>
+                      <TableHead className="px-4 py-3 text-left">Soru Metni</TableHead>
+                      <TableHead className="px-4 py-3 text-left">Etap ID</TableHead>
+                      <TableHead className="px-4 py-3 text-left">Tip</TableHead>
+                      <TableHead className="px-4 py-3 text-left">Zorunlu</TableHead>
+                      <TableHead className="px-4 py-3 text-left">Sıra</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {questions && questions.length > 0 ? (
                       questions.map((question: any) => (
-                        <TableRow key={question.id}>
-                          <TableCell>{question.id}</TableCell>
-                          <TableCell className="max-w-md truncate">
+                        <TableRow key={question.id} className="border-b border-slate-100 last:border-0 hover:bg-slate-50/50">
+                          <TableCell className="text-xs text-slate-400 font-bold px-4 py-3">#{question.id}</TableCell>
+                          <TableCell className="text-sm font-semibold text-[var(--navy)] max-w-md truncate px-4 py-3">
                             {question.text}
                           </TableCell>
-                          <TableCell>{question.stageId}</TableCell>
-                          <TableCell>
-                            <Badge variant="outline">
+                          <TableCell className="text-xs font-bold text-slate-500 px-4 py-3">Etap #{question.stageId}</TableCell>
+                          <TableCell className="px-4 py-3">
+                            <Badge className="bg-slate-100 text-slate-650 border-none font-bold text-[10px]">
                               {question.type === 'likert' ? 'Likert' : 
                                question.type === 'multiple_choice' ? 'Çoktan Seçmeli' :
                                question.type === 'ranking' ? 'Sıralama' : 'Metin'}
                             </Badge>
                           </TableCell>
-                          <TableCell>
+                          <TableCell className="px-4 py-3">
                             {question.required ? (
-                              <Badge variant="default">Evet</Badge>
+                              <Badge className="bg-red-50 text-red-700 border-none font-bold text-[10px]">Evet</Badge>
                             ) : (
-                              <Badge variant="secondary">Hayır</Badge>
+                              <Badge className="bg-slate-100 text-slate-500 border-none font-bold text-[10px]">Hayır</Badge>
                             )}
                           </TableCell>
-                          <TableCell>{question.order}</TableCell>
+                          <TableCell className="text-xs font-bold text-slate-600 px-4 py-3">{question.order}</TableCell>
                         </TableRow>
                       ))
                     ) : (
                       <TableRow>
-                        <TableCell colSpan={6} className="text-center text-muted-foreground">
+                        <TableCell colSpan={6} className="text-center text-slate-400 font-medium py-8">
                           Henüz soru bulunmamaktadır.
                         </TableCell>
                       </TableRow>
                     )}
                   </TableBody>
                 </Table>
-                </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </TabsContent>
         </Tabs>
       </div>
@@ -700,31 +666,32 @@ function CreateMentorDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button>
-          <Plus className="h-4 w-4 mr-2" />
+        <button className="px-4 py-2 bg-gradient-to-br from-[var(--navy)] to-[var(--steel)] text-white font-semibold rounded-xl hover:shadow-md hover:from-[var(--navy-light)] hover:to-[var(--steel-light)] transition-all text-xs flex items-center gap-1.5 cursor-pointer border-none shrink-0">
+          <Plus className="h-4 w-4 text-[var(--gold)]" />
           Yeni Mentor Ekle
-        </Button>
+        </button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="rounded-2xl max-w-md p-6 bg-white">
         <DialogHeader>
-          <DialogTitle>Yeni Mentor Ekle</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-lg font-bold text-[var(--navy)]">Yeni Mentor Ekle</DialogTitle>
+          <DialogDescription className="text-xs text-slate-500 mt-1">
             Sisteme yeni bir mentor ekleyin. Mentor otomatik olarak aktif olacaktır.
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="name">Ad Soyad</Label>
+        <form onSubmit={handleSubmit} className="space-y-4 pt-3">
+          <div className="space-y-1.5">
+            <Label htmlFor="name" className="text-xs font-bold text-[var(--navy)]">Ad Soyad</Label>
             <Input
               id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Örn: Ahmet Yılmaz"
               required
+              className="rounded-xl border-slate-200 bg-slate-50/50 p-4 transition-all focus:border-[var(--gold)] focus:ring-[var(--gold)]/20 text-xs"
             />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="email">E-posta</Label>
+          <div className="space-y-1.5">
+            <Label htmlFor="email" className="text-xs font-bold text-[var(--navy)]">E-posta Adresi</Label>
             <Input
               id="email"
               type="email"
@@ -732,10 +699,11 @@ function CreateMentorDialog() {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Örn: ahmet@example.com"
               required
+              className="rounded-xl border-slate-200 bg-slate-50/50 p-4 transition-all focus:border-[var(--gold)] focus:ring-[var(--gold)]/20 text-xs"
             />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="password">Şifre</Label>
+          <div className="space-y-1.5">
+            <Label htmlFor="password" className="text-xs font-bold text-[var(--navy)]">Şifre</Label>
             <Input
               id="password"
               type="password"
@@ -744,26 +712,31 @@ function CreateMentorDialog() {
               placeholder="En az 6 karakter"
               required
               minLength={6}
+              className="rounded-xl border-slate-200 bg-slate-50/50 p-4 transition-all focus:border-[var(--gold)] focus:ring-[var(--gold)]/20 text-xs"
             />
           </div>
-          <div className="flex justify-end gap-2">
-            <Button
+          <div className="flex justify-end gap-2 pt-2 border-t border-slate-50 mt-4">
+            <button
               type="button"
-              variant="outline"
               onClick={() => setOpen(false)}
+              className="border-2 border-slate-200 text-slate-650 hover:bg-slate-50 rounded-xl font-bold px-4 py-2 transition-all text-xs bg-white cursor-pointer"
             >
               İptal
-            </Button>
-            <Button type="submit" disabled={createMentorMutation.isPending}>
+            </button>
+            <button 
+              type="submit" 
+              disabled={createMentorMutation.isPending}
+              className="btn-accent px-5 py-2.5 text-xs font-bold flex items-center justify-center cursor-pointer border-none disabled:opacity-50"
+            >
               {createMentorMutation.isPending ? (
                 <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  <Loader2 className="h-3.5 w-3.5 mr-1 animate-spin text-[var(--navy)]" />
                   Oluşturuluyor...
                 </>
               ) : (
                 'Oluştur'
               )}
-            </Button>
+            </button>
           </div>
         </form>
       </DialogContent>

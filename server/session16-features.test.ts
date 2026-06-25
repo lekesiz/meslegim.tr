@@ -2,6 +2,44 @@ import { describe, expect, it, vi } from "vitest";
 import { appRouter } from "./routers";
 import type { TrpcContext } from "./_core/context";
 
+vi.mock("./db", async (importOriginal) => {
+  const original = await importOriginal<typeof import("./db")>();
+  return {
+    ...original,
+    getInactiveStudents: vi.fn(async () => {
+      return [
+        { id: 3, name: "Inactive Student", email: "inactive@test.com", lastActive: new Date() }
+      ];
+    }),
+    getInactivityNotificationHistory: vi.fn(async () => {
+      return {
+        notifications: [
+          { id: 1, userId: 3, userEmail: "inactive@test.com", sentAt: new Date(), status: "sent" }
+        ],
+        total: 1,
+      };
+    }),
+    getSegmentCounts: vi.fn(async () => {
+      return {
+        total: 10,
+        active: 5,
+        inactive: 5,
+        trial: 3,
+        premium: 4,
+        pending: 3,
+      };
+    }),
+    getUsersBySegment: vi.fn(async (segment: string) => {
+      return [
+        { id: 2, name: "Student User", email: "student@test.com", role: "student" }
+      ];
+    }),
+    createBulkEmailCampaign: vi.fn(async () => {
+      return 123;
+    }),
+  };
+});
+
 type AuthenticatedUser = NonNullable<TrpcContext["user"]>;
 
 function createAdminContext(): { ctx: TrpcContext } {

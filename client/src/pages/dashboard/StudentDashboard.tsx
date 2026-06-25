@@ -1,11 +1,8 @@
 import { useAuth } from "@/contexts/AuthContext";
 import DashboardLayout from "@/components/DashboardLayout";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { trpc } from "@/lib/trpc";
-import { Loader2, FileText, Clock, CheckCircle2, Lock, Award, MessageCircle, User, MessageSquareHeart, BarChart3, ShoppingCart, Crown } from "lucide-react";
+import { Loader2, FileText, Clock, CheckCircle2, Lock, Award, MessageCircle, User, MessageSquareHeart, BarChart3, ShoppingCart } from "lucide-react";
 import { toast } from 'sonner';
 import { ChatDialog } from "@/components/ChatDialog";
 import { useState, useEffect } from "react";
@@ -70,9 +67,9 @@ export default function StudentDashboard() {
       <div className="space-y-6">
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold">Hoş Geldiniz, {user.name}!</h1>
-          <p className="text-muted-foreground mt-2">
-            Kariyer değerlendirme sürecinizi buradan takip edebilirsiniz.
+          <h1 className="text-2xl md:text-3xl font-extrabold text-[var(--navy)] tracking-tight">Hoş Geldiniz, {user.name}!</h1>
+          <p className="text-sm text-[var(--slate-muted)] mt-1.5 font-medium">
+            Kariyer değerlendirme ve gelişim sürecinizi buradan takip edebilirsiniz.
           </p>
         </div>
 
@@ -91,177 +88,174 @@ export default function StudentDashboard() {
         )}
 
         {/* Progress Card */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Genel İlerleme</CardTitle>
-            <CardDescription>
-              {completedStages} / {totalStages} etap tamamlandı
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <Progress value={progressPercentage} className="h-3" />
-              <p className="text-sm text-muted-foreground text-right">
-                %{progressPercentage.toFixed(0)} tamamlandı
+        <div className="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h2 className="text-base font-bold text-[var(--navy)]">Genel Süreç İlerlemesi</h2>
+              <p className="text-xs text-[var(--slate-muted)] mt-1 font-medium">
+                {completedStages} / {totalStages} etap tamamlandı
               </p>
             </div>
-          </CardContent>
-        </Card>
+            <div className="text-right">
+              <span className="text-lg font-bold text-[var(--gold-dark)]">%{progressPercentage.toFixed(0)}</span>
+            </div>
+          </div>
+          <div className="h-3 bg-slate-100 rounded-full overflow-hidden w-full">
+            <div className="h-full rounded-full progress-bar-gold transition-all duration-500" style={{ width: `${progressPercentage}%` }} />
+          </div>
+        </div>
 
         {/* Certificate Section */}
         {(isEligible || certificate) && (
-          <Card className="border-amber-300/60 bg-gradient-to-br from-amber-50 via-yellow-50/30 to-orange-50/20 dark:from-amber-950/30 dark:via-yellow-950/10 dark:to-transparent shadow-lg">
-            <CardHeader>
-              <div className="flex items-center gap-3">
-                <div className="flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br from-amber-400 to-yellow-500 shadow-md">
-                  <Award className="h-6 w-6 text-white" />
-                </div>
-                <div>
-                  <CardTitle className="text-lg">Tebrikler! Başarı Sertifikası Kazandınız</CardTitle>
-                  <CardDescription>
-                    Tüm etapları başarıyla tamamladınız. Sertifikanızı oluşturup indirebilirsiniz.
-                  </CardDescription>
+          <div className="border-[var(--gold)]/30 bg-gradient-to-br from-white to-[var(--cream)] shadow-md rounded-2xl p-6 border">
+            <div className="flex items-start gap-4">
+              <div className="flex-shrink-0 flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-[var(--gold)] to-[var(--gold-light)] shadow-sm">
+                <Award className="h-6 w-6 text-[var(--navy)]" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-bold text-[var(--navy)]">Tebrikler! Başarı Sertifikası Kazandınız</h3>
+                <p className="text-sm text-slate-500 font-medium mt-1">
+                  Tüm etapları başarıyla tamamladınız. Sertifikanızı oluşturup indirebilirsiniz.
+                </p>
+                <div className="mt-4 pt-4 border-t border-slate-100/50">
+                  {certificate ? (
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-1.5">
+                          <div className="w-2.5 h-2.5 rounded-full bg-green-500"></div>
+                          <p className="text-xs font-bold text-green-700">Sertifika Hazır ve Doğrulanmış</p>
+                        </div>
+                        <p className="font-mono text-xs text-slate-400">{certificate.certificateNumber}</p>
+                        <p className="text-[11px] text-slate-400">
+                          Düzenleme Tarihi: {new Date(certificate.issueDate).toLocaleDateString('tr-TR', { year: 'numeric', month: 'long', day: 'numeric' })}
+                        </p>
+                      </div>
+                      <div className="flex gap-2 shrink-0">
+                        {certificate.pdfUrl && (
+                          <button
+                            asChild
+                            className="btn-accent px-5 py-2.5 text-xs font-bold flex items-center justify-center cursor-pointer shadow-sm"
+                          >
+                            <a href={certificate.pdfUrl} target="_blank" rel="noopener noreferrer">
+                              <Award className="h-4 w-4 mr-1.5 text-[var(--navy)]" />
+                              Sertifikayı İndir
+                            </a>
+                          </button>
+                        )}
+                        <button
+                          onClick={() => window.open(`/verify-certificate/${certificate.certificateNumber}`, '_blank')}
+                          className="border-2 border-slate-200 text-slate-600 hover:bg-slate-50 rounded-xl font-bold px-4 py-2.5 transition-all text-xs bg-white cursor-pointer"
+                        >
+                          Doğrula
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center gap-3 py-2">
+                      <p className="text-xs text-[var(--slate-muted)] text-center font-medium">Profesyonel sertifikanızı oluşturun. Altın çerçeveli, QR doğrulamalı ve RIASEC profilinizi içerir.</p>
+                      <button 
+                        onClick={() => generateCertificate.mutate()}
+                        disabled={generateCertificate.isPending}
+                        className="btn-accent px-8 py-3 text-sm font-bold flex items-center justify-center cursor-pointer shadow-md"
+                      >
+                        {generateCertificate.isPending ? "Oluşturuluyor..." : "Sertifikamı Oluştur"}
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
-            </CardHeader>
-            <CardContent>
-              {certificate ? (
-                <div className="space-y-4">
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-5 bg-white/80 dark:bg-background/80 rounded-xl border border-amber-200/50 shadow-sm">
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                        <p className="text-sm font-semibold text-green-700 dark:text-green-400">Sertifika Hazır</p>
-                      </div>
-                      <p className="font-mono text-sm text-muted-foreground">{certificate.certificateNumber}</p>
-                      <p className="text-xs text-muted-foreground">
-                        Düzenleme: {new Date(certificate.issueDate).toLocaleDateString('tr-TR', { year: 'numeric', month: 'long', day: 'numeric' })}
-                      </p>
-                    </div>
-                    <div className="flex gap-2">
-                      {certificate.pdfUrl && (
-                        <Button asChild className="bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white shadow-md">
-                          <a href={certificate.pdfUrl} target="_blank" rel="noopener noreferrer">
-                            <Award className="h-4 w-4 mr-2" />
-                            Sertifikayı İndir
-                          </a>
-                        </Button>
-                      )}
-                      <Button variant="outline" size="sm" asChild className="border-amber-300">
-                        <a href={`/verify-certificate/${certificate.certificateNumber}`} target="_blank">
-                          QR Doğrulama
-                        </a>
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="flex flex-col items-center gap-3 py-2">
-                  <p className="text-sm text-muted-foreground text-center">Profesyonel sertifikanızı oluşturun. Altın çerçeveli, QR doğrulamalı ve RIASEC profilinizi içerir.</p>
-                  <Button 
-                    onClick={() => generateCertificate.mutate()}
-                    disabled={generateCertificate.isPending}
-                    size="lg"
-                    className="bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white shadow-md"
-                  >
-                    <Award className="h-5 w-5 mr-2" />
-                    {generateCertificate.isPending ? "Oluşturuluyor..." : "Sertifikamı Oluştur"}
-                  </Button>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         )}
 
         {/* Active Stage Card */}
         {activeStage ? (
-          <Card className="border-primary shadow-sm">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <CardTitle>Aktif Etap</CardTitle>
-                    {progress && (
-                      <Badge variant="outline" className="text-xs">
-                        {(progress.findIndex((s: any) => s.stageId === activeStage.stageId) + 1)}/{progress.length}
-                      </Badge>
-                    )}
-                  </div>
-                  <CardDescription className="mt-2 text-base font-medium text-foreground">
-                    {activeStage.stageName}
-                  </CardDescription>
-                </div>
-                <Badge variant="default" className="bg-blue-600">Aktif</Badge>
+          <div className="border-[var(--gold)]/30 bg-white rounded-2xl border p-6 shadow-sm">
+            <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-50">
+              <div className="flex items-center gap-2">
+                <h3 className="font-bold text-base text-[var(--navy)]">Aktif Etap</h3>
+                {progress && (
+                  <Badge variant="outline" className="text-[10px] font-bold border-slate-200 text-slate-500">
+                    {(progress.findIndex((s: any) => s.stageId === activeStage.stageId) + 1)} / {progress.length}
+                  </Badge>
+                )}
               </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-sm text-muted-foreground">
-                {activeStage.stageDescription}
-              </p>
+              <Badge className="bg-[var(--gold)] text-[var(--navy)] border-none font-bold text-xs py-1 px-3.5 rounded-full shadow-xs">Aktif</Badge>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <h4 className="font-bold text-sm text-[var(--navy)] mb-1">{activeStage.stageName}</h4>
+                <p className="text-xs text-slate-500 font-medium leading-relaxed">
+                  {activeStage.stageDescription}
+                </p>
+              </div>
               {totalStages > 0 && (
-                <div className="space-y-1">
-                  <div className="flex justify-between text-xs text-muted-foreground">
-                    <span>Genel İlerleme</span>
+                <div className="space-y-1.5 pt-2">
+                  <div className="flex justify-between text-[11px] font-bold text-slate-400">
+                    <span>Etap İlerleme</span>
                     <span>%{progressPercentage.toFixed(0)}</span>
                   </div>
-                  <Progress value={progressPercentage} className="h-2" />
+                  <div className="h-2 bg-slate-100 rounded-full overflow-hidden w-full">
+                    <div className="h-full rounded-full progress-bar-gold transition-all duration-500" style={{ width: `${progressPercentage}%` }} />
+                  </div>
                 </div>
               )}
-              <Button onClick={() => setLocation(`/dashboard/student/stage/${activeStage.stageId}`)} className="w-full sm:w-auto">
+              <button 
+                onClick={() => setLocation(`/dashboard/student/stage/${activeStage.stageId}`)} 
+                className="btn-primary w-full sm:w-auto font-bold px-6 py-2.5 text-sm flex items-center justify-center cursor-pointer shadow-md mt-2"
+              >
                 Etabı Başlat
-              </Button>
-            </CardContent>
-          </Card>
+              </button>
+            </div>
+          </div>
         ) : (
-          <Card>
-            <CardHeader>
-              <CardTitle>Aktif Etap</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <EmptyState
-                icon={Clock}
-                title="Aktif Etap Yok"
-                description="Şu anda aktif bir etabınız bulunmamaktadır. Bir önceki etabı tamamladıktan sonra 7 gün içinde yeni etap otomatik olarak aktif hale gelecektir."
-              />
-            </CardContent>
-          </Card>
+          <div className="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-bold text-base text-[var(--navy)]">Aktif Etap</h3>
+            </div>
+            <EmptyState
+              icon={Clock}
+              title="Aktif Etap Yok"
+              description="Şu anda aktif bir etabınız bulunmamaktadır. Bir önceki etabı tamamladıktan sonra 7 gün içinde yeni etap otomatik olarak aktif hale gelecektir."
+            />
+          </div>
         )}
 
         {/* All Stages */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Tüm Etaplar</CardTitle>
-            <CardDescription>Kariyer değerlendirme sürecinizin tüm aşamaları</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {progress?.map((stage) => (
-                <div
-                  key={stage.id}
-                  className="flex items-center justify-between p-4 border rounded-lg"
-                >
-                  <div className="flex items-center gap-3">
-                    {stage.status === 'completed' ? (
-                      <CheckCircle2 className="h-5 w-5 text-green-600" />
-                    ) : stage.status === 'active' ? (
-                      <Clock className="h-5 w-5 text-blue-600" />
-                    ) : (
-                      <Lock className="h-5 w-5 text-muted-foreground/70" />
-                    )}
-                    <div>
-                      <p className="font-medium">{stage.stageName}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {stage.stageDescription}
-                      </p>
-                    </div>
+        <div className="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm">
+          <div className="pb-3 mb-4 border-b border-slate-50">
+            <h3 className="font-bold text-base text-[var(--navy)]">Süreç Aşamaları</h3>
+            <p className="text-xs text-[var(--slate-muted)] mt-1 font-medium">Kariyer değerlendirme sürecinizin tüm adımları</p>
+          </div>
+          <div className="space-y-3">
+            {progress?.map((stage) => (
+              <div
+                key={stage.id}
+                className="flex items-center justify-between p-4 border border-slate-100/80 rounded-xl hover:border-slate-200 transition-all bg-slate-50/30"
+              >
+                <div className="flex items-center gap-3">
+                  {stage.status === 'completed' ? (
+                    <CheckCircle2 className="h-5 w-5 text-green-600 flex-shrink-0" />
+                  ) : stage.status === 'active' ? (
+                    <Clock className="h-5 w-5 text-[var(--steel)] flex-shrink-0 animate-pulse" />
+                  ) : (
+                    <Lock className="h-5 w-5 text-slate-400 flex-shrink-0" />
+                  )}
+                  <div>
+                    <p className="font-bold text-sm text-[var(--navy)]">{stage.stageName}</p>
+                    <p className="text-xs text-slate-400 line-clamp-1 max-w-[200px] sm:max-w-md">
+                      {stage.stageDescription}
+                    </p>
                   </div>
+                </div>
+                <div className="flex items-center gap-2">
                   <Badge
-                    variant={
+                    className={
                       stage.status === 'completed'
-                        ? 'default'
+                        ? 'bg-green-50 text-green-700 border-none font-bold text-[10px]'
                         : stage.status === 'active'
-                        ? 'secondary'
-                        : 'outline'
+                        ? 'bg-[var(--gold)]/10 text-[var(--gold-dark)] border-none font-bold text-[10px]'
+                        : 'bg-slate-100 text-slate-450 border-none font-bold text-[10px]'
                     }
                   >
                     {stage.status === 'completed'
@@ -271,162 +265,152 @@ export default function StudentDashboard() {
                       : 'Kilitli'}
                   </Badge>
                   {stage.status === 'locked' && (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="ml-2 border-amber-300 text-amber-700 hover:bg-amber-50"
+                    <button
                       onClick={() => setLocation('/fiyatlandirma')}
+                      className="ml-2 border border-[var(--gold)]/30 text-[var(--gold-dark)] hover:bg-[var(--gold)]/10 rounded-lg font-bold px-3 py-1 transition-all text-[10px] flex items-center gap-1 bg-white cursor-pointer"
                     >
-                      <ShoppingCart className="h-3 w-3 mr-1" />
+                      <ShoppingCart className="h-3 w-3 text-[var(--gold-dark)]" />
                       Aç
-                    </Button>
+                    </button>
                   )}
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+              </div>
+            ))}
+          </div>
+        </div>
 
         {/* Kariyer Profili Özeti */}
         {completedStages >= 2 && (
-          <Card className="border-emerald-200 bg-gradient-to-br from-emerald-50/80 to-teal-50/50">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <BarChart3 className="h-5 w-5 text-emerald-600" />
-                  <CardTitle className="text-lg">Kariyer Profili Özeti</CardTitle>
-                </div>
-                <Badge variant="outline" className="border-emerald-300 text-emerald-700">
-                  {completedStages} etap tamamlandı
-                </Badge>
+          <div className="border-[var(--gold)]/20 bg-gradient-to-br from-white to-[var(--cream)] rounded-2xl p-6 shadow-sm border">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
+              <div className="flex items-center gap-2">
+                <BarChart3 className="h-5 w-5 text-[var(--gold-dark)]" />
+                <h3 className="font-bold text-base text-[var(--navy)]">Kariyer Haritam & Kişilik Profilim</h3>
               </div>
-              <CardDescription>
-                Tüm etap sonuçlarınızı birleştiren kapsamlı kariyer profili analizi
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <p className="text-sm text-muted-foreground">
-                RIASEC, Big Five Kişilik, Kariyer Değerleri ve Risk Analizi sonuçlarınızı birleştirerek
-                bütünsel bir kariyer profili oluşturulur. AI-Proof kariyer önerileri de dahil edilir.
+              <Badge className="bg-[var(--steel)] text-white border-none font-bold text-[10px] px-2.5 py-0.5 rounded-full">
+                {completedStages} etap verisi analiz edildi
+              </Badge>
+            </div>
+            <div className="space-y-4">
+              <p className="text-xs text-slate-500 font-medium leading-relaxed">
+                Tamamlamış olduğunuz etaplardan elde edilen RIASEC İlgi Profili, Big Five Kişilik Kriterleri, Değerler Envanteri ve Risk Yönetimi sonuçlarınızı bütünsel olarak görüntüleyebilirsiniz.
               </p>
-              <div className="flex gap-3">
-                <Button
-                  className="bg-emerald-600 hover:bg-emerald-700"
-                  onClick={() => setLocation('/dashboard/student/career-profile')}
-                >
-                  <BarChart3 className="h-4 w-4 mr-2" />
-                  Profilimi Gör
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+              <button
+                className="btn-primary font-bold px-6 py-2.5 text-sm flex items-center justify-center cursor-pointer shadow-md"
+                onClick={() => setLocation('/dashboard/student/career-profile')}
+              >
+                <BarChart3 className="h-4 w-4 mr-1.5 text-[var(--gold)]" />
+                Profilimi Görüntüle
+              </button>
+            </div>
+          </div>
         )}
 
         {/* Reports */}
         {reports && reports.length > 0 && (
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle>Raporlarım</CardTitle>
-                  <CardDescription>Tamamlanan etaplarınızın raporları</CardDescription>
-                </div>
-                <Button variant="outline" size="sm" onClick={() => setLocation('/dashboard/student/reports')}>
-                  Tümünü Gör
-                </Button>
+          <div className="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm">
+            <div className="pb-3 mb-4 border-b border-slate-50 flex items-center justify-between">
+              <div>
+                <h3 className="font-bold text-base text-[var(--navy)]">Kariyer Raporlarım</h3>
+                <p className="text-xs text-[var(--slate-muted)] mt-1 font-medium">Onaylanmış veya değerlendirilen raporlarınız</p>
               </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {reports.slice(0, 3).map((report: any) => (
-                  <div
-                    key={report.id}
-                    className="flex items-center justify-between p-4 border rounded-lg"
-                  >
-                    <div className="flex items-center gap-3">
-                      <FileText className="h-5 w-5 text-primary" />
-                      <div>
-                        <p className="font-medium">
-                          {(report as any).stageName || (report.type === 'stage' ? 'Etap Raporu' : 'Final Raporu')}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          {new Date(report.createdAt).toLocaleDateString('tr-TR')}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Badge
-                        variant={report.status === 'approved' ? 'default' : report.status === 'rejected' ? 'destructive' : 'secondary'}
-                      >
-                        {report.status === 'approved' ? 'Onaylandı' : report.status === 'rejected' ? 'Reddedildi' : 'Beklemede'}
-                      </Badge>
-                      {report.status === 'approved' && (
-                        <Button
-                          size="sm"
-                          onClick={() => setLocation(`/dashboard/student/reports/${report.id}`)}
-                        >
-                          Görüntüle
-                        </Button>
-                      )}
+              <button 
+                onClick={() => setLocation('/dashboard/student/reports')}
+                className="border-2 border-slate-200 text-slate-650 hover:bg-slate-50 rounded-xl font-bold px-4 py-2 transition-all text-xs bg-white cursor-pointer"
+              >
+                Tümünü Gör
+              </button>
+            </div>
+            <div className="space-y-3">
+              {reports.slice(0, 3).map((report: any) => (
+                <div
+                  key={report.id}
+                  className="flex items-center justify-between p-4 border border-slate-100 rounded-xl bg-slate-50/30"
+                >
+                  <div className="flex items-center gap-3">
+                    <FileText className="h-5 w-5 text-[var(--steel)] flex-shrink-0" />
+                    <div>
+                      <p className="font-bold text-sm text-[var(--navy)]">
+                        {(report as any).stageName || (report.type === 'stage' ? 'Etap Raporu' : 'Final Raporu')}
+                      </p>
+                      <p className="text-[11px] text-slate-400 font-semibold">
+                        {new Date(report.createdAt).toLocaleDateString('tr-TR')}
+                      </p>
                     </div>
                   </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+                  <div className="flex items-center gap-2">
+                    <Badge
+                      className={
+                        report.status === 'approved' 
+                          ? 'bg-green-50 text-green-700 border-none font-bold text-[10px]' 
+                          : report.status === 'rejected' 
+                            ? 'bg-red-50 text-red-700 border-none font-bold text-[10px]' 
+                            : 'bg-amber-50 text-amber-700 border-none font-bold text-[10px]'
+                      }
+                    >
+                      {report.status === 'approved' ? 'Onaylandı' : report.status === 'rejected' ? 'Reddedildi' : 'Değerlendirmede'}
+                    </Badge>
+                    {report.status === 'approved' && (
+                      <button
+                        onClick={() => setLocation(`/dashboard/student/reports/${report.id}`)}
+                        className="bg-[var(--steel)] hover:bg-[var(--steel-light)] text-white font-semibold rounded-lg text-xs px-3.5 py-1.5 cursor-pointer transition-colors shadow-sm"
+                      >
+                        Görüntüle
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         )}
 
         {/* Mentor Contact */}
         {user.mentorId && (
-          <Card className="border-indigo-200 bg-indigo-50/50">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <User className="h-5 w-5 text-indigo-600" />
-                  <CardTitle className="text-base">Mentorünüze Ulaşın</CardTitle>
-                </div>
-              </div>
-              <CardDescription>
-                Sorularınız için mentorünüze mesaj gönderebilirsiniz
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button
-                variant="outline"
-                className="border-indigo-300 text-indigo-700 hover:bg-indigo-100"
-                onClick={() => setChatOpen(true)}
-              >
-                <MessageCircle className="mr-2 h-4 w-4" />
-                Mentor ile Mesajlaş
-              </Button>
-              <ChatDialog
-                open={chatOpen}
-                onOpenChange={setChatOpen}
-                otherUser={{ id: user.mentorId, name: 'Mentörünüz' }}
-                currentUserRole="student"
-              />
-            </CardContent>
-          </Card>
-        )}
-        {/* Pilot Geri Bildirim Banner */}
-        <Card className="bg-gradient-to-r from-purple-50 to-blue-50 border-purple-200">
-          <CardContent className="py-4 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <MessageSquareHeart className="h-5 w-5 text-purple-600" />
-              <div>
-                <p className="font-medium text-purple-900">Deneyiminizi paylaşın!</p>
-                <p className="text-sm text-purple-700">Platformu geliştirmemize yardımcı olun</p>
+          <div className="border-slate-100 bg-slate-50/50 rounded-2xl p-6 border shadow-sm">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <User className="h-5 w-5 text-[var(--steel)]" />
+                <h3 className="font-bold text-base text-[var(--navy)]">Mentorunuz ile İletişim</h3>
               </div>
             </div>
-            <Button
-              variant="outline"
-              className="border-purple-300 text-purple-700 hover:bg-purple-100"
+            <p className="text-xs text-[var(--slate-muted)] font-medium mb-4">
+              Değerlendirme sonuçları, gelişim süreçleriniz veya sorularınız için mentorünüze anlık mesaj gönderebilirsiniz.
+            </p>
+            <button
+              className="border-2 border-[var(--navy)] text-[var(--navy)] hover:bg-[var(--navy)] hover:text-white rounded-xl font-bold px-5 py-2 transition-all text-xs bg-white cursor-pointer flex items-center gap-2"
+              onClick={() => setChatOpen(true)}
+            >
+              <MessageCircle className="h-4 w-4 text-[var(--navy)] group-hover:text-white" />
+              Mesajlaşmayı Başlat
+            </button>
+            <ChatDialog
+              open={chatOpen}
+              onOpenChange={setChatOpen}
+              otherUser={{ id: user.mentorId, name: 'Mentörünüz' }}
+              currentUserRole="student"
+            />
+          </div>
+        )}
+
+        {/* Pilot Geri Bildirim Banner */}
+        <div className="bg-gradient-to-r from-[var(--navy)] to-[var(--steel)] text-white p-6 rounded-2xl shadow-md border-0">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <MessageSquareHeart className="h-6 w-6 text-[var(--gold)]" />
+              <div>
+                <p className="font-bold text-white text-base">Kullanıcı deneyiminizi paylaşın!</p>
+                <p className="text-xs text-slate-200 font-light mt-0.5">Platformumuzu geliştirmemize yardımcı olun.</p>
+              </div>
+            </div>
+            <button
+              className="border-2 border-white/20 text-white hover:bg-white hover:text-[var(--navy)] rounded-xl font-bold px-6 py-2.5 transition-all text-sm bg-transparent cursor-pointer shrink-0"
               onClick={() => setLocation("/geri-bildirim")}
             >
               Geri Bildirim Ver
-            </Button>
-          </CardContent>
-        </Card>
+            </button>
+          </div>
+        </div>
       </div>
     </DashboardLayout>
   );

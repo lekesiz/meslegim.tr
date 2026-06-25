@@ -1,6 +1,42 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { appRouter } from "./routers";
 import type { TrpcContext } from "./_core/context";
+
+let mockWidgetPrefs: any = null;
+
+vi.mock("./db", async (importOriginal) => {
+  const original = await importOriginal<typeof import("./db")>();
+  return {
+    ...original,
+    getUserJourneyList: vi.fn(async (options?: { search?: string; limit?: number; offset?: number }) => {
+      const limit = options?.limit ?? 10;
+      const users = [
+        { id: 1, name: "Test User", email: "test@meslegim.tr", currentStage: "Stage 1", lastActive: new Date() }
+      ];
+      return {
+        users: users.slice(0, limit),
+        total: 1,
+      };
+    }),
+    getUserJourneyMap: vi.fn(async (userId: number) => {
+      if (userId === 999999) return null;
+      return {
+        userId,
+        userName: "Test User",
+        stages: [
+          { id: 1, name: "Stage 1", status: "completed", unlockedAt: new Date(), completedAt: new Date() }
+        ],
+      };
+    }),
+    getWidgetPreferences: vi.fn(async (userId: number) => {
+      return mockWidgetPrefs;
+    }),
+    saveWidgetPreferences: vi.fn(async (userId: number, preferences: any) => {
+      mockWidgetPrefs = preferences;
+      return { success: true };
+    }),
+  };
+});
 
 // Helper: create admin context
 function createAdminContext(): TrpcContext {

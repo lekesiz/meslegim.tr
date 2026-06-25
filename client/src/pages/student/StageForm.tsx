@@ -208,7 +208,7 @@ export default function StageForm() {
             value={currentAnswer}
             onChange={(e) => handleTextChange(question.id, e.target.value)}
             placeholder="Cevabınızı buraya yazın..."
-            className="min-h-[100px]"
+            className="min-h-[120px] rounded-xl border-slate-200 bg-slate-50/50 p-4 transition-all focus:border-[var(--gold)] focus:ring-[var(--gold)]/20 text-[var(--slate-text)]"
           />
         );
 
@@ -218,7 +218,7 @@ export default function StageForm() {
           const selectedOptions = currentAnswer ? currentAnswer.split(',').filter(Boolean) : [];
           return (
             <div className="space-y-3">
-              <Badge variant="outline" className="mb-2 text-xs">
+              <Badge variant="outline" className="mb-2 text-xs border-[var(--gold)]/30 text-[var(--gold-dark)] bg-[var(--gold)]/5">
                 Birden fazla seçenek işaretleyebilirsiniz
               </Badge>
               {options.map((option: string, index: number) => {
@@ -231,8 +231,8 @@ export default function StageForm() {
                     htmlFor={`mc-${question.id}-${index}`}
                     className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 ${
                       isSelected
-                        ? 'border-primary bg-primary/5 shadow-md ring-1 ring-primary/20'
-                        : 'border-border hover:border-primary/40 hover:bg-accent/50'
+                        ? 'border-[var(--gold)] bg-[var(--gold)]/5 shadow-md ring-1 ring-[var(--gold)]/20'
+                        : 'border-slate-100 bg-slate-50/30 hover:border-[var(--gold)]/40 hover:bg-slate-50'
                     }`}
                   >
                     <input
@@ -252,13 +252,13 @@ export default function StageForm() {
                     />
                     <span className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold transition-colors ${
                       isSelected
-                        ? 'bg-primary text-primary-foreground'
-                        : 'bg-muted text-muted-foreground'
+                        ? 'bg-[var(--gold)] text-[var(--navy)] font-extrabold shadow-sm'
+                        : 'bg-slate-100 text-slate-500 font-bold'
                     }`}>
                       {isSelected ? <CheckCircle2 className="h-5 w-5" /> : optionLetter}
                     </span>
                     <span className={`text-sm font-medium ${
-                      isSelected ? 'text-foreground' : 'text-muted-foreground'
+                      isSelected ? 'text-[var(--navy)] font-semibold' : 'text-[var(--slate-text)]'
                     }`}>{option}</span>
                   </label>
                 );
@@ -280,8 +280,8 @@ export default function StageForm() {
                   htmlFor={`mc-${question.id}-${index}`}
                   className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 ${
                     isSelected
-                      ? 'border-primary bg-primary/5 shadow-md ring-1 ring-primary/20'
-                      : 'border-border hover:border-primary/40 hover:bg-accent/50'
+                      ? 'border-[var(--gold)] bg-[var(--gold)]/5 shadow-md ring-1 ring-[var(--gold)]/20'
+                      : 'border-slate-100 bg-slate-50/30 hover:border-[var(--gold)]/40 hover:bg-slate-50'
                   }`}
                 >
                   <input
@@ -295,13 +295,13 @@ export default function StageForm() {
                   />
                   <span className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-colors ${
                     isSelected
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-muted text-muted-foreground'
+                      ? 'bg-[var(--gold)] text-[var(--navy)] font-extrabold shadow-sm'
+                      : 'bg-slate-100 text-slate-500 font-bold'
                   }`}>
                     {optionLetter}
                   </span>
                   <span className={`text-sm font-medium ${
-                    isSelected ? 'text-foreground' : 'text-muted-foreground'
+                    isSelected ? 'text-[var(--navy)] font-semibold' : 'text-[var(--slate-text)]'
                   }`}>{option}</span>
                 </label>
               );
@@ -318,18 +318,18 @@ export default function StageForm() {
           '5': 'Kesinlikle\nKatılıyorum',
         };
         const likertColors: Record<string, string> = {
-          '1': 'border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400',
-          '2': 'border-orange-300 dark:border-orange-700 bg-orange-50 dark:bg-orange-950/30 text-orange-700 dark:text-orange-400',
-          '3': 'border-gray-300 dark:border-gray-600 bg-muted/50 text-foreground/80',
-          '4': 'border-green-300 dark:border-green-700 bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-400',
-          '5': 'border-emerald-300 dark:border-emerald-700 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400',
+          '1': 'border-red-200 bg-red-50/30 text-red-700 hover:border-red-400',
+          '2': 'border-orange-200 bg-orange-50/30 text-orange-700 hover:border-orange-400',
+          '3': 'border-slate-200 bg-slate-50/30 text-slate-650 hover:border-slate-400',
+          '4': 'border-green-200 bg-green-50/30 text-green-700 hover:border-green-400',
+          '5': 'border-emerald-200 bg-emerald-50/30 text-emerald-700 hover:border-emerald-400',
         };
         const selectedLikertColors: Record<string, string> = {
-          '1': 'border-red-500 bg-red-100 dark:bg-red-900/40 ring-2 ring-red-500 text-red-800 dark:text-red-300',
-          '2': 'border-orange-500 bg-orange-100 dark:bg-orange-900/40 ring-2 ring-orange-500 text-orange-800 dark:text-orange-300',
-          '3': 'border-gray-500 bg-muted ring-2 ring-gray-500 text-foreground',
-          '4': 'border-green-500 bg-green-100 dark:bg-green-900/40 ring-2 ring-green-500 text-green-800 dark:text-green-300',
-          '5': 'border-emerald-500 bg-emerald-100 dark:bg-emerald-900/40 ring-2 ring-emerald-500 text-emerald-800 dark:text-emerald-300',
+          '1': 'border-red-500 bg-red-100/50 ring-2 ring-red-500/20 text-red-900 font-bold shadow-sm',
+          '2': 'border-orange-500 bg-orange-100/50 ring-2 ring-orange-500/20 text-orange-900 font-bold shadow-sm',
+          '3': 'border-slate-500 bg-slate-200 ring-2 ring-slate-500/20 text-slate-900 font-bold shadow-sm',
+          '4': 'border-green-500 bg-green-100/50 ring-2 ring-green-500/20 text-green-900 font-bold shadow-sm',
+          '5': 'border-emerald-500 bg-emerald-100/50 ring-2 ring-emerald-500/20 text-emerald-900 font-bold shadow-sm',
         };
 
         // Use custom labels from metadata if available
@@ -338,7 +338,7 @@ export default function StageForm() {
         const likertOptions = options.length > 0 ? options : ['1', '2', '3', '4', '5'];
         return (
           <div className="space-y-3">
-            <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
+            <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
               {likertOptions.map((option: string, idx: number) => {
                 const optionKey = String(idx + 1);
                 const optionStr = String(option).trim();
@@ -358,13 +358,13 @@ export default function StageForm() {
                       onChange={(e) => handleSelectionChange(question.id, e.target.value.trim())}
                       className="sr-only"
                     />
-                    <div className={`w-full py-3 px-1 rounded-lg border-2 text-center transition-all ${
+                    <div className={`w-full py-4 px-2 rounded-xl border-2 text-center transition-all ${
                       isSelected 
-                        ? (selectedLikertColors[optionKey] || 'border-primary bg-primary/10 ring-2 ring-primary')
-                        : (likertColors[optionKey] || 'border-gray-300 bg-muted/50')
+                        ? (selectedLikertColors[optionKey] || 'border-[var(--gold)] bg-[var(--gold)]/10 ring-2 ring-[var(--gold)]/20')
+                        : (likertColors[optionKey] || 'border-slate-100 bg-slate-50/30')
                     }`}>
                       <div className="text-lg font-bold">{optionKey}</div>
-                      <div className="text-[10px] leading-tight mt-1 whitespace-pre-line">
+                      <div className="text-[10px] leading-tight mt-1.5 whitespace-pre-line font-medium">
                         {customLabels[optionKey] || likertLabels[optionKey] || option}
                       </div>
                     </div>
@@ -381,7 +381,7 @@ export default function StageForm() {
         const selectedRankingOptions = currentAnswer ? currentAnswer.split(',').filter(Boolean) : [];
         return (
           <div className="space-y-3">
-            <Badge variant="outline" className="mb-2 text-xs">
+            <Badge variant="outline" className="mb-2 text-xs border-[var(--gold)]/30 text-[var(--gold-dark)] bg-[var(--gold)]/5">
               Birden fazla seçenek işaretleyebilirsiniz - önem sırasına göre seçin
             </Badge>
             {options.map((option: string, index: number) => {
@@ -394,8 +394,8 @@ export default function StageForm() {
                   htmlFor={`rank-${question.id}-${index}`}
                   className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 ${
                     isSelected
-                      ? 'border-primary bg-primary/5 shadow-md ring-1 ring-primary/20'
-                      : 'border-border hover:border-primary/40 hover:bg-accent/50'
+                      ? 'border-[var(--gold)] bg-[var(--gold)]/5 shadow-md ring-1 ring-[var(--gold)]/20'
+                      : 'border-slate-100 bg-slate-50/30 hover:border-[var(--gold)]/40 hover:bg-slate-50'
                   }`}
                 >
                   <input
@@ -415,13 +415,13 @@ export default function StageForm() {
                   />
                   <span className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-colors ${
                     isSelected
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-muted text-muted-foreground'
+                      ? 'bg-[var(--navy)] text-[var(--gold)] font-extrabold shadow-sm'
+                      : 'bg-slate-100 text-slate-500 font-bold'
                   }`}>
                     {isSelected ? selectionOrder : index + 1}
                   </span>
                   <span className={`text-sm font-medium ${
-                    isSelected ? 'text-foreground' : 'text-muted-foreground'
+                    isSelected ? 'text-[var(--navy)] font-semibold' : 'text-[var(--slate-text)]'
                   }`}>{option}</span>
                 </label>
               );
@@ -436,6 +436,7 @@ export default function StageForm() {
             value={currentAnswer}
             onChange={(e) => handleTextChange(question.id, e.target.value)}
             placeholder="Cevabınızı buraya yazın..."
+            className="rounded-xl border-slate-200 bg-slate-50/50 p-4 transition-all focus:border-[var(--gold)] focus:ring-[var(--gold)]/20 text-[var(--slate-text)]"
           />
         );
     }
@@ -445,84 +446,91 @@ export default function StageForm() {
     <DashboardLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="bg-gradient-to-r from-[var(--navy)] to-[var(--steel)] text-white p-6 md:p-8 rounded-2xl shadow-md flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold">{activeStage.stageName}</h1>
-            <p className="text-muted-foreground mt-2">
+            <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-white">{activeStage.stageName}</h1>
+            <p className="text-slate-200 mt-2 text-sm md:text-base max-w-xl font-light">
               {activeStage.stageDescription}
             </p>
           </div>
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <div className="flex items-center gap-2 text-sm text-slate-100 bg-white/10 px-4 py-2 rounded-xl backdrop-blur-md shrink-0 self-start md:self-center border border-white/10">
             {isSaving ? (
               <>
-                <Loader2 className="h-4 w-4 animate-spin" />
-                <span>Kaydediliyor...</span>
+                <Loader2 className="h-4 w-4 animate-spin text-[var(--gold-light)]" />
+                <span className="font-medium">Değişiklikler kaydediliyor...</span>
               </>
             ) : lastSaved ? (
               <>
-                <CheckCircle2 className="h-4 w-4 text-green-500" />
-                <span className="text-green-600">Kaydedildi</span>
+                <CheckCircle2 className="h-4 w-4 text-[var(--gold-light)]" />
+                <span className="text-[var(--gold-light)] font-semibold">Tüm değişiklikler kaydedildi</span>
               </>
-            ) : null}
+            ) : (
+              <span className="opacity-70 text-xs">Cevaplarınız otomatik olarak kaydedilir.</span>
+            )}
           </div>
         </div>
 
         {/* Progress */}
-        <Card>
-          <CardHeader>
-            <CardTitle>İlerleme</CardTitle>
-            <CardDescription>
-              {answeredCount} / {questions.length} soru cevaplanmış
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Progress value={progressPercentage} className="h-3" />
-          </CardContent>
-        </Card>
+        <div className="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h2 className="text-base font-bold text-[var(--navy)]">Etap İlerleme Durumu</h2>
+              <p className="text-xs text-[var(--slate-muted)] mt-1 font-medium">
+                {answeredCount} / {questions.length} soru tamamlandı
+              </p>
+            </div>
+            <div className="text-right">
+              <span className="text-lg font-bold text-[var(--gold-dark)]">{Math.round(progressPercentage)}%</span>
+            </div>
+          </div>
+          <div className="h-3 bg-slate-100 rounded-full overflow-hidden w-full">
+            <div className="h-full rounded-full progress-bar-gold transition-all duration-500" style={{ width: `${progressPercentage}%` }} />
+          </div>
+        </div>
 
-        {/* Questions - STABLE KEYS: only use question.id */}
-        <div className="space-y-4">
+        {/* Questions */}
+        <div className="space-y-6">
           {questions.map((question: any, index: number) => (
-            <Card key={`q-${question.id}`}>
-              <CardHeader>
-                <CardTitle className="text-lg">
-                  Soru {index + 1}
-                  {question.required && <span className="text-red-500 ml-1">*</span>}
-                </CardTitle>
-                <CardDescription>{question.text}</CardDescription>
-              </CardHeader>
-              <CardContent>
+            <div key={`q-${question.id}`} className="bg-white rounded-2xl border border-slate-100 p-6 md:p-8 shadow-sm transition-shadow duration-300 hover:shadow-md">
+              <div className="mb-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-xs font-bold text-[var(--gold-dark)] bg-[var(--gold)]/10 px-2.5 py-1 rounded-full uppercase tracking-wider">Soru {index + 1}</span>
+                  {question.required && <Badge className="bg-red-50 text-red-600 border border-red-250 text-[10px] py-0 px-2">Zorunlu</Badge>}
+                </div>
+                <h3 className="text-base md:text-lg font-bold text-[var(--navy)] leading-snug">{question.text}</h3>
+              </div>
+              <div className="pt-2 border-t border-slate-50">
                 {renderQuestion(question)}
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           ))}
         </div>
 
         {/* Actions */}
-        <div className="flex justify-between items-center pt-6 border-t">
-          <Button
-            variant="outline"
+        <div className="flex justify-between items-center pt-6 border-t border-slate-150">
+          <button
             onClick={() => setLocation('/dashboard/student')}
+            className="border-2 border-[var(--navy)] text-[var(--navy)] hover:bg-[var(--navy)] hover:text-white rounded-xl font-bold px-6 py-2.5 transition-all text-sm flex items-center gap-1.5 bg-white cursor-pointer"
           >
             Panele Dön
-          </Button>
-          <Button
+          </button>
+          <button
             onClick={handleSubmit}
             disabled={submitStageMutation.isPending}
-            size="lg"
+            className="btn-accent px-8 py-3 text-sm font-bold flex items-center justify-center cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {submitStageMutation.isPending ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <Loader2 className="mr-2 h-4 w-4 animate-spin text-[var(--navy)]" />
                 Gönderiliyor...
               </>
             ) : (
               <>
                 <Send className="mr-2 h-4 w-4" />
-                Etabı Tamamla
+                Etabı Tamamla ve Gönder
               </>
             )}
-          </Button>
+          </button>
         </div>
       </div>
     </DashboardLayout>

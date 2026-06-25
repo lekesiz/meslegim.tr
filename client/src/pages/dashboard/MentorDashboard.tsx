@@ -1,7 +1,5 @@
 import { useAuth } from '@/contexts/AuthContext';
 import DashboardLayout from '@/components/DashboardLayout';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { trpc } from '@/lib/trpc';
@@ -52,65 +50,65 @@ function MentorUnlockSection() {
   return (
     <div className="space-y-4">
       {/* Students with locked stages */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Unlock className="h-5 w-5 text-primary" />
-            Kilitli Etap Açma
-          </CardTitle>
-          <CardDescription>
+      <div className="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm">
+        <div className="pb-3 mb-4 border-b border-slate-50">
+          <h3 className="text-base font-bold text-[var(--navy)] flex items-center gap-2">
+            <Unlock className="h-5 w-5 text-[var(--gold-dark)]" />
+            Manuel Etap Kilidi Açma
+          </h3>
+          <p className="text-xs text-[var(--slate-muted)] mt-1 font-medium">
             Öğrencilerinizin kilitli etaplarını bekleme süresini atlayıp anlık açabilirsiniz. Açma işlemi denetim log'una kaydedilir.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+          </p>
+        </div>
+        <div>
           {isLoading ? (
             <div className="flex items-center justify-center h-16">
-              <Loader2 className="h-5 w-5 animate-spin text-primary" />
+              <Loader2 className="h-5 w-5 animate-spin text-[var(--steel)]" />
             </div>
           ) : !studentsWithLocked || studentsWithLocked.length === 0 ? (
-            <div className="flex items-center gap-3 p-4 rounded-lg bg-muted/30 text-muted-foreground">
-              <CheckCircle className="h-5 w-5 shrink-0 text-green-500" />
-              <p className="text-sm">Şu anda kilitli etabı olan öğrencileriniz bulunmuyor.</p>
+            <div className="flex items-center gap-3 p-4 rounded-xl bg-slate-50/50 border border-slate-100 text-slate-500">
+              <CheckCircle className="h-5 w-5 shrink-0 text-green-600" />
+              <p className="text-sm font-medium">Şu anda kilitli etabı olan öğrencileriniz bulunmuyor.</p>
             </div>
           ) : (
             <div className="space-y-3">
               {studentsWithLocked.map((student: any) => (
-                <div key={student.userId} className="border rounded-lg overflow-hidden">
+                <div key={student.userId} className="border border-slate-100/80 rounded-xl overflow-hidden bg-slate-50/20">
                   <button
-                    className="w-full flex items-center justify-between p-3 hover:bg-muted/30 transition-colors text-left"
+                    className="w-full flex items-center justify-between p-4 hover:bg-slate-50 transition-all text-left"
                     onClick={() => setExpandedUser(expandedUser === student.userId ? null : student.userId)}
                   >
                     <div className="flex items-center gap-3">
-                      <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold text-sm">
+                      <div className="h-9 w-9 rounded-xl bg-[var(--gold)]/15 flex items-center justify-center text-[var(--gold-dark)] font-extrabold text-sm shadow-xs border border-[var(--gold)]/10">
                         {student.userName?.charAt(0).toUpperCase() ?? '?'}
                       </div>
                       <div>
-                        <p className="font-medium text-sm">{student.userName}</p>
-                        <p className="text-xs text-muted-foreground">{student.userEmail} · {student.ageGroup} yaş</p>
+                        <p className="font-bold text-sm text-[var(--navy)]">{student.userName}</p>
+                        <p className="text-xs text-slate-400 font-semibold">{student.userEmail} · {student.ageGroup} yaş grubu</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Badge variant="secondary">{student.lockedStages.length} kilitli etap</Badge>
+                      <Badge className="bg-[var(--steel)] text-white text-[10px] font-bold border-none px-2 py-0.5">{student.lockedStages.length} kilitli etap</Badge>
                       {expandedUser === student.userId ? (
-                        <ChevronUp className="h-4 w-4 text-muted-foreground" />
+                        <ChevronUp className="h-4 w-4 text-slate-400" />
                       ) : (
-                        <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                        <ChevronDown className="h-4 w-4 text-slate-400" />
                       )}
                     </div>
                   </button>
 
                   {expandedUser === student.userId && (
-                    <div className="border-t bg-muted/10 p-3 space-y-3">
+                    <div className="border-t border-slate-100 bg-white p-4 space-y-3">
                       {student.lockedStages.map((stage: any) => (
-                        <div key={stage.id} className="space-y-2 p-2 rounded bg-background border">
-                          <div className="flex items-center justify-between">
+                        <div key={stage.id} className="space-y-3 p-3 rounded-xl bg-slate-50/50 border border-slate-100">
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                             <div>
-                              <p className="text-sm font-medium">{stage.stageName}</p>
-                              <p className="text-xs text-muted-foreground">
+                              <p className="text-sm font-bold text-[var(--navy)]">{stage.stageName}</p>
+                              <p className="text-xs text-slate-400 font-medium">
                                 Etap {stage.stageOrder} · {stage.ageGroup} yaş grubu
                                 {stage.unlockedAt && (
-                                  <span className="ml-2 text-amber-600">
-                                    · Planl. açılış: {new Date(stage.unlockedAt).toLocaleDateString('tr-TR')}
+                                  <span className="ml-2 text-amber-700 font-semibold bg-amber-50 px-1.5 py-0.5 rounded">
+                                    Planlanan açılış: {new Date(stage.unlockedAt).toLocaleDateString('tr-TR')}
                                   </span>
                                 )}
                               </p>
@@ -119,25 +117,23 @@ function MentorUnlockSection() {
                           <div className="flex gap-2">
                             <input
                               type="text"
-                              placeholder="Not ekle (isteğe bağlı)"
-                              className="flex-1 text-xs px-2 py-1 rounded border bg-background"
+                              placeholder="Gerekçe / Not ekle (isteğe bağlı)"
+                              className="flex-1 text-xs px-3 py-2 rounded-xl border border-slate-200 bg-white transition-all focus:border-[var(--gold)] focus:ring-[var(--gold)]/20 outline-none"
                               value={noteInputs[stage.id] ?? ''}
                               onChange={(e) => setNoteInputs(prev => ({ ...prev, [stage.id]: e.target.value }))}
                             />
-                            <Button
-                              size="sm"
-                              variant="default"
+                            <button
                               onClick={() => handleUnlock(student.userId, stage.id, stage.stageName)}
                               disabled={unlocking === stage.id}
-                              className="gap-1.5 shrink-0"
+                              className="btn-accent px-4 py-1.5 text-xs font-bold flex items-center justify-center shrink-0 border-none disabled:opacity-50"
                             >
                               {unlocking === stage.id ? (
-                                <Loader2 className="h-3 w-3 animate-spin" />
+                                <Loader2 className="h-3.5 w-3.5 animate-spin text-[var(--navy)]" />
                               ) : (
-                                <Unlock className="h-3 w-3" />
+                                <Unlock className="h-3.5 w-3.5 mr-1" />
                               )}
-                              Şimdi Aç
-                            </Button>
+                              Kilidi Aç
+                            </button>
                           </div>
                         </div>
                       ))}
@@ -147,66 +143,69 @@ function MentorUnlockSection() {
               ))}
             </div>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* Audit Log */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <History className="h-5 w-5 text-primary" />
-            Açma Geçmişim
-          </CardTitle>
-          <CardDescription>Yaptığınız veya öğrencilerinize yapılan manuel etap açma işlemleri</CardDescription>
-        </CardHeader>
-        <CardContent>
+      <div className="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm">
+        <div className="pb-3 mb-4 border-b border-slate-50">
+          <h3 className="text-base font-bold text-[var(--navy)] flex items-center gap-2">
+            <History className="h-5 w-5 text-[var(--steel)]" />
+            Açma Geçmişi Logları
+          </h3>
+          <p className="text-xs text-[var(--slate-muted)] mt-1 font-medium">Yaptığınız veya öğrencilerinize yapılan manuel etap açma işlemleri</p>
+        </div>
+        <div>
           {logsLoading ? (
             <div className="flex items-center justify-center h-12">
-              <Loader2 className="h-4 w-4 animate-spin text-primary" />
+              <Loader2 className="h-4 w-4 animate-spin text-[var(--steel)]" />
             </div>
           ) : !unlockLogs || unlockLogs.length === 0 ? (
-            <p className="text-sm text-muted-foreground">Henüz hiç manuel açma işlemi yapılmamış.</p>
+            <p className="text-sm text-slate-400 font-medium">Henüz hiç manuel açma işlemi yapılmamış.</p>
           ) : (
-            <div className="space-y-2">
-              <div className="rounded-md border overflow-x-auto">
+            <div className="space-y-3">
+              <div className="rounded-xl border border-slate-100 overflow-x-auto shadow-xs">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b bg-muted/50">
-                      <th className="px-3 py-2 text-left font-medium">Tarih</th>
-                      <th className="px-3 py-2 text-left font-medium">Öğrenci</th>
-                      <th className="px-3 py-2 text-left font-medium">Etap</th>
-                      <th className="px-3 py-2 text-left font-medium">Açan</th>
-                      <th className="px-3 py-2 text-left font-medium">Not</th>
+                    <tr className="border-b border-slate-100 bg-slate-50 text-[var(--navy)] font-bold text-xs uppercase tracking-wide">
+                      <th className="px-4 py-3 text-left">Tarih</th>
+                      <th className="px-4 py-3 text-left">Öğrenci</th>
+                      <th className="px-4 py-3 text-left">Etap</th>
+                      <th className="px-4 py-3 text-left">Açan Rolü</th>
+                      <th className="px-4 py-3 text-left">Not</th>
                     </tr>
                   </thead>
                   <tbody>
                     {(showLogs ? unlockLogs : unlockLogs.slice(0, 5)).map((log: any) => (
-                      <tr key={log.id} className="border-b last:border-0 hover:bg-muted/20">
-                        <td className="px-3 py-2 text-xs text-muted-foreground whitespace-nowrap">
+                      <tr key={log.id} className="border-b border-slate-100 last:border-0 hover:bg-slate-50/50">
+                        <td className="px-4 py-3 text-xs text-slate-400 font-semibold whitespace-nowrap">
                           {new Date(log.createdAt).toLocaleString('tr-TR')}
                         </td>
-                        <td className="px-3 py-2 text-sm">{log.studentName ?? `#${log.studentId}`}</td>
-                        <td className="px-3 py-2 text-sm font-medium">{log.stageName}</td>
-                        <td className="px-3 py-2">
-                          <Badge variant={log.unlockedByRole === 'admin' ? 'default' : 'secondary'} className="text-xs">
+                        <td className="px-4 py-3 text-sm font-bold text-[var(--navy)]">{log.studentName ?? `#${log.studentId}`}</td>
+                        <td className="px-4 py-3 text-sm font-medium text-[var(--steel)]">{log.stageName}</td>
+                        <td className="px-4 py-3">
+                          <Badge className={log.unlockedByRole === 'admin' ? 'bg-red-50 text-red-700 border-none font-bold text-[10px]' : 'bg-slate-100 text-slate-700 border-none font-bold text-[10px]'}>
                             {log.unlockedByRole}
                           </Badge>
                         </td>
-                        <td className="px-3 py-2 text-xs text-muted-foreground">{log.note ?? '-'}</td>
+                        <td className="px-4 py-3 text-xs text-slate-500 font-medium">{log.note ?? '-'}</td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
               {unlockLogs.length > 5 && (
-                <Button variant="ghost" size="sm" onClick={() => setShowLogs(!showLogs)} className="w-full">
+                <button
+                  onClick={() => setShowLogs(!showLogs)}
+                  className="border-2 border-slate-200 text-slate-650 hover:bg-slate-50 rounded-xl font-bold px-4 py-2 transition-all text-xs bg-white cursor-pointer w-full"
+                >
                   {showLogs ? 'Daralt' : `Tümünü Göster (${unlockLogs.length} kayıt)`}
-                </Button>
+                </button>
               )}
             </div>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }
@@ -265,9 +264,9 @@ export default function MentorDashboard() {
       <div className="space-y-6">
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold">Mentor Paneli</h1>
-          <p className="text-muted-foreground mt-2">
-            Öğrencilerinizi yönetin ve raporları onaylayın
+          <h1 className="text-2xl md:text-3xl font-extrabold text-[var(--navy)] tracking-tight">Mentor Yönetim Paneli</h1>
+          <p className="text-sm text-[var(--slate-muted)] mt-1.5 font-medium">
+            Öğrencilerinizin gelişim süreçlerini kontrol edin, kilitli etaplarını yönetin ve raporlarını onaylayın.
           </p>
         </div>
 
@@ -279,306 +278,263 @@ export default function MentorDashboard() {
         {/* Performance Trends */}
         <MentorPerformanceTrends />
 
-        {/* Stats */}
-        <div className="grid gap-4 md:grid-cols-4">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Bekleyen Onaylar</CardTitle>
-              <UserCheck className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{pendingStudents?.length || 0}</div>
-              <p className="text-xs text-muted-foreground">
-                Aktif edilmeyi bekleyen öğrenci
-              </p>
-            </CardContent>
-          </Card>
+        {/* Stats Grid */}
+        <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
+          <div className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm transition-all duration-300 hover:shadow-md">
+            <div className="flex items-center justify-between pb-2">
+              <span className="text-xs font-bold text-[var(--slate-muted)] uppercase tracking-wider">Bekleyen Onaylar</span>
+              <UserCheck className="h-4.5 w-4.5 text-[var(--steel)]" />
+            </div>
+            <div>
+              <p className="text-2xl font-black text-[var(--navy)]">{pendingStudents?.length || 0}</p>
+              <p className="text-[10px] font-bold text-[var(--slate-light)] mt-1">Aktifleştirme bekleyen öğrenciler</p>
+            </div>
+          </div>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Öğrencilerim</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{myStudents?.length || 0}</div>
-              <p className="text-xs text-muted-foreground">
-                Aktif öğrenci
-              </p>
-            </CardContent>
-          </Card>
+          <div className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm transition-all duration-300 hover:shadow-md">
+            <div className="flex items-center justify-between pb-2">
+              <span className="text-xs font-bold text-[var(--slate-muted)] uppercase tracking-wider">Öğrencilerim</span>
+              <Users className="h-4.5 w-4.5 text-[var(--gold-dark)]" />
+            </div>
+            <div>
+              <p className="text-2xl font-black text-[var(--navy)]">{myStudents?.length || 0}</p>
+              <p className="text-[10px] font-bold text-[var(--slate-light)] mt-1">Aktif takip edilen öğrenciler</p>
+            </div>
+          </div>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Bekleyen Raporlar</CardTitle>
-              <FileText className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{pendingReports?.length || 0}</div>
-              <p className="text-xs text-muted-foreground">
-                Onay bekleyen rapor
-              </p>
+          <div className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm transition-all duration-300 hover:shadow-md">
+            <div className="flex items-center justify-between pb-2">
+              <span className="text-xs font-bold text-[var(--slate-muted)] uppercase tracking-wider">Bekleyen Raporlar</span>
+              <FileText className="h-4.5 w-4.5 text-[var(--steel)]" />
+            </div>
+            <div>
+              <p className="text-2xl font-black text-[var(--navy)]">{pendingReports?.length || 0}</p>
+              <p className="text-[10px] font-bold text-[var(--slate-light)] mt-1">Onay bekleyen etap & final raporları</p>
               {(pendingReports?.length || 0) > 0 && (
-                <Button
-                  variant="link"
-                  size="sm"
+                <button
                   onClick={() => setLocation('/dashboard/mentor/reports')}
-                  className="mt-2 p-0 h-auto"
+                  className="text-[10px] font-bold text-[var(--gold-dark)] hover:underline mt-1 bg-transparent border-none p-0 cursor-pointer block"
                 >
                   Tümünü Gör →
-                </Button>
+                </button>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Ortalama Yanıt Süresi</CardTitle>
-              <CheckCircle className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats?.avgResponseTimeDays || 0} gün</div>
-              <p className="text-xs text-muted-foreground">
-                Rapor onaylama süresi
-              </p>
-            </CardContent>
-          </Card>
+          <div className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm transition-all duration-300 hover:shadow-md">
+            <div className="flex items-center justify-between pb-2">
+              <span className="text-xs font-bold text-[var(--slate-muted)] uppercase tracking-wider">Yanıt Süresi</span>
+              <CheckCircle className="h-4.5 w-4.5 text-green-600" />
+            </div>
+            <div>
+              <p className="text-2xl font-black text-[var(--navy)]">{stats?.avgResponseTimeDays || 0} Gün</p>
+              <p className="text-[10px] font-bold text-[var(--slate-light)] mt-1">Ortalama onay/red süresi</p>
+            </div>
+          </div>
         </div>
 
         {/* Tabs */}
         <Tabs defaultValue="pending" className="space-y-4">
-          <TabsList>
-            <TabsTrigger value="pending">
+          <TabsList className="flex flex-wrap h-auto gap-1 bg-slate-100/70 p-1.5 rounded-xl border border-slate-200/50">
+            <TabsTrigger value="pending" className="text-xs font-bold rounded-lg px-4 py-2 cursor-pointer transition-all data-[state=active]:bg-white data-[state=active]:text-[var(--navy)] data-[state=active]:shadow-sm">
               Bekleyen Onaylar ({pendingStudents?.length || 0})
             </TabsTrigger>
-            <TabsTrigger value="students">
+            <TabsTrigger value="students" className="text-xs font-bold rounded-lg px-4 py-2 cursor-pointer transition-all data-[state=active]:bg-white data-[state=active]:text-[var(--navy)] data-[state=active]:shadow-sm">
               Öğrencilerim ({myStudents?.length || 0})
             </TabsTrigger>
-            <TabsTrigger value="reports">
+            <TabsTrigger value="reports" className="text-xs font-bold rounded-lg px-4 py-2 cursor-pointer transition-all data-[state=active]:bg-white data-[state=active]:text-[var(--navy)] data-[state=active]:shadow-sm">
               Bekleyen Raporlar ({pendingReports?.length || 0})
             </TabsTrigger>
-            <TabsTrigger value="feedback">
+            <TabsTrigger value="feedback" className="text-xs font-bold rounded-lg px-4 py-2 cursor-pointer transition-all data-[state=active]:bg-white data-[state=active]:text-[var(--navy)] data-[state=active]:shadow-sm">
               Geri Bildirimler
             </TabsTrigger>
-            <TabsTrigger value="unlock">
+            <TabsTrigger value="unlock" className="text-xs font-bold rounded-lg px-4 py-2 cursor-pointer transition-all data-[state=active]:bg-white data-[state=active]:text-[var(--navy)] data-[state=active]:shadow-sm">
               Etap Açma
             </TabsTrigger>
           </TabsList>
 
           {/* Pending Students Tab */}
-          <TabsContent value="pending" className="space-y-4">
+          <TabsContent value="pending" className="space-y-4 mt-6">
             {pendingStudents && pendingStudents.length > 0 ? (
               pendingStudents.map((student: any) => (
-                <Card key={student.id}>
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <CardTitle>{student.name}</CardTitle>
-                        <CardDescription className="mt-2">
-                          {student.email} • {student.phone}
-                        </CardDescription>
-                      </div>
-                      <Badge variant="secondary">Beklemede</Badge>
+                <div key={student.id} className="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all hover:shadow-md">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-bold text-base text-[var(--navy)]">{student.name}</h3>
+                      <Badge className="bg-amber-50 text-amber-700 border-none font-bold text-[10px]">Onay Bekliyor</Badge>
                     </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2">
-                      <p className="text-sm">
-                        <span className="font-medium">Yaş Grubu:</span> {student.ageGroup}
-                      </p>
-                      <p className="text-sm">
-                        <span className="font-medium">TC Kimlik:</span> {student.tcKimlik}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        Kayıt Tarihi: {new Date(student.createdAt).toLocaleDateString('tr-TR')}
-                      </p>
+                    <p className="text-xs text-slate-400 font-semibold mt-1">
+                      {student.email} • {student.phone}
+                    </p>
+                    <div className="flex gap-4 mt-3 flex-wrap text-xs text-slate-500 font-medium">
+                      <p><span className="font-semibold text-[var(--navy)]">Yaş Grubu:</span> {student.ageGroup}</p>
+                      <p><span className="font-semibold text-[var(--navy)]">TC Kimlik:</span> {student.tcKimlik}</p>
+                      <p><span className="font-semibold text-[var(--navy)]">Kayıt:</span> {new Date(student.createdAt).toLocaleDateString('tr-TR')}</p>
                     </div>
-                    <div className="mt-4">
-                      <Button
-                        onClick={() => activateStudentMutation.mutate({ studentId: student.id })}
-                        disabled={activateStudentMutation.isPending}
-                      >
-                        {activateStudentMutation.isPending ? (
-                          <>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Aktif Ediliyor...
-                          </>
-                        ) : (
-                          <>
-                            <CheckCircle className="mr-2 h-4 w-4" />
-                            Aktif Et
-                          </>
-                        )}
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
+                  </div>
+                  <div className="shrink-0 self-start md:self-center">
+                    <button
+                      onClick={() => activateStudentMutation.mutate({ studentId: student.id })}
+                      disabled={activateStudentMutation.isPending}
+                      className="btn-accent px-5 py-2.5 text-xs font-bold flex items-center justify-center cursor-pointer shadow-sm border-none disabled:opacity-50"
+                    >
+                      {activateStudentMutation.isPending ? (
+                        <>
+                          <Loader2 className="mr-1.5 h-4 w-4 animate-spin text-[var(--navy)]" />
+                          Aktifleştiriliyor...
+                        </>
+                      ) : (
+                        <>
+                          <CheckCircle className="mr-1.5 h-4 w-4" />
+                          Aktif Et ve Onayla
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
               ))
             ) : (
-              <Card>
-                <CardContent className="pt-6">
-                  <p className="text-center text-muted-foreground">
-                    Bekleyen onay bulunmamaktadır.
-                  </p>
-                </CardContent>
-              </Card>
+              <div className="bg-white rounded-2xl border border-slate-100 p-8 text-center shadow-sm">
+                <p className="text-slate-400 font-medium">Bekleyen aktifleştirme onayı bulunmamaktadır.</p>
+              </div>
             )}
           </TabsContent>
 
           {/* My Students Tab */}
-          <TabsContent value="students" className="space-y-4">
+          <TabsContent value="students" className="space-y-4 mt-6">
             {myStudents && myStudents.length > 0 ? (
               myStudents.map((student: any) => (
-                <Card key={student.id}>
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <CardTitle>{student.name}</CardTitle>
-                        <CardDescription className="mt-2">
-                          {student.email}
-                        </CardDescription>
-                      </div>
-                      <Badge variant="default">Aktif</Badge>
+                <div key={student.id} className="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all hover:shadow-md">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-bold text-base text-[var(--navy)]">{student.name}</h3>
+                      <Badge className="bg-green-50 text-green-700 border-none font-bold text-[10px]">Aktif</Badge>
                     </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2">
-                      <p className="text-sm">
-                        <span className="font-medium">Yaş Grubu:</span> {student.ageGroup}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        Aktif Edilme: {student.updatedAt ? new Date(student.updatedAt).toLocaleDateString('tr-TR') : '-'}
-                      </p>
+                    <p className="text-xs text-slate-400 font-semibold mt-1">
+                      {student.email}
+                    </p>
+                    <div className="flex gap-4 mt-3 flex-wrap text-xs text-slate-500 font-medium">
+                      <p><span className="font-semibold text-[var(--navy)]">Yaş Grubu:</span> {student.ageGroup}</p>
+                      <p><span className="font-semibold text-[var(--navy)]">Aktifleşme:</span> {student.updatedAt ? new Date(student.updatedAt).toLocaleDateString('tr-TR') : '-'}</p>
                     </div>
-                    <div className="mt-4 flex gap-2">
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => setLocation(`/dashboard/student/${student.id}`)}
-                      >
-                        Detayları Görüntüle
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          setChatStudent({ id: student.id, name: student.name });
-                          setChatOpen(true);
-                        }}
-                      >
-                        <MessageSquare className="h-4 w-4 mr-1" />
-                        Mesaj Gönder
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0 self-start md:self-center">
+                    <button 
+                      onClick={() => setLocation(`/dashboard/student/${student.id}`)}
+                      className="border border-slate-200 text-slate-650 hover:bg-slate-50 rounded-xl font-bold px-4 py-2 transition-all text-xs bg-white cursor-pointer"
+                    >
+                      Detayları Gör
+                    </button>
+                    <button
+                      onClick={() => {
+                        setChatStudent({ id: student.id, name: student.name });
+                        setChatOpen(true);
+                      }}
+                      className="border border-[var(--navy)] text-[var(--navy)] hover:bg-[var(--navy)] hover:text-white rounded-xl font-bold px-4 py-2 transition-all text-xs bg-white cursor-pointer flex items-center gap-1"
+                    >
+                      <MessageSquare className="h-3.5 w-3.5 mr-0.5" />
+                      Mesaj Gönder
+                    </button>
+                  </div>
+                </div>
               ))
             ) : (
-              <Card>
-                <CardContent className="pt-6">
-                  <p className="text-center text-muted-foreground">
-                    Henüz aktif öğrenciniz bulunmamaktadır.
-                  </p>
-                </CardContent>
-              </Card>
+              <div className="bg-white rounded-2xl border border-slate-100 p-8 text-center shadow-sm">
+                <p className="text-slate-400 font-medium">Henüz aktif öğrenciniz bulunmamaktadır.</p>
+              </div>
             )}
           </TabsContent>
 
           {/* Pending Reports Tab */}
-          <TabsContent value="reports" className="space-y-4">
+          <TabsContent value="reports" className="space-y-4 mt-6">
             <div className="flex items-center justify-between">
-              <p className="text-sm text-muted-foreground">
-                {pendingReports?.length || 0} rapor onay bekliyor
+              <p className="text-xs text-[var(--slate-muted)] font-medium">
+                Toplam {pendingReports?.length || 0} rapor onay bekliyor
               </p>
-              <Button variant="outline" size="sm" onClick={() => setLocation('/dashboard/mentor/reports')}>
-                <ExternalLink className="mr-2 h-4 w-4" />
-                Tüm Raporları Gör
-              </Button>
+              <button 
+                onClick={() => setLocation('/dashboard/mentor/reports')}
+                className="border border-slate-250 text-slate-650 hover:bg-slate-50 rounded-xl font-bold px-4 py-2 transition-all text-xs bg-white cursor-pointer flex items-center gap-1.5"
+              >
+                <ExternalLink className="h-3.5 w-3.5" />
+                Tüm Rapor Havuzuna Git
+              </button>
             </div>
             {pendingReports && pendingReports.length > 0 ? (
               pendingReports.map((report: any) => (
-                <Card key={report.id}>
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <CardTitle className="text-base">
-                          {report.stageName || (report.type === 'stage' ? 'Etap Raporu' : 'Final Raporu')}
-                        </CardTitle>
-                        <CardDescription className="mt-1">
-                          Öğrenci: <span className="font-medium text-foreground">{report.studentName || 'Bilinmiyor'}</span>
-                        </CardDescription>
-                        <CardDescription>
-                          Tamamlanma: {report.completedAt ? new Date(report.completedAt).toLocaleDateString('tr-TR') : new Date(report.createdAt).toLocaleDateString('tr-TR')}
-                        </CardDescription>
-                      </div>
-                      <Badge variant="secondary">Beklemede</Badge>
+                <div key={report.id} className="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm transition-all hover:shadow-md">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-50">
+                    <div>
+                      <h3 className="font-bold text-base text-[var(--navy)]">
+                        {report.stageName || (report.type === 'stage' ? 'Etap Raporu' : 'Final Raporu')}
+                      </h3>
+                      <p className="text-xs text-slate-450 font-semibold mt-1">
+                        Öğrenci: <span className="font-bold text-[var(--navy)]">{report.studentName || 'Bilinmeyen Öğrenci'}</span>
+                      </p>
+                      <p className="text-[10px] text-slate-400 mt-0.5">
+                        Tamamlanma Tarihi: {report.completedAt ? new Date(report.completedAt).toLocaleDateString('tr-TR') : new Date(report.createdAt).toLocaleDateString('tr-TR')}
+                      </p>
                     </div>
-                  </CardHeader>
-                  <CardContent>
+                    <Badge className="bg-amber-50 text-amber-700 border-none font-bold text-[10px] self-start sm:self-center">Onay Bekliyor</Badge>
+                  </div>
+                  <div>
                     {report.summary && (
-                      <div className="bg-muted p-3 rounded-lg mb-4">
-                        <p className="text-xs font-semibold mb-1 text-muted-foreground uppercase tracking-wide">Rapor Özeti</p>
-                        <p className="text-sm">{report.summary}</p>
+                      <div className="bg-slate-50/50 p-4 rounded-xl border border-slate-100 mb-4">
+                        <p className="text-[10px] font-extrabold mb-1 text-[var(--slate-muted)] uppercase tracking-wide">Etap Özeti / AI Görüşü</p>
+                        <p className="text-xs text-[var(--slate-text)] leading-relaxed font-medium">{report.summary}</p>
                       </div>
                     )}
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-2 pt-2">
                       {report.fileUrl && (
-                        <Button
-                          variant="outline"
-                          size="sm"
+                        <button
                           onClick={() => window.open(report.fileUrl, '_blank')}
+                          className="border border-slate-200 text-slate-650 hover:bg-slate-50 rounded-xl font-bold px-4 py-2 transition-all text-xs bg-white cursor-pointer flex items-center gap-1"
                         >
-                          <ExternalLink className="mr-2 h-3 w-3" />
-                          Raporu Görüntüle
-                        </Button>
+                          <ExternalLink className="h-3.5 w-3.5 mr-0.5" />
+                          Raporu Detaylı Oku
+                        </button>
                       )}
-                      <Button
-                        size="sm"
+                      <button
                         onClick={() => approveReportMutation.mutate({ reportId: report.id, approved: true })}
                         disabled={approveReportMutation.isPending}
-                        className="bg-green-600 hover:bg-green-700"
+                        className="bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl text-xs px-4 py-2 transition-colors cursor-pointer flex items-center gap-1 disabled:opacity-50"
                       >
                         {approveReportMutation.isPending ? (
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
                         ) : (
-                          <CheckCircle className="mr-2 h-4 w-4" />
+                          <CheckCircle className="h-3.5 w-3.5" />
                         )}
-                        Onayla
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="destructive"
+                        Raporu Onayla
+                      </button>
+                      <button
                         onClick={() => {
                           setRejectReportId(report.id);
                           setRejectFeedback('');
                           setRejectDialogOpen(true);
                         }}
                         disabled={approveReportMutation.isPending}
+                        className="bg-red-50 hover:bg-red-100 text-red-700 font-bold rounded-xl text-xs px-4 py-2 transition-colors cursor-pointer flex items-center gap-1 disabled:opacity-50 border-none"
                       >
-                        <XCircle className="mr-2 h-4 w-4" />
-                        Reddet
-                      </Button>
+                        <XCircle className="h-3.5 w-3.5" />
+                        Revizyon İste (Reddet)
+                      </button>
                     </div>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               ))
             ) : (
-              <Card>
-                <CardContent className="pt-6">
-                  <p className="text-center text-muted-foreground">
-                    Onay bekleyen rapor bulunmamaktadır.
-                  </p>
-                </CardContent>
-              </Card>
+              <div className="bg-white rounded-2xl border border-slate-100 p-8 text-center shadow-sm">
+                <p className="text-slate-400 font-medium">Onay bekleyen rapor bulunmamaktadır.</p>
+              </div>
             )}
           </TabsContent>
 
           {/* Feedback Tab */}
-          <TabsContent value="feedback">
+          <TabsContent value="feedback" className="mt-6">
             <MentorFeedbackStats />
           </TabsContent>
 
           {/* Stage Unlock Tab */}
-          <TabsContent value="unlock" className="space-y-4">
+          <TabsContent value="unlock" className="mt-6">
             <MentorUnlockSection />
           </TabsContent>
         </Tabs>
@@ -587,27 +543,32 @@ export default function MentorDashboard() {
 
     {/* Reject Dialog */}
     <Dialog open={rejectDialogOpen} onOpenChange={setRejectDialogOpen}>
-      <DialogContent>
+      <DialogContent className="rounded-2xl max-w-md p-6">
         <DialogHeader>
-          <DialogTitle>Raporu Reddet</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-lg font-bold text-[var(--navy)]">Raporu Reddet & Revizyon İste</DialogTitle>
+          <DialogDescription className="text-xs text-slate-500 font-medium mt-1">
             Öğrenciye iletilecek geri bildirimi yazın. Bu mesaj öğrenciye e-posta ile gönderilecektir.
           </DialogDescription>
         </DialogHeader>
-        <div className="space-y-3 py-2">
-          <Label htmlFor="reject-feedback">Geri Bildirim <span className="text-destructive">*</span></Label>
+        <div className="space-y-3 py-3">
+          <Label htmlFor="reject-feedback" className="text-xs font-bold text-[var(--navy)]">Geri Bildirim Açıklaması <span className="text-red-500">*</span></Label>
           <Textarea
             id="reject-feedback"
             placeholder="Raporun neden reddedildiğini ve öğrencinin ne yapması gerektiğini açıklayın..."
             value={rejectFeedback}
             onChange={(e) => setRejectFeedback(e.target.value)}
             rows={4}
+            className="rounded-xl border-slate-200 bg-slate-50/50 p-4 transition-all focus:border-[var(--gold)] focus:ring-[var(--gold)]/20 text-xs"
           />
         </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={() => setRejectDialogOpen(false)}>İptal</Button>
-          <Button
-            variant="destructive"
+        <DialogFooter className="flex gap-2">
+          <button 
+            onClick={() => setRejectDialogOpen(false)}
+            className="border-2 border-slate-200 text-slate-600 hover:bg-slate-50 rounded-xl font-bold px-4 py-2 transition-all text-xs bg-white cursor-pointer"
+          >
+            İptal
+          </button>
+          <button
             disabled={!rejectFeedback.trim() || approveReportMutation.isPending}
             onClick={() => {
               if (rejectReportId && rejectFeedback.trim()) {
@@ -617,10 +578,11 @@ export default function MentorDashboard() {
                 );
               }
             }}
+            className="bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl text-xs px-4 py-2 cursor-pointer flex items-center gap-1 disabled:opacity-50"
           >
-            {approveReportMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <XCircle className="mr-2 h-4 w-4" />}
+            {approveReportMutation.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <XCircle className="h-3.5 w-3.5" />}
             Reddet ve Bildir
-          </Button>
+          </button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

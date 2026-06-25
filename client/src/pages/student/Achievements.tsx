@@ -45,38 +45,36 @@ function XPBar({ totalXP, maxXP = 1000 }: { totalXP: number; maxXP?: number }) {
   const progress = (currentLevelXP / 200) * 100;
 
   return (
-    <Card className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white border-0">
-      <CardContent className="p-6">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <div className="h-14 w-14 rounded-full bg-white/20 flex items-center justify-center backdrop-blur-sm">
-              <Trophy className="h-7 w-7 text-yellow-300" />
-            </div>
-            <div>
-              <p className="text-sm text-white/80">Seviye</p>
-              <p className="text-3xl font-bold">{level}</p>
-            </div>
+    <div className="bg-gradient-to-r from-[var(--navy)] to-[var(--steel)] text-white border-0 rounded-2xl p-6 shadow-md">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-3">
+          <div className="h-14 w-14 rounded-xl bg-white/10 flex items-center justify-center backdrop-blur-md border border-white/10">
+            <Trophy className="h-7 w-7 text-[var(--gold)]" />
           </div>
-          <div className="text-right">
-            <p className="text-sm text-white/80">Toplam XP</p>
-            <p className="text-3xl font-bold">{totalXP}</p>
+          <div>
+            <p className="text-xs text-slate-300 font-medium uppercase tracking-wider">Mevcut Seviye</p>
+            <p className="text-3xl font-extrabold text-white">{level}</p>
           </div>
         </div>
-        <div className="space-y-2">
-          <div className="flex justify-between text-sm text-white/80">
-            <span>Seviye {level}</span>
-            <span>{currentLevelXP}/200 XP</span>
-            <span>Seviye {level + 1}</span>
-          </div>
-          <div className="h-3 bg-white/20 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-gradient-to-r from-yellow-300 to-yellow-500 rounded-full transition-all duration-1000"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
+        <div className="text-right">
+          <p className="text-xs text-slate-300 font-medium uppercase tracking-wider">Toplam Deneyim (XP)</p>
+          <p className="text-3xl font-extrabold text-[var(--gold-light)]">{totalXP}</p>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+      <div className="space-y-2 pt-2 border-t border-white/5">
+        <div className="flex justify-between text-xs font-semibold text-slate-200">
+          <span>Seviye {level}</span>
+          <span className="text-[var(--gold-light)]">{currentLevelXP} / 200 XP</span>
+          <span>Seviye {level + 1}</span>
+        </div>
+        <div className="h-3 bg-white/10 rounded-full overflow-hidden w-full border border-white/5">
+          <div
+            className="h-full progress-bar-gold rounded-full transition-all duration-1000"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -102,18 +100,18 @@ function BadgeCard({
   return (
     <div
       className={cn(
-        "relative group rounded-xl border-2 p-4 transition-all duration-300 cursor-pointer",
+        "relative group rounded-2xl border-2 p-5 transition-all duration-300 cursor-pointer bg-white",
         badge.earned
-          ? "bg-card border-indigo-200 dark:border-indigo-800 shadow-md hover:shadow-lg hover:-translate-y-1"
-          : "bg-zinc-50 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-700 opacity-60 grayscale hover:opacity-80"
+          ? "border-slate-100 shadow-sm hover:border-[var(--gold)]/50 hover:shadow-md hover:-translate-y-1"
+          : "border-slate-100 opacity-60 grayscale hover:opacity-80"
       )}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* Rarity indicator */}
       {badge.earned && (
-        <div className="absolute -top-2 -right-2">
-          <Badge className={cn("text-xs border", rarityColors[badge.rarity] || rarityColors.common)}>
+        <div className="absolute -top-2.5 -right-1">
+          <Badge className={cn("text-[10px] uppercase font-bold border-none py-0.5 px-2", rarityColors[badge.rarity] || rarityColors.common)}>
             {rarityLabels[badge.rarity] || badge.rarity}
           </Badge>
         </div>
@@ -123,41 +121,41 @@ function BadgeCard({
         {/* Icon */}
         <div
           className={cn(
-            "h-16 w-16 rounded-full flex items-center justify-center text-3xl transition-transform duration-300",
+            "h-16 w-16 rounded-2xl flex items-center justify-center text-3xl transition-transform duration-300 shadow-inner border border-slate-50",
             badge.earned ? "scale-100" : "scale-90",
             isHovered && badge.earned && "scale-110"
           )}
           style={{
-            backgroundColor: badge.earned ? `${badge.color}20` : "#f4f4f5",
+            backgroundColor: badge.earned ? `${badge.color}15` : "#f8fafc",
           }}
         >
           {badge.earned ? (
             <span>{badge.icon}</span>
           ) : (
-            <Lock className="h-6 w-6 text-zinc-400" />
+            <Lock className="h-6 w-6 text-slate-400" />
           )}
         </div>
 
         {/* Name */}
-        <h3 className={cn("font-semibold text-sm", badge.earned ? "text-foreground" : "text-muted-foreground")}>
+        <h3 className={cn("font-bold text-sm tracking-tight", badge.earned ? "text-[var(--navy)]" : "text-slate-400")}>
           {badge.name}
         </h3>
 
         {/* Description */}
-        <p className="text-xs text-muted-foreground line-clamp-2">{badge.description}</p>
+        <p className="text-[11px] text-slate-500 leading-relaxed line-clamp-2 min-h-[32px]">{badge.description}</p>
 
         {/* XP */}
-        <div className="flex items-center gap-1">
-          <Sparkles className={cn("h-3 w-3", badge.earned ? "text-yellow-500" : "text-zinc-400")} />
-          <span className={cn("text-xs font-medium", badge.earned ? "text-yellow-600" : "text-zinc-400")}>
+        <div className="flex items-center gap-1 bg-slate-50 px-2.5 py-1 rounded-full border border-slate-100/50">
+          <Sparkles className={cn("h-3 w-3", badge.earned ? "text-[var(--gold-dark)]" : "text-slate-400")} />
+          <span className={cn("text-[10px] font-bold", badge.earned ? "text-[var(--gold-dark)]" : "text-slate-400")}>
             +{badge.xpReward} XP
           </span>
         </div>
 
         {/* Earned date */}
         {badge.earned && badge.earnedAt && (
-          <p className="text-xs text-indigo-500">
-            {new Date(badge.earnedAt).toLocaleDateString("tr-TR")}
+          <p className="text-[10px] font-semibold text-[var(--steel)]">
+            Kazanıldı: {new Date(badge.earnedAt).toLocaleDateString("tr-TR")}
           </p>
         )}
       </div>
@@ -178,10 +176,10 @@ export default function Achievements() {
   if (isLoading) {
     return (
       <div className="space-y-6 p-6">
-        <div className="h-32 bg-muted rounded-xl animate-pulse" />
+        <div className="h-32 bg-slate-100 rounded-2xl animate-pulse" />
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className="h-48 bg-muted rounded-xl animate-pulse" />
+            <div key={i} className="h-48 bg-slate-100 rounded-2xl animate-pulse" />
           ))}
         </div>
       </div>
@@ -199,81 +197,79 @@ export default function Achievements() {
   return (
     <div className="space-y-6 p-4 md:p-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-            <Award className="h-7 w-7 text-indigo-600" />
-            Başarılarım
+          <h1 className="text-2xl md:text-3xl font-extrabold text-[var(--navy)] flex items-center gap-2 tracking-tight">
+            <Award className="h-8 w-8 text-[var(--gold)]" />
+            Başarılarım ve Rozetlerim
           </h1>
-          <p className="text-muted-foreground mt-1">
-            {earnedCount}/{totalCount} rozet kazanıldı
+          <p className="text-sm text-slate-500 mt-1 font-medium">
+            Toplam {totalCount} rozetten <span className="text-[var(--gold-dark)] font-bold">{earnedCount} tanesini</span> kazandınız.
           </p>
         </div>
         <button
           onClick={() => checkMutation.mutate()}
           disabled={checkMutation.isPending}
-          className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm font-medium disabled:opacity-50 flex items-center gap-2"
+          className="px-5 py-2.5 bg-gradient-to-br from-[var(--navy)] to-[var(--steel)] text-white font-semibold rounded-xl hover:shadow-lg hover:from-[var(--navy-light)] hover:to-[var(--steel-light)] transition-all text-sm disabled:opacity-50 flex items-center gap-2 cursor-pointer border-none shrink-0"
         >
-          <Sparkles className="h-4 w-4" />
-          {checkMutation.isPending ? "Kontrol ediliyor..." : "Rozet Kontrol Et"}
+          <Sparkles className="h-4 w-4 text-[var(--gold)]" />
+          {checkMutation.isPending ? "Kontrol ediliyor..." : "Yeni Rozetleri Kontrol Et"}
         </button>
       </div>
 
       {/* New badges notification */}
       {checkMutation.data && checkMutation.data.newBadges.length > 0 && (
-        <Card className="bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-yellow-950/20 dark:to-amber-950/20 border-yellow-200 dark:border-yellow-800">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2 mb-2">
-              <Sparkles className="h-5 w-5 text-yellow-600" />
-              <span className="font-semibold text-yellow-800 dark:text-yellow-300">
-                Tebrikler! {checkMutation.data.newBadges.length} yeni rozet kazandınız!
-              </span>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {checkMutation.data.newBadges.map((b) => (
-                <Badge key={b.id} className="bg-yellow-100 text-yellow-800 border-yellow-300">
-                  {b.icon} {b.name} (+{b.xpReward} XP)
-                </Badge>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+        <div className="bg-gradient-to-r from-[var(--gold)]/10 to-amber-50 rounded-2xl border border-[var(--gold)]/20 p-5 shadow-sm animate-fade-in-up">
+          <div className="flex items-center gap-2.5 mb-3">
+            <Sparkles className="h-5 w-5 text-[var(--gold-dark)]" />
+            <span className="font-bold text-[var(--navy)]">
+              Tebrikler! {checkMutation.data.newBadges.length} yeni rozet kazandınız!
+            </span>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {checkMutation.data.newBadges.map((b) => (
+              <Badge key={b.id} className="bg-[var(--gold)] text-[var(--navy)] border-none font-bold py-1 px-3">
+                {b.icon} {b.name} (+{b.xpReward} XP)
+              </Badge>
+            ))}
+          </div>
+        </div>
       )}
 
       {/* XP Bar */}
       <XPBar totalXP={totalXP} />
 
       {/* Progress overview */}
-      <Card>
-        <CardContent className="p-4">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-foreground">Genel İlerleme</span>
-            <span className="text-sm text-muted-foreground">
-              {earnedCount}/{totalCount} ({Math.round((earnedCount / totalCount) * 100)}%)
-            </span>
-          </div>
-          <Progress value={(earnedCount / totalCount) * 100} className="h-2" />
-        </CardContent>
-      </Card>
+      <div className="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm">
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-sm font-bold text-[var(--navy)]">Genel Rozet İlerlemesi</span>
+          <span className="text-xs font-bold text-[var(--gold-dark)] bg-[var(--gold)]/10 px-2.5 py-0.5 rounded-full">
+            {earnedCount} / {totalCount} rozet (%{Math.round((earnedCount / totalCount) * 100)})
+          </span>
+        </div>
+        <div className="h-2.5 bg-slate-100 rounded-full overflow-hidden w-full">
+          <div className="h-full rounded-full progress-bar-gold transition-all duration-500" style={{ width: `${(earnedCount / totalCount) * 100}%` }} />
+        </div>
+      </div>
 
       {/* Badges by category */}
       <Tabs defaultValue="all">
-        <TabsList className="flex flex-wrap h-auto gap-1">
-          <TabsTrigger value="all" className="text-xs">
-            <Shield className="h-3 w-3 mr-1" />
+        <TabsList className="flex flex-wrap h-auto gap-1 bg-slate-100/70 p-1.5 rounded-xl border border-slate-200/50">
+          <TabsTrigger value="all" className="text-xs font-semibold rounded-lg px-4 py-2 cursor-pointer transition-all data-[state=active]:bg-white data-[state=active]:text-[var(--navy)] data-[state=active]:shadow-sm">
+            <Shield className="h-3.5 w-3.5 mr-1 text-[var(--gold-dark)]" />
             Tümü ({badges.length})
           </TabsTrigger>
           {categories.map((cat) => (
-            <TabsTrigger key={cat} value={cat} className="text-xs">
-              {categoryIcons[cat]}
-              <span className="ml-1">
+            <TabsTrigger key={cat} value={cat} className="text-xs font-semibold rounded-lg px-4 py-2 cursor-pointer transition-all data-[state=active]:bg-white data-[state=active]:text-[var(--navy)] data-[state=active]:shadow-sm">
+              <span className="mr-1 shrink-0">{categoryIcons[cat]}</span>
+              <span>
                 {categoryLabels[cat] || cat} ({badges.filter((b) => b.category === cat).length})
               </span>
             </TabsTrigger>
           ))}
         </TabsList>
 
-        <TabsContent value="all" className="mt-4">
+        <TabsContent value="all" className="mt-6">
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {badges.map((badge) => (
               <BadgeCard key={badge.id} badge={badge} />
@@ -282,11 +278,11 @@ export default function Achievements() {
         </TabsContent>
 
         {categories.map((cat) => (
-          <TabsContent key={cat} value={cat} className="mt-4">
+          <TabsContent key={cat} value={cat} className="mt-6">
             <div className="mb-4">
-              <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
-                {categoryIcons[cat]}
-                {categoryLabels[cat] || cat}
+              <h2 className="text-base font-bold text-[var(--navy)] flex items-center gap-2">
+                <span className="text-[var(--gold-dark)]">{categoryIcons[cat]}</span>
+                {categoryLabels[cat] || cat} Ünvanları
               </h2>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
@@ -301,17 +297,16 @@ export default function Achievements() {
       </Tabs>
 
       {/* Leaderboard teaser */}
-      <Card className="bg-gradient-to-r from-zinc-50 to-zinc-100 dark:from-zinc-900 dark:to-zinc-800 border-zinc-200 dark:border-zinc-700">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-lg flex items-center gap-2">
-            <Crown className="h-5 w-5 text-amber-500" />
+      <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-sm">
+        <div className="pb-4 mb-4 border-b border-slate-50 flex items-center justify-between">
+          <h2 className="text-lg font-bold text-[var(--navy)] flex items-center gap-2">
+            <Crown className="h-5 w-5 text-[var(--gold)]" />
             Liderlik Tablosu
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <LeaderboardMini />
-        </CardContent>
-      </Card>
+          </h2>
+          <span className="text-xs text-slate-400 font-medium">En yüksek XP kazanan öğrenciler</span>
+        </div>
+        <LeaderboardMini />
+      </div>
     </div>
   );
 }
@@ -321,41 +316,43 @@ function LeaderboardMini() {
 
   if (isLoading) {
     return (
-      <div className="space-y-2">
+      <div className="space-y-3">
         {Array.from({ length: 3 }).map((_, i) => (
-          <div key={i} className="h-10 bg-muted rounded animate-pulse" />
+          <div key={i} className="h-12 bg-slate-50 rounded-xl animate-pulse" />
         ))}
       </div>
     );
   }
 
   if (!data || data.length === 0) {
-    return <p className="text-sm text-muted-foreground">Henüz liderlik tablosunda kimse yok. İlk sen ol!</p>;
+    return <p className="text-sm text-slate-400">Henüz liderlik tablosunda kimse yok. İlk sen ol!</p>;
   }
 
   const medals = ["🥇", "🥈", "🥉"];
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-3">
       {data.map((entry, idx) => (
         <div
           key={entry.userId}
           className={cn(
-            "flex items-center justify-between p-3 rounded-lg",
-            idx === 0 ? "bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800" : "bg-card border border-zinc-100 dark:border-zinc-700"
+            "flex items-center justify-between p-4 rounded-xl border transition-all duration-200",
+            idx === 0 
+              ? "bg-[var(--gold)]/5 border-[var(--gold)]/20 shadow-sm" 
+              : "bg-white border-slate-100 hover:border-slate-200"
           )}
         >
           <div className="flex items-center gap-3">
-            <span className="text-lg w-8 text-center">
+            <span className="text-xl w-8 text-center font-bold">
               {idx < 3 ? medals[idx] : `${idx + 1}.`}
             </span>
-            <span className="font-medium text-foreground">{entry.userName || "Anonim"}</span>
+            <span className="font-bold text-sm text-[var(--navy)]">{entry.userName || "Anonim Öğrenci"}</span>
           </div>
-          <div className="flex items-center gap-2">
-            <Badge variant="secondary" className="text-xs">
-              {entry.badgeCount} rozet
+          <div className="flex items-center gap-3">
+            <Badge variant="secondary" className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 bg-slate-100 text-slate-600 border-none">
+              {entry.badgeCount} Rozet
             </Badge>
-            <span className="font-bold text-indigo-600">{entry.totalXP} XP</span>
+            <span className="font-extrabold text-sm text-[var(--steel)]">{entry.totalXP} XP</span>
           </div>
         </div>
       ))}

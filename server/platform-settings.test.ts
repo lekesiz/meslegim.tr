@@ -3,6 +3,54 @@ import { appRouter } from "./routers";
 import type { TrpcContext } from "./_core/context";
 import * as db from "./db";
 
+const mockSettings: Record<string, string> = {
+  stage_transition_delay_days: "7",
+  stage_reminder_days_before: "3",
+};
+
+vi.mock("./db", async (importOriginal) => {
+  const original = await importOriginal<typeof import("./db")>();
+  return {
+    ...original,
+    setPlatformSetting: vi.fn(async (key: string, value: string) => {
+      mockSettings[key] = value;
+      return { success: true };
+    }),
+    getPlatformSetting: vi.fn(async (key: string) => {
+      return mockSettings[key] ?? null;
+    }),
+    getAllPlatformSettings: vi.fn(async () => {
+      return Object.entries(mockSettings).map(([key, value]) => ({
+        id: Math.floor(Math.random() * 1000),
+        key,
+        value,
+        description: "",
+        updatedAt: new Date(),
+      }));
+    }),
+    getTransitionDelayForAgeGroup: vi.fn(async (ageGroup: string, defaultValue = 7) => {
+      const key = `stage_transition_delay_days_${ageGroup.replace("-", "_")}`;
+      const ageGroupValue = mockSettings[key];
+      if (ageGroupValue !== undefined && ageGroupValue !== null) {
+        const parsed = parseInt(ageGroupValue, 10);
+        if (!isNaN(parsed)) return parsed;
+      }
+      const globalValue = mockSettings["stage_transition_delay_days"];
+      if (globalValue !== undefined && globalValue !== null) {
+        const parsed = parseInt(globalValue, 10);
+        if (!isNaN(parsed)) return parsed;
+      }
+      return defaultValue;
+    }),
+    getStudentsWithLockedStages: vi.fn(async () => {
+      return [];
+    }),
+    getLockedStagesForUser: vi.fn(async (userId: number) => {
+      return [];
+    }),
+  };
+});
+
 type AuthenticatedUser = NonNullable<TrpcContext["user"]>;
 
 function createAdminContext(): TrpcContext {
