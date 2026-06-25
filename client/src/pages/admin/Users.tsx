@@ -3,8 +3,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { trpc } from "@/lib/trpc";
-import { Loader2 } from "lucide-react";
+import { Users as UsersIcon } from "lucide-react";
 import { toast } from "sonner";
+import { TableSkeleton } from "@/components/DashboardSkeleton";
+import { EmptyState } from "@/components/EmptyState";
 import {
   Table,
   TableBody,
@@ -36,27 +38,17 @@ export default function AdminUsers() {
 
   const [editingUser, setEditingUser] = useState<number | null>(null);
 
-  if (isLoading) {
-    return (
-      <DashboardLayout>
-        <div className="flex items-center justify-center h-64">
-          <Loader2 className="w-8 h-8 animate-spin text-primary" />
-        </div>
-      </DashboardLayout>
-    );
-  }
-
-  const handleUpdateRole = (userId: number, role: string) => {
+  const handleUpdateRole = (userId: number, role: 'student' | 'mentor' | 'admin') => {
     updateUserMutation.mutate({
       id: userId,
-      data: { role: role as any },
+      data: { role },
     });
   };
 
-  const handleUpdateStatus = (userId: number, status: string) => {
+  const handleUpdateStatus = (userId: number, status: 'pending' | 'active' | 'inactive') => {
     updateUserMutation.mutate({
       id: userId,
-      data: { status: status as any },
+      data: { status },
     });
   };
 
@@ -91,67 +83,78 @@ export default function AdminUsers() {
             <CardTitle>Kullanıcı Listesi ({users?.length || 0})</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Ad Soyad</TableHead>
-                    <TableHead>E-posta</TableHead>
-                    <TableHead>Rol</TableHead>
-                    <TableHead>Durum</TableHead>
-                    <TableHead>Yaş Grubu</TableHead>
-                    <TableHead>İşlemler</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {users?.map((user) => (
-                    <TableRow key={user.id}>
-                      <TableCell className="font-medium">{user.name}</TableCell>
-                      <TableCell>{user.email}</TableCell>
-                      <TableCell>
-                        {editingUser === user.id ? (
-                          <Select
-                            defaultValue={user.role}
-                            onValueChange={(value) => {
-                              handleUpdateRole(user.id, value);
-                              setEditingUser(null);
-                            }}
-                          >
-                            <SelectTrigger className="w-32">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="student">Öğrenci</SelectItem>
-                              <SelectItem value="mentor">Mentor</SelectItem>
-                              <SelectItem value="admin">Admin</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        ) : (
-                          <Badge className={getRoleBadge(user.role)}>
-                            {user.role === 'student' ? 'Öğrenci' : user.role === 'mentor' ? 'Mentor' : 'Admin'}
-                          </Badge>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <Badge className={getStatusBadge(user.status)}>
-                          {user.status === 'active' ? 'Aktif' : user.status === 'pending' ? 'Beklemede' : 'Pasif'}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>{user.ageGroup || "-"}</TableCell>
-                      <TableCell>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setEditingUser(user.id)}
-                        >
-                          Düzenle
-                        </Button>
-                      </TableCell>
+            {isLoading ? (
+              <TableSkeleton rows={8} />
+            ) : !users || users.length === 0 ? (
+              <EmptyState
+                icon={UsersIcon}
+                title="Kullanıcı Bulunamadı"
+                description="Sistemde henüz kayıtlı kullanıcı bulunmuyor."
+              />
+            ) : (
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Ad Soyad</TableHead>
+                      <TableHead>E-posta</TableHead>
+                      <TableHead>Rol</TableHead>
+                      <TableHead>Durum</TableHead>
+                      <TableHead>Yaş Grubu</TableHead>
+                      <TableHead className="text-right">İşlemler</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
+                  </TableHeader>
+                  <TableBody>
+                    {users.map((user) => (
+                      <TableRow key={user.id} className="hover:bg-slate-50/50 transition-colors duration-200">
+                        <TableCell className="font-medium">{user.name}</TableCell>
+                        <TableCell>{user.email}</TableCell>
+                        <TableCell>
+                          {editingUser === user.id ? (
+                            <Select
+                              defaultValue={user.role}
+                              onValueChange={(value) => {
+                                handleUpdateRole(user.id, value as 'student' | 'mentor' | 'admin');
+                                setEditingUser(null);
+                              }}
+                            >
+                              <SelectTrigger className="w-32">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="student">Öğrenci</SelectItem>
+                                <SelectItem value="mentor">Mentor</SelectItem>
+                                <SelectItem value="admin">Admin</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          ) : (
+                            <Badge className={getRoleBadge(user.role)}>
+                              {user.role === 'student' ? 'Öğrenci' : user.role === 'mentor' ? 'Mentor' : 'Admin'}
+                            </Badge>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          <Badge className={getStatusBadge(user.status)}>
+                            {user.status === 'active' ? 'Aktif' : user.status === 'pending' ? 'Beklemede' : 'Pasif'}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>{user.ageGroup || "-"}</TableCell>
+                        <TableCell className="text-right">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setEditingUser(user.id)}
+                            className="transition-all duration-300 hover:scale-105 active:scale-95"
+                          >
+                            Düzenle
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

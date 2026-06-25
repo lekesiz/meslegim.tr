@@ -2,6 +2,8 @@ import { trpc } from "@/lib/trpc";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CreditCard, CheckCircle, XCircle, Clock, Package } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { EmptyState } from "@/components/EmptyState";
 
 const statusMap: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline"; icon: React.ReactNode }> = {
   completed: { label: "Tamamlandı", variant: "default", icon: <CheckCircle className="h-3.5 w-3.5" /> },
@@ -63,18 +65,35 @@ export default function PaymentHistory() {
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <div className="text-center py-8 text-muted-foreground">Yükleniyor...</div>
-          ) : !purchases || purchases.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              <CreditCard className="h-12 w-12 mx-auto mb-3 opacity-30" />
-              <p>Henüz bir ödeme kaydınız bulunmuyor.</p>
+            <div className="space-y-3">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="flex items-center justify-between p-4 border rounded-lg animate-pulse">
+                  <div className="flex items-center gap-3">
+                    <Skeleton className="h-9 w-9 rounded-full" />
+                    <div className="space-y-2">
+                      <Skeleton className="h-4 w-32" />
+                      <Skeleton className="h-3 w-24" />
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Skeleton className="h-4 w-12" />
+                    <Skeleton className="h-6 w-20 rounded-full" />
+                  </div>
+                </div>
+              ))}
             </div>
+          ) : !purchases || purchases.length === 0 ? (
+            <EmptyState
+              icon={CreditCard}
+              title="Ödeme Kaydı Bulunamadı"
+              description="Henüz bir ödeme kaydınız bulunmuyor."
+            />
           ) : (
             <div className="space-y-3">
-              {purchases.map((purchase: any) => {
+              {purchases.map((purchase) => {
                 const status = statusMap[purchase.status] || statusMap.pending;
                 return (
-                  <div key={purchase.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-3 sm:p-4 border rounded-lg gap-2 sm:gap-3">
+                  <div key={purchase.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-3 sm:p-4 border rounded-lg gap-2 sm:gap-3 hover:border-slate-350 hover:shadow-sm transition-all duration-300">
                     <div className="flex items-center gap-3">
                       <div className="bg-primary/10 rounded-full p-2 shrink-0">
                         <CreditCard className="h-4 w-4 text-primary" />

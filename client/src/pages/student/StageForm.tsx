@@ -13,6 +13,8 @@ import { trpc } from '@/lib/trpc';
 import { Loader2, Save, Send, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { analytics } from '@/lib/analytics';
+import { CardSkeleton } from '@/components/DashboardSkeleton';
+import { Skeleton } from '@/components/ui/skeleton';
 
 type Answer = {
   [questionId: number]: string;
@@ -53,6 +55,10 @@ export default function StageForm() {
   const prevAnswersRef = useRef<string>('');
 
   const { data: activeStage, isLoading } = trpc.student.getActiveStage.useQuery();
+  type ActiveStage = NonNullable<typeof activeStage>;
+  type StageQuestion = ActiveStage['questions'][number];
+  type StageAnswer = ActiveStage['answers'][number];
+
   const utils = trpc.useUtils();
   
   const saveAnswerMutation = trpc.student.saveAnswer.useMutation({
@@ -93,7 +99,7 @@ export default function StageForm() {
     if (activeStage?.answers && activeStage.answers.length > 0) {
       // Create a fingerprint of server answers to detect real changes
       const fingerprint = activeStage.answers
-        .map((ans: any) => `${ans.questionId}:${ans.answer}`)
+        .map((ans: StageAnswer) => `${ans.questionId}:${ans.answer}`)
         .sort()
         .join('|');
       
@@ -101,7 +107,7 @@ export default function StageForm() {
       if (fingerprint !== prevAnswersRef.current) {
         prevAnswersRef.current = fingerprint;
         const initialAnswers: Answer = {};
-        activeStage.answers.forEach((ans: any) => {
+        activeStage.answers.forEach((ans: StageAnswer) => {
           // Normalize: trim whitespace and ensure string type
           initialAnswers[ans.questionId] = String(ans.answer || '').trim();
         });
@@ -141,11 +147,19 @@ export default function StageForm() {
     await saveToServer(questionId, value);
   }, [saveToServer]);
 
-  if (!user || isLoading) {
+  if (isLoading) {
     return (
       <DashboardLayout>
-        <div className="flex items-center justify-center h-64">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <div className="space-y-6">
+          {/* Header Skeleton */}
+          <div className="bg-slate-100 p-8 rounded-2xl h-36 animate-pulse" />
+          {/* Progress Skeleton */}
+          <div className="bg-slate-100 h-24 rounded-2xl animate-pulse" />
+          {/* Questions Skeleton */}
+          <div className="space-y-6">
+            <CardSkeleton />
+            <CardSkeleton />
+          </div>
         </div>
       </DashboardLayout>
     );
@@ -176,8 +190,8 @@ export default function StageForm() {
   const progressPercentage = questions.length > 0 ? (answeredCount / questions.length) * 100 : 0;
 
   const handleSubmit = () => {
-    const requiredQuestions = questions.filter((q: any) => q.required);
-    const unanswered = requiredQuestions.filter((q: any) => !answers[q.id]?.trim());
+    const requiredQuestions = questions.filter((q: StageQuestion) => q.required);
+    const unanswered = requiredQuestions.filter((q: StageQuestion) => !answers[q.id]?.trim());
 
     if (unanswered.length > 0) {
       toast.error(`Lütfen tüm zorunlu soruları cevaplayın (${unanswered.length} soru kaldı)`);
@@ -189,15 +203,19 @@ export default function StageForm() {
     });
   };
 
-  const renderQuestion = (question: any) => {
+  const renderQuestion = (question: StageQuestion) => {
     const options = question.options 
-      ? (Array.isArray(question.options) ? question.options : JSON.parse(question.options))
+      ? (typeof question.options === 'string' 
+          ? JSON.parse(question.options) 
+          : (Array.isArray(question.options) ? question.options : []))
       : [];
     const currentAnswer = String(answers[question.id] || '').trim();
     
     // Check if this multiple_choice question allows multiple selections
     const metadata = question.metadata 
-      ? (typeof question.metadata === 'object' ? question.metadata : JSON.parse(question.metadata))
+      ? (typeof question.metadata === 'string' 
+          ? JSON.parse(question.metadata) 
+          : (typeof question.metadata === 'object' ? question.metadata : {})) as Record<string, any>
       : {};
     const allowMultiple = metadata?.allowMultiple === true;
 
@@ -488,9 +506,8 @@ export default function StageForm() {
           </div>
         </div>
 
-        {/* Questions */}
         <div className="space-y-6">
-          {questions.map((question: any, index: number) => (
+          {questions.map((question: StageQuestion, index: number) => (
             <div key={`q-${question.id}`} className="bg-white rounded-2xl border border-slate-100 p-6 md:p-8 shadow-sm transition-shadow duration-300 hover:shadow-md">
               <div className="mb-4">
                 <div className="flex items-center gap-2 mb-2">

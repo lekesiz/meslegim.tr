@@ -58,6 +58,11 @@ export default function StudentDetailView() {
   const reports = data?.reports;
   const progress = data?.progress;
   const unlockLogs = data?.unlockLogs;
+
+  type StudentDetails = NonNullable<typeof data>;
+  type StageDetail = NonNullable<StudentDetails['stages']>[number];
+  type ReportDetail = NonNullable<StudentDetails['reports']>[number];
+  type UnlockLogDetail = NonNullable<StudentDetails['unlockLogs']>[number];
   
   // Mentor notes state
   const [noteDialogOpen, setNoteDialogOpen] = useState(false);
@@ -72,6 +77,7 @@ export default function StudentDetailView() {
     { studentId: parseInt(id || '0') },
     { enabled: !!id }
   );
+  type MentorNoteDetail = NonNullable<typeof notes>[number];
   
   const createNoteMutation = trpc.mentor.createNote.useMutation({
     onSuccess: () => {
@@ -121,7 +127,7 @@ export default function StudentDetailView() {
     }
   };
   
-  const handleEditNote = (note: any) => {
+  const handleEditNote = (note: MentorNoteDetail) => {
     setEditingNote({ id: note.id, note: note.note });
     setNoteText(note.note);
     setNoteDialogOpen(true);
@@ -281,7 +287,7 @@ export default function StudentDetailView() {
           <CardContent>
             {stages && stages.length > 0 ? (
               <div className="space-y-4">
-                {stages.map((stage: any) => (
+                {stages.map((stage: StageDetail) => (
                   <div
                     key={stage.id}
                     className="flex items-center justify-between border-b pb-4 last:border-0"
@@ -289,7 +295,7 @@ export default function StudentDetailView() {
                     <div className="flex items-center gap-3">
                       {stage.status === 'completed' ? (
                         <CheckCircle className="h-5 w-5 text-green-600" />
-                      ) : stage.status === 'in_progress' ? (
+                      ) : stage.status === 'active' ? (
                         <Clock className="h-5 w-5 text-blue-600" />
                       ) : (
                         <div className="h-5 w-5 rounded-full border-2 border-gray-300" />
@@ -299,7 +305,7 @@ export default function StudentDetailView() {
                         <p className="text-sm text-muted-foreground">
                           {stage.status === 'completed'
                             ? 'Tamamlandı'
-                            : stage.status === 'in_progress'
+                            : stage.status === 'active'
                             ? 'Devam Ediyor'
                             : 'Başlanmadı'}
                         </p>
@@ -328,7 +334,7 @@ export default function StudentDetailView() {
           <CardContent>
             {reports && reports.length > 0 ? (
               <div className="space-y-4">
-                {reports.map((report: any) => (
+                {reports.map((report: ReportDetail) => (
                   <div
                     key={report.id}
                     className="flex items-center justify-between border-b pb-4 last:border-0"
@@ -352,7 +358,7 @@ export default function StudentDetailView() {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => window.open(report.fileUrl, '_blank')}
+                          onClick={() => report.fileUrl && window.open(report.fileUrl, '_blank')}
                         >
                           Görüntüle
                         </Button>
@@ -424,7 +430,7 @@ export default function StudentDetailView() {
           <CardContent>
             {notes && notes.length > 0 ? (
               <div className="space-y-4">
-                {notes.map((note: any) => (
+                {notes.map((note: MentorNoteDetail) => (
                   <div
                     key={note.id}
                     className="rounded-lg border p-4 space-y-2"
@@ -492,7 +498,7 @@ export default function StudentDetailView() {
                   </tr>
                 </thead>
                 <tbody>
-                  {unlockLogs.map((log: any) => (
+                  {unlockLogs.map((log: UnlockLogDetail) => (
                     <tr key={log.id} className="border-b last:border-0 hover:bg-muted/20">
                       <td className="px-3 py-2 text-xs text-muted-foreground whitespace-nowrap">
                         {new Date(log.createdAt).toLocaleString('tr-TR')}

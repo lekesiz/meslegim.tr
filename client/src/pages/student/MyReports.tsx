@@ -7,6 +7,8 @@ import { FileText, Download, Clock, CheckCircle, XCircle, AlertCircle, RefreshCw
 import { useLocation } from 'wouter';
 import DashboardLayout from '@/components/DashboardLayout';
 import { toast } from 'sonner';
+import { CardSkeleton } from '@/components/DashboardSkeleton';
+import { EmptyState } from '@/components/EmptyState';
 
 export default function MyReports() {
   const [, setLocation] = useLocation();
@@ -31,7 +33,9 @@ export default function MyReports() {
     }
   });
 
-  const handleDownloadPdf = async (report: any) => {
+  type StudentReport = NonNullable<typeof reports>[number];
+
+  const handleDownloadPdf = async (report: StudentReport) => {
     if (report.fileUrl) {
       // Already generated, open directly
       window.open(report.fileUrl, '_blank');
@@ -45,10 +49,16 @@ export default function MyReports() {
   if (isLoading) {
     return (
       <DashboardLayout>
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="text-center">
-            <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto mb-4" />
-            <p className="text-muted-foreground">Raporlar yükleniyor...</p>
+        <div className="space-y-6">
+          <div>
+            <h1 className="text-3xl font-bold">Raporlarım</h1>
+            <p className="text-muted-foreground mt-2">
+              Tamamladığınız etapların değerlendirme raporlarını buradan görüntüleyebilirsiniz.
+            </p>
+          </div>
+          <div className="space-y-4">
+            <CardSkeleton />
+            <CardSkeleton />
           </div>
         </div>
       </DashboardLayout>
@@ -69,8 +79,8 @@ export default function MyReports() {
   };
 
   // Deduplicate reports: if same stageId has both 'stage' and 'comprehensive', show only 'comprehensive'
-  const deduplicatedReports = reports ? reports.reduce((acc: any[], report: any) => {
-    const existingIdx = acc.findIndex((r: any) => r.stageId === report.stageId && r.stageId !== null);
+  const deduplicatedReports = reports ? reports.reduce((acc: StudentReport[], report: StudentReport) => {
+    const existingIdx = acc.findIndex((r) => r.stageId === report.stageId && r.stageId !== null);
     if (existingIdx >= 0) {
       // Prefer comprehensive over stage type
       if (report.type === 'comprehensive') {
@@ -94,17 +104,17 @@ export default function MyReports() {
 
         {deduplicatedReports.length === 0 ? (
           <Card>
-            <CardContent className="flex flex-col items-center justify-center py-12">
-              <FileText className="w-16 h-16 text-muted-foreground mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Henüz Rapor Yok</h3>
-              <p className="text-muted-foreground text-center">
-                Etapları tamamladıkça raporlarınız burada görünecektir.
-              </p>
+            <CardContent className="p-6">
+              <EmptyState
+                icon={FileText}
+                title="Henüz Rapor Yok"
+                description="Etapları tamamladıkça raporlarınız burada görünecektir."
+              />
             </CardContent>
           </Card>
         ) : (
           <div className="space-y-4">
-            {deduplicatedReports.map((report: any) => (
+            {deduplicatedReports.map((report) => (
               <Card key={report.id} className={`hover:shadow-md transition-shadow ${report.status === 'rejected' ? 'border-red-200' : ''}`}>
                 <CardHeader>
                   <div className="flex items-start justify-between">

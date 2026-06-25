@@ -10,15 +10,19 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import DashboardLayout from '@/components/DashboardLayout';
 import { Streamdown } from 'streamdown';
+import { CardSkeleton } from '@/components/DashboardSkeleton';
+import { EmptyState } from '@/components/EmptyState';
 
 export default function MentorReportApproval() {
   const [selectedReport, setSelectedReport] = useState<number | null>(null);
   const [feedback, setFeedback] = useState('');
   const [rejectFeedback, setRejectFeedback] = useState('');
-  const [viewingReport, setViewingReport] = useState<any>(null);
-  const [isRejectMode, setIsRejectMode] = useState(false);
 
   const { data: pendingReports, isLoading } = trpc.mentor.getPendingReports.useQuery();
+  type PendingReport = NonNullable<typeof pendingReports>[number];
+
+  const [viewingReport, setViewingReport] = useState<PendingReport | null>(null);
+  const [isRejectMode, setIsRejectMode] = useState(false);
   const utils = trpc.useUtils();
 
   const approveReportMutation = trpc.mentor.approveReport.useMutation({
@@ -62,10 +66,19 @@ export default function MentorReportApproval() {
   if (isLoading) {
     return (
       <DashboardLayout>
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="text-center">
-            <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto mb-4" />
-            <p className="text-muted-foreground">Raporlar yükleniyor...</p>
+        <div className="space-y-6">
+          <div>
+            <h1 className="text-3xl font-bold">Rapor Onaylama</h1>
+            <p className="text-muted-foreground mt-2">
+              Öğrencilerinizin tamamladığı etap raporlarını inceleyin ve onaylayın
+            </p>
+          </div>
+          <div className="grid gap-4 md:grid-cols-3">
+            <CardSkeleton />
+          </div>
+          <div className="grid gap-6">
+            <CardSkeleton />
+            <CardSkeleton />
           </div>
         </div>
       </DashboardLayout>
@@ -100,17 +113,17 @@ export default function MentorReportApproval() {
         {/* Pending Reports List */}
         {!pendingReports || pendingReports.length === 0 ? (
           <Card>
-            <CardContent className="flex flex-col items-center justify-center py-12">
-              <CheckCircle className="w-16 h-16 text-green-500 mb-4" />
-              <p className="text-lg font-semibold mb-2">Tüm raporlar onaylandı!</p>
-              <p className="text-sm text-muted-foreground">
-                Şu anda onay bekleyen rapor bulunmamaktadır.
-              </p>
+            <CardContent className="p-6">
+              <EmptyState
+                icon={CheckCircle}
+                title="Tüm Raporlar Onaylandı!"
+                description="Şu anda onay bekleyen herhangi bir öğrenci raporu bulunmamaktadır."
+              />
             </CardContent>
           </Card>
         ) : (
           <div className="grid gap-6">
-            {pendingReports.map((report: any) => (
+            {pendingReports.map((report) => (
               <Card key={report.id} className={`transition-all ${selectedReport === report.id ? 'border-primary shadow-md' : ''}`}>
                 <CardHeader>
                   <div className="flex items-start justify-between">
@@ -203,7 +216,7 @@ export default function MentorReportApproval() {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => window.open(report.fileUrl, '_blank')}
+                        onClick={() => report.fileUrl && window.open(report.fileUrl, '_blank')}
                       >
                         <FileText className="mr-2 h-4 w-4" />
                         PDF Görüntüle

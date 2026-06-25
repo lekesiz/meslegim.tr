@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Bell, BellOff, Mail, Smartphone, Loader2, CheckCircle2, XCircle, Info } from 'lucide-react';
 import { toast } from 'sonner';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function NotificationSettings() {
   const { isSupported, isSubscribed, isLoading: pushLoading, permission, subscribe, unsubscribe } = usePushNotifications();
@@ -144,8 +145,16 @@ export default function NotificationSettings() {
         </CardHeader>
         <CardContent>
           {emailPrefs.isLoading ? (
-            <div className="flex items-center justify-center py-8">
-              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+            <div className="space-y-4">
+              {Array.from({ length: 7 }).map((_, i) => (
+                <div key={i} className="flex items-center justify-between py-3">
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-48" />
+                    <Skeleton className="h-3 w-64" />
+                  </div>
+                  <Skeleton className="h-6 w-10 rounded-full" />
+                </div>
+              ))}
             </div>
           ) : (
             <div className="space-y-1">
@@ -159,7 +168,7 @@ export default function NotificationSettings() {
                     <p className="text-xs text-muted-foreground">{item.desc}</p>
                   </div>
                   <Switch
-                    checked={(emailPrefs.data as any)?.[item.key] ?? true}
+                    checked={emailPrefs.data ? (emailPrefs.data as unknown as Record<string, boolean>)[item.key] ?? true : true}
                     onCheckedChange={(checked) => handleEmailPrefChange(item.key, checked)}
                     disabled={updatePrefs.isPending}
                   />

@@ -11,6 +11,7 @@ type User = {
   phone?: string | null;
   tcKimlik?: string | null;
   mentorId?: number | null;
+  schoolId?: number | null;
 };
 
 type AuthContextType = {

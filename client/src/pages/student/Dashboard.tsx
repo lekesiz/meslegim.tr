@@ -1,7 +1,7 @@
 import DashboardLayout from "@/components/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";
-import { CheckCircle, Clock, FileText, Lock, Loader2, ArrowRight, Award, Compass, BarChart3, Trophy, MessageSquare } from "lucide-react";
+import { CheckCircle, Clock, FileText, Lock, ArrowRight, Award, Compass, MessageSquare } from "lucide-react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { motion } from "framer-motion";
 import { useLocation } from "wouter";
@@ -17,8 +17,65 @@ export default function StudentDashboard() {
   if (isLoading) {
     return (
       <DashboardLayout>
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <Loader2 className="w-10 h-10 animate-spin text-[var(--gold)]" />
+        <div className="space-y-8 max-w-5xl mx-auto py-4 animate-pulse">
+          {/* Welcome Header Skeleton */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="space-y-2">
+              <div className="h-8 w-64 bg-slate-200 rounded-lg"></div>
+              <div className="h-4 w-48 bg-slate-200 rounded-lg"></div>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="h-7 w-24 bg-slate-200 rounded-full"></div>
+              <div className="h-7 w-24 bg-slate-200 rounded-full"></div>
+            </div>
+          </div>
+
+          {/* Stats Grid Skeleton */}
+          <div className="grid md:grid-cols-3 gap-6">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="bg-white border border-slate-100 rounded-2xl p-6 flex items-center gap-4 shadow-sm h-[88px]">
+                <div className="w-12 h-12 rounded-xl bg-slate-200 shrink-0"></div>
+                <div className="space-y-2 flex-1">
+                  <div className="h-3 w-16 bg-slate-200 rounded"></div>
+                  <div className="h-6 w-24 bg-slate-200 rounded"></div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Progress Card Skeleton */}
+          <div className="bg-white border border-slate-100 rounded-2xl overflow-hidden shadow-sm">
+            <div className="h-12 bg-slate-100 px-6 py-4"></div>
+            <div className="p-6 space-y-4">
+              <div className="flex justify-between">
+                <div className="h-4 w-32 bg-slate-200 rounded"></div>
+                <div className="h-4 w-12 bg-slate-200 rounded"></div>
+              </div>
+              <div className="h-3.5 bg-slate-100 rounded-full"></div>
+              <div className="h-12 bg-slate-50 border border-slate-100 rounded-xl"></div>
+            </div>
+          </div>
+
+          {/* Stages List Skeleton */}
+          <div className="bg-white border border-slate-100 rounded-2xl shadow-sm">
+            <div className="h-14 border-b border-slate-50 px-6 py-4">
+              <div className="h-5 w-40 bg-slate-200 rounded"></div>
+            </div>
+            <div className="p-6 space-y-3">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="flex items-center justify-between p-4 border border-slate-100 rounded-2xl h-[74px]">
+                  <div className="flex items-center gap-4 flex-1">
+                    <div className="w-10 h-10 rounded-xl bg-slate-200 shrink-0"></div>
+                    <div className="space-y-2 flex-1 max-w-sm">
+                      <div className="h-4 w-32 bg-slate-200 rounded"></div>
+                      <div className="h-3 w-full bg-slate-200 rounded"></div>
+                    </div>
+                  </div>
+                  <div className="h-6 w-16 bg-slate-200 rounded-lg"></div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </DashboardLayout>
     );
@@ -30,7 +87,7 @@ export default function StudentDashboard() {
       <DashboardLayout>
         <div className="flex items-center justify-center min-h-[60vh] px-4">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="max-w-md w-full">
-            <Card className="card-elevated border-slate-100 overflow-hidden text-center p-8">
+            <Card className="card-elevated border-slate-100 overflow-hidden text-center p-8 shadow-lg hover:shadow-xl transition-all duration-300">
               <div className="w-20 h-20 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center mx-auto mb-6">
                 <Clock className="w-10 h-10 text-amber-500 animate-pulse" />
               </div>
@@ -89,7 +146,7 @@ export default function StudentDashboard() {
 
         {/* Stats Grid */}
         <div className="grid md:grid-cols-3 gap-6">
-          <Card className="card-elevated border-slate-100 p-6 flex items-center gap-4">
+          <Card className="card-elevated border-slate-100 p-6 flex items-center gap-4 hover:scale-[1.02] hover:-translate-y-0.5 hover:shadow-lg transition-all duration-300 cursor-pointer">
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-500 flex items-center justify-center text-white shadow-md">
               <Compass className="w-6 h-6" />
             </div>
@@ -99,7 +156,7 @@ export default function StudentDashboard() {
             </div>
           </Card>
           
-          <Card className="card-elevated border-slate-100 p-6 flex items-center gap-4">
+          <Card className="card-elevated border-slate-100 p-6 flex items-center gap-4 hover:scale-[1.02] hover:-translate-y-0.5 hover:shadow-lg transition-all duration-300 cursor-pointer">
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white shadow-md">
               <FileText className="w-6 h-6" />
             </div>
@@ -109,7 +166,7 @@ export default function StudentDashboard() {
             </div>
           </Card>
 
-          <Card className="card-elevated border-slate-100 p-6 flex items-center gap-4">
+          <Card className="card-elevated border-slate-100 p-6 flex items-center gap-4 hover:scale-[1.02] hover:-translate-y-0.5 hover:shadow-lg transition-all duration-300 cursor-pointer">
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-white shadow-md">
               <Award className="w-6 h-6" />
             </div>
@@ -123,7 +180,7 @@ export default function StudentDashboard() {
         </div>
 
         {/* Progress Card */}
-        <Card className="card-elevated border-slate-100 overflow-hidden">
+        <Card className="card-elevated border-slate-100 overflow-hidden hover:shadow-md transition-shadow duration-300">
           <div className="bg-gradient-to-r from-[var(--navy)] via-[var(--navy-light)] to-[var(--steel)] text-white px-6 py-4">
             <h2 className="font-bold text-lg text-white">Genel İlerleme</h2>
           </div>
@@ -144,7 +201,7 @@ export default function StudentDashboard() {
         </Card>
 
         {/* Stages List */}
-        <Card className="card-elevated border-slate-100">
+        <Card className="card-elevated border-slate-100 hover:shadow-md transition-shadow duration-300">
           <CardHeader className="pb-3 border-b border-slate-50">
             <CardTitle className="text-lg font-bold text-[var(--navy)]">Kariyer Adımlarınız</CardTitle>
           </CardHeader>
@@ -154,10 +211,10 @@ export default function StudentDashboard() {
                 {progress.map((stage, index) => (
                   <div
                     key={stage.id}
-                    className="flex items-center justify-between p-4 border border-slate-100 rounded-2xl hover:bg-slate-50/50 transition-colors"
+                    className="flex items-center justify-between p-4 border border-slate-100 rounded-2xl hover:border-slate-300 hover:shadow-sm hover:scale-[1.01] hover:bg-slate-50/30 transition-all duration-300 group"
                   >
                     <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center">
+                      <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0">
                         {getStatusIcon(stage.status)}
                       </div>
                       <div>
@@ -174,9 +231,9 @@ export default function StudentDashboard() {
                       {stage.status === 'active' && (
                         <button
                           onClick={() => setLocation(`/dashboard/student/stage/${stage.stageId}`)}
-                          className="btn-accent px-4 py-2 text-xs font-semibold rounded-xl cursor-pointer"
+                          className="btn-accent px-4 py-2 text-xs font-semibold rounded-xl cursor-pointer hover:scale-105 active:scale-95 transition-transform duration-200 flex items-center gap-1 shadow-sm"
                         >
-                          Başla <ArrowRight className="w-3.5 h-3.5 ml-1 inline" />
+                          Başla <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                         </button>
                       )}
                     </div>
@@ -184,29 +241,33 @@ export default function StudentDashboard() {
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-[var(--slate-muted)] text-center py-8">
-                Hesabınız aktif edildiğinde etaplarınız burada görüntülenecektir.
-              </p>
+              <div className="text-center py-12 border border-dashed border-slate-200 rounded-2xl bg-slate-50/50">
+                <Compass className="w-10 h-10 text-slate-400 mx-auto mb-3 animate-pulse" />
+                <h3 className="text-sm font-semibold text-[var(--navy)] mb-1">Görünecek Etap Bulunmuyor</h3>
+                <p className="text-xs text-[var(--slate-muted)] max-w-xs mx-auto">
+                  Hesabınız aktif edildiğinde gelişim etaplarınız burada listelenecektir.
+                </p>
+              </div>
             )}
           </CardContent>
         </Card>
 
         {/* Reports List */}
-        {reports && reports.length > 0 && (
-          <Card className="card-elevated border-slate-100">
-            <CardHeader className="pb-3 border-b border-slate-50">
-              <CardTitle className="text-lg font-bold text-[var(--navy)]">Kariyer Raporlarınız</CardTitle>
-            </CardHeader>
-            <CardContent className="pt-6">
+        <Card className="card-elevated border-slate-100 hover:shadow-md transition-shadow duration-300">
+          <CardHeader className="pb-3 border-b border-slate-50">
+            <CardTitle className="text-lg font-bold text-[var(--navy)]">Kariyer Raporlarınız</CardTitle>
+          </CardHeader>
+          <CardContent className="pt-6">
+            {reports && reports.length > 0 ? (
               <div className="grid sm:grid-cols-2 gap-4">
                 {reports.map((report) => (
                   <div
                     key={report.id}
-                    className="p-5 border border-slate-100 rounded-2xl flex flex-col justify-between gap-4 bg-gradient-to-br from-white to-slate-50/50"
+                    className="p-5 border border-slate-100 rounded-2xl flex flex-col justify-between gap-4 bg-gradient-to-br from-white to-slate-50/50 hover:scale-[1.02] hover:-translate-y-0.5 hover:shadow-md hover:border-slate-200 transition-all duration-300 group"
                   >
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-[var(--steel)]">
+                        <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-[var(--steel)] group-hover:bg-blue-100 transition-colors">
                           <FileText className="w-5 h-5" />
                         </div>
                         <div>
@@ -229,15 +290,15 @@ export default function StudentDashboard() {
                     <div className="flex items-center justify-between border-t border-slate-100 pt-3 mt-1">
                       <button
                         onClick={() => setLocation(`/dashboard/student/reports`)}
-                        className="text-xs text-[var(--steel)] hover:underline font-semibold cursor-pointer flex items-center gap-1"
+                        className="text-xs text-[var(--steel)] hover:underline font-semibold cursor-pointer flex items-center gap-1 group/btn"
                       >
-                        Rapor Detayı <ArrowRight className="w-3.5 h-3.5" />
+                        Rapor Detayı <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" />
                       </button>
                       
                       {report.status === 'approved' && report.fileUrl && (
                         <button
                           onClick={() => window.open(report.fileUrl!, '_blank')}
-                          className="btn-accent px-4 py-1.5 text-xs font-semibold rounded-lg cursor-pointer"
+                          className="btn-accent px-4 py-1.5 text-xs font-semibold rounded-lg cursor-pointer hover:scale-105 active:scale-95 transition-transform"
                         >
                           Raporu İndir
                         </button>
@@ -246,9 +307,17 @@ export default function StudentDashboard() {
                   </div>
                 ))}
               </div>
-            </CardContent>
-          </Card>
-        )}
+            ) : (
+              <div className="text-center py-12 border border-dashed border-slate-200 rounded-2xl bg-slate-50/50">
+                <FileText className="w-10 h-10 text-slate-400 mx-auto mb-3 animate-pulse" />
+                <h3 className="text-sm font-semibold text-[var(--navy)] mb-1">Raporunuz Bulunmuyor</h3>
+                <p className="text-xs text-[var(--slate-muted)] max-w-xs mx-auto">
+                  Etapları tamamladıkça yapay zeka tarafından hazırlanan analiz raporlarınız burada listelenecektir.
+                </p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </DashboardLayout>
   );

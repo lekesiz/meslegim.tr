@@ -303,17 +303,17 @@ export default function BulkEmailCampaigns() {
                 <CardContent>
                   {campaignHistory.data?.campaigns?.[0] ? (
                     <div className="space-y-2 text-sm">
-                      <p className="font-medium">{(campaignHistory.data.campaigns[0] as any).subject}</p>
+                      <p className="font-medium">{campaignHistory.data.campaigns[0].subject}</p>
                       <p className="text-muted-foreground">
-                        {new Date((campaignHistory.data.campaigns[0] as any).createdAt).toLocaleDateString('tr-TR')}
+                        {new Date(campaignHistory.data.campaigns[0].createdAt).toLocaleDateString('tr-TR')}
                       </p>
                       <div className="flex gap-2">
                         <Badge variant="outline" className="text-green-600">
-                          {(campaignHistory.data.campaigns[0] as any).sentCount} gönderildi
+                          {campaignHistory.data.campaigns[0].sentCount} gönderildi
                         </Badge>
-                        {(campaignHistory.data.campaigns[0] as any).failedCount > 0 && (
+                        {campaignHistory.data.campaigns[0].failedCount > 0 && (
                           <Badge variant="outline" className="text-red-600">
-                            {(campaignHistory.data.campaigns[0] as any).failedCount} başarısız
+                            {campaignHistory.data.campaigns[0].failedCount} başarısız
                           </Badge>
                         )}
                       </div>
@@ -368,7 +368,7 @@ export default function BulkEmailCampaigns() {
 
                 {inactiveStudents.data && inactiveStudents.data.length > 0 && (
                   <div className="max-h-[300px] overflow-auto space-y-2">
-                    {(inactiveStudents.data as any[]).slice(0, 20).map((student: any) => (
+                    {inactiveStudents.data.slice(0, 20).map((student: { id: number; name: string | null; email: string; daysSinceLastActivity: number }) => (
                       <div key={student.id} className="flex items-center justify-between p-2 bg-muted/50 rounded text-sm">
                         <div>
                           <p className="font-medium">{student.name || 'İsimsiz'}</p>
@@ -400,7 +400,7 @@ export default function BulkEmailCampaigns() {
               <CardContent>
                 {inactivityHistory.data?.notifications && inactivityHistory.data.notifications.length > 0 ? (
                   <div className="max-h-[400px] overflow-auto space-y-2">
-                    {(inactivityHistory.data.notifications as any[]).map((notif: any) => (
+                    {inactivityHistory.data.notifications.map((notif: { id: number; userName: string | null; emailSentAt: string | Date; inactiveDays: number; success: boolean }) => (
                       <div key={notif.id} className="flex items-center justify-between p-2 bg-muted/50 rounded text-sm">
                         <div>
                           <p className="font-medium">{notif.userName || 'Bilinmiyor'}</p>
@@ -440,7 +440,7 @@ export default function BulkEmailCampaigns() {
             <CardContent>
               {campaignHistory.data?.campaigns && campaignHistory.data.campaigns.length > 0 ? (
                 <div className="space-y-3">
-                  {(campaignHistory.data.campaigns as any[]).map((campaign: any) => (
+                  {campaignHistory.data.campaigns.map((campaign: { id: number; subject: string; segment: string; createdAt: string | Date; adminName: string | null; sentCount: number; failedCount: number; campaignStatus: string }) => (
                     <div key={campaign.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors">
                       <div className="space-y-1">
                         <p className="font-medium">{campaign.subject}</p>

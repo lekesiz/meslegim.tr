@@ -103,6 +103,9 @@ export default function CareerProfile() {
 
   const { riasec, values, risk, integratedInsights, profileCompleteness, completedStageCount, totalAnswerCount } = profileSummary;
 
+  type ValueItem = NonNullable<typeof values>['topValues'][number];
+  type CareerItem = NonNullable<typeof integratedInsights>['aiProofCareers'][number];
+
   return (
     <DashboardLayout>
       <div className="space-y-6">
@@ -256,7 +259,7 @@ export default function CareerProfile() {
                   <h4 className="font-bold text-sm text-[var(--navy)]">En Önemli Değerleriniz</h4>
                 </div>
                 <div className="space-y-3">
-                  {values.topValues.map((v: any, i: number) => (
+                  {values.topValues.map((v: ValueItem, i: number) => (
                     <div key={v.key} className="flex items-start gap-3.5 p-4 rounded-xl bg-slate-50 border border-slate-100/50 hover:border-[var(--gold)]/20 transition-all">
                       <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-[var(--gold)]/15 flex items-center justify-center text-sm font-extrabold text-[var(--gold-dark)]">
                         {i + 1}
@@ -280,7 +283,7 @@ export default function CareerProfile() {
                   <h4 className="font-bold text-sm text-[var(--navy)]">Daha Az Öncelikli Değerleriniz</h4>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {values.bottomValues.map((v: any) => (
+                  {values.bottomValues.map((v: ValueItem) => (
                     <div key={v.key} className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100/50">
                       <span className="text-sm font-medium text-[var(--navy)]">{v.name}</span>
                       <Badge variant="outline" className="text-xs border-slate-200 text-slate-500 bg-white font-bold">{v.score}/100</Badge>
@@ -372,7 +375,7 @@ export default function CareerProfile() {
               Kişisel profilinize uygun, yapay zekaya karşı dayanıklılığı yüksek kariyer alternatifleri
             </p>
             <div className="space-y-3.5">
-              {integratedInsights.aiProofCareers.map((career: any, i: number) => (
+              {integratedInsights.aiProofCareers.map((career: CareerItem, i: number) => (
                 <div key={i} className="flex items-start gap-3.5 p-4 rounded-xl border border-slate-100 bg-white hover:shadow-sm hover:border-[var(--gold)]/20 transition-all">
                   <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-[var(--gold)]/10 flex items-center justify-center">
                     <span className="text-sm font-extrabold text-[var(--gold-dark)]">{career.aiProofScore}</span>

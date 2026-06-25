@@ -41,11 +41,27 @@ import BulkEmailCampaigns from '@/pages/admin/BulkEmailCampaigns';
 
 export default function AdminDashboard() {
   const { user } = useAuth();
-  const [editingStudent, setEditingStudent] = useState<any>(null);
-  const [editingMentor, setEditingMentor] = useState<any>(null);
+  const [editingStudent, setEditingStudent] = useState<{
+    id: number;
+    name: string;
+    email: string;
+    phone: string | null;
+    ageGroup: string | null;
+    status: string;
+    mentorId: number | null;
+  } | null>(null);
+  const [editingMentor, setEditingMentor] = useState<{
+    id: number;
+    name: string;
+    email: string;
+    phone: string | null;
+    status: string;
+  } | null>(null);
 
   const { data: users, isLoading: usersLoading } = trpc.admin.getUsers.useQuery();
   const { data: reports, isLoading: reportsLoading } = trpc.admin.getAllReports.useQuery();
+  type AdminReportItem = NonNullable<typeof reports>[number];
+
   const { data: stages, isLoading: stagesLoading } = trpc.admin.getAllStages.useQuery();
   const { data: questions, isLoading: questionsLoading } = trpc.admin.getAllQuestions.useQuery();
   const { data: stats } = trpc.admin.getSystemStats.useQuery();
@@ -449,11 +465,11 @@ export default function AdminDashboard() {
                   </TableHeader>
                   <TableBody>
                     {reports && reports.length > 0 ? (
-                      reports.map((report: any) => (
+                      reports.map((report: AdminReportItem) => (
                         <TableRow key={report.id} className="border-b border-slate-100 last:border-0 hover:bg-slate-50/50">
                           <TableCell className="text-xs text-slate-450 font-bold px-4 py-3">#{report.id}</TableCell>
-                          <TableCell className="font-bold text-sm text-[var(--navy)] px-4 py-3">{(report as any).studentName || report.userId}</TableCell>
-                          <TableCell className="text-sm font-medium text-[var(--steel)] px-4 py-3">{(report as any).stageName || report.stageId || '-'}</TableCell>
+                          <TableCell className="font-bold text-sm text-[var(--navy)] px-4 py-3">{report.studentName || report.userId}</TableCell>
+                          <TableCell className="text-sm font-medium text-[var(--steel)] px-4 py-3">{report.stageName || report.stageId || '-'}</TableCell>
                           <TableCell className="px-4 py-3">
                             <Badge variant="outline" className="border-slate-200 text-slate-650 bg-slate-50/50 font-bold text-[10px]">
                               {report.type === 'stage' ? 'Etap' : 'Final'}
@@ -480,9 +496,9 @@ export default function AdminDashboard() {
                             {new Date(report.createdAt).toLocaleDateString('tr-TR')}
                           </TableCell>
                           <TableCell className="px-4 py-3">
-                            {report.pdfUrl && (
+                            {report.fileUrl && (
                               <button
-                                onClick={() => window.open(report.pdfUrl, '_blank')}
+                                onClick={() => report.fileUrl && window.open(report.fileUrl, '_blank')}
                                 className="border border-slate-200 text-slate-650 hover:bg-slate-50 rounded-xl font-bold px-3 py-1.5 transition-all text-xs bg-white cursor-pointer flex items-center gap-1"
                               >
                                 <Eye className="h-3.5 w-3.5 mr-0.5" />

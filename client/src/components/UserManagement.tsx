@@ -16,6 +16,8 @@ import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Loader2, Pencil, UserCheck, Search, Filter, Building2, Shield, GraduationCap, Users, ArrowUpDown, ChevronLeft, ChevronRight } from 'lucide-react';
 import { toast } from 'sonner';
+import type { School } from '@shared/types';
+import { TableSkeleton } from './DashboardSkeleton';
 
 const ROLES = [
   { value: 'student', label: 'Öğrenci', color: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' },
@@ -33,8 +35,22 @@ const STATUSES = [
 
 const PAGE_SIZE = 20;
 
+interface EditingUser {
+  id: number;
+  name: string;
+  email: string;
+  role: string;
+  status: string;
+  schoolId: number | null;
+}
+
 export function UserManagement() {
-  const [editingUser, setEditingUser] = useState<any>(null);
+  const { data: users, isLoading, refetch } = trpc.admin.getUsers.useQuery();
+  const { data: schools } = trpc.school.getAll.useQuery();
+
+  type AdminUser = NonNullable<typeof users>[number];
+
+  const [editingUser, setEditingUser] = useState<EditingUser | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
@@ -44,9 +60,6 @@ export function UserManagement() {
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
   const [page, setPage] = useState(1);
 
-  const { data: users, isLoading, refetch } = trpc.admin.getUsers.useQuery();
-  const { data: schools } = trpc.school.getAll.useQuery();
-
   const updateUserMutation = trpc.admin.updateUser.useMutation({
     onSuccess: () => {
       toast.success('Kullanıcı başarıyla güncellendi!');
@@ -54,27 +67,7 @@ export function UserManagement() {
       setIsDialogOpen(false);
       setEditingUser(null);
     },
-    onError: (error: any) => {
-      toast.error(`Hata: ${error.message}`);
-    },
-  });
-
-  const changeRoleMutation = trpc.superAdmin.changeUserRole.useMutation({
-    onSuccess: () => {
-      toast.success('Kullanıcı rolü güncellendi!');
-      refetch();
-    },
-    onError: (error: any) => {
-      toast.error(`Hata: ${error.message}`);
-    },
-  });
-
-  const assignSchoolMutation = trpc.superAdmin.assignUserToSchool.useMutation({
-    onSuccess: () => {
-      toast.success('Kullanıcı okula atandı!');
-      refetch();
-    },
-    onError: (error: any) => {
+    onError: (error) => {
       toast.error(`Hata: ${error.message}`);
     },
   });
@@ -82,26 +75,26 @@ export function UserManagement() {
   // Filter and sort
   const filteredUsers = useMemo(() => {
     if (!users) return [];
-    let result = [...users];
+    let result = [...users] as AdminUser[];
 
     // Search
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
-      result = result.filter((u: any) =>
-        u.name?.toLowerCase().includes(q) ||
-        u.email?.toLowerCase().includes(q) ||
+      result = result.filter((u: AdminUser) =>
+        (u.name || '').toLowerCase().includes(q) ||
+        (u.email || '').toLowerCase().includes(q) ||
         String(u.id).includes(q)
       );
     }
 
     // Role filter
     if (roleFilter !== 'all') {
-      result = result.filter((u: any) => u.role === roleFilter);
+      result = result.filter((u: AdminUser) => u.role === roleFilter);
     }
 
     // Status filter
     if (statusFilter !== 'all') {
-      result = result.filter((u: any) => u.status === statusFilter);
+      result = result.filter((u: AdminUser) => u.status === statusFilter);
     }
 
     // School filter
@@ -114,7 +107,7 @@ export function UserManagement() {
     }
 
     // Sort
-    result.sort((a: any, b: any) => {
+    result.sort((a: AdminUser, b: AdminUser) => {
       let cmp = 0;
       if (sortField === 'name') {
         cmp = (a.name || '').localeCompare(b.name || '', 'tr');
@@ -133,14 +126,14 @@ export function UserManagement() {
   const totalPages = Math.ceil(filteredUsers.length / PAGE_SIZE);
   const paginatedUsers = filteredUsers.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
-  const handleEdit = (user: any) => {
+  const handleEdit = (user: AdminUser) => {
     setEditingUser({
       id: user.id,
       name: user.name || '',
       email: user.email || '',
       role: user.role || 'student',
       status: user.status || 'pending',
-      schoolId: user.schoolId || '',
+      schoolId: user.schoolId || null,
     });
     setIsDialogOpen(true);
   };
@@ -152,8 +145,8 @@ export function UserManagement() {
       data: {
         name: editingUser.name,
         email: editingUser.email,
-        role: editingUser.role,
-        status: editingUser.status,
+        role: editingUser.role as "student" | "mentor" | "admin",
+        status: editingUser.status as "pending" | "active" | "inactive",
       },
     });
   };
@@ -173,22 +166,26 @@ export function UserManagement() {
   if (isLoading) {
     return (
       <Card>
-        <CardContent className="flex items-center justify-center py-8">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        <CardHeader>
+          <CardTitle>Kullanıcı Listesi</CardTitle>
+          <CardDescription>Kullanıcılar yükleniyor...</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <TableSkeleton rows={8} />
         </CardContent>
       </Card>
     );
   }
 
-  const students = users?.filter((u: any) => u.role === 'student') || [];
-  const mentors = users?.filter((u: any) => u.role === 'mentor') || [];
-  const admins = users?.filter((u: any) => ['admin', 'super_admin', 'school_admin'].includes(u.role)) || [];
+  const students = users?.filter((u: AdminUser) => u.role === 'student') || [];
+  const mentors = users?.filter((u: AdminUser) => u.role === 'mentor') || [];
+  const admins = users?.filter((u: AdminUser) => ['admin', 'super_admin', 'school_admin'].includes(u.role)) || [];
 
   return (
     <>
       {/* Stats */}
       <div className="grid gap-4 md:grid-cols-4 mb-6">
-        <Card>
+        <Card className="hover:shadow-md transition-shadow duration-300">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Toplam Kullanıcı</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
@@ -196,11 +193,11 @@ export function UserManagement() {
           <CardContent>
             <div className="text-2xl font-bold">{users?.length || 0}</div>
             <p className="text-xs text-muted-foreground">
-              Aktif: {users?.filter((u: any) => u.status === 'active').length || 0}
+              Aktif: {users?.filter((u: AdminUser) => u.status === 'active').length || 0}
             </p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="hover:shadow-md transition-shadow duration-300">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Öğrenciler</CardTitle>
             <GraduationCap className="h-4 w-4 text-green-500" />
@@ -208,11 +205,11 @@ export function UserManagement() {
           <CardContent>
             <div className="text-2xl font-bold">{students.length}</div>
             <p className="text-xs text-muted-foreground">
-              Aktif: {students.filter((s: any) => s.status === 'active').length}
+              Aktif: {students.filter((s: AdminUser) => s.status === 'active').length}
             </p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="hover:shadow-md transition-shadow duration-300">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Mentorlar</CardTitle>
             <UserCheck className="h-4 w-4 text-blue-500" />
@@ -220,11 +217,11 @@ export function UserManagement() {
           <CardContent>
             <div className="text-2xl font-bold">{mentors.length}</div>
             <p className="text-xs text-muted-foreground">
-              Aktif: {mentors.filter((m: any) => m.status === 'active').length}
+              Aktif: {mentors.filter((m: AdminUser) => m.status === 'active').length}
             </p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="hover:shadow-md transition-shadow duration-300">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Yöneticiler</CardTitle>
             <Shield className="h-4 w-4 text-red-500" />
@@ -280,7 +277,7 @@ export function UserManagement() {
           <SelectContent>
             <SelectItem value="all">Tüm Okullar</SelectItem>
             <SelectItem value="none">Okulsuz</SelectItem>
-            {(schools || []).map((s: any) => (
+            {(schools || []).map((s: School) => (
               <SelectItem key={s.id} value={String(s.id)}>{s.name}</SelectItem>
             ))}
           </SelectContent>
@@ -288,7 +285,7 @@ export function UserManagement() {
       </div>
 
       {/* Table */}
-      <Card>
+      <Card className="hover:shadow-md transition-shadow duration-300">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
@@ -327,12 +324,12 @@ export function UserManagement() {
             </TableHeader>
             <TableBody>
               {paginatedUsers.length > 0 ? (
-                paginatedUsers.map((user: any) => {
+                paginatedUsers.map((user: AdminUser) => {
                   const roleInfo = getRoleInfo(user.role);
                   const statusInfo = getStatusInfo(user.status);
-                  const userSchool = schools?.find((s: any) => s.id === user.schoolId);
+                  const userSchool = schools?.find((s: School) => s.id === user.schoolId);
                   return (
-                    <TableRow key={user.id}>
+                    <TableRow key={user.id} className="hover:bg-slate-50/50 transition-colors">
                       <TableCell className="font-mono text-sm">{user.id}</TableCell>
                       <TableCell className="font-medium">{user.name || '-'}</TableCell>
                       <TableCell className="text-sm">{user.email || '-'}</TableCell>
@@ -354,7 +351,7 @@ export function UserManagement() {
                         {user.createdAt ? new Date(user.createdAt).toLocaleDateString('tr-TR') : '-'}
                       </TableCell>
                       <TableCell className="text-right">
-                        <Button variant="ghost" size="sm" onClick={() => handleEdit(user)}>
+                        <Button variant="ghost" size="sm" onClick={() => handleEdit(user)} className="hover:bg-slate-100 transition-colors">
                           <Pencil className="h-4 w-4" />
                         </Button>
                       </TableCell>
@@ -385,6 +382,7 @@ export function UserManagement() {
                   size="sm"
                   onClick={() => setPage(p => Math.max(1, p - 1))}
                   disabled={page === 1}
+                  className="hover:scale-105 active:scale-95 transition-transform"
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
@@ -393,6 +391,7 @@ export function UserManagement() {
                   size="sm"
                   onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                   disabled={page === totalPages}
+                  className="hover:scale-105 active:scale-95 transition-transform"
                 >
                   <ChevronRight className="h-4 w-4" />
                 </Button>
@@ -480,7 +479,7 @@ export function UserManagement() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="none">Okul Yok</SelectItem>
-                    {(schools || []).map((s: any) => (
+                    {(schools || []).map((s: School) => (
                       <SelectItem key={s.id} value={String(s.id)}>{s.name}</SelectItem>
                     ))}
                   </SelectContent>
@@ -493,10 +492,11 @@ export function UserManagement() {
             <Button
               variant="outline"
               onClick={() => { setIsDialogOpen(false); setEditingUser(null); }}
+              className="hover:bg-slate-100 transition-colors"
             >
               İptal
             </Button>
-            <Button onClick={handleSave} disabled={updateUserMutation.isPending}>
+            <Button onClick={handleSave} disabled={updateUserMutation.isPending} className="hover:scale-105 active:scale-95 transition-transform">
               {updateUserMutation.isPending ? (
                 <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Kaydediliyor...</>
               ) : (

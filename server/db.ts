@@ -177,6 +177,7 @@ export async function getAllUsers() {
       ageGroup: users.ageGroup,
       mentorId: users.mentorId,
       createdAt: users.createdAt,
+      schoolId: users.schoolId,
     })
     .from(users)
     .orderBy(users.createdAt);
@@ -380,7 +381,14 @@ export async function getReportById(reportId: number) {
   
   // Get student to find mentor
   const student = await getUserById(report.userId);
-  if (!student) return report;
+  if (!student) {
+    return {
+      ...report,
+      mentorId: null as number | null,
+      mentorName: null as string | null,
+      stageName: null as string | null
+    };
+  }
   
   // Get mentor info if exists
   let mentorName = null;

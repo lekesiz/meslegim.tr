@@ -54,6 +54,9 @@ export default function StudentDashboard() {
     return null;
   }
 
+  type StudentProgressItem = NonNullable<typeof progress>[number];
+  type StudentReportItem = NonNullable<typeof reports>[number];
+
   if (progressLoading || stageLoading || reportsLoading) {
     return <DashboardSkeleton />;
   }
@@ -76,13 +79,12 @@ export default function StudentDashboard() {
         {/* Progress Timeline */}
         {progress && progress.length > 0 && (
           <StudentProgressTimeline
-            stages={progress.map((p: any) => ({
+            stages={progress.map((p: StudentProgressItem) => ({
               id: p.stageId,
               name: p.stageName,
               description: p.stageDescription || '',
               status: p.status,
-              completedAt: p.completedAt,
-              scheduledAt: p.scheduledAt,
+              completedAt: p.completedAt ? p.completedAt.toISOString() : undefined,
             }))}
           />
         )}
@@ -176,7 +178,7 @@ export default function StudentDashboard() {
                 <h3 className="font-bold text-base text-[var(--navy)]">Aktif Etap</h3>
                 {progress && (
                   <Badge variant="outline" className="text-[10px] font-bold border-slate-200 text-slate-500">
-                    {(progress.findIndex((s: any) => s.stageId === activeStage.stageId) + 1)} / {progress.length}
+                    {(progress.findIndex((s: StudentProgressItem) => s.stageId === activeStage.stageId) + 1)} / {progress.length}
                   </Badge>
                 )}
               </div>
@@ -322,7 +324,7 @@ export default function StudentDashboard() {
               </button>
             </div>
             <div className="space-y-3">
-              {reports.slice(0, 3).map((report: any) => (
+              {reports.slice(0, 3).map((report: StudentReportItem) => (
                 <div
                   key={report.id}
                   className="flex items-center justify-between p-4 border border-slate-100 rounded-xl bg-slate-50/30"
@@ -331,7 +333,7 @@ export default function StudentDashboard() {
                     <FileText className="h-5 w-5 text-[var(--steel)] flex-shrink-0" />
                     <div>
                       <p className="font-bold text-sm text-[var(--navy)]">
-                        {(report as any).stageName || (report.type === 'stage' ? 'Etap Raporu' : 'Final Raporu')}
+                        {report.stageName || (report.type === 'stage' ? 'Etap Raporu' : 'Final Raporu')}
                       </p>
                       <p className="text-[11px] text-slate-400 font-semibold">
                         {new Date(report.createdAt).toLocaleDateString('tr-TR')}

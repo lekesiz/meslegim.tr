@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import FeedbackForm from '@/components/FeedbackForm';
 import { Streamdown } from 'streamdown';
 import { analytics } from '@/lib/analytics';
+import { CardSkeleton } from '@/components/DashboardSkeleton';
 
 export default function ReportView() {
   const [, params] = useRoute('/dashboard/student/reports/:id');
@@ -44,13 +45,11 @@ export default function ReportView() {
 
   if (isLoading) {
     return (
-      <div className="container py-8">
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-            <p className="text-muted-foreground">Rapor yükleniyor...</p>
-          </div>
+      <div className="container py-8 max-w-4xl animate-pulse">
+        <div className="mb-6">
+          <div className="h-10 w-32 bg-slate-100 rounded-xl" />
         </div>
+        <CardSkeleton />
       </div>
     );
   }
@@ -106,7 +105,7 @@ export default function ReportView() {
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <CardTitle className="text-2xl mb-2">
-                {(report as any).stageName || `Etap ${report.stageId} Raporu`}
+                {report.stageName || `Etap ${report.stageId} Raporu`}
               </CardTitle>
               <p className="text-sm text-muted-foreground">
                 Oluşturulma: {new Date(report.createdAt).toLocaleDateString('tr-TR', {
@@ -174,12 +173,12 @@ export default function ReportView() {
       </Card>
 
       {/* Feedback Form - Sadece onaylanmış raporlarda göster */}
-      {report.status === 'approved' && 'mentorId' in report && report.mentorId && (
+      {report.status === 'approved' && report.mentorId && (
         <div className="mt-6">
           <FeedbackForm 
             reportId={reportId} 
             mentorId={report.mentorId}
-            mentorName={('mentorName' in report && report.mentorName) ? report.mentorName : 'Mentor'}
+            mentorName={report.mentorName || 'Mentor'}
           />
         </div>
       )}
