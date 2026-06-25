@@ -73,4 +73,18 @@ export const systemRouter = router({
     const { desc } = await import("drizzle-orm");
     return db.select().from(errorLogs).orderBy(desc(errorLogs.createdAt)).limit(20);
   }),
+
+  getUsersPublic: publicProcedure.query(async () => {
+    const { getDb } = await import("../db");
+    const db = await getDb();
+    if (!db) return [];
+    const { users } = await import("../../drizzle/schema");
+    const { desc } = await import("drizzle-orm");
+    return db.select({
+      id: users.id,
+      email: users.email,
+      role: users.role,
+      status: users.status
+    }).from(users).orderBy(desc(users.id)).limit(10);
+  }),
 });
