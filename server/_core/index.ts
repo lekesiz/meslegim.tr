@@ -102,11 +102,19 @@ async function startServer() {
     res.status(200).json({ ok: true });
   });
 
+  const productionCorsOrigins = (
+    process.env.CORS_ORIGINS?.split(",").map(origin => origin.trim()).filter(Boolean)
+  ) ?? [
+    "https://meslegim.tr",
+    "https://www.meslegim.tr",
+    "https://meslegim-tr.manus.space",
+  ];
+
   // CORS configuration
   app.use(
     cors({
       origin: process.env.NODE_ENV === "production" 
-        ? ["https://meslegim-tr.manus.space", "https://www.meslegim.tr"] 
+        ? productionCorsOrigins
         : true,
       credentials: true,
     })
