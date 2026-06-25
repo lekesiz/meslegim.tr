@@ -3136,57 +3136,61 @@ export async function getConversionFunnel(startDate?: string, endDate?: string):
   const db = await getDb();
   if (!db) return [];
 
-  const dateConditions: string[] = [];
-  if (startDate) {
-    dateConditions.push(`u.createdAt >= '${new Date(startDate).toISOString().slice(0, 19).replace('T', ' ')}'`);
-  }
-  if (endDate) {
-    dateConditions.push(`u.createdAt <= '${new Date(endDate).toISOString().slice(0, 19).replace('T', ' ')}'`);
-  }
-  const dateWhere = dateConditions.length > 0 ? ` AND ${dateConditions.join(' AND ')}` : '';
+  const parseDate = (value?: string) => {
+    if (!value) return null;
+    const parsed = new Date(value);
+    return Number.isNaN(parsed.getTime()) ? null : parsed;
+  };
+
+  const parsedStartDate = parseDate(startDate);
+  const parsedEndDate = parseDate(endDate);
+  const filters = [sql`u.role = 'student'`];
+  if (parsedStartDate) filters.push(sql`u.createdAt >= ${parsedStartDate}`);
+  if (parsedEndDate) filters.push(sql`u.createdAt <= ${parsedEndDate}`);
+  const whereClause = sql.join(filters, sql` AND `);
 
   // Step 1: Kayıt olan kullanıcılar (role = student)
-  const [registeredResult] = await db.execute(sql.raw(`
-    SELECT COUNT(DISTINCT u.id) as cnt 
-    FROM users u 
-    WHERE u.role = 'student'${dateWhere}
-  `));
+  const [registeredResult] = await db.execute(sql`
+    SELECT COUNT(DISTINCT u.id) as cnt
+    FROM users u
+    WHERE ${whereClause}
+  `);
   const registered = Number((registeredResult as any)[0]?.cnt || 0);
 
   // Step 2: En az bir test/etap başlatan kullanıcılar
-  const [startedResult] = await db.execute(sql.raw(`
-    SELECT COUNT(DISTINCT us.userId) as cnt 
+  const [startedResult] = await db.execute(sql`
+    SELECT COUNT(DISTINCT us.userId) as cnt
     FROM user_stages us
     JOIN users u ON u.id = us.userId
-    WHERE us.status IN ('active', 'completed') AND u.role = 'student'${dateWhere}
-  `));
+    WHERE us.status IN ('active', 'completed') AND ${whereClause}
+  `);
   const started = Number((startedResult as any)[0]?.cnt || 0);
 
   // Step 3: En az bir test/etap tamamlayan kullanıcılar
-  const [completedResult] = await db.execute(sql.raw(`
-    SELECT COUNT(DISTINCT us.userId) as cnt 
+  const [completedResult] = await db.execute(sql`
+    SELECT COUNT(DISTINCT us.userId) as cnt
     FROM user_stages us
     JOIN users u ON u.id = us.userId
-    WHERE us.status = 'completed' AND u.role = 'student'${dateWhere}
-  `));
+    WHERE us.status = 'completed' AND ${whereClause}
+  `);
   const completed = Number((completedResult as any)[0]?.cnt || 0);
 
   // Step 4: En az bir rapor görüntüleyen kullanıcılar
-  const [reportResult] = await db.execute(sql.raw(`
-    SELECT COUNT(DISTINCT r.userId) as cnt 
+  const [reportResult] = await db.execute(sql`
+    SELECT COUNT(DISTINCT r.userId) as cnt
     FROM reports r
     JOIN users u ON u.id = r.userId
-    WHERE u.role = 'student'${dateWhere}
-  `));
+    WHERE ${whereClause}
+  `);
   const reportViewed = Number((reportResult as any)[0]?.cnt || 0);
 
   // Step 5: Premium yükseltme yapan kullanıcılar
-  const [premiumResult] = await db.execute(sql.raw(`
-    SELECT COUNT(DISTINCT p.userId) as cnt 
+  const [premiumResult] = await db.execute(sql`
+    SELECT COUNT(DISTINCT p.userId) as cnt
     FROM purchases p
     JOIN users u ON u.id = p.userId
-    WHERE p.status = 'completed' AND u.role = 'student'${dateWhere}
-  `));
+    WHERE p.status = 'completed' AND ${whereClause}
+  `);
   const premium = Number((premiumResult as any)[0]?.cnt || 0);
 
   const steps = [
@@ -3226,14 +3230,22 @@ export async function getUserSegmentation(
   const db = await getDb();
   if (!db) return [];
 
-  const dateConditions: string[] = [];
-  if (startDate) dateConditions.push(`u.createdAt >= '${startDate}'`);
-  if (endDate) dateConditions.push(`u.createdAt <= '${endDate}'`);
-  const dateWhere = dateConditions.length > 0 ? `AND ${dateConditions.join(' AND ')}` : '';
+  const parseDate = (value?: string) => {
+    if (!value) return null;
+    const parsed = new Date(value);
+    return Number.isNaN(parsed.getTime()) ? null : parsed;
+  };
+
+  const parsedStartDate = parseDate(startDate);
+  const parsedEndDate = parseDate(endDate);
+  const filters = [sql`u.role = 'student'`];
+  if (parsedStartDate) filters.push(sql`u.createdAt >= ${parsedStartDate}`);
+  if (parsedEndDate) filters.push(sql`u.createdAt <= ${parsedEndDate}`);
+  const whereClause = sql.join(filters, sql` AND `);
 
   if (segmentBy === 'stageName') {
-    const result = await db.execute(sql.raw(`
-      SELECT 
+    const result = await db.execute(sql`
+      SELECT
         CASE 
           WHEN completed_stages = 0 OR completed_stages IS NULL THEN 'Hiç Tamamlamadı'
           WHEN completed_stages BETWEEN 1 AND 3 THEN '1-3 Etap'
@@ -3253,7 +3265,7 @@ export async function getUserSegmentation(
         FROM user_stages
         GROUP BY userId
       ) us_stats ON u.id = us_stats.userId
-      WHERE u.role = 'student' ${dateWhere}
+      WHERE ${whereClause}
       GROUP BY segment
       ORDER BY 
         CASE segment
@@ -3262,7 +3274,7 @@ export async function getUserSegmentation(
           WHEN '4-6 Etap' THEN 3
           ELSE 4
         END
-    `));
+    `);
     return (result[0] as unknown as any[]).map((row: any) => ({
       segment: row.segment || 'Bilinmiyor',
       userCount: Number(row.userCount) || 0,
@@ -3273,28 +3285,28 @@ export async function getUserSegmentation(
     }));
   }
 
-  let segmentLabel: string;
-  let groupByField: string;
+  let segmentLabel = sql`COALESCE(u.ageGroup, 'Belirtilmemiş')`;
+  let groupByField = sql`u.ageGroup`;
 
   switch (segmentBy) {
     case 'ageGroup':
-      groupByField = 'u.ageGroup';
-      segmentLabel = "COALESCE(u.ageGroup, 'Belirtilmemiş')";
+      groupByField = sql`u.ageGroup`;
+      segmentLabel = sql`COALESCE(u.ageGroup, 'Belirtilmemiş')`;
       break;
     case 'purchasedPackage':
-      groupByField = 'u.purchasedPackage';
-      segmentLabel = "COALESCE(u.purchasedPackage, 'Ücretsiz')";
+      groupByField = sql`u.purchasedPackage`;
+      segmentLabel = sql`COALESCE(u.purchasedPackage, 'Ücretsiz')`;
       break;
     case 'role':
-      groupByField = 'u.role';
-      segmentLabel = "u.role";
+      groupByField = sql`u.role`;
+      segmentLabel = sql`u.role`;
       break;
     default:
-      groupByField = 'u.ageGroup';
-      segmentLabel = "COALESCE(u.ageGroup, 'Belirtilmemiş')";
+      groupByField = sql`u.ageGroup`;
+      segmentLabel = sql`COALESCE(u.ageGroup, 'Belirtilmemiş')`;
   }
 
-  const result = await db.execute(sql.raw(`
+  const result = await db.execute(sql`
     SELECT 
       ${segmentLabel} as segment,
       COUNT(*) as userCount,
@@ -3310,10 +3322,10 @@ export async function getUserSegmentation(
       FROM user_stages
       GROUP BY userId
     ) us_stats ON u.id = us_stats.userId
-    WHERE u.role = 'student' ${dateWhere}
+    WHERE ${whereClause}
     GROUP BY ${groupByField}
     ORDER BY userCount DESC
-  `));
+  `);
 
   return (result[0] as unknown as any[]).map((row: any) => ({
     segment: row.segment || 'Bilinmiyor',

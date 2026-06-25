@@ -1,7 +1,8 @@
-import { NOT_ADMIN_ERR_MSG, UNAUTHED_ERR_MSG } from '@shared/const';
+import { COOKIE_NAME, NOT_ADMIN_ERR_MSG, UNAUTHED_ERR_MSG } from '@shared/const';
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import type { TrpcContext } from "./context";
+import { validateCsrfToken } from "./csrf";
 
 import { ZodError } from "zod";
 
@@ -42,6 +43,10 @@ const requireUser = t.middleware(async opts => {
 
   if (!ctx.user) {
     throw new TRPCError({ code: "UNAUTHORIZED", message: UNAUTHED_ERR_MSG });
+  }
+  const hasSessionCookie = (ctx.req.headers.cookie ?? "").includes(`${COOKIE_NAME}=`);
+  if (opts.type === "mutation" && hasSessionCookie && !validateCsrfToken(ctx.req)) {
+    throw new TRPCError({ code: "FORBIDDEN", message: "Invalid CSRF token" });
   }
 
   return next({

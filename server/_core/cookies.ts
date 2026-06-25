@@ -1,4 +1,5 @@
 import type { CookieOptions, Request } from "express";
+import { ENV } from "./env";
 
 const LOCAL_HOSTS = new Set(["localhost", "127.0.0.1", "::1"]);
 
@@ -39,10 +40,23 @@ export function getSessionCookieOptions(
   //       ? hostname
   //       : undefined;
 
+  const secure = ENV.isProduction || isSecureRequest(req);
   return {
     httpOnly: true,
     path: "/",
-    sameSite: "lax",
-    secure: isSecureRequest(req),
+    sameSite: secure ? "none" : "lax",
+    secure,
+  };
+}
+
+export function getCsrfCookieOptions(
+  req: Request
+): Pick<CookieOptions, "domain" | "httpOnly" | "path" | "sameSite" | "secure"> {
+  const secure = ENV.isProduction || isSecureRequest(req);
+  return {
+    httpOnly: false,
+    path: "/",
+    sameSite: secure ? "none" : "lax",
+    secure,
   };
 }
