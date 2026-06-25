@@ -249,6 +249,34 @@ export async function getQuestionById(id: number) {
   return result.length > 0 ? result[0] : undefined;
 }
 
+export async function logError(data: {
+  level?: "info" | "warn" | "error" | "fatal";
+  source: "client" | "server";
+  message: string;
+  stackTrace?: string;
+  path?: string;
+  userId?: number;
+  metadata?: any;
+}) {
+  const db = await getDb();
+  if (!db) return;
+  try {
+    const { errorLogs } = await import("../drizzle/schema");
+    await db.insert(errorLogs).values({
+      level: data.level || "error",
+      source: data.source,
+      message: data.message,
+      stackTrace: data.stackTrace,
+      path: data.path,
+      userId: data.userId,
+      metadata: data.metadata,
+    });
+  } catch (error) {
+    logger.error("Failed to insert error log:", error);
+  }
+}
+
+
 // User stage functions
 export async function getUserStages(userId: number) {
   const db = await getDb();

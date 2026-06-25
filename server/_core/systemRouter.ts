@@ -44,4 +44,24 @@ export const systemRouter = router({
         return { success: false, message: error.message };
       }
     }),
+
+  logError: publicProcedure
+    .input(
+      z.object({
+        level: z.enum(["info", "warn", "error", "fatal"]).optional(),
+        source: z.enum(["client", "server"]),
+        message: z.string(),
+        stackTrace: z.string().optional(),
+        path: z.string().optional(),
+        metadata: z.any().optional(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const { logError } = await import("../db");
+      await logError({
+        ...input,
+        userId: ctx.user?.id,
+      });
+      return { success: true };
+    }),
 });

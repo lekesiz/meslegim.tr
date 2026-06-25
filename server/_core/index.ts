@@ -14,7 +14,23 @@ import helmet from "helmet";
 import cors from "cors";
 import { rateLimit } from "express-rate-limit";
 import { initSentry, setupSentryErrorHandler } from "../utils/sentry";
-import logger, { logInfo, logError } from "../utils/logger";
+import logger, { logInfo, logError as _logError } from "../utils/logger";
+
+process.on("unhandledRejection", async (reason: any) => {
+  try {
+    const { logError } = await import("../db");
+    await logError({
+      level: "fatal",
+      source: "server",
+      message: reason?.message || String(reason),
+      stackTrace: reason?.stack,
+      metadata: { type: "unhandledRejection" }
+    });
+  } catch (e) {
+    console.error("Failed to log unhandled rejection to DB", e);
+  }
+});
+
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -126,6 +142,22 @@ async function startServer() {
     createExpressMiddleware({
       router: appRouter,
       createContext,
+      onError: async ({ error, type, path, input, ctx, req }) => {
+        try {
+          const { logError } = await import("../db");
+          await logError({
+            level: error.code === "INTERNAL_SERVER_ERROR" ? "error" : "warn",
+            source: "server",
+            message: `TRPC Error [${error.code}]: ${error.message}`,
+            stackTrace: error.stack,
+            path: `/api/trpc/${path}`,
+            userId: ctx?.user?.id,
+            metadata: { type, input, trpcCode: error.code }
+          });
+        } catch (e) {
+          console.error("Failed to log TRPC error to DB:", e);
+        }
+      }
     })
   );
   // development mode uses Vite, production mode uses static files
@@ -137,6 +169,29 @@ async function startServer() {
 
   // Sentry error handler - Must be after all routes
   setupSentryErrorHandler(app);
+
+  // Custom DB error logger
+  app.use(async (err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+    try {
+      const { logError } = await import("../db");
+      await logError({
+        level: "error",
+        source: "server",
+        message: err.message || "Unknown server error",
+        stackTrace: err.stack,
+        path: req.path,
+        metadata: {
+          method: req.method,
+          headers: req.headers,
+          query: req.query,
+          body: req.body,
+        }
+      });
+    } catch (e) {
+      console.error("Failed to log error to DB:", e);
+    }
+    next(err);
+  });
 
   const preferredPort = parseInt(process.env.PORT || "3000");
   const port = await findAvailablePort(preferredPort);
