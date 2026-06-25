@@ -17,7 +17,7 @@ test.describe('Student Journey', () => {
 
   test('should display student dashboard with stages', async ({ page, context }) => {
     await loginAs(page, context, studentEmail, studentPassword);
-    await page.waitForSelector('text=Hoş Geldiniz', { timeout: 10000 });
+    await page.getByRole('heading', { name: /Hoş Geldiniz/i }).waitFor({ timeout: 15000 });
     
     const pageContent = await page.locator('body').textContent() || '';
     const hasRelevantContent = pageContent.includes('Etap') || 

@@ -19,7 +19,7 @@ test.describe('Admin Dashboard', () => {
     await loginAs(page, context, adminEmail, adminPassword);
     
     // Admin dashboard uses tabs - click Öğrenciler tab
-    const studentsTab = page.locator('[role="tab"][value="students"]').first();
+    const studentsTab = page.getByRole('tab', { name: /Öğrenciler/i }).first();
     await studentsTab.scrollIntoViewIfNeeded();
     await studentsTab.click();
     await page.waitForTimeout(1000);
@@ -31,7 +31,7 @@ test.describe('Admin Dashboard', () => {
     await loginAs(page, context, adminEmail, adminPassword);
     
     // Click Ödemeler tab
-    const paymentTab = page.locator('[role="tab"][value="payments"]').first();
+    const paymentTab = page.getByRole('tab', { name: /Ödemeler/i }).first();
     await paymentTab.scrollIntoViewIfNeeded();
     await paymentTab.click();
     await page.waitForTimeout(1000);
@@ -43,7 +43,7 @@ test.describe('Admin Dashboard', () => {
     await loginAs(page, context, adminEmail, adminPassword);
     
     // Click Okullar tab
-    const schoolTab = page.locator('[role="tab"][value="schools"]').first();
+    const schoolTab = page.getByRole('tab', { name: /Okullar/i }).first();
     await schoolTab.scrollIntoViewIfNeeded();
     await schoolTab.click();
     await page.waitForTimeout(1000);
@@ -55,7 +55,7 @@ test.describe('Admin Dashboard', () => {
     await loginAs(page, context, adminEmail, adminPassword);
     
     // Click Kuponlar tab
-    const promoTab = page.locator('[role="tab"][value="promotions"]').first();
+    const promoTab = page.getByRole('tab', { name: /Kuponlar/i }).first();
     await promoTab.scrollIntoViewIfNeeded();
     await promoTab.click();
     await page.waitForTimeout(1000);

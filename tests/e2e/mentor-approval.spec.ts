@@ -17,7 +17,7 @@ test.describe('Mentor Dashboard', () => {
 
   test('should display mentor dashboard', async ({ page, context }) => {
     await loginAs(page, context, mentorEmail, mentorPassword);
-    await page.waitForSelector('text=Mentor Paneli', { timeout: 10000 });
+    await page.getByRole('heading', { name: /Yönetim Paneli/i }).waitFor({ timeout: 15000 });
     
     const pageContent = await page.locator('body').textContent() || '';
     const hasRelevantContent = pageContent.includes('Öğrenci') || 

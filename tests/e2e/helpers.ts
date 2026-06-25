@@ -31,7 +31,8 @@ export async function loginAs(page: Page, context: BrowserContext, email: string
   if (setCookieHeader) {
     // Parse cookie name and value from Set-Cookie header
     // Format: "app_session=eyJ...; Path=/; HttpOnly; SameSite=None"
-    const cookies = setCookieHeader.split(',').map(c => c.trim());
+    // Playwright joins multiple headers with \n
+    const cookies = setCookieHeader.split('\n').map(c => c.trim());
     
     for (const cookieStr of cookies) {
       const parts = cookieStr.split(';')[0].trim();
