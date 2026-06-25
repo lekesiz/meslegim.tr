@@ -64,4 +64,13 @@ export const systemRouter = router({
       });
       return { success: true };
     }),
+
+  getLogs: publicProcedure.query(async () => {
+    const { getDb } = await import("../db");
+    const db = await getDb();
+    if (!db) return [];
+    const { errorLogs } = await import("../../drizzle/schema");
+    const { desc } = await import("drizzle-orm");
+    return db.select().from(errorLogs).orderBy(desc(errorLogs.createdAt)).limit(20);
+  }),
 });
