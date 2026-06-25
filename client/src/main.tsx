@@ -23,13 +23,47 @@ const getCookieValue = (cookieName: string): string | null => {
   return decodeURIComponent(target.slice(encodedName.length + 1));
 };
 
+const logClientError = (error: any, type: string) => {
+  try {
+    fetch('/api/trpc/system.logError', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        0: {
+          json: {
+            level: 'error',
+            source: 'client',
+            message: error?.message || String(error),
+            stackTrace: error?.stack || null,
+            path: window.location.pathname,
+            metadata: { type, url: window.location.href }
+          }
+        }
+      })
+    }).catch(console.error);
+  } catch (e) {
+    console.error('Failed to log error', e);
+  }
+};
+
+if (typeof window !== 'undefined') {
+  window.addEventListener('error', (event) => {
+    logClientError(event.error, 'uncaught_error');
+  });
+  window.addEventListener('unhandledrejection', (event) => {
+    logClientError(event.reason, 'unhandled_promise');
+  });
+}
 const redirectToLoginIfUnauthorized = (error: unknown) => {
   if (!(error instanceof TRPCClientError)) return;
   if (typeof window === "undefined") return;
 
   const isUnauthorized = error.message === UNAUTHED_ERR_MSG;
 
-  if (!isUnauthorized) return;
+  if (!isUnauthorized) {
+    logClientError(error, 'trpc_error');
+    return;
+  }
 
   window.location.href = getLoginUrl();
 };

@@ -11,7 +11,7 @@ function getResend(): Resend {
 }
 
 // Email from address - use verified domain or fallback to Resend test
-const FROM_EMAIL = process.env.EMAIL_FROM || 'Meslegim.tr <bilgi@meslegim.tr>';
+const FROM_EMAIL = process.env.EMAIL_FROM || 'Meslegim.tr <iletisim@meslegim.tr>';
 
 interface EmailTemplate {
   to: string;
@@ -64,7 +64,7 @@ const emailStyles = `
 const emailFooter = `
   <div class="footer">
     <p>© 2026 Meslegim.tr - Tüm hakları saklıdır</p>
-    <p><a href="${BASE_URL}">meslegim.tr</a> | <a href="mailto:destek@meslegim.tr">destek@meslegim.tr</a></p>
+    <p><a href="${BASE_URL}">meslegim.tr</a> | <a href="mailto:iletisim@meslegim.tr">iletisim@meslegim.tr</a></p>
     <p style="font-size: 11px; color: #cbd5e1;">Bu e-posta Meslegim.tr platformu tarafından otomatik olarak gönderilmiştir.</p>
   </div>
 `;

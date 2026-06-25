@@ -17,7 +17,7 @@ export interface EmailOptions {
 export async function sendEmail(options: EmailOptions): Promise<boolean> {
   try {
     const { data, error } = await getResend().emails.send({
-      from: 'Meslegim.tr <noreply@meslegim.tr>',
+      from: 'Meslegim.tr <iletisim@meslegim.tr>',
       to: options.to,
       subject: options.subject,
       html: options.html,

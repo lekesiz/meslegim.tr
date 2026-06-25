@@ -676,3 +676,25 @@ export const emailTrackingEvents = mysqlTable("email_tracking_events", {
 }));
 export type EmailTrackingEvent = typeof emailTrackingEvents.$inferSelect;
 export type InsertEmailTrackingEvent = typeof emailTrackingEvents.$inferInsert;
+
+/**
+ * Error logs - stores client and server side errors
+ */
+export const errorLogs = mysqlTable("error_logs", {
+  id: int("id").autoincrement().primaryKey(),
+  level: mysqlEnum("level", ["info", "warn", "error", "fatal"]).default("error").notNull(),
+  source: mysqlEnum("source", ["client", "server"]).notNull(),
+  message: text("message").notNull(),
+  stackTrace: text("stackTrace"),
+  path: varchar("path", { length: 255 }),
+  userId: int("userId"), // optional, if user was logged in
+  metadata: json("metadata"), // request body, headers, browser info, etc.
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+  sourceIdx: index("err_source_idx").on(table.source),
+  levelIdx: index("err_level_idx").on(table.level),
+  userIdIdx: index("err_user_id_idx").on(table.userId),
+}));
+
+export type ErrorLog = typeof errorLogs.$inferSelect;
+export type InsertErrorLog = typeof errorLogs.$inferInsert;

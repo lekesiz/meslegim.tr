@@ -91,8 +91,8 @@ export default function Iletisim() {
                 </div>
                 <div>
                   <p className="font-medium text-foreground text-sm">E-posta</p>
-                  <a href="mailto:destek@meslegim.tr" className="text-blue-600 hover:underline text-sm">
-                    destek@meslegim.tr
+                  <a href="mailto:iletisim@meslegim.tr" className="text-blue-600 hover:underline text-sm">
+                    iletisim@meslegim.tr
                   </a>
                 </div>
               </div>
@@ -160,7 +160,7 @@ export default function Iletisim() {
                   <h2 className="text-2xl font-bold text-foreground">Mesajınız Gönderildi</h2>
                   <p className="text-muted-foreground max-w-md mx-auto">
                     Mesajınız başarıyla iletildi. Destek ekibimiz en kısa sürede size dönüş yapacaktır. 
-                    Acil durumlar için destek@meslegim.tr adresinden bize ulaşabilirsiniz.
+                    Acil durumlar için iletisim@meslegim.tr adresinden bize ulaşabilirsiniz.
                   </p>
                   <div className="flex items-center justify-center gap-4 pt-4">
                     <Button variant="outline" onClick={() => setLocation('/')}>

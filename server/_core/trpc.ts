@@ -4,8 +4,35 @@ import superjson from "superjson";
 import type { TrpcContext } from "./context";
 import { validateCsrfToken } from "./csrf";
 
+import { ZodError } from "zod";
+
 const t = initTRPC.context<TrpcContext>().create({
   transformer: superjson,
+  errorFormatter({ shape, error }) {
+    let parsedMessage = error.message;
+    if (error.code === 'BAD_REQUEST' && error.cause instanceof ZodError) {
+      try {
+        const parsed = JSON.parse(error.message);
+        if (Array.isArray(parsed) && parsed[0]?.message) {
+          parsedMessage = parsed[0].message;
+        }
+      } catch (e) {
+        // Fallback to error.message if parsing fails
+      }
+    }
+
+    return {
+      ...shape,
+      data: {
+        ...shape.data,
+        zodError:
+          error.code === 'BAD_REQUEST' && error.cause instanceof ZodError
+            ? error.cause.flatten()
+            : null,
+      },
+      message: parsedMessage,
+    };
+  },
 });
 
 export const router = t.router;

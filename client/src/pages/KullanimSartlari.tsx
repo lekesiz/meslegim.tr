@@ -155,7 +155,7 @@ export default function KullanimSartlari() {
                 kullanıcılara zarar veren hesapları önceden bildirim yapmaksızın askıya alma veya sonlandırma hakkını
                 saklı tutar. Kullanıcılar da istedikleri zaman hesaplarını kapatabilir; bu durumda kişisel verileri
                 yasal saklama süreleri dışında silinir. Hesap kapatma talebi için{" "}
-                <a href="mailto:destek@meslegim.tr" className="text-indigo-600 hover:underline">destek@meslegim.tr</a>{" "}
+                <a href="mailto:iletisim@meslegim.tr" className="text-indigo-600 hover:underline">iletisim@meslegim.tr</a>{" "}
                 adresine başvurabilirsiniz.
               </p>
             </section>
@@ -202,7 +202,7 @@ export default function KullanimSartlari() {
               <h2 className="text-xl font-semibold text-foreground mb-3">14. İletişim</h2>
               <p className="text-muted-foreground leading-relaxed">
                 Kullanım şartlarıyla ilgili sorularınız için{" "}
-                <a href="mailto:destek@meslegim.tr" className="text-indigo-600 hover:underline">destek@meslegim.tr</a>{" "}
+                <a href="mailto:iletisim@meslegim.tr" className="text-indigo-600 hover:underline">iletisim@meslegim.tr</a>{" "}
                 adresine ulaşabilirsiniz.
               </p>
             </section>

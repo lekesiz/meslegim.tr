@@ -259,14 +259,14 @@ export default function GizlilikPolitikasi() {
                   <Mail className="w-5 h-5 text-indigo-600 shrink-0" />
                   <div>
                     <p className="text-sm font-medium text-foreground">E-posta ile başvuru</p>
-                    <a href="mailto:kvkk@meslegim.tr" className="text-sm text-indigo-600 hover:underline">kvkk@meslegim.tr</a>
+                    <a href="mailto:iletisim@meslegim.tr" className="text-sm text-indigo-600 hover:underline">iletisim@meslegim.tr</a>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
                   <Building2 className="w-5 h-5 text-indigo-600 shrink-0" />
                   <div>
                     <p className="text-sm font-medium text-foreground">Genel iletişim</p>
-                    <a href="mailto:destek@meslegim.tr" className="text-sm text-indigo-600 hover:underline">destek@meslegim.tr</a>
+                    <a href="mailto:iletisim@meslegim.tr" className="text-sm text-indigo-600 hover:underline">iletisim@meslegim.tr</a>
                   </div>
                 </div>
               </div>
