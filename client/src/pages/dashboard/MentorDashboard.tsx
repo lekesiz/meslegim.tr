@@ -4,7 +4,9 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { trpc } from '@/lib/trpc';
 import { Loader2, UserCheck, Users, FileText, CheckCircle, XCircle, ExternalLink, MessageSquare, Unlock, History, ChevronDown, ChevronUp } from 'lucide-react';
-import { DashboardSkeleton } from '@/components/DashboardSkeleton';
+import { TableSkeleton, CardSkeleton } from '@/components/DashboardSkeleton';
+import { EmptyState } from '@/components/EmptyState';
+import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
 import { useLocation } from 'wouter';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -72,7 +74,7 @@ function MentorUnlockSection() {
             </div>
           ) : (
             <div className="space-y-3">
-              {studentsWithLocked.map((student: any) => (
+              {studentsWithLocked.map((student) => (
                 <div key={student.userId} className="border border-slate-100/80 rounded-xl overflow-hidden bg-slate-50/20">
                   <button
                     className="w-full flex items-center justify-between p-4 hover:bg-slate-50 transition-all text-left"
@@ -99,7 +101,7 @@ function MentorUnlockSection() {
 
                   {expandedUser === student.userId && (
                     <div className="border-t border-slate-100 bg-white p-4 space-y-3">
-                      {student.lockedStages.map((stage: any) => (
+                      {student.lockedStages.map((stage) => (
                         <div key={stage.id} className="space-y-3 p-3 rounded-xl bg-slate-50/50 border border-slate-100">
                           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                             <div>
@@ -176,7 +178,7 @@ function MentorUnlockSection() {
                     </tr>
                   </thead>
                   <tbody>
-                    {(showLogs ? unlockLogs : unlockLogs.slice(0, 5)).map((log: any) => (
+                    {(showLogs ? unlockLogs : unlockLogs.slice(0, 5)).map((log) => (
                       <tr key={log.id} className="border-b border-slate-100 last:border-0 hover:bg-slate-50/50">
                         <td className="px-4 py-3 text-xs text-slate-400 font-semibold whitespace-nowrap">
                           {new Date(log.createdAt).toLocaleString('tr-TR')}
@@ -255,7 +257,23 @@ export default function MentorDashboard() {
   }
 
   if (pendingLoading || studentsLoading || reportsLoading || statsLoading) {
-    return <DashboardSkeleton />;
+    return (
+      <DashboardLayout>
+        <div className="space-y-6 animate-in fade-in duration-500">
+          <div className="flex flex-col gap-2">
+            <Skeleton className="h-8 w-64" />
+            <Skeleton className="h-4 w-96" />
+          </div>
+          <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
+            {[1, 2, 3, 4].map(i => <CardSkeleton key={i} />)}
+          </div>
+          <Skeleton className="h-12 w-full mt-6" />
+          <div className="mt-6 bg-white rounded-2xl border border-slate-100 p-6 shadow-sm">
+            <TableSkeleton rows={3} />
+          </div>
+        </div>
+      </DashboardLayout>
+    );
   }
 
   return (
@@ -356,7 +374,7 @@ export default function MentorDashboard() {
           {/* Pending Students Tab */}
           <TabsContent value="pending" className="space-y-4 mt-6">
             {pendingStudents && pendingStudents.length > 0 ? (
-              pendingStudents.map((student: any) => (
+              pendingStudents.map((student) => (
                 <div key={student.id} className="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all hover:shadow-md">
                   <div>
                     <div className="flex items-center gap-2">
@@ -395,7 +413,11 @@ export default function MentorDashboard() {
               ))
             ) : (
               <div className="bg-white rounded-2xl border border-slate-100 p-8 text-center shadow-sm">
-                <p className="text-slate-400 font-medium">Bekleyen aktifleştirme onayı bulunmamaktadır.</p>
+                <EmptyState 
+                  icon={UserCheck} 
+                  title="Bekleyen Onay Yok" 
+                  description="Şu anda aktifleştirme bekleyen öğrenci bulunmamaktadır." 
+                />
               </div>
             )}
           </TabsContent>
@@ -403,7 +425,7 @@ export default function MentorDashboard() {
           {/* My Students Tab */}
           <TabsContent value="students" className="space-y-4 mt-6">
             {myStudents && myStudents.length > 0 ? (
-              myStudents.map((student: any) => (
+              myStudents.map((student) => (
                 <div key={student.id} className="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all hover:shadow-md">
                   <div>
                     <div className="flex items-center gap-2">
@@ -415,7 +437,7 @@ export default function MentorDashboard() {
                     </p>
                     <div className="flex gap-4 mt-3 flex-wrap text-xs text-slate-500 font-medium">
                       <p><span className="font-semibold text-[var(--navy)]">Yaş Grubu:</span> {student.ageGroup}</p>
-                      <p><span className="font-semibold text-[var(--navy)]">Aktifleşme:</span> {student.updatedAt ? new Date(student.updatedAt).toLocaleDateString('tr-TR') : '-'}</p>
+                      <p><span className="font-semibold text-[var(--navy)]">Aktifleşme:</span> {student.createdAt ? new Date(student.createdAt).toLocaleDateString('tr-TR') : '-'}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2 shrink-0 self-start md:self-center">
@@ -440,7 +462,11 @@ export default function MentorDashboard() {
               ))
             ) : (
               <div className="bg-white rounded-2xl border border-slate-100 p-8 text-center shadow-sm">
-                <p className="text-slate-400 font-medium">Henüz aktif öğrenciniz bulunmamaktadır.</p>
+                <EmptyState 
+                  icon={Users} 
+                  title="Öğrenci Bulunamadı" 
+                  description="Henüz aktif öğrenciniz bulunmamaktadır." 
+                />
               </div>
             )}
           </TabsContent>
@@ -460,7 +486,7 @@ export default function MentorDashboard() {
               </button>
             </div>
             {pendingReports && pendingReports.length > 0 ? (
-              pendingReports.map((report: any) => (
+              pendingReports.map((report) => (
                 <div key={report.id} className="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm transition-all hover:shadow-md">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-50">
                     <div>
@@ -486,7 +512,7 @@ export default function MentorDashboard() {
                     <div className="flex flex-wrap gap-2 pt-2">
                       {report.fileUrl && (
                         <button
-                          onClick={() => window.open(report.fileUrl, '_blank')}
+                          onClick={() => window.open(report.fileUrl as string, '_blank')}
                           className="border border-slate-200 text-slate-650 hover:bg-slate-50 rounded-xl font-bold px-4 py-2 transition-all text-xs bg-white cursor-pointer flex items-center gap-1"
                         >
                           <ExternalLink className="h-3.5 w-3.5 mr-0.5" />
@@ -523,7 +549,11 @@ export default function MentorDashboard() {
               ))
             ) : (
               <div className="bg-white rounded-2xl border border-slate-100 p-8 text-center shadow-sm">
-                <p className="text-slate-400 font-medium">Onay bekleyen rapor bulunmamaktadır.</p>
+                <EmptyState 
+                  icon={FileText} 
+                  title="Rapor Yok" 
+                  description="Onay bekleyen rapor bulunmamaktadır." 
+                />
               </div>
             )}
           </TabsContent>

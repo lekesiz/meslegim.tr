@@ -11,7 +11,7 @@ test.describe('Student Registration', () => {
 
   test('should display registration form on homepage', async ({ page }) => {
     // Check if registration button is visible
-    const registerBtn = page.locator('text=Ücretsiz Başla').first();
+    const registerBtn = page.locator('button:has-text("Ücretsiz Başla"), button:has-text("Ücretsiz Değerlendirme Al")').filter({ visible: true }).first();
     await expect(registerBtn).toBeVisible({ timeout: 5000 });
     
     // Click registration button
@@ -25,7 +25,7 @@ test.describe('Student Registration', () => {
   });
 
   test('should validate required fields', async ({ page }) => {
-    const registerBtn = page.locator('text=Ücretsiz Başla').first();
+    const registerBtn = page.locator('button:has-text("Ücretsiz Başla"), button:has-text("Ücretsiz Değerlendirme Al")').filter({ visible: true }).first();
     if (await registerBtn.isVisible().catch(() => false)) {
       await registerBtn.click();
       await page.waitForTimeout(1000);

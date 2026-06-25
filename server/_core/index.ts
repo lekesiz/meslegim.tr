@@ -43,7 +43,7 @@ async function startServer() {
   app.set('trust proxy', 1);
 
   // Initialize Sentry (error tracking)
-  initSentry(app);
+  await initSentry(app);
 
   // Log server startup
   logInfo('Server initialization started');

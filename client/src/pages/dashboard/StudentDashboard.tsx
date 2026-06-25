@@ -6,8 +6,9 @@ import { Loader2, FileText, Clock, CheckCircle2, Lock, Award, MessageCircle, Use
 import { toast } from 'sonner';
 import { ChatDialog } from "@/components/ChatDialog";
 import { useState, useEffect } from "react";
-import { DashboardSkeleton } from "@/components/DashboardSkeleton";
+import { DashboardSkeleton, CardSkeleton, TableSkeleton } from "@/components/DashboardSkeleton";
 import { EmptyState } from "@/components/EmptyState";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useLocation } from "wouter";
 import StudentProgressTimeline from "@/components/StudentProgressTimeline";
 
@@ -58,7 +59,23 @@ export default function StudentDashboard() {
   type StudentReportItem = NonNullable<typeof reports>[number];
 
   if (progressLoading || stageLoading || reportsLoading) {
-    return <DashboardSkeleton />;
+    return (
+      <DashboardLayout>
+        <div className="space-y-6 animate-in fade-in duration-500">
+          <div className="flex flex-col gap-2">
+            <Skeleton className="h-8 w-64" />
+            <Skeleton className="h-4 w-96" />
+          </div>
+          <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
+            {[1, 2, 3, 4].map(i => <CardSkeleton key={i} />)}
+          </div>
+          <Skeleton className="h-12 w-full mt-6" />
+          <div className="mt-6 bg-white rounded-2xl border border-slate-100 p-6 shadow-sm">
+            <TableSkeleton rows={3} />
+          </div>
+        </div>
+      </DashboardLayout>
+    );
   }
 
   const completedStages = progress?.filter(s => s.status === 'completed').length || 0;

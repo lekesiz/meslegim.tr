@@ -65,7 +65,7 @@ test.describe('Dark Mode', () => {
     await page.waitForTimeout(2000);
     
     // Verify login form is visible using id selector
-    await expect(page.locator('#email')).toBeVisible({ timeout: 10000 });
+    await expect(page.locator('#login-email')).toBeVisible({ timeout: 10000 });
     
     const htmlClass = await page.locator('html').getAttribute('class') || '';
     expect(htmlClass).toContain('dark');
@@ -97,8 +97,8 @@ test.describe('Responsive Layout', () => {
     await page.waitForTimeout(2000);
     
     // Use id selector instead of name
-    await expect(page.locator('#email')).toBeVisible({ timeout: 10000 });
-    await expect(page.locator('#password')).toBeVisible();
+    await expect(page.locator('#login-email')).toBeVisible({ timeout: 10000 });
+    await expect(page.locator('#login-password')).toBeVisible();
     await expect(page.locator('button:has-text("Giriş Yap")')).toBeVisible();
   });
 
@@ -115,8 +115,8 @@ test.describe('Responsive Layout', () => {
         el.dispatchEvent(new Event('input', { bubbles: true }));
         el.dispatchEvent(new Event('change', { bubbles: true }));
       }
-      const emailEl = document.querySelector('#email') as HTMLInputElement;
-      const pwdEl = document.querySelector('#password') as HTMLInputElement;
+      const emailEl = document.querySelector('#login-email') as HTMLInputElement;
+      const pwdEl = document.querySelector('#login-password') as HTMLInputElement;
       if (emailEl) setNativeValue(emailEl, 'admin@test.com');
       if (pwdEl) setNativeValue(pwdEl, 'test123');
     });

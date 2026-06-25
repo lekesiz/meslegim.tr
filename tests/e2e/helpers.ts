@@ -61,11 +61,11 @@ export async function loginAs(page: Page, context: BrowserContext, email: string
   const currentUrl = page.url();
   if (currentUrl.includes('login')) {
     // Cookie approach failed, try UI login as fallback
-    await page.waitForSelector('#email', { timeout: 5000 });
+    await page.waitForSelector('#login-email', { timeout: 5000 });
     await page.waitForTimeout(2000);
-    await page.locator('#email').fill(email);
+    await page.locator('#login-email').fill(email);
     await page.waitForTimeout(200);
-    await page.locator('#password').fill(password);
+    await page.locator('#login-password').fill(password);
     await page.waitForTimeout(200);
     await page.click('button:has-text("Giriş Yap")');
     await page.waitForURL('**/dashboard**', { timeout: 15000 });

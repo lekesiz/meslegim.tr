@@ -1,5 +1,8 @@
 import { useAuth } from '@/contexts/AuthContext';
 import DashboardLayout from '@/components/DashboardLayout';
+import { Skeleton } from '@/components/ui/skeleton';
+import { TableSkeleton, CardSkeleton } from '@/components/DashboardSkeleton';
+import { EmptyState } from '@/components/EmptyState';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
@@ -11,7 +14,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { trpc } from '@/lib/trpc';
-import { Loader2, Users, FileQuestion, Layers, Plus, TrendingUp, Zap, MessageSquare, Eye, Settings, CreditCard, BarChart3, FileDown, Mail, AlertTriangle } from 'lucide-react';
+import { Loader2, Users, FileQuestion, Layers, Plus, TrendingUp, Zap, MessageSquare, Eye, Settings, CreditCard, BarChart3, FileDown, Mail, AlertTriangle, FileText } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -73,8 +76,18 @@ export default function AdminDashboard() {
   if (usersLoading || reportsLoading || stagesLoading || questionsLoading) {
     return (
       <DashboardLayout>
-        <div className="flex items-center justify-center h-64">
-          <Loader2 className="h-8 w-8 animate-spin text-[var(--steel)]" />
+        <div className="space-y-6 animate-in fade-in duration-500">
+          <div className="flex flex-col gap-2">
+            <Skeleton className="h-8 w-64" />
+            <Skeleton className="h-4 w-96" />
+          </div>
+          <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
+            {[1, 2, 3, 4].map(i => <CardSkeleton key={i} />)}
+          </div>
+          <Skeleton className="h-12 w-full mt-6" />
+          <div className="mt-6 bg-white rounded-2xl border border-slate-100 p-6 shadow-sm">
+            <TableSkeleton rows={5} />
+          </div>
         </div>
       </DashboardLayout>
     );
@@ -343,7 +356,7 @@ export default function AdminDashboard() {
                   </TableHeader>
                   <TableBody>
                     {students.length > 0 ? (
-                      students.map((student: any) => (
+                      students.map((student) => (
                         <TableRow key={student.id} className="border-b border-slate-100 last:border-0 hover:bg-slate-50/50">
                           <TableCell className="font-bold text-sm text-[var(--navy)] px-4 py-3">{student.name}</TableCell>
                           <TableCell className="text-sm px-4 py-3">{student.email}</TableCell>
@@ -370,7 +383,15 @@ export default function AdminDashboard() {
                           </TableCell>
                           <TableCell className="px-4 py-3">
                             <button 
-                              onClick={() => setEditingStudent(student)}
+                              onClick={() => setEditingStudent({
+                                id: student.id,
+                                name: student.name || '',
+                                email: student.email || '',
+                                phone: (student as any).phone || null,
+                                ageGroup: student.ageGroup,
+                                status: student.status,
+                                mentorId: student.mentorId
+                              })}
                               className="border border-slate-250 text-slate-650 hover:bg-slate-50 rounded-xl font-bold px-3 py-1.5 transition-all text-xs bg-white cursor-pointer"
                             >
                               Düzenle
@@ -380,8 +401,12 @@ export default function AdminDashboard() {
                       ))
                     ) : (
                       <TableRow>
-                        <TableCell colSpan={6} className="text-center text-slate-400 font-medium py-8">
-                          Henüz öğrenci bulunmamaktadır.
+                        <TableCell colSpan={6} className="h-48 text-center">
+                          <EmptyState 
+                            icon={Users} 
+                            title="Öğrenci Bulunamadı" 
+                            description="Sistemde henüz kayıtlı bir öğrenci bulunmamaktadır." 
+                          />
                         </TableCell>
                       </TableRow>
                     )}
@@ -413,7 +438,7 @@ export default function AdminDashboard() {
                   </TableHeader>
                   <TableBody>
                     {mentors.length > 0 ? (
-                      mentors.map((mentor: any) => (
+                      mentors.map((mentor) => (
                         <TableRow key={mentor.id} className="border-b border-slate-100 last:border-0 hover:bg-slate-50/50">
                           <TableCell className="font-bold text-sm text-[var(--navy)] px-4 py-3">{mentor.name}</TableCell>
                           <TableCell className="text-sm px-4 py-3">{mentor.email}</TableCell>
@@ -422,7 +447,13 @@ export default function AdminDashboard() {
                           </TableCell>
                           <TableCell className="px-4 py-3">
                             <button 
-                              onClick={() => setEditingMentor(mentor)}
+                              onClick={() => setEditingMentor({
+                                id: mentor.id,
+                                name: mentor.name || '',
+                                email: mentor.email || '',
+                                phone: (mentor as any).phone || null,
+                                status: mentor.status
+                              })}
                               className="border border-slate-250 text-slate-650 hover:bg-slate-50 rounded-xl font-bold px-3 py-1.5 transition-all text-xs bg-white cursor-pointer"
                             >
                               Düzenle
@@ -432,8 +463,12 @@ export default function AdminDashboard() {
                       ))
                     ) : (
                       <TableRow>
-                        <TableCell colSpan={4} className="text-center text-slate-400 font-medium py-8">
-                          Henüz mentor bulunmamaktadır.
+                        <TableCell colSpan={4} className="h-48 text-center">
+                          <EmptyState 
+                            icon={Users} 
+                            title="Mentor Bulunamadı" 
+                            description="Sistemde henüz kayıtlı bir mentor bulunmamaktadır." 
+                          />
                         </TableCell>
                       </TableRow>
                     )}
@@ -510,8 +545,12 @@ export default function AdminDashboard() {
                       ))
                     ) : (
                       <TableRow>
-                        <TableCell colSpan={7} className="text-center text-slate-400 font-medium py-8">
-                          Henüz rapor bulunmamaktadır.
+                        <TableCell colSpan={7} className="h-48 text-center">
+                          <EmptyState 
+                            icon={FileText} 
+                            title="Rapor Bulunamadı" 
+                            description="Sistemde henüz oluşturulmuş bir rapor bulunmamaktadır." 
+                          />
                         </TableCell>
                       </TableRow>
                     )}
@@ -541,7 +580,7 @@ export default function AdminDashboard() {
                   </TableHeader>
                   <TableBody>
                     {stages && stages.length > 0 ? (
-                      stages.map((stage: any) => (
+                      stages.map((stage) => (
                         <TableRow key={stage.id} className="border-b border-slate-100 last:border-0 hover:bg-slate-50/50">
                           <TableCell className="text-xs font-bold text-slate-400 px-4 py-3">#{stage.id}</TableCell>
                           <TableCell className="font-bold text-sm text-[var(--navy)] px-4 py-3">{stage.name}</TableCell>
@@ -556,8 +595,12 @@ export default function AdminDashboard() {
                       ))
                     ) : (
                       <TableRow>
-                        <TableCell colSpan={5} className="text-center text-slate-400 font-medium py-8">
-                          Henüz etap bulunmamaktadır.
+                        <TableCell colSpan={5} className="h-48 text-center">
+                          <EmptyState 
+                            icon={Layers} 
+                            title="Etap Bulunamadı" 
+                            description="Sistemde henüz tanımlı bir etap bulunmamaktadır." 
+                          />
                         </TableCell>
                       </TableRow>
                     )}
@@ -588,7 +631,7 @@ export default function AdminDashboard() {
                   </TableHeader>
                   <TableBody>
                     {questions && questions.length > 0 ? (
-                      questions.map((question: any) => (
+                      questions.map((question) => (
                         <TableRow key={question.id} className="border-b border-slate-100 last:border-0 hover:bg-slate-50/50">
                           <TableCell className="text-xs text-slate-400 font-bold px-4 py-3">#{question.id}</TableCell>
                           <TableCell className="text-sm font-semibold text-[var(--navy)] max-w-md truncate px-4 py-3">
@@ -614,8 +657,12 @@ export default function AdminDashboard() {
                       ))
                     ) : (
                       <TableRow>
-                        <TableCell colSpan={6} className="text-center text-slate-400 font-medium py-8">
-                          Henüz soru bulunmamaktadır.
+                        <TableCell colSpan={6} className="h-48 text-center">
+                          <EmptyState 
+                            icon={FileQuestion} 
+                            title="Soru Bulunamadı" 
+                            description="Sistemde henüz tanımlı bir soru bulunmamaktadır." 
+                          />
                         </TableCell>
                       </TableRow>
                     )}

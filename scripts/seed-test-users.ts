@@ -50,6 +50,18 @@ async function seedTestUsers() {
       kvkkConsent: true,
       kvkkConsentDate: new Date(),
     },
+    {
+      openId: `test_school_${Date.now()}_4`,
+      name: "Test School Admin",
+      email: "school@test.com",
+      password,
+      phone: "5551234570",
+      tcKimlik: "12345678904",
+      role: "school_admin" as const,
+      status: "active" as const,
+      kvkkConsent: true,
+      kvkkConsentDate: new Date(),
+    },
   ];
 
   for (const user of testUsers) {

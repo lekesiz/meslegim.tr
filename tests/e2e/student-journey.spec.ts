@@ -17,12 +17,12 @@ test.describe('Student Journey', () => {
 
   test('should display student dashboard with stages', async ({ page, context }) => {
     await loginAs(page, context, studentEmail, studentPassword);
-    await page.waitForTimeout(1000);
+    await page.waitForSelector('text=Hoş Geldiniz', { timeout: 10000 });
     
     const pageContent = await page.locator('body').textContent() || '';
     const hasRelevantContent = pageContent.includes('Etap') || 
       pageContent.includes('Dashboard') || 
-      pageContent.includes('Hoş Geldin') ||
+      pageContent.includes('Hoş Geldiniz') ||
       pageContent.includes('Öğrenci') ||
       pageContent.includes('Kariyer');
     expect(hasRelevantContent).toBeTruthy();

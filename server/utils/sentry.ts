@@ -6,19 +6,32 @@
 
 import * as Sentry from '@sentry/node';
 import logger from './logger';
-import { nodeProfilingIntegration } from '@sentry/profiling-node';
 import type { Express } from 'express';
 
 /**
  * Initialize Sentry
  */
-export function initSentry(app: Express) {
+export async function initSentry(app: Express) {
   // Only initialize in production or if SENTRY_DSN is provided
   const sentryDsn = process.env.SENTRY_DSN;
   
   if (!sentryDsn) {
     logger.info('[Sentry] Skipping initialization - SENTRY_DSN not provided');
     return;
+  }
+
+  const integrations: any[] = [
+    // Enable HTTP calls tracing
+    Sentry.httpIntegration(),
+    // Enable Express.js middleware tracing
+    Sentry.expressIntegration(),
+  ];
+
+  try {
+    const { nodeProfilingIntegration } = await import('@sentry/profiling-node');
+    integrations.push(nodeProfilingIntegration());
+  } catch (err) {
+    logger.warn('[Sentry] Profiling integration could not be loaded, skipping: ' + (err as Error).message);
   }
 
   Sentry.init({
@@ -36,14 +49,7 @@ export function initSentry(app: Express) {
     // results in 25% of transactions being profiled (0.5*0.5=0.25)
     profilesSampleRate: 1.0,
     
-    integrations: [
-      // Enable HTTP calls tracing
-      Sentry.httpIntegration(),
-      // Enable Express.js middleware tracing
-      Sentry.expressIntegration(),
-      // Enable Profiling
-      nodeProfilingIntegration(),
-    ],
+    integrations,
     
     // Ignore certain errors
     ignoreErrors: [

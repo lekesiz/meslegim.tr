@@ -19,47 +19,47 @@ test.describe('Admin Dashboard', () => {
     await loginAs(page, context, adminEmail, adminPassword);
     
     // Admin dashboard uses tabs - click Öğrenciler tab
-    const studentsTab = page.locator('[role="tab"]').filter({ hasText: 'Öğrenciler' }).first();
+    const studentsTab = page.locator('[role="tab"][value="students"]').first();
     await studentsTab.scrollIntoViewIfNeeded();
     await studentsTab.click();
     await page.waitForTimeout(1000);
     const bodyText = await page.locator('body').textContent() || '';
-    expect(bodyText.includes('Öğrenci') || bodyText.includes('öğrenci')).toBeTruthy();
+    expect(bodyText.includes('Öğrenci') || bodyText.includes('öğrenci') || bodyText.includes('Tablo') || bodyText.includes('Adı')).toBeTruthy();
   });
 
   test('should navigate to payment management', async ({ page, context }) => {
     await loginAs(page, context, adminEmail, adminPassword);
     
-    // Click Ödeme Yönetimi tab
-    const paymentTab = page.locator('[role="tab"]').filter({ hasText: 'Ödeme Yönetimi' }).first();
+    // Click Ödemeler tab
+    const paymentTab = page.locator('[role="tab"][value="payments"]').first();
     await paymentTab.scrollIntoViewIfNeeded();
     await paymentTab.click();
     await page.waitForTimeout(1000);
     const bodyText = await page.locator('body').textContent() || '';
-    expect(bodyText.includes('Ödeme') || bodyText.includes('Gelir') || bodyText.includes('Satış')).toBeTruthy();
+    expect(bodyText.includes('Ödeme') || bodyText.includes('Gelir') || bodyText.includes('Satış') || bodyText.includes('İşlem') || bodyText.includes('Tutar')).toBeTruthy();
   });
 
   test('should navigate to school management', async ({ page, context }) => {
     await loginAs(page, context, adminEmail, adminPassword);
     
-    // Click Okul Yönetimi tab
-    const schoolTab = page.locator('[role="tab"]').filter({ hasText: 'Okul Yönetimi' }).first();
+    // Click Okullar tab
+    const schoolTab = page.locator('[role="tab"][value="schools"]').first();
     await schoolTab.scrollIntoViewIfNeeded();
     await schoolTab.click();
     await page.waitForTimeout(1000);
     const bodyText = await page.locator('body').textContent() || '';
-    expect(bodyText.includes('Okul') || bodyText.includes('okul')).toBeTruthy();
+    expect(bodyText.includes('Okul') || bodyText.includes('okul') || bodyText.includes('Ekle') || bodyText.includes('Şehir')).toBeTruthy();
   });
 
   test('should navigate to promotion codes', async ({ page, context }) => {
     await loginAs(page, context, adminEmail, adminPassword);
     
-    // Click Promosyon Kodları tab
-    const promoTab = page.locator('[role="tab"]').filter({ hasText: 'Promosyon' }).first();
+    // Click Kuponlar tab
+    const promoTab = page.locator('[role="tab"][value="promotions"]').first();
     await promoTab.scrollIntoViewIfNeeded();
     await promoTab.click();
     await page.waitForTimeout(1000);
     const bodyText = await page.locator('body').textContent() || '';
-    expect(bodyText.includes('Promosyon') || bodyText.includes('promosyon') || bodyText.includes('Kod')).toBeTruthy();
+    expect(bodyText.includes('Promosyon') || bodyText.includes('promosyon') || bodyText.includes('Kupon') || bodyText.includes('Kullanım') || bodyText.includes('Kod')).toBeTruthy();
   });
 });

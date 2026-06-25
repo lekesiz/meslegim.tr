@@ -1,5 +1,8 @@
 import DashboardLayout from '@/components/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
+import { TableSkeleton, CardSkeleton } from '@/components/DashboardSkeleton';
+import { EmptyState } from '@/components/EmptyState';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -36,8 +39,18 @@ export default function SchoolAdminDashboard() {
   if (schoolLoading || studentsLoading || mentorsLoading) {
     return (
       <DashboardLayout>
-        <div className="flex items-center justify-center h-64">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <div className="space-y-6 animate-in fade-in duration-500">
+          <div className="flex flex-col gap-2">
+            <Skeleton className="h-8 w-64" />
+            <Skeleton className="h-4 w-96" />
+          </div>
+          <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
+            {[1, 2, 3, 4].map(i => <CardSkeleton key={i} />)}
+          </div>
+          <Skeleton className="h-12 w-full mt-6" />
+          <div className="mt-6 bg-white rounded-2xl border border-slate-100 p-6 shadow-sm">
+            <TableSkeleton rows={5} />
+          </div>
         </div>
       </DashboardLayout>
     );
@@ -55,16 +68,16 @@ export default function SchoolAdminDashboard() {
     );
   }
 
-  const filteredStudents = (students || []).filter((s: any) => {
+  const filteredStudents = (students || []).filter((s) => {
     if (!studentSearch) return true;
     const q = studentSearch.toLowerCase();
     return s.name?.toLowerCase().includes(q) || s.email?.toLowerCase().includes(q);
   });
 
-  const filteredMentors = (mentors || []).filter((m: any) => {
+  const filteredMentors = (mentors || []).filter((m) => {
     if (!mentorSearch) return true;
     const q = mentorSearch.toLowerCase();
-    return m.name?.toLowerCase().includes(q) || m.email?.toLowerCase().includes(q);
+    return m.mentorName?.toLowerCase().includes(q) || m.mentorEmail?.toLowerCase().includes(q);
   });
 
   return (
@@ -118,7 +131,7 @@ export default function SchoolAdminDashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {students?.filter((s: any) => s.status === 'active').length || 0}
+                {students?.filter((s) => s.status === 'active').length || 0}
               </div>
               <p className="text-xs text-muted-foreground">Aktif durumdaki</p>
             </CardContent>
@@ -172,7 +185,7 @@ export default function SchoolAdminDashboard() {
                   </TableHeader>
                   <TableBody>
                     {filteredStudents.length > 0 ? (
-                      filteredStudents.map((student: any) => (
+                      filteredStudents.map((student) => (
                         <TableRow key={student.id}>
                           <TableCell className="font-medium">{student.name}</TableCell>
                           <TableCell>{student.email}</TableCell>
@@ -182,24 +195,28 @@ export default function SchoolAdminDashboard() {
                               {student.status === 'active' ? 'Aktif' : student.status === 'pending' ? 'Beklemede' : 'Pasif'}
                             </Badge>
                           </TableCell>
-                          <TableCell>{student.mentorName || '-'}</TableCell>
+                          <TableCell>-</TableCell>
                           <TableCell>
                             <div className="flex items-center gap-2">
                               <div className="w-16 bg-muted rounded-full h-2">
                                 <div
                                   className="bg-primary rounded-full h-2"
-                                  style={{ width: `${student.progress || 0}%` }}
+                                  style={{ width: `0%` }}
                                 />
                               </div>
-                              <span className="text-sm text-muted-foreground">{student.progress || 0}%</span>
+                              <span className="text-sm text-muted-foreground">0%</span>
                             </div>
                           </TableCell>
                         </TableRow>
                       ))
                     ) : (
                       <TableRow>
-                        <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
-                          {studentSearch ? 'Arama sonucu bulunamadı.' : 'Henüz öğrenci bulunmamaktadır.'}
+                        <TableCell colSpan={6} className="h-48 text-center">
+                          <EmptyState 
+                            icon={Users} 
+                            title={studentSearch ? 'Sonuç Bulunamadı' : 'Öğrenci Bulunamadı'} 
+                            description={studentSearch ? 'Arama kriterlerinize uygun öğrenci bulunamadı.' : 'Sistemde henüz kayıtlı bir öğrenci bulunmamaktadır.'} 
+                          />
                         </TableCell>
                       </TableRow>
                     )}
@@ -241,11 +258,11 @@ export default function SchoolAdminDashboard() {
                   </TableHeader>
                   <TableBody>
                     {filteredMentors.length > 0 ? (
-                      filteredMentors.map((mentor: any) => (
+                      filteredMentors.map((mentor) => (
                         <TableRow key={mentor.id}>
-                          <TableCell className="font-medium">{mentor.name}</TableCell>
-                          <TableCell>{mentor.email}</TableCell>
-                          <TableCell>{mentor.studentCount || 0}</TableCell>
+                          <TableCell className="font-medium">{mentor.mentorName}</TableCell>
+                          <TableCell>{mentor.mentorEmail}</TableCell>
+                          <TableCell>0</TableCell>
                           <TableCell>
                             <Badge variant="default">Aktif</Badge>
                           </TableCell>
@@ -253,8 +270,12 @@ export default function SchoolAdminDashboard() {
                       ))
                     ) : (
                       <TableRow>
-                        <TableCell colSpan={4} className="text-center text-muted-foreground py-8">
-                          {mentorSearch ? 'Arama sonucu bulunamadı.' : 'Henüz mentor atanmamıştır.'}
+                        <TableCell colSpan={4} className="h-48 text-center">
+                          <EmptyState 
+                            icon={UserCheck} 
+                            title={mentorSearch ? 'Sonuç Bulunamadı' : 'Mentor Bulunamadı'} 
+                            description={mentorSearch ? 'Arama kriterlerinize uygun mentor bulunamadı.' : 'Okulunuza henüz mentor atanmamıştır.'} 
+                          />
                         </TableCell>
                       </TableRow>
                     )}

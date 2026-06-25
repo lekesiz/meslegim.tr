@@ -5,13 +5,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { trpc } from '@/lib/trpc';
-import { Loader2, ArrowLeft, FileText, CheckCircle, Clock, TrendingUp, StickyNote, Plus, Edit, Trash2, MessageCircle, Unlock, History } from 'lucide-react';
+import { Loader2, ArrowLeft, FileText, CheckCircle, Clock, TrendingUp, StickyNote, Plus, Edit, Trash2, MessageCircle, Unlock, History, Layers } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { DashboardSkeleton } from '@/components/DashboardSkeleton';
+import { TableSkeleton, CardSkeleton } from '@/components/DashboardSkeleton';
+import { EmptyState } from '@/components/EmptyState';
+import { Skeleton } from '@/components/ui/skeleton';
 import { ChatDialog } from '@/components/ChatDialog';
 
 // Initiate Stages Button Component
@@ -150,7 +152,23 @@ export default function StudentDetailView() {
   }
 
   if (isLoading) {
-    return <DashboardSkeleton />;
+    return (
+      <DashboardLayout>
+        <div className="space-y-6 animate-in fade-in duration-500">
+          <div className="flex flex-col gap-2">
+            <Skeleton className="h-8 w-64" />
+            <Skeleton className="h-4 w-96" />
+          </div>
+          <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
+            {[1, 2, 3, 4].map(i => <CardSkeleton key={i} />)}
+          </div>
+          <Skeleton className="h-12 w-full mt-6" />
+          <div className="mt-6 bg-white rounded-2xl border border-slate-100 p-6 shadow-sm">
+            <TableSkeleton rows={3} />
+          </div>
+        </div>
+      </DashboardLayout>
+    );
   }
 
   if (!student) {
@@ -320,7 +338,13 @@ export default function StudentDetailView() {
                 ))}
               </div>
             ) : (
-              <p className="text-center text-muted-foreground">Henüz etap bulunmamaktadır.</p>
+              <div className="py-8">
+                <EmptyState 
+                  icon={Layers} 
+                  title="Etap Bulunamadı" 
+                  description="Henüz etap bulunmamaktadır." 
+                />
+              </div>
             )}
           </CardContent>
         </Card>
@@ -368,7 +392,13 @@ export default function StudentDetailView() {
                 ))}
               </div>
             ) : (
-              <p className="text-center text-muted-foreground">Henüz rapor bulunmamaktadır.</p>
+              <div className="py-8">
+                <EmptyState 
+                  icon={FileText} 
+                  title="Rapor Bulunamadı" 
+                  description="Henüz rapor bulunmamaktadır." 
+                />
+              </div>
             )}
           </CardContent>
         </Card>
@@ -468,7 +498,13 @@ export default function StudentDetailView() {
                 ))}
               </div>
             ) : (
-              <p className="text-center text-muted-foreground">Henüz not bulunmamaktadır.</p>
+              <div className="py-8">
+                <EmptyState 
+                  icon={StickyNote} 
+                  title="Not Bulunamadı" 
+                  description="Henüz not bulunmamaktadır." 
+                />
+              </div>
             )}
           </CardContent>
         </Card>

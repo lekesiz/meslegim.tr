@@ -26,7 +26,7 @@ test.describe('Role-Based Access Control', () => {
     await page.waitForTimeout(3000);
     
     const url = page.url();
-    const hasLoginForm = await page.locator('#email').isVisible().catch(() => false);
+    const hasLoginForm = await page.locator('#login-email').isVisible().catch(() => false);
     expect(url.includes('login') || hasLoginForm).toBeTruthy();
   });
 
@@ -42,6 +42,6 @@ test.describe('Role-Based Access Control', () => {
     
     await page.goto('/login');
     await page.waitForTimeout(1000);
-    await expect(page.locator('#email')).toBeVisible({ timeout: 5000 });
+    await expect(page.locator('#login-email')).toBeVisible({ timeout: 5000 });
   });
 });

@@ -17,14 +17,13 @@ test.describe('Mentor Dashboard', () => {
 
   test('should display mentor dashboard', async ({ page, context }) => {
     await loginAs(page, context, mentorEmail, mentorPassword);
-    await page.waitForTimeout(2000);
+    await page.waitForSelector('text=Mentor Paneli', { timeout: 10000 });
     
     const pageContent = await page.locator('body').textContent() || '';
     const hasRelevantContent = pageContent.includes('Öğrenci') || 
       pageContent.includes('Mentor') || 
-      pageContent.includes('Dashboard') ||
-      pageContent.includes('Etap') ||
-      pageContent.includes('Hoş Geldin');
+      pageContent.includes('Panel') ||
+      pageContent.includes('Etap');
     expect(hasRelevantContent).toBeTruthy();
   });
 
