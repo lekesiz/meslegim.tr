@@ -102,13 +102,14 @@ async function startServer() {
     res.status(200).json({ ok: true });
   });
 
-  const productionCorsOrigins = (
-    process.env.CORS_ORIGINS?.split(",").map(origin => origin.trim()).filter(Boolean)
-  ) ?? [
-    "https://meslegim.tr",
-    "https://www.meslegim.tr",
-    "https://meslegim-tr.manus.space",
-  ];
+  const productionCorsOrigins = Array.from(
+    new Set([
+      "https://meslegim.tr",
+      "https://www.meslegim.tr",
+      "https://meslegim-tr.manus.space",
+      ...(process.env.CORS_ORIGINS?.split(",").map(origin => origin.trim()).filter(Boolean) ?? []),
+    ])
+  );
 
   // CORS configuration
   app.use(
