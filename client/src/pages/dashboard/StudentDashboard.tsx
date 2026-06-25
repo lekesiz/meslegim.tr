@@ -132,15 +132,15 @@ export default function StudentDashboard() {
                       </div>
                       <div className="flex gap-2 shrink-0">
                         {certificate.pdfUrl && (
-                          <button
-                            asChild
-                            className="btn-accent px-5 py-2.5 text-xs font-bold flex items-center justify-center cursor-pointer shadow-sm"
+                          <a
+                            href={certificate.pdfUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="btn-accent px-5 py-2.5 text-xs font-bold flex items-center justify-center cursor-pointer shadow-sm no-underline"
                           >
-                            <a href={certificate.pdfUrl} target="_blank" rel="noopener noreferrer">
-                              <Award className="h-4 w-4 mr-1.5 text-[var(--navy)]" />
-                              Sertifikayı İndir
-                            </a>
-                          </button>
+                            <Award className="h-4 w-4 mr-1.5 text-[var(--navy)]" />
+                            Sertifikayı İndir
+                          </a>
                         )}
                         <button
                           onClick={() => window.open(`/verify-certificate/${certificate.certificateNumber}`, '_blank')}
