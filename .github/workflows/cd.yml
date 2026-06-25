@@ -47,7 +47,6 @@ jobs:
         run: |
           echo "Running smoke tests on staging..."
           # Add smoke test commands here
-        continue-on-error: true
 
       - name: Notify deployment success
         if: success()
@@ -107,7 +106,6 @@ jobs:
         run: |
           echo "Running smoke tests on production..."
           # Add smoke test commands here
-        continue-on-error: true
 
       - name: Create GitHub Release
         uses: actions/create-release@v1

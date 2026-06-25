@@ -111,3 +111,6 @@ temp/
 test-results/
 playwright-report/
 playwright/.cache/
+
+# Manus runtime/session artifacts
+.manus/

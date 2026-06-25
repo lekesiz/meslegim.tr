@@ -10,6 +10,7 @@ import { serveStatic, setupVite } from "./vite";
 import { initializeCronJobs } from "../services/cronJobs";
 import { registerStripeWebhook } from "../stripeWebhook";
 import { registerEmailTrackingRoutes } from "../emailTracking";
+import { getDb } from "../db";
 import helmet from "helmet";
 import cors from "cors";
 import { rateLimit } from "express-rate-limit";
@@ -50,6 +51,11 @@ async function startServer() {
 
   // Security middleware
   // Helmet - Security headers
+  const isProduction = process.env.NODE_ENV === "production";
+  const scriptSrc = ["'self'", "'unsafe-inline'", "https://manus-analytics.com", "https://js.stripe.com"];
+  if (!isProduction) {
+    scriptSrc.push("'unsafe-eval'"); // Needed for Vite HMR in development
+  }
   app.use(
     helmet({
       contentSecurityPolicy: {
@@ -57,7 +63,7 @@ async function startServer() {
           defaultSrc: ["'self'"],
           styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
           fontSrc: ["'self'", "https://fonts.gstatic.com"],
-          scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://manus-analytics.com", "https://js.stripe.com"], // unsafe-eval needed for Vite HMR in dev
+          scriptSrc,
           frameSrc: ["'self'", "https://js.stripe.com", "https://hooks.stripe.com"],
           imgSrc: ["'self'", "data:", "https:"],
           connectSrc: ["'self'", "https:", "https://manus-analytics.com", "https://api.stripe.com"],
@@ -66,6 +72,19 @@ async function startServer() {
       crossOriginEmbedderPolicy: false, // Needed for some external resources
     })
   );
+
+  app.get("/health", (_req, res) => {
+    res.status(200).json({ ok: true });
+  });
+
+  app.get("/readiness", async (_req, res) => {
+    const db = await getDb();
+    if (!db) {
+      res.status(503).json({ ok: false, reason: "database_unavailable" });
+      return;
+    }
+    res.status(200).json({ ok: true });
+  });
 
   // CORS configuration
   app.use(
@@ -86,7 +105,7 @@ async function startServer() {
     legacyHeaders: false,
     skip: (req) => {
       // Skip static assets and health checks
-      if (req.path.startsWith("/client") || req.path === "/health") return true;
+      if (req.path.startsWith("/client") || req.path === "/health" || req.path === "/readiness") return true;
       // Skip rate limiting in development
       if (process.env.NODE_ENV !== "production") return true;
       return false;

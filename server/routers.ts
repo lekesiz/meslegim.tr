@@ -1,5 +1,5 @@
-import { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
-import { getSessionCookieOptions } from "./_core/cookies";
+import { COOKIE_NAME, CSRF_COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
+import { getCsrfCookieOptions, getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router, protectedProcedure } from "./_core/trpc";
 import { TRPCError } from "@trpc/server";
@@ -13,6 +13,7 @@ import { sendEmail, getRegistrationEmailTemplate, getApprovalEmailTemplate, getR
 import { notifyOwner } from './_core/notification';
 import bcrypt from 'bcryptjs';
 import { sdk } from './_core/sdk';
+import { createCsrfToken } from "./_core/csrf";
 import { hasRole, hasAnyRole, isSuperAdmin, isAdminLevel, isSchoolAdminLevel, hasRoleLevel, getHighestRole, addRole, removeRole } from './roleHelper';
 import { sanitizeHtml, sanitizeEmail, sanitizeTcKimlik, sanitizePhone } from './utils/sanitization';
 import logger from './utils/logger';
@@ -67,6 +68,8 @@ export const appRouter = router({
     logout: publicProcedure.mutation(({ ctx }) => {
       const cookieOptions = getSessionCookieOptions(ctx.req);
       ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
+      const csrfCookieOptions = getCsrfCookieOptions(ctx.req);
+      ctx.res.clearCookie(CSRF_COOKIE_NAME, { ...csrfCookieOptions, maxAge: -1 });
       return { success: true } as const;
     }),
     verifyCertificate: publicProcedure
@@ -118,6 +121,9 @@ export const appRouter = router({
         // Set session cookie
         const cookieOptions = getSessionCookieOptions(ctx.req);
         ctx.res.cookie(COOKIE_NAME, sessionToken, { ...cookieOptions, maxAge: ONE_YEAR_MS });
+        const csrfToken = createCsrfToken();
+        const csrfCookieOptions = getCsrfCookieOptions(ctx.req);
+        ctx.res.cookie(CSRF_COOKIE_NAME, csrfToken, { ...csrfCookieOptions, maxAge: ONE_YEAR_MS });
         
         // Never return password hash to client
         const { password: _, ...safeUser } = user;

@@ -111,12 +111,14 @@ jobs:
 
       - name: Setup test database
         run: |
-          mysql -h 127.0.0.1 -u root -ptest_password meslegim_test < tests/fixtures/test-schema.sql || true
-        continue-on-error: true
+          if [ -f "tests/fixtures/test-schema.sql" ]; then
+            mysql -h 127.0.0.1 -u root -ptest_password meslegim_test < tests/fixtures/test-schema.sql
+          else
+            echo "No tests/fixtures/test-schema.sql found, skipping fixture import."
+          fi
 
       - name: Run E2E tests
-        run: pnpm test:e2e || true
-        continue-on-error: true
+        run: pnpm test:e2e
         env:
           BASE_URL: http://localhost:3000
           DATABASE_URL: mysql://root:test_password@127.0.0.1:3306/meslegim_test
@@ -201,12 +203,11 @@ jobs:
           cache: 'pnpm'
 
       - name: Run security audit
-        run: pnpm audit --audit-level=critical || true
-        continue-on-error: true
+        run: pnpm audit --prod --audit-level=critical
 
       - name: Check for known vulnerabilities
         run: |
-          pnpm audit --json > audit-report.json || true
+          pnpm audit --prod --audit-level=critical --json > audit-report.json
           cat audit-report.json
 
       - name: Upload audit report

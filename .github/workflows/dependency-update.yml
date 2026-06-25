@@ -32,7 +32,14 @@ jobs:
       - name: Check for outdated dependencies
         id: outdated
         run: |
-          pnpm outdated --format json > outdated.json 2>&1 || true
+          set +e
+          pnpm outdated --format json > outdated.json 2>&1
+          EXIT_CODE=$?
+          set -e
+          if [ "$EXIT_CODE" -gt 1 ]; then
+            cat outdated.json
+            exit "$EXIT_CODE"
+          fi
           if [ -s outdated.json ] && grep -q '"name"' outdated.json 2>/dev/null; then
             echo "has_updates=true" >> $GITHUB_OUTPUT
           else
@@ -114,7 +121,9 @@ jobs:
       - name: Run security audit
         id: audit
         run: |
-          pnpm audit --audit-level=critical > audit-output.txt 2>&1 || true
+          set +e
+          pnpm audit --audit-level=critical > audit-output.txt 2>&1
+          set -e
           if grep -q "critical" audit-output.txt 2>/dev/null; then
             echo "has_vulnerabilities=true" >> $GITHUB_OUTPUT
           else
@@ -123,19 +132,16 @@ jobs:
 
       - name: Attempt to fix security vulnerabilities
         if: steps.audit.outputs.has_vulnerabilities == 'true'
-        continue-on-error: true
         run: |
           pnpm update --latest --interactive=false
           pnpm install
 
       - name: Run type check after fixes
         if: steps.audit.outputs.has_vulnerabilities == 'true'
-        continue-on-error: true
         run: pnpm check
 
       - name: Run tests after fixes
         if: steps.audit.outputs.has_vulnerabilities == 'true'
-        continue-on-error: true
         env:
           RESEND_API_KEY: dummy_key_for_ci
           DATABASE_URL: mysql://dummy:dummy@localhost:3306/dummy
