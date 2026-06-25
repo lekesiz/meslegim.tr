@@ -235,11 +235,17 @@ export async function getStageById(stageId: number) {
   return result[0] || null;
 }
 
-// Question functions
 export async function getQuestionsByStage(stageId: number) {
   const db = await getDb();
   if (!db) return [];
   return await db.select().from(questions).where(eq(questions.stageId, stageId));
+}
+
+export async function getQuestionById(id: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(questions).where(eq(questions.id, id)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
 }
 
 // User stage functions
@@ -275,6 +281,17 @@ export async function getAllUserStages() {
   const db = await getDb();
   if (!db) return [];
   return await db.select().from(userStages);
+}
+
+export async function getUserStage(userId: number, stageId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  
+  const result = await db.select().from(userStages).where(
+    and(eq(userStages.userId, userId), eq(userStages.stageId, stageId))
+  ).limit(1);
+  
+  return result.length > 0 ? result[0] : undefined;
 }
 
 export async function getActiveStage(userId: number) {
@@ -1765,6 +1782,30 @@ export async function getLockedStagesForUser(userId: number) {
 }
 
 /**
+ * Get locked stages for multiple students in a single query (batch mode)
+ */
+export async function getLockedStagesForStudents(studentIds: number[]) {
+  const dbInstance = await getDb();
+  if (!dbInstance || studentIds.length === 0) return [];
+
+  return await dbInstance
+    .select({
+      id: userStages.id,
+      userId: userStages.userId,
+      stageId: userStages.stageId,
+      status: userStages.status,
+      unlockedAt: userStages.unlockedAt,
+      stageName: stages.name,
+      stageOrder: stages.order,
+      ageGroup: stages.ageGroup,
+    })
+    .from(userStages)
+    .innerJoin(stages, eq(userStages.stageId, stages.id))
+    .where(and(inArray(userStages.userId, studentIds), eq(userStages.status, 'locked')))
+    .orderBy(stages.order);
+}
+
+/**
  * Get all students with their locked stage counts (for admin overview)
  */
 export async function getStudentsWithLockedStages() {
@@ -1773,10 +1814,14 @@ export async function getStudentsWithLockedStages() {
 
   const allUsers = await getAllUsers();
   const students = allUsers.filter(u => u.role === 'student' && u.status === 'active');
+  if (students.length === 0) return [];
+
+  const studentIds = students.map(s => s.id);
+  const allLockedStages = await getLockedStagesForStudents(studentIds);
 
   const result = [];
   for (const student of students) {
-    const lockedStages = await getLockedStagesForUser(student.id);
+    const lockedStages = allLockedStages.filter(ls => ls.userId === student.id);
     if (lockedStages.length > 0) {
       result.push({
         userId: student.id,

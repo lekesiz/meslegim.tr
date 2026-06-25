@@ -1816,6 +1816,14 @@ export const appRouter = router({
           throw new TRPCError({ code: 'NOT_FOUND', message: 'Rapor bulunamadı' });
         }
         
+        // Verify access (unless admin/super_admin)
+        if (hasRole(ctx.user.role, 'mentor') && !hasRole(ctx.user.role, 'admin') && report.userId) {
+          const student = await db.getUserById(report.userId);
+          if (!student || student.mentorId !== ctx.user.id) {
+            throw new TRPCError({ code: 'FORBIDDEN', message: 'Yalnızca kendi öğrencilerinizin raporlarını onaylayabilirsiniz' });
+          }
+        }
+        
         // Approve or reject the report
         if (input.approved) {
           await db.approveReport(input.reportId, ctx.user.id);
@@ -1968,6 +1976,16 @@ export const appRouter = router({
     sendMessage: mentorProcedure
       .input(z.object({ receiverId: z.number(), message: z.string().min(1) }))
       .mutation(async ({ input, ctx }) => {
+        // Verify receiver is assigned to this mentor (unless admin)
+        if (hasRole(ctx.user.role, 'mentor') && !hasRole(ctx.user.role, 'admin')) {
+          const student = await db.getUserById(input.receiverId);
+          if (!student || student.mentorId !== ctx.user.id) {
+            throw new TRPCError({ 
+              code: 'FORBIDDEN', 
+              message: 'Yalnızca kendi öğrencilerinize mesaj gönderebilirsiniz' 
+            });
+          }
+        }
         return await db.sendMessage({
           senderId: ctx.user.id,
           receiverId: input.receiverId,
@@ -1978,12 +1996,32 @@ export const appRouter = router({
     getConversation: mentorProcedure
       .input(z.object({ otherUserId: z.number() }))
       .query(async ({ input, ctx }) => {
+        // Verify otherUser is assigned to this mentor (unless admin)
+        if (hasRole(ctx.user.role, 'mentor') && !hasRole(ctx.user.role, 'admin')) {
+          const student = await db.getUserById(input.otherUserId);
+          if (!student || student.mentorId !== ctx.user.id) {
+            throw new TRPCError({ 
+              code: 'FORBIDDEN', 
+              message: 'Konuşmayı görüntülemek için yetkiniz yok' 
+            });
+          }
+        }
         return await db.getConversation(ctx.user.id, input.otherUserId);
       }),
     
     markMessagesAsRead: mentorProcedure
       .input(z.object({ otherUserId: z.number() }))
       .mutation(async ({ input, ctx }) => {
+        // Verify otherUser is assigned to this mentor (unless admin)
+        if (hasRole(ctx.user.role, 'mentor') && !hasRole(ctx.user.role, 'admin')) {
+          const student = await db.getUserById(input.otherUserId);
+          if (!student || student.mentorId !== ctx.user.id) {
+            throw new TRPCError({ 
+              code: 'FORBIDDEN', 
+              message: 'Mesajları okundu olarak işaretlemek için yetkiniz yok' 
+            });
+          }
+        }
         await db.markMessagesAsRead(ctx.user.id, input.otherUserId);
         return { success: true };
       }),
@@ -2001,16 +2039,20 @@ export const appRouter = router({
       return await db.getMentorFeedbackStats(ctx.user.id);
     }),
 
-    // Get locked stages for mentor's own students
     getMyStudentsWithLockedStages: mentorProcedure.query(async ({ ctx }) => {
       if (hasRole(ctx.user.role, 'admin')) {
         return await db.getStudentsWithLockedStages();
       }
       // Mentor: only their assigned students
       const myStudents = await db.getStudentsByMentor(ctx.user.id);
+      if (myStudents.length === 0) return [];
+
+      const studentIds = myStudents.map(s => s.id);
+      const allLockedStages = await db.getLockedStagesForStudents(studentIds);
+
       const result = [];
       for (const student of myStudents) {
-        const lockedStages = await db.getLockedStagesForUser(student.id);
+        const lockedStages = allLockedStages.filter(ls => ls.userId === student.id);
         if (lockedStages.length > 0) {
           result.push({
             userId: student.id,
@@ -2195,6 +2237,17 @@ export const appRouter = router({
         answer: z.string(),
       }))
       .mutation(async ({ input, ctx }) => {
+        const question = await db.getQuestionById(input.questionId);
+        if (!question) {
+          throw new TRPCError({ code: 'NOT_FOUND', message: 'Soru bulunamadı' });
+        }
+        const userStage = await db.getUserStage(ctx.user.id, question.stageId);
+        if (!userStage || userStage.status !== 'active') {
+          throw new TRPCError({
+            code: 'FORBIDDEN',
+            message: 'Yalnızca aktif durumdaki etabın sorularını cevaplayabilirsiniz',
+          });
+        }
         await db.saveAnswer(ctx.user.id, input.questionId, input.answer);
         return { success: true };
       }),
@@ -2204,6 +2257,14 @@ export const appRouter = router({
       .mutation(async ({ input, ctx }) => {
         const { stageId } = input;
         const userId = ctx.user.id;
+        
+        const userStage = await db.getUserStage(userId, stageId);
+        if (!userStage || userStage.status !== 'active') {
+          throw new TRPCError({
+            code: 'FORBIDDEN',
+            message: 'Yalnızca aktif durumdaki etapları gönderebilirsiniz',
+          });
+        }
         
         // Validate all required questions are answered
         const questions = await db.getQuestionsByStage(stageId);
@@ -2365,6 +2426,9 @@ export const appRouter = router({
     sendMessage: studentProcedure
       .input(z.object({ receiverId: z.number(), message: z.string().min(1) }))
       .mutation(async ({ input, ctx }) => {
+        if (!ctx.user.mentorId || input.receiverId !== ctx.user.mentorId) {
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'Sadece atanan mentorunuza mesaj gönderebilirsiniz' });
+        }
         return await db.sendMessage({
           senderId: ctx.user.id,
           receiverId: input.receiverId,
@@ -2375,12 +2439,18 @@ export const appRouter = router({
     getConversation: studentProcedure
       .input(z.object({ otherUserId: z.number() }))
       .query(async ({ input, ctx }) => {
+        if (!ctx.user.mentorId || input.otherUserId !== ctx.user.mentorId) {
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'Yalnızca atanan mentorunuzla olan konuşmanızı görüntüleyebilirsiniz' });
+        }
         return await db.getConversation(ctx.user.id, input.otherUserId);
       }),
     
     markMessagesAsRead: studentProcedure
       .input(z.object({ otherUserId: z.number() }))
       .mutation(async ({ input, ctx }) => {
+        if (!ctx.user.mentorId || input.otherUserId !== ctx.user.mentorId) {
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'Yalnızca atanan mentorunuzdan gelen mesajları okundu olarak işaretleyebilirsiniz' });
+        }
         await db.markMessagesAsRead(ctx.user.id, input.otherUserId);
         return { success: true };
       }),
@@ -2398,6 +2468,15 @@ export const appRouter = router({
         comment: z.string().optional(),
       }))
       .mutation(async ({ input, ctx }) => {
+        if (!ctx.user.mentorId || input.mentorId !== ctx.user.mentorId) {
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'Yalnızca kendi mentorunuza geri bildirim gönderebilirsiniz' });
+        }
+        if (input.reportId) {
+          const report = await db.getReportById(input.reportId);
+          if (!report || report.userId !== ctx.user.id) {
+            throw new TRPCError({ code: 'BAD_REQUEST', message: 'Geçersiz rapor' });
+          }
+        }
         const feedback = await db.createFeedback({
           studentId: ctx.user.id,
           mentorId: input.mentorId,
@@ -2466,8 +2545,8 @@ export const appRouter = router({
       const userId = ctx.user.id;
       
       // Get all completed stages for this user
-      const allStages = await db.getAllUserStages();
-      const completedStages = allStages.filter(s => s.userId === userId && s.status === 'completed');
+      const allStages = await db.getUserStages(userId);
+      const completedStages = allStages.filter(s => s.status === 'completed');
       
       if (completedStages.length === 0) {
         return null;
@@ -2498,8 +2577,8 @@ export const appRouter = router({
       const userId = ctx.user.id;
       
       // Get all completed stages for this user
-      const allUserStages = await db.getAllUserStages();
-      const completedStages = allUserStages.filter(s => s.userId === userId && s.status === 'completed');
+      const allUserStages = await db.getUserStages(userId);
+      const completedStages = allUserStages.filter(s => s.status === 'completed');
       
       if (completedStages.length === 0) {
         return null;
@@ -2540,8 +2619,8 @@ export const appRouter = router({
       if (!user) throw new TRPCError({ code: 'NOT_FOUND', message: 'Kullanıcı bulunamadı' });
       
       // Get all completed stages
-      const allUserStages = await db.getAllUserStages();
-      const completedStages = allUserStages.filter(s => s.userId === userId && s.status === 'completed');
+      const allUserStages = await db.getUserStages(userId);
+      const completedStages = allUserStages.filter(s => s.status === 'completed');
       
       if (completedStages.length < 2) {
         throw new TRPCError({ code: 'BAD_REQUEST', message: 'Kapsamlı rapor için en az 2 etabı tamamlamanız gerekiyor' });

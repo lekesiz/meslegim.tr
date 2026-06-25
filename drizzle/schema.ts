@@ -34,6 +34,7 @@ export const users = mysqlTable("users", {
   statusIdx: index("status_idx").on(table.status),
   roleIdx: index("role_idx").on(table.role),
   mentorIdIdx: index("mentor_id_idx").on(table.mentorId),
+  schoolIdIdx: index("school_id_idx").on(table.schoolId),
 }));
 
 export type User = typeof users.$inferSelect;
@@ -70,7 +71,9 @@ export const questions = mysqlTable("questions", {
   order: int("order").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-});
+}, (table) => ({
+  stageIdIdx: index("stage_id_idx").on(table.stageId),
+}));
 
 export type Question = typeof questions.$inferSelect;
 export type InsertQuestion = typeof questions.$inferInsert;
@@ -85,7 +88,11 @@ export const answers = mysqlTable("answers", {
   answer: text("answer").notNull(), // JSON string or plain text depending on question type
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-});
+}, (table) => ({
+  userIdIdx: index("user_id_idx").on(table.userId),
+  questionIdIdx: index("question_id_idx").on(table.questionId),
+  userQuestionIdx: index("user_question_idx").on(table.userId, table.questionId),
+}));
 
 export type Answer = typeof answers.$inferSelect;
 export type InsertAnswer = typeof answers.$inferInsert;
@@ -131,7 +138,9 @@ export const reports = mysqlTable("reports", {
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 }, (table) => ({
   userIdIdx: index("user_id_idx").on(table.userId),
+  stageIdIdx: index("stage_id_idx").on(table.stageId),
   statusIdx: index("status_idx").on(table.status),
+  approvedByIdx: index("approved_by_idx").on(table.approvedBy),
 }));
 
 export type Report = typeof reports.$inferSelect;
@@ -463,6 +472,7 @@ export const schoolMentors = mysqlTable("school_mentors", {
   schoolIdIdx: index("sm_school_id_idx").on(table.schoolId),
   mentorIdIdx: index("sm_mentor_id_idx").on(table.mentorId),
   uniquePair: index("sm_unique_pair_idx").on(table.schoolId, table.mentorId),
+  assignedByIdx: index("sm_assigned_by_idx").on(table.assignedBy),
 }));
 export type SchoolMentor = typeof schoolMentors.$inferSelect;
 
@@ -491,6 +501,7 @@ export const promotionCodes = mysqlTable("promotion_codes", {
 }, (table) => ({
   codeIdx: index("promo_code_idx").on(table.code),
   activeIdx: index("promo_active_idx").on(table.isActive),
+  createdByIdx: index("promo_created_by_idx").on(table.createdBy),
 }));
 export type PromotionCode = typeof promotionCodes.$inferSelect;
 export type InsertPromotionCode = typeof promotionCodes.$inferInsert;
@@ -508,6 +519,7 @@ export const promotionCodeUsages = mysqlTable("promotion_code_usages", {
 }, (table) => ({
   promoIdIdx: index("pcu_promo_id_idx").on(table.promotionCodeId),
   userIdIdx: index("pcu_user_id_idx").on(table.userId),
+  purchaseIdIdx: index("pcu_purchase_id_idx").on(table.purchaseId),
 }));
 export type PromotionCodeUsage = typeof promotionCodeUsages.$inferSelect;
 
@@ -579,6 +591,7 @@ export const kpiAnomalies = mysqlTable("kpi_anomalies", {
   kpiNameIdx: index("ka_kpi_name_idx").on(table.kpiName),
   severityIdx: index("ka_severity_idx").on(table.severity),
   acknowledgedIdx: index("ka_acknowledged_idx").on(table.acknowledged),
+  acknowledgedByIdx: index("ka_acknowledged_by_idx").on(table.acknowledgedBy),
 }));
 export type KpiAnomaly = typeof kpiAnomalies.$inferSelect;
 export type InsertKpiAnomaly = typeof kpiAnomalies.$inferInsert;
