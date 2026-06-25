@@ -101,7 +101,7 @@ const faqCategories: FAQCategory[] = [
       },
       {
         question: "İade politikanız nedir?",
-        answer: "Satın aldığınız paketteki hiçbir etabı henüz tamamlamadıysanız, satın alma tarihinden itibaren 14 gün içinde tam iade talep edebilirsiniz. İade taleplerinizi destek@meslegim.tr adresine gönderebilirsiniz. Tamamlanmış etaplar için iade yapılamamaktadır."
+        answer: "Satın aldığınız paketteki hiçbir etabı henüz tamamlamadıysanız, satın alma tarihinden itibaren 14 gün içinde tam iade talep edebilirsiniz. İade taleplerinizi iletisim@meslegim.tr adresine gönderebilirsiniz. Tamamlanmış etaplar için iade yapılamamaktadır."
       },
       {
         question: "Promosyon kodu nasıl kullanılır?",
@@ -109,7 +109,7 @@ const faqCategories: FAQCategory[] = [
       },
       {
         question: "Kurumsal/okul indirimi var mı?",
-        answer: "Evet, okullar ve eğitim kurumları için özel kurumsal fiyatlandırma sunuyoruz. 50 ve üzeri öğrenci için toplu indirimler mevcuttur. Detaylı bilgi için destek@meslegim.tr adresinden bizimle iletişime geçebilirsiniz."
+        answer: "Evet, okullar ve eğitim kurumları için özel kurumsal fiyatlandırma sunuyoruz. 50 ve üzeri öğrenci için toplu indirimler mevcuttur. Detaylı bilgi için iletisim@meslegim.tr adresinden bizimle iletişime geçebilirsiniz."
       },
     ]
   },
@@ -163,7 +163,7 @@ const faqCategories: FAQCategory[] = [
       },
       {
         question: "Hesabımı silebilir miyim?",
-        answer: "Evet, KVKK kapsamındaki haklarınız gereği hesabınızı ve tüm verilerinizi kalıcı olarak sildirebilirsiniz. Bunun için destek@meslegim.tr adresine hesap silme talebinizi göndermeniz yeterlidir. Talebiniz 30 gün içinde işleme alınır."
+        answer: "Evet, KVKK kapsamındaki haklarınız gereği hesabınızı ve tüm verilerinizi kalıcı olarak sildirebilirsiniz. Bunun için iletisim@meslegim.tr adresine hesap silme talebinizi göndermeniz yeterlidir. Talebiniz 30 gün içinde işleme alınır."
       },
     ]
   },
@@ -187,7 +187,7 @@ const faqCategories: FAQCategory[] = [
     items: [
       {
         question: "Teknik bir sorunla karşılaştım, ne yapmalıyım?",
-        answer: "Teknik sorunlar için destek@meslegim.tr adresine e-posta gönderebilir veya İletişim sayfamızdaki formu doldurabilirsiniz. Sorununuzu detaylı bir şekilde açıklamanız (ekran görüntüsü, hata mesajı vb.) çözüm sürecini hızlandıracaktır. Destek ekibimiz en geç 24 saat içinde yanıt verir."
+        answer: "Teknik sorunlar için iletisim@meslegim.tr adresine e-posta gönderebilir veya İletişim sayfamızdaki formu doldurabilirsiniz. Sorununuzu detaylı bir şekilde açıklamanız (ekran görüntüsü, hata mesajı vb.) çözüm sürecini hızlandıracaktır. Destek ekibimiz en geç 24 saat içinde yanıt verir."
       },
       {
         question: "Şifremi unuttum, ne yapmalıyım?",
@@ -279,10 +279,10 @@ export default function SSS() {
             <Button 
               variant="outline" 
               size="lg"
-              onClick={() => window.location.href = 'mailto:destek@meslegim.tr'}
+              onClick={() => window.location.href = 'mailto:iletisim@meslegim.tr'}
               className="border-white text-white hover:bg-white/10"
             >
-              destek@meslegim.tr
+              iletisim@meslegim.tr
             </Button>
           </div>
         </div>

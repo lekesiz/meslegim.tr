@@ -2,7 +2,7 @@ import { Resend } from 'resend';
 
 // Resend API configuration
 const resend = new Resend(process.env.RESEND_API_KEY);
-const FROM_EMAIL = process.env.EMAIL_FROM || 'Meslegim.tr <bilgi@meslegim.tr>';
+const FROM_EMAIL = process.env.EMAIL_FROM || 'Meslegim.tr <iletisim@meslegim.tr>';
 
 export interface EmailOptions {
   to: string;

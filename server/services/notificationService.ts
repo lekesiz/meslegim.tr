@@ -15,7 +15,7 @@ const VAPID_PRIVATE_KEY = process.env.VAPID_PRIVATE_KEY || '';
 
 if (VAPID_PUBLIC_KEY && VAPID_PRIVATE_KEY) {
   webpush.setVapidDetails(
-    'mailto:noreply@meslegim.tr',
+    'mailto:iletisim@meslegim.tr',
     VAPID_PUBLIC_KEY,
     VAPID_PRIVATE_KEY
   );

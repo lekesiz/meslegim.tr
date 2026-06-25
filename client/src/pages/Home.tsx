@@ -692,7 +692,7 @@ export default function Home() {
             <div>
               <h4 className="font-semibold mb-4 text-sm text-[var(--gold-light)]">Destek</h4>
               <p className="text-sm text-white/40">Destek almak için iletişim sayfamızı kullanabilir ya da e-posta atabilirsiniz:</p>
-              <p className="text-sm text-[var(--gold-light)] mt-2 font-medium">info@meslegim.tr</p>
+              <p className="text-sm text-[var(--gold-light)] mt-2 font-medium">iletisim@meslegim.tr</p>
             </div>
           </div>
           <div className="border-t border-white/[0.06] pt-6 text-center text-xs text-white/25">
